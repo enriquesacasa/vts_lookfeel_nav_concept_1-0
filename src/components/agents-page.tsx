@@ -144,8 +144,8 @@ export function AgentsPage({ className }: AgentsPageProps) {
           <Sparkle fill="currentColor" className="h-7 w-7 sm:h-10 sm:w-10 text-primary" />
         </div>
         <div className="flex-1">
-          <p className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground mb-2">AI · Automation</p>
-          <h1 className="font-inter text-2xl sm:text-4xl font-medium text-foreground leading-tight mb-1.5 tracking-wide">VTS Agents</h1>
+          <p className="text-[11px] font-medium uppercasest text-muted-foreground mb-2">AI · Automation</p>
+          <h1 className="font-inter text-2xl sm:text-4xl font-medium text-foreground leading-tight mb-1.5">VTS Agents</h1>
           <p className="text-sm text-muted-foreground">Ask anything about your portfolio. Agents research, analyze, and act on your behalf.</p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
@@ -214,7 +214,7 @@ export function AgentsPage({ className }: AgentsPageProps) {
         <div className={cn(cardBase, "md:col-span-2")}>
           <div className="flex items-start justify-between gap-4 mb-6">
             <div>
-              <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">History</p>
+              <p className="text-[10px] font-medium uppercasest text-muted-foreground mb-1">History</p>
               <h2 className="text-xl font-medium text-foreground">Recent Agent Runs</h2>
             </div>
             <Button variant="outline" size="sm" className="shrink-0 text-primary border-primary bg-transparent hover:bg-primary/10 hover:text-primary dark:bg-white/8 dark:border-white/25 dark:text-white dark:hover:bg-white/15">
@@ -254,7 +254,7 @@ export function AgentsPage({ className }: AgentsPageProps) {
         <div className={cn(cardBase)}>
           <div className="flex items-start justify-between gap-4 mb-6">
             <div>
-              <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">Capabilities</p>
+              <p className="text-[10px] font-medium uppercasest text-muted-foreground mb-1">Capabilities</p>
               <h2 className="text-xl font-medium text-foreground">Agent Types</h2>
             </div>
           </div>

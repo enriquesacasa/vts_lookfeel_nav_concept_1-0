@@ -29,11 +29,11 @@ const BuildingHeader = React.forwardRef<HTMLDivElement, BuildingHeaderProps>(
         )}
         <div className="flex-1">
           {city && (
-            <p className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground mb-2">
+            <p className="text-[11px] font-medium uppercasest text-muted-foreground mb-2">
               {city}
             </p>
           )}
-          <h1 className="font-inter text-2xl sm:text-4xl font-medium text-foreground leading-tight mb-1.5 tracking-wide">
+          <h1 className="font-inter text-2xl sm:text-4xl font-medium text-foreground leading-tight mb-1.5">
             {name}
           </h1>
           <p className="text-sm text-muted-foreground">{address}</p>
@@ -53,7 +53,7 @@ const BuildingHeader = React.forwardRef<HTMLDivElement, BuildingHeaderProps>(
       <div className="flex flex-wrap divide-x divide-border/60 bg-white/70 dark:bg-white/8 backdrop-blur-md">
         {stats.map(({ label, value, accent }) => (
           <div key={label} className="flex-1 min-w-[90px] px-4 py-4">
-            <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">
+            <p className="text-[10px] font-medium uppercasest text-muted-foreground mb-1">
               {label}
             </p>
             <p className={cn(
