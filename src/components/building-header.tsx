@@ -33,7 +33,7 @@ const BuildingHeader = React.forwardRef<HTMLDivElement, BuildingHeaderProps>(
               {city}
             </p>
           )}
-          <h1 className="font-inter text-2xl sm:text-4xl font-semibold text-foreground leading-tight mb-1.5">
+          <h1 className="font-inter text-2xl sm:text-4xl font-semibold tracking-tight text-foreground leading-tight mb-1.5">
             {name}
           </h1>
           <p className="text-sm text-muted-foreground">{address}</p>
