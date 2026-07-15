@@ -214,7 +214,7 @@ export function AgentsPage({ className }: AgentsPageProps) {
         <div className={cn(cardBase, "md:col-span-2")}>
           <div className="flex items-start justify-between gap-4 mb-6">
             <div>
-              <p className="text-[10px] font-medium uppercasest text-muted-foreground mb-1">History</p>
+              <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">History</p>
               <h2 className="text-xl font-medium text-foreground">Recent Agent Runs</h2>
             </div>
             <Button variant="outline" size="sm" className="shrink-0 text-primary border-primary bg-transparent hover:bg-primary/10 hover:text-primary dark:bg-white/8 dark:border-white/25 dark:text-white dark:hover:bg-white/15">
@@ -254,7 +254,7 @@ export function AgentsPage({ className }: AgentsPageProps) {
         <div className={cn(cardBase)}>
           <div className="flex items-start justify-between gap-4 mb-6">
             <div>
-              <p className="text-[10px] font-medium uppercasest text-muted-foreground mb-1">Capabilities</p>
+              <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">Capabilities</p>
               <h2 className="text-xl font-medium text-foreground">Agent Types</h2>
             </div>
           </div>
