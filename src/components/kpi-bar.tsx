@@ -21,7 +21,7 @@ const KpiBar = React.forwardRef<HTMLDivElement, KpiBarProps>(
           <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">
             {kpi.label}
           </p>
-          <p className="text-lg font-medium text-foreground">{kpi.value}</p>
+          <p className="text-lg font-semibold text-foreground">{kpi.value}</p>
         </div>
       ))}
     </div>

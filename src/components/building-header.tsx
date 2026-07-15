@@ -57,7 +57,7 @@ const BuildingHeader = React.forwardRef<HTMLDivElement, BuildingHeaderProps>(
               {label}
             </p>
             <p className={cn(
-              "text-lg font-medium truncate",
+              "text-lg font-semibold truncate",
               accent ? "text-primary" : "text-foreground"
             )}>
               {value}
