@@ -123,14 +123,6 @@ export function ProfileShell({ onExit, assets, portfolios, selectedAssetId, onAs
     else setSearch("")
   }, [dropdownOpen])
 
-  const toggleSection = (id: string) => {
-    setOpenSections(prev => {
-      const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
-      return next
-    })
-  }
-
   const selectedAsset = assets.find(a => a.id === selectedAssetId)
 
   const allFlat = NAV_ITEMS.flatMap(i => [i, ...(i.children ?? [])])
