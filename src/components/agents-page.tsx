@@ -144,7 +144,7 @@ export function AgentsPage({ className }: AgentsPageProps) {
           <Sparkle fill="currentColor" className="h-7 w-7 sm:h-10 sm:w-10 text-primary" />
         </div>
         <div className="flex-1">
-          <p className="text-[11px] font-medium uppercasest text-muted-foreground mb-2">AI · Automation</p>
+          <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">AI · Automation</p>
           <h1 className="font-inter text-2xl sm:text-4xl font-semibold text-foreground leading-tight mb-1.5">VTS Agents</h1>
           <p className="text-sm text-muted-foreground">Ask anything about your portfolio. Agents research, analyze, and act on your behalf.</p>
         </div>

@@ -29,7 +29,7 @@ const BuildingHeader = React.forwardRef<HTMLDivElement, BuildingHeaderProps>(
         )}
         <div className="flex-1">
           {city && (
-            <p className="text-[11px] font-medium uppercasest text-muted-foreground mb-2">
+            <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">
               {city}
             </p>
           )}
