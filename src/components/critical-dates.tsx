@@ -2,7 +2,7 @@ import * as React from "react"
 import { cn, cardBase } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
-import { ChevronUp, ChevronDown, ChevronsUpDown, Sparkles } from "lucide-react"
+import { ChevronUp, ChevronDown, ChevronsUpDown, Sparkle } from "lucide-react"
 
 type DateCategory = "expiring" | "renewal" | "options" | "all"
 type SortKey = "tenant" | "type" | "space" | "date" | "monthsOut"
@@ -37,9 +37,9 @@ function urgency(months: number): "urgent" | "soon" | "later" {
 }
 
 const PILL: Record<ReturnType<typeof urgency>, string> = {
-  urgent: "bg-rose-500/10 text-rose-600 dark:bg-rose-500/15 dark:text-rose-400",
-  soon:   "bg-orange-500/10 text-orange-600 dark:bg-orange-500/15 dark:text-orange-400",
-  later:  "bg-primary/10 text-primary dark:bg-primary/15",
+  urgent: "bg-destructive/10 text-destructive",
+  soon:   "bg-warning/10 text-warning",
+  later:  "bg-primary/10 text-primary",
 }
 
 function fmtMonths(n: number) {
@@ -64,22 +64,22 @@ function AIButton({ onClick }: AIButtonProps) {
       <TooltipTrigger render={<span />}>
         <button
           onClick={onClick}
-          className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-primary/10 hover:bg-primary text-primary hover:text-white transition-all duration-150 shrink-0"
+          className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-primary/10 hover:bg-primary text-primary hover:text-primary-foreground transition-all duration-150 shrink-0"
         >
-          <Sparkles className="h-3 w-3" />
+          <Sparkle fill="currentColor" className="h-3 w-3" />
         </button>
       </TooltipTrigger>
       <TooltipContent
         side="top"
-        className="bg-[oklch(0.22_0.18_278)] text-white border-transparent font-medium"
-        arrowClassName="fill-[oklch(0.22_0.18_278)]"
+        className="bg-sidebar text-sidebar-foreground border-transparent font-medium"
+        arrowClassName="fill-sidebar"
       >
         <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-1.5 font-semibold text-white">
-            <Sparkles className="h-3 w-3" />
+          <div className="flex items-center gap-1.5 font-medium text-sidebar-foreground">
+            <Sparkle fill="currentColor" className="h-3 w-3" />
             Run Agent
           </div>
-          <p className="text-white/70 font-normal">Research this date and surface next steps</p>
+          <p className="text-sidebar-foreground/70 font-normal">Research this date and surface next steps</p>
         </div>
       </TooltipContent>
     </Tooltip>
@@ -113,7 +113,7 @@ const CriticalDates = React.forwardRef<HTMLDivElement, CriticalDatesProps>(
         <th
           onClick={() => handleSort(col)}
           className={cn(
-            "pb-2 text-left text-[10px] font-bold uppercase tracking-widest cursor-pointer select-none whitespace-nowrap",
+            "pb-2 text-left text-[10px] font-medium uppercase tracking-widest cursor-pointer select-none whitespace-nowrap",
             sortKey === col ? "text-foreground/80" : "text-foreground/50",
             "hover:text-foreground/80 transition-colors",
             cls
@@ -132,8 +132,8 @@ const CriticalDates = React.forwardRef<HTMLDivElement, CriticalDatesProps>(
         {/* Header */}
         <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">Upcoming 12 Mo</p>
-            <h2 className="text-xl font-semibold text-foreground">Critical Dates</h2>
+            <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">Upcoming 12 Mo</p>
+            <h2 className="text-xl font-medium text-foreground">Critical Dates</h2>
           </div>
           <Button
             variant="outline"
@@ -187,7 +187,7 @@ const CriticalDates = React.forwardRef<HTMLDivElement, CriticalDatesProps>(
                 const u = urgency(d.monthsOut)
                 return (
                   <tr key={i} title="View Lease" className={cn("cursor-pointer hover:bg-muted/40 dark:hover:bg-white/4 transition-colors", i > 0 && "border-t border-border/40")}>
-                    <td className="py-2.5 text-sm font-semibold text-foreground whitespace-nowrap">
+                    <td className="py-2.5 text-sm font-medium text-foreground whitespace-nowrap">
                       {d.tenant}
                     </td>
                     <td className="py-2.5 pl-3 text-sm font-medium text-muted-foreground whitespace-nowrap">
@@ -200,7 +200,7 @@ const CriticalDates = React.forwardRef<HTMLDivElement, CriticalDatesProps>(
                       {d.date}
                     </td>
                     <td className="py-2.5 pl-3 text-right whitespace-nowrap">
-                      <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold tabular-nums", PILL[u])}>
+                      <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium tabular-nums", PILL[u])}>
                         {fmtMonths(d.monthsOut)}
                       </span>
                     </td>

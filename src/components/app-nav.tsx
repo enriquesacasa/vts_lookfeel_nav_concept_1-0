@@ -27,7 +27,7 @@ import {
   BookOpen,
   Share2,
   MessageSquare,
-  Sparkles,
+  Sparkle,
   Activity,
   BellRing,
   UserCircle,
@@ -36,6 +36,7 @@ import {
   Menu,
   X as XIcon,
   Search,
+  Archive,
   type LucideIcon,
 } from "lucide-react"
 
@@ -61,15 +62,15 @@ const portfolioItems: NavItem[] = [
 ]
 
 const navStructure: NavItem[] = [
-  { id: "dashboard",    label: "Dashboard",    icon: LayoutGrid },
+  { id: "dashboard",    label: "Overview",     icon: LayoutGrid },
   { id: "stacking",     label: "Stacking Plan", icon: Layers, children: [
     { id: "spaces",     label: "Spaces",        icon: SquareStack },
   ]},
   { id: "leases",       label: "Leases",        icon: FileText, children: [
     { id: "critical-dates",    label: "Critical Dates",    icon: CalendarDays },
     { id: "options-rights",    label: "Options & Rights",  icon: ShieldCheck },
-    { id: "tenants",           label: "Tenants",           icon: Users },
   ]},
+  { id: "tenants",      label: "Tenants",       icon: Users },
   { id: "deals",        label: "Deals",         icon: Handshake, children: [
     { id: "deal-tasks",        label: "Deal Tasks",        icon: ClipboardList },
     { id: "tenant-coord",      label: "Tenant Coordination", icon: UsersRound },
@@ -80,6 +81,7 @@ const navStructure: NavItem[] = [
     { id: "appraisals", label: "Appraisals",    icon: Scale },
     { id: "comps",      label: "Comps",         icon: BarChart2 },
   ]},
+  { id: "doc-vault",    label: "Doc Vault",     icon: Archive },
   { id: "div-insights", label: "",              divider: true },
   { id: "market",       label: "Market",        icon: Globe, children: [
     { id: "buildings",          label: "Buildings",            icon: Building2 },
@@ -98,10 +100,9 @@ const navStructure: NavItem[] = [
   ]},
 ]
 
-const aiItem = { id: "ai", label: "VTS Agents", icon: Sparkles, accent: true, small: false }
+const aiItem = { id: "ai", label: "VTS Agents", icon: Sparkle, accent: true, small: false }
 
 const bottomItems = [
-  { id: "abstraction",label: "Abstraction Management",  icon: FileText,    accent: false, small: true },
   { id: "activity",   label: "Activity Feed",            icon: Activity,    accent: false, small: true },
   { id: "reminders",  label: "Reminders",                icon: BellRing,    accent: false, small: true },
   { id: "avatar",     label: "Profile",                  icon: UserCircle,  accent: false, small: true },
@@ -186,7 +187,7 @@ interface DesktopNavProps {
 }
 
 function DesktopNav({ className, onCollapsedChange, assets, portfolios, selectedAssetId, onAssetChange, onLogoClick, onNavItemClick, activePage }: DesktopNavProps) {
-  const [collapsed, setCollapsed] = React.useState(true)
+  const [collapsed, setCollapsed] = React.useState(false)
   const [active, setActive] = React.useState(activePage ?? "dashboard")
 
   React.useEffect(() => {
@@ -196,6 +197,9 @@ function DesktopNav({ className, onCollapsedChange, assets, portfolios, selected
   const [dropdownOpen, setDropdownOpen] = React.useState(false)
   const [search, setSearch] = React.useState("")
   const selectorRef = React.useRef<HTMLDivElement>(null)
+  const toggleSection = (id: string) => {
+    setOpenSections(prev => prev.has(id) ? new Set() : new Set([id]))
+  }
   const searchRef = React.useRef<HTMLInputElement>(null)
 
   React.useEffect(() => {
@@ -217,14 +221,6 @@ function DesktopNav({ className, onCollapsedChange, assets, portfolios, selected
   const toggle = (val: boolean) => {
     setCollapsed(val)
     onCollapsedChange?.(val)
-  }
-
-  const toggleSection = (id: string) => {
-    setOpenSections(prev => {
-      const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
-      return next
-    })
   }
 
   const selectedAsset = assets?.find(a => a.id === selectedAssetId)
@@ -296,7 +292,7 @@ function DesktopNav({ className, onCollapsedChange, assets, portfolios, selected
                 <div
                   role="button"
                   tabIndex={0}
-                  aria-label={selectedAsset?.name ?? "Select Asset"}
+                  aria-label={selectedAssetId === "all" ? "All Assets" : (selectedAsset?.name ?? "Select Asset")}
                   onClick={() => setDropdownOpen(v => !v)}
                   onKeyDown={e => (e.key === "Enter" || e.key === " ") && setDropdownOpen(v => !v)}
                   className={cn(
@@ -308,7 +304,7 @@ function DesktopNav({ className, onCollapsedChange, assets, portfolios, selected
                 </div>
               </TooltipTrigger>
               <TooltipContent side="right" className="bg-[oklch(0.22_0.18_278)] text-white border-transparent text-xs font-medium" arrowClassName="fill-[oklch(0.22_0.18_278)]">
-                {selectedAsset?.name ?? "Select Asset"}
+                {selectedAssetId === "all" ? "All Assets" : (selectedAsset?.name ?? "Select Asset")}
               </TooltipContent>
             </Tooltip>
           ) : (
@@ -324,7 +320,7 @@ function DesktopNav({ className, onCollapsedChange, assets, portfolios, selected
             >
               <Building2 className="h-3.5 w-3.5 shrink-0 text-sidebar-foreground/60" />
               <span className="text-xs font-medium text-sidebar-foreground flex-1">
-                {selectedAsset?.name ?? "Select Asset"}
+                {selectedAssetId === "all" ? "All Assets" : (selectedAsset?.name ?? "Select Asset")}
               </span>
               <ChevronDown className={cn("h-3.5 w-3.5 shrink-0 text-sidebar-foreground/60 transition-transform duration-200", dropdownOpen && "rotate-180")} />
             </div>
@@ -363,10 +359,31 @@ function DesktopNav({ className, onCollapsedChange, assets, portfolios, selected
                   </div>
 
                   <div className="max-h-[360px] overflow-y-auto">
+                    {/* All Assets option */}
+                    {!q && (
+                      <div className="px-1.5 pt-2 pb-1">
+                        <div
+                          role="button"
+                          tabIndex={0}
+                          onClick={() => select("all")}
+                          onKeyDown={e => (e.key === "Enter" || e.key === " ") && select("all")}
+                          className={cn(
+                            "flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer transition-colors",
+                            selectedAssetId === "all" ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-sidebar-foreground hover:bg-sidebar-accent/60"
+                          )}
+                        >
+                          <div className="h-6 w-6 rounded-md bg-sidebar-primary/20 flex items-center justify-center shrink-0">
+                            <Layers className="h-3.5 w-3.5 text-sidebar-primary" />
+                          </div>
+                          <span className="text-xs font-medium">All Assets</span>
+                          {selectedAssetId === "all" && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-sidebar-primary shrink-0" />}
+                        </div>
+                      </div>
+                    )}
                     {/* Portfolios section */}
                     {filteredPortfolios.length > 0 && (
                       <div className="px-1.5 pt-2 pb-1">
-                        <p className="px-2 pb-1 text-[10px] font-semibold uppercase tracking-widest text-sidebar-foreground/50">Portfolios</p>
+                        <p className="px-2 pb-1 text-[10px] font-medium uppercase tracking-widest text-sidebar-foreground/50">Portfolios</p>
                         {filteredPortfolios.map(p => (
                           <div
                             key={p.id}
@@ -383,7 +400,7 @@ function DesktopNav({ className, onCollapsedChange, assets, portfolios, selected
                               <Layers className="h-3.5 w-3.5 text-sidebar-primary" />
                             </div>
                             <div className="flex flex-col min-w-0">
-                              <span className="text-xs font-semibold truncate">{p.name}</span>
+                              <span className="text-xs font-medium truncate">{p.name}</span>
                               <span className="text-[10px] text-sidebar-foreground/60">{p.assetIds.length} properties</span>
                             </div>
                             {selectedAssetId === p.id && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-sidebar-primary shrink-0" />}
@@ -395,7 +412,7 @@ function DesktopNav({ className, onCollapsedChange, assets, portfolios, selected
                     {/* Assets section */}
                     {filteredAssets.length > 0 && (
                       <div className="px-1.5 pt-2 pb-1.5">
-                        <p className="px-2 pb-1 text-[10px] font-semibold uppercase tracking-widest text-sidebar-foreground/50">Properties</p>
+                        <p className="px-2 pb-1 text-[10px] font-medium uppercase tracking-widest text-sidebar-foreground/50">Properties</p>
                         {filteredAssets.map(asset => {
                           const isSelected = asset.id === selectedAssetId
                           return (
@@ -412,7 +429,7 @@ function DesktopNav({ className, onCollapsedChange, assets, portfolios, selected
                             >
                               <Building2 className="h-3.5 w-3.5 shrink-0 opacity-50" />
                               <div className="flex flex-col min-w-0">
-                                <span className="text-xs font-semibold truncate">{asset.name}</span>
+                                <span className="text-xs font-medium truncate">{asset.name}</span>
                                 <span className="text-[10px] text-sidebar-foreground/60 truncate">{asset.address}</span>
                               </div>
                               {isSelected && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-sidebar-primary shrink-0" />}
@@ -434,6 +451,15 @@ function DesktopNav({ className, onCollapsedChange, assets, portfolios, selected
       )}
 
       <Separator className="mb-3 bg-sidebar-border" />
+
+      {/* VTS Agents */}
+      <NavRow
+        key={aiItem.id}
+        {...aiItem}
+        active={active === aiItem.id}
+        collapsed={collapsed}
+        onClick={() => { setActive(aiItem.id); onNavItemClick?.(aiItem.id) }}
+      />
 
       {/* Main nav */}
       <div className="flex flex-col gap-0.5 flex-1 overflow-y-auto">
@@ -480,6 +506,7 @@ function DesktopNav({ className, onCollapsedChange, assets, portfolios, selected
                     setActive(item.id)
                     onNavItemClick?.(item.id)
                     if (hasChildren) toggleSection(item.id)
+                    else setOpenSections(new Set())
                   }}
                 />
               )}
@@ -492,20 +519,13 @@ function DesktopNav({ className, onCollapsedChange, assets, portfolios, selected
                     active={active === child.id}
                     collapsed={false}
                     sub
-                    onClick={() => { setActive(child.id); onNavItemClick?.(child.id) }}
+                    onClick={() => { setActive(child.id); onNavItemClick?.(child.id); setOpenSections(new Set([item.id])) }}
                   />
                 </div>
               ))}
             </React.Fragment>
           )
         })}
-        <NavRow
-          key={aiItem.id}
-          {...aiItem}
-          active={active === aiItem.id}
-          collapsed={collapsed}
-          onClick={() => { setActive(aiItem.id); onNavItemClick?.(aiItem.id) }}
-        />
       </div>
 
       <Separator className="my-3 bg-sidebar-border" />
@@ -560,11 +580,7 @@ function MobileNav({ onLogoClick, onNavItemClick, activePage, assets, portfolios
   }
 
   const toggleSection = (id: string) => {
-    setOpenSections(prev => {
-      const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
-      return next
-    })
+    setOpenSections(prev => prev.has(id) ? new Set() : new Set([id]))
   }
 
   const selectedAsset = assets?.find(a => a.id === selectedAssetId)
@@ -623,8 +639,8 @@ function MobileNav({ onLogoClick, onNavItemClick, activePage, assets, portfolios
                   assetDropdownOpen ? "bg-sidebar-accent/70" : "bg-sidebar-accent/40 hover:bg-sidebar-accent/60"
                 )}>
                 <Building2 className="h-3.5 w-3.5 shrink-0 text-sidebar-foreground/60" />
-                <span className="text-xs font-medium text-sidebar-foreground flex-1 truncate">
-                  {selectedAsset?.name ?? "Select Asset"}
+                <span className="text-xs font-medium text-sidebar-foreground flex-1">
+                  {selectedAssetId === "all" ? "All Assets" : (selectedAsset?.name ?? "Select Asset")}
                 </span>
                 <ChevronDown className={cn("h-3.5 w-3.5 shrink-0 text-sidebar-foreground/60 transition-transform duration-200", assetDropdownOpen && "rotate-180")} />
               </div>
@@ -646,9 +662,21 @@ function MobileNav({ onLogoClick, onNavItemClick, activePage, assets, portfolios
                         </div>
                       </div>
                       <div className="max-h-[280px] overflow-y-auto">
+                        {!q && (
+                          <div className="px-1.5 pt-2 pb-1">
+                            <div role="button" tabIndex={0} onClick={() => select("all")} onKeyDown={e => (e.key === "Enter" || e.key === " ") && select("all")}
+                              className={cn("flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer transition-colors", selectedAssetId === "all" ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-sidebar-foreground hover:bg-sidebar-accent/60")}>
+                              <div className="h-6 w-6 rounded-md bg-sidebar-primary/20 flex items-center justify-center shrink-0">
+                                <Layers className="h-3.5 w-3.5 text-sidebar-primary" />
+                              </div>
+                              <span className="text-xs font-medium">All Assets</span>
+                              {selectedAssetId === "all" && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-sidebar-primary shrink-0" />}
+                            </div>
+                          </div>
+                        )}
                         {filteredPortfolios.length > 0 && (
                           <div className="px-1.5 pt-2 pb-1">
-                            <p className="px-2 pb-1 text-[10px] font-semibold uppercase tracking-widest text-sidebar-foreground/50">Portfolios</p>
+                            <p className="px-2 pb-1 text-[10px] font-medium uppercase tracking-widest text-sidebar-foreground/50">Portfolios</p>
                             {filteredPortfolios.map(p => (
                               <div key={p.id} role="button" tabIndex={0} onClick={() => select(p.id)} onKeyDown={e => (e.key === "Enter" || e.key === " ") && select(p.id)}
                                 className={cn("flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer transition-colors", selectedAssetId === p.id ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-sidebar-foreground hover:bg-sidebar-accent/60")}>
@@ -656,7 +684,7 @@ function MobileNav({ onLogoClick, onNavItemClick, activePage, assets, portfolios
                                   <Layers className="h-3.5 w-3.5 text-sidebar-primary" />
                                 </div>
                                 <div className="flex flex-col min-w-0">
-                                  <span className="text-xs font-semibold truncate">{p.name}</span>
+                                  <span className="text-xs font-medium truncate">{p.name}</span>
                                   <span className="text-[10px] text-sidebar-foreground/60">{p.assetIds.length} properties</span>
                                 </div>
                                 {selectedAssetId === p.id && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-sidebar-primary shrink-0" />}
@@ -666,13 +694,13 @@ function MobileNav({ onLogoClick, onNavItemClick, activePage, assets, portfolios
                         )}
                         {filteredAssets.length > 0 && (
                           <div className="px-1.5 pt-2 pb-1.5">
-                            <p className="px-2 pb-1 text-[10px] font-semibold uppercase tracking-widest text-sidebar-foreground/50">Properties</p>
+                            <p className="px-2 pb-1 text-[10px] font-medium uppercase tracking-widest text-sidebar-foreground/50">Properties</p>
                             {filteredAssets.map(asset => (
                               <div key={asset.id} role="button" tabIndex={0} onClick={() => select(asset.id)} onKeyDown={e => (e.key === "Enter" || e.key === " ") && select(asset.id)}
                                 className={cn("flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer transition-colors", asset.id === selectedAssetId ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-sidebar-foreground hover:bg-sidebar-accent/60")}>
                                 <Building2 className="h-3.5 w-3.5 shrink-0 opacity-50" />
                                 <div className="flex flex-col min-w-0">
-                                  <span className="text-xs font-semibold truncate">{asset.name}</span>
+                                  <span className="text-xs font-medium truncate">{asset.name}</span>
                                   <span className="text-[10px] text-sidebar-foreground/60 truncate">{asset.address}</span>
                                 </div>
                                 {asset.id === selectedAssetId && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-sidebar-primary shrink-0" />}

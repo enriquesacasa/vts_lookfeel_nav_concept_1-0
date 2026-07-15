@@ -45,17 +45,17 @@ const OccupancyCard = React.forwardRef<HTMLDivElement, OccupancyCardProps>(
     const vacantPct = 100 - occupiedPct
 
     const TrendIcon = occupancyTrend === "up" ? TrendingUp : occupancyTrend === "down" ? TrendingDown : Minus
-    const trendColor = occupancyTrend === "up" ? "text-emerald-500" : occupancyTrend === "down" ? "text-rose-500" : "text-muted-foreground"
+    const trendColor = occupancyTrend === "up" ? "text-success" : occupancyTrend === "down" ? "text-destructive" : "text-muted-foreground"
 
     return (
       <div ref={ref} className={cn(cardBase, "flex flex-col gap-5", className)}>
 
         {/* Section 1: Current Occupancy */}
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-2">Occupancy</p>
+          <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-2">Occupancy</p>
           <div className="flex items-end justify-between mb-2">
             <div>
-              <span className="text-3xl font-bold text-foreground">{occupiedPct}%</span>
+              <span className="text-3xl font-medium text-foreground">{occupiedPct}%</span>
               <span className="text-sm text-muted-foreground ml-1.5">occupied</span>
             </div>
             <div className={cn("flex items-center gap-1 text-xs font-medium mb-1", trendColor)}>
@@ -77,14 +77,14 @@ const OccupancyCard = React.forwardRef<HTMLDivElement, OccupancyCardProps>(
 
         {/* Section 2: Upcoming Move-Ins & Move-Outs */}
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-2">Upcoming Move-Ins & Move-Outs</p>
+          <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-2">Upcoming Move-Ins & Move-Outs</p>
           <div className="flex flex-col gap-1.5">
             {moveEvents.map((e, i) => (
               <div key={i} className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2 min-w-0">
                   <span className={cn(
                     "shrink-0 h-1.5 w-1.5 rounded-full",
-                    e.type === "move-in" ? "bg-emerald-500" : "bg-rose-500"
+                    e.type === "move-in" ? "bg-success" : "bg-destructive"
                   )} />
                   <span className="text-xs font-medium text-foreground truncate">{e.tenant}</span>
                 </div>
@@ -101,7 +101,7 @@ const OccupancyCard = React.forwardRef<HTMLDivElement, OccupancyCardProps>(
 
         {/* Section 3: Vacant Spaces */}
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-2">Vacant Spaces</p>
+          <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-2">Vacant Spaces</p>
           <div className="flex flex-col gap-1.5">
             {vacantSpaces.map((v, i) => (
               <div key={i} className="flex items-center justify-between gap-2">
@@ -109,8 +109,8 @@ const OccupancyCard = React.forwardRef<HTMLDivElement, OccupancyCardProps>(
                 <div className="flex items-center gap-2 shrink-0 text-[11px] text-muted-foreground tabular-nums">
                   <span>{fmt(v.sf)} sf</span>
                   <span className={cn(
-                    "text-[10px] font-semibold",
-                    v.daysVacant > 180 ? "text-rose-500" : v.daysVacant > 90 ? "text-orange-500" : "text-muted-foreground"
+                    "text-[10px] font-medium",
+                    v.daysVacant > 180 ? "text-destructive" : v.daysVacant > 90 ? "text-warning" : "text-muted-foreground"
                   )}>{v.daysVacant} d</span>
                 </div>
               </div>
@@ -122,7 +122,7 @@ const OccupancyCard = React.forwardRef<HTMLDivElement, OccupancyCardProps>(
 
         {/* Section 4: Near-Term Lease Expirations */}
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-2">Near-Term Expirations</p>
+          <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-2">Near-Term Expirations</p>
           <div className="flex flex-col gap-1.5">
             {expirations.map((e, i) => (
               <div key={i} className="flex items-center justify-between gap-2">

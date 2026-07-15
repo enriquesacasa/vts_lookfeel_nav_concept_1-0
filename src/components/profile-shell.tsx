@@ -1,8 +1,8 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 import {
-  LayoutGrid, Layers, FileText, Handshake, Wallet, Scale, BarChart2, Calculator,
-  Globe, TrendingUp, Sparkles, BellRing, Activity, UserCircle,
+  LayoutGrid, Layers, FileText, Handshake, Wallet, Scale, BarChart2, Calculator, Archive,
+  Globe, TrendingUp, Sparkle, BellRing, Activity, UserCircle,
   ChevronRight, ChevronDown, Building2, CalendarDays, Users,
   SquareStack, ShieldCheck, ClipboardList, UsersRound, ListChecks,
   MapPin, BookOpen, Share2, MessageSquare, FileBarChart, BellRing as BellRingIcon,
@@ -23,15 +23,15 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { id: "dashboard",    label: "Dashboard",     icon: LayoutGrid },
+  { id: "dashboard",    label: "Overview",      icon: LayoutGrid },
   { id: "stacking",     label: "Stacking Plan", icon: Layers, children: [
     { id: "spaces",     label: "Spaces",         icon: SquareStack },
   ]},
   { id: "leases",       label: "Leases",         icon: FileText, children: [
     { id: "critical-dates",   label: "Critical Dates",    icon: CalendarDays },
     { id: "options-rights",   label: "Options & Rights",  icon: ShieldCheck },
-    { id: "tenants",          label: "Tenants",           icon: Users },
   ]},
+  { id: "tenants",      label: "Tenants",        icon: Users },
   { id: "deals",        label: "Deals",          icon: Handshake, children: [
     { id: "deal-tasks",       label: "Deal Tasks",          icon: ClipboardList },
     { id: "tenant-coord",     label: "Tenant Coordination", icon: UsersRound },
@@ -42,6 +42,7 @@ const NAV_ITEMS: NavItem[] = [
     { id: "appraisals", label: "Appraisals",       icon: Scale },
     { id: "comps",      label: "Comps",             icon: BarChart2 },
   ]},
+  { id: "doc-vault",    label: "Doc Vault",        icon: Archive },
   { id: "div-insights", label: "",                 icon: LayoutGrid, divider: true },
   { id: "market",       label: "Market",           icon: Globe, children: [
     { id: "buildings",           label: "Buildings",             icon: Building2 },
@@ -60,7 +61,7 @@ const NAV_ITEMS: NavItem[] = [
   ]},
 ]
 
-const AI_ITEM = { id: "ai", label: "VTS Agents", icon: Sparkles }
+const AI_ITEM = { id: "ai", label: "VTS Agents", icon: Sparkle }
 
 const BOTTOM_ITEMS = [
   { id: "activity",    label: "Activity Feed", icon: Activity },
@@ -73,7 +74,7 @@ const BOTTOM_ITEMS = [
 function PlaceholderPage({ label, icon: Icon }: { label: string; icon: React.ElementType }) {
   return (
     <div className="p-8 space-y-6">
-      <h1 className="text-2xl font-semibold text-foreground flex items-center gap-2.5">
+      <h1 className="text-2xl font-medium text-foreground flex items-center gap-2.5">
         <Icon className="h-6 w-6 text-[#5528FF]" />
         {label}
       </h1>
@@ -122,12 +123,9 @@ export function ProfileShell({ onExit, assets, portfolios, selectedAssetId, onAs
     else setSearch("")
   }, [dropdownOpen])
 
-  const toggleSection = (id: string) =>
-    setOpenSections(prev => {
-      const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
-      return next
-    })
+  const toggleSection = (id: string) => {
+    setOpenSections(prev => prev.has(id) ? new Set() : new Set([id]))
+  }
 
   const selectedAsset = assets.find(a => a.id === selectedAssetId)
 
@@ -253,8 +251,8 @@ export function ProfileShell({ onExit, assets, portfolios, selectedAssetId, onAs
               )}
             >
               <Building2 className="h-3.5 w-3.5 shrink-0 text-white/50" />
-              <span className="text-xs font-medium text-white/80 flex-1 text-left truncate">
-                {selectedAsset?.name ?? "Select Asset"}
+              <span className="text-xs font-medium text-white/80 flex-1 text-left">
+                {selectedAssetId === "all" ? "All Assets" : (selectedAsset?.name ?? "All Assets")}
               </span>
               <ChevronDown className={cn("h-3 w-3 shrink-0 text-white/40 transition-transform", dropdownOpen && "rotate-180")} />
             </button>
@@ -287,9 +285,20 @@ export function ProfileShell({ onExit, assets, portfolios, selectedAssetId, onAs
                     </div>
                   </div>
                   <div className="max-h-[320px] overflow-y-auto">
+                    {!q && (
+                      <div className="px-1.5 pt-2 pb-1">
+                        <button onClick={() => select("all")}
+                          className={cn("w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg transition-colors text-left",
+                            selectedAssetId === "all" ? "bg-[#5528FF] text-white" : "text-white/70 hover:bg-white/8 hover:text-white"
+                          )}>
+                          <Layers className="h-3.5 w-3.5 shrink-0 opacity-60" />
+                          <p className="text-xs font-medium">All Assets</p>
+                        </button>
+                      </div>
+                    )}
                     {filteredPortfolios.length > 0 && (
                       <div className="px-1.5 pt-2 pb-1">
-                        <p className="px-2 pb-1 text-[10px] font-semibold uppercase tracking-widest text-white/35">Portfolios</p>
+                        <p className="px-2 pb-1 text-[10px] font-medium uppercase tracking-widest text-white/35">Portfolios</p>
                         {filteredPortfolios.map(p => (
                           <button key={p.id} onClick={() => select(p.id)}
                             className={cn("w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg transition-colors text-left",
@@ -297,7 +306,7 @@ export function ProfileShell({ onExit, assets, portfolios, selectedAssetId, onAs
                             )}>
                             <Layers className="h-3.5 w-3.5 shrink-0 opacity-60" />
                             <div className="min-w-0">
-                              <p className="text-xs font-semibold truncate">{p.name}</p>
+                              <p className="text-xs font-medium truncate">{p.name}</p>
                               <p className="text-[10px] text-white/45">{p.assetIds.length} properties</p>
                             </div>
                           </button>
@@ -306,7 +315,7 @@ export function ProfileShell({ onExit, assets, portfolios, selectedAssetId, onAs
                     )}
                     {filteredAssets.length > 0 && (
                       <div className="px-1.5 pt-2 pb-1.5">
-                        <p className="px-2 pb-1 text-[10px] font-semibold uppercase tracking-widest text-white/35">Properties</p>
+                        <p className="px-2 pb-1 text-[10px] font-medium uppercase tracking-widest text-white/35">Properties</p>
                         {filteredAssets.map(a => (
                           <button key={a.id} onClick={() => select(a.id)}
                             className={cn("w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg transition-colors text-left",
@@ -314,7 +323,7 @@ export function ProfileShell({ onExit, assets, portfolios, selectedAssetId, onAs
                             )}>
                             <Building2 className="h-3.5 w-3.5 shrink-0 opacity-50" />
                             <div className="min-w-0">
-                              <p className="text-xs font-semibold truncate">{a.name}</p>
+                              <p className="text-xs font-medium truncate">{a.name}</p>
                               <p className="text-[10px] text-white/45 truncate">{a.address}</p>
                             </div>
                           </button>
@@ -355,11 +364,12 @@ export function ProfileShell({ onExit, assets, portfolios, selectedAssetId, onAs
                     onClick={() => {
                       handleNavClick(item.id)
                       if (hasChildren) toggleSection(item.id)
+                      else setOpenSections(new Set())
                     }}
                   />
                   {!collapsed && isOpen && item.children?.map(child => (
                     <div key={child.id} className="pl-3">
-                      <SidebarRow item={child} active={activePage === child.id} collapsed={false} onClick={() => handleNavClick(child.id)} />
+                      <SidebarRow item={child} active={activePage === child.id} collapsed={false} onClick={() => { handleNavClick(child.id); setOpenSections(new Set([item.id])) }} />
                     </div>
                   ))}
                 </React.Fragment>
@@ -416,7 +426,7 @@ function SidebarRow({
         "w-full flex items-center gap-2.5 rounded-lg text-sm transition-all text-left",
         collapsed ? "justify-center p-2" : "px-2.5 py-1.5",
         active
-          ? "bg-[#5528FF] text-white font-semibold"
+          ? "bg-[#5528FF] text-white font-medium"
           : accent ? "text-white/50 hover:text-white hover:bg-white/8"
                    : "text-white/50 hover:text-white hover:bg-white/8"
       )}

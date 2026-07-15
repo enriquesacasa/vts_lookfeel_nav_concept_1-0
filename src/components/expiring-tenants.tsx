@@ -16,7 +16,7 @@ interface ExpiringTenantsProps {
 
 function YearTick({ x, y, payload }: any) {
   return (
-    <text x={x} y={y} dy={10} textAnchor="middle" style={{ fill: "rgba(255,255,255,0.5)", fontSize: 9 }}>
+    <text x={x} y={y} dy={10} textAnchor="middle" style={{ fill: "var(--color-sidebar-foreground)", opacity: 0.5, fontSize: 9 }}>
       {payload.value}
     </text>
   )
@@ -28,10 +28,10 @@ function BarLabel({ x, y, width, value: _value, index, data: bars }: any) {
   const cx = x + width / 2
   return (
     <g>
-      <text x={cx} y={y - 18} textAnchor="middle" style={{ fill: "rgba(255,255,255,0.95)", fontSize: 12, fontWeight: 500 }}>
+      <text x={cx} y={y - 18} textAnchor="middle" style={{ fill: "var(--color-sidebar-foreground)", fontSize: 12, fontWeight: 500 }}>
         {bar.sf}K
       </text>
-      <text x={cx} y={y - 5} textAnchor="middle" style={{ fill: "rgba(255,255,255,0.55)", fontSize: 9 }}>
+      <text x={cx} y={y - 5} textAnchor="middle" style={{ fill: "var(--color-sidebar-foreground)", opacity: 0.55, fontSize: 9 }}>
         {bar.revenue}
       </text>
     </g>
@@ -41,12 +41,11 @@ function BarLabel({ x, y, width, value: _value, index, data: bars }: any) {
 const ExpiringTenants = React.forwardRef<HTMLDivElement, ExpiringTenantsProps>(
   ({ data, className }, ref) => {
     return (
-      <div ref={ref} className={cn(cardBase, "flex flex-col border-transparent", className)}
-        style={{ background: "oklch(0.22 0.18 278)" }}>
+      <div ref={ref} className={cn(cardBase, "flex flex-col border-transparent bg-sidebar", className)}>
         <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2 mb-4 shrink-0">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-widest mb-1" style={{ color: "rgba(255,255,255,0.75)" }}>Leases</p>
-            <h2 className="text-xl font-semibold" style={{ color: "rgba(255,255,255,0.95)" }}>Expiring Tenants by SF</h2>
+            <p className="text-[10px] font-medium uppercase tracking-widest mb-1 text-sidebar-foreground/75">Leases</p>
+            <h2 className="text-xl font-medium text-sidebar-foreground">Expiring Tenants by SF</h2>
           </div>
           <Button variant="outline" size="sm" className="shrink-0 text-white/80 border-white/25 bg-transparent hover:bg-white/10 hover:text-white dark:bg-white/8 dark:border-white/25 dark:text-white dark:hover:bg-white/15">View Expiring Leases</Button>
         </div>
@@ -57,7 +56,7 @@ const ExpiringTenants = React.forwardRef<HTMLDivElement, ExpiringTenantsProps>(
             <XAxis
               dataKey="year"
               tick={<YearTick />}
-              axisLine={{ stroke: "rgba(255,255,255,0.12)" }}
+              axisLine={{ stroke: "var(--color-sidebar-border)" }}
               tickLine={false}
             />
             <YAxis hide domain={[0, 100]} />
@@ -67,7 +66,7 @@ const ExpiringTenants = React.forwardRef<HTMLDivElement, ExpiringTenantsProps>(
               isAnimationActive={false}
             >
               {data.map((_, i) => (
-                <Cell key={i} style={{ fill: "rgba(255,255,255,0.85)" }} />
+                <Cell key={i} style={{ fill: "var(--color-sidebar-foreground)", fillOpacity: 0.85 }} />
               ))}
               <LabelList content={(props: any) => <BarLabel {...props} data={data} />} />
             </Bar>

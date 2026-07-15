@@ -85,7 +85,7 @@ function ChartPatternDefs() {
         <rect width="2.5" height="5" fill="var(--color-primary)" fillOpacity={0.85} />
       </pattern>
       <pattern id="stripe-exp-proj" patternUnits="userSpaceOnUse" width="5" height="5" patternTransform="rotate(45)">
-        <rect width="2.5" height="5" fill="#ef4444" fillOpacity={0.85} />
+        <rect width="2.5" height="5" fill="var(--color-destructive)" fillOpacity={0.85} />
       </pattern>
     </defs>
   )
@@ -115,7 +115,7 @@ function ChartTooltip({ active, payload, label }: any) {
   const noi    = d.noiActual ?? d.noiProjected
   return (
     <div className="rounded-lg border border-border/60 bg-background/95 backdrop-blur-sm px-3 py-2.5 shadow-lg text-xs space-y-1.5 min-w-[200px]">
-      <p className="font-semibold text-foreground text-sm">{label} 2026{isProj ? " · Projected" : ""}</p>
+      <p className="font-medium text-foreground text-sm">{label} 2026{isProj ? " · Projected" : ""}</p>
       <div className="space-y-1">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-1.5">
@@ -127,10 +127,10 @@ function ChartTooltip({ active, payload, label }: any) {
         {exp != null && (
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-1.5">
-              <span className="h-2 w-2 rounded-sm shrink-0 bg-[#ef4444]" />
+              <span className="h-2 w-2 rounded-sm shrink-0 bg-destructive" />
               <span className="text-muted-foreground">Expenses</span>
             </div>
-            <span className="font-medium tabular-nums text-[#ef4444]">{fmtM(exp)} <span className="text-muted-foreground font-normal">/ {fmtM(d.expBudgetLine)}</span></span>
+            <span className="font-medium tabular-nums text-destructive">{fmtM(exp)} <span className="text-muted-foreground font-normal">/ {fmtM(d.expBudgetLine)}</span></span>
           </div>
         )}
         {noi != null && (
@@ -138,10 +138,10 @@ function ChartTooltip({ active, payload, label }: any) {
             <div className="h-px bg-border/50 my-0.5" />
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-1.5">
-                <span className="h-2 w-2 rounded-full shrink-0 bg-emerald-500" />
+                <span className="h-2 w-2 rounded-full shrink-0 bg-success" />
                 <span className="text-muted-foreground">NOI</span>
               </div>
-              <span className="font-semibold tabular-nums text-emerald-500">{fmtM(noi)} <span className="text-muted-foreground font-normal">/ {fmtM(d.noiBudget)}</span></span>
+              <span className="font-medium tabular-nums text-success">{fmtM(noi)} <span className="text-muted-foreground font-normal">/ {fmtM(d.noiBudget)}</span></span>
             </div>
           </>
         )}
@@ -166,12 +166,12 @@ function BridgeRow({ item }: { item: RevenueItem }) {
     <>
       {item.separatorBefore && <tr><td colSpan={4}><div className="h-px bg-border/50 my-1" /></td></tr>}
       <tr>
-        <td className={cn("py-1.5 pr-3 text-sm whitespace-nowrap", item.bold ? "font-semibold text-foreground" : "text-muted-foreground")}>
+        <td className={cn("py-1.5 pr-3 text-sm whitespace-nowrap", item.bold ? "font-medium text-foreground" : "text-muted-foreground")}>
           {item.label}
         </td>
         <td className="py-1.5 pr-4 text-right text-sm tabular-nums text-muted-foreground whitespace-nowrap">{fmtM(item.budget)}</td>
         <td className="py-1.5 pr-4 text-right text-sm tabular-nums text-foreground whitespace-nowrap">{fmtM(item.actual)}</td>
-        <td className={cn("py-1.5 text-right text-sm font-semibold tabular-nums whitespace-nowrap", isGood ? "text-emerald-500" : "text-rose-500")}>
+        <td className={cn("py-1.5 text-right text-sm font-medium tabular-nums whitespace-nowrap", isGood ? "text-success" : "text-destructive")}>
           {delta > 0 ? "+" : ""}{fmtM(delta)} <span className="opacity-70">({fmtPct(pctVal)})</span>
         </td>
       </tr>
@@ -199,8 +199,8 @@ const FinancialPerformance = React.forwardRef<HTMLDivElement, FinancialPerforman
         {/* Header */}
         <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2 mb-5">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">2026</p>
-            <h2 className="text-xl font-semibold text-foreground">Financial Performance</h2>
+            <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">2026</p>
+            <h2 className="text-xl font-medium text-foreground">Financial Performance</h2>
           </div>
           <Button variant="outline" size="sm" className="shrink-0 text-primary border-primary bg-transparent hover:bg-primary/10 hover:text-primary dark:bg-white/8 dark:border-white/25 dark:text-white dark:hover:bg-white/15">
             View Full Report
@@ -210,10 +210,10 @@ const FinancialPerformance = React.forwardRef<HTMLDivElement, FinancialPerforman
         {/* Chart */}
         <ResponsiveContainer width="100%" height={200}>
           <ComposedChart data={CHART_DATA_NOI} margin={{ top: 6, right: 4, bottom: 0, left: 0 }} barCategoryGap="30%" barGap={2}>
-            <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="rgba(128,128,128,0.12)" />
-            <XAxis dataKey="month" tick={{ fontSize: 14, fill: "rgba(128,128,128,0.7)" }} axisLine={false} tickLine={false} />
+            <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="var(--color-border)" strokeOpacity={0.5} />
+            <XAxis dataKey="month" tick={{ fontSize: 14, fill: "var(--color-muted-foreground)" }} axisLine={false} tickLine={false} />
             <YAxis hide domain={[0, "auto"]} />
-            <Tooltip content={<ChartTooltip />} cursor={{ fill: "rgba(128,128,128,0.06)" }} />
+            <Tooltip content={<ChartTooltip />} cursor={{ fill: "var(--color-muted)", fillOpacity: 0.4 }} />
             <Customized component={ChartPatternDefs} />
             <Bar dataKey="revValue" name="Revenue" barSize={20} radius={[2,2,0,0]} isAnimationActive={false}>
               {CHART_DATA_NOI.map((m, i) => (
@@ -223,13 +223,13 @@ const FinancialPerformance = React.forwardRef<HTMLDivElement, FinancialPerforman
             <Bar dataKey="revBudget"    name="Revenue Budget"  barSize={20} radius={[2,2,0,0]} isAnimationActive={false} fill="var(--color-primary)" fillOpacity={0.18} />
             <Bar dataKey="expValue"     name="Total Expenses"  barSize={20} radius={[2,2,0,0]} isAnimationActive={false}>
               {CHART_DATA_NOI.map((m, i) => (
-                <Cell key={i} fill={m.expIsProjected ? "url(#stripe-exp-proj)" : "#ef4444"} />
+                <Cell key={i} fill={m.expIsProjected ? "url(#stripe-exp-proj)" : "var(--color-destructive)"} />
               ))}
             </Bar>
-            <Bar dataKey="expBudgetLine" name="Expenses Budget" barSize={20} radius={[2,2,0,0]} isAnimationActive={false} fill="#ef4444" fillOpacity={0.18} />
-            <Line dataKey="noiActual"    name="NOI Actual"    type="monotone" stroke="#10b981" strokeWidth={2.5} dot={{ fill: "#10b981", r: 3, strokeWidth: 0 }} activeDot={{ r: 4 }} isAnimationActive={false} connectNulls={false} />
-            <Line dataKey="noiProjected" name="NOI Projected" type="monotone" stroke="#34d399" strokeWidth={2} strokeDasharray="4 3" dot={false} isAnimationActive={false} connectNulls={false} />
-            <Line dataKey="noiBudget"    name="NOI Budget"    type="monotone" stroke="#f59e0b" strokeWidth={2} dot={false} isAnimationActive={false} />
+            <Bar dataKey="expBudgetLine" name="Expenses Budget" barSize={20} radius={[2,2,0,0]} isAnimationActive={false} fill="var(--color-destructive)" fillOpacity={0.18} />
+            <Line dataKey="noiActual"    name="NOI Actual"    type="monotone" stroke="var(--color-success)" strokeWidth={2.5} dot={{ fill: "var(--color-success)", r: 3, strokeWidth: 0 }} activeDot={{ r: 4 }} isAnimationActive={false} connectNulls={false} />
+            <Line dataKey="noiProjected" name="NOI Projected" type="monotone" stroke="var(--color-success)" strokeWidth={2} strokeDasharray="4 3" dot={false} isAnimationActive={false} connectNulls={false} />
+            <Line dataKey="noiBudget"    name="NOI Budget"    type="monotone" stroke="var(--color-warning)" strokeWidth={2} dot={false} isAnimationActive={false} />
           </ComposedChart>
         </ResponsiveContainer>
 
@@ -255,14 +255,14 @@ const FinancialPerformance = React.forwardRef<HTMLDivElement, FinancialPerforman
             <span className="text-sm text-muted-foreground">Revenue Budget</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="h-2.5 w-2.5 rounded-sm shrink-0 bg-[#ef4444]" />
+            <span className="h-2.5 w-2.5 rounded-sm shrink-0 bg-destructive" />
             <span className="text-sm text-muted-foreground">Expenses Actual</span>
           </div>
           <div className="flex items-center gap-1.5">
             <svg width="10" height="10" className="shrink-0 rounded-sm overflow-hidden">
               <defs>
                 <pattern id="leg-exp-proj" patternUnits="userSpaceOnUse" width="5" height="5" patternTransform="rotate(45)">
-                  <rect width="2.5" height="5" fill="#ef4444" />
+                  <rect width="2.5" height="5" fill="var(--color-destructive)" />
                 </pattern>
               </defs>
               <rect width="10" height="10" fill="url(#leg-exp-proj)" />
@@ -270,19 +270,19 @@ const FinancialPerformance = React.forwardRef<HTMLDivElement, FinancialPerforman
             <span className="text-sm text-muted-foreground">Expenses Projected</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="h-2.5 w-2.5 rounded-sm shrink-0" style={{ background: "#ef4444", opacity: 0.22 }} />
+            <span className="h-2.5 w-2.5 rounded-sm shrink-0 bg-destructive/20" />
             <span className="text-sm text-muted-foreground">Expenses Budget</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="h-0.5 w-4 shrink-0 rounded-full bg-emerald-500" />
+            <span className="h-0.5 w-4 shrink-0 rounded-full bg-success" />
             <span className="text-sm text-muted-foreground">NOI Actual</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="h-0.5 w-4 shrink-0 rounded-full bg-[#34d399]" style={{ opacity: 0.8 }} />
+            <span className="h-0.5 w-4 shrink-0 rounded-full bg-success/70" />
             <span className="text-sm text-muted-foreground">NOI Projected</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="h-0.5 w-4 shrink-0 rounded-full bg-[#f59e0b]" />
+            <span className="h-0.5 w-4 shrink-0 rounded-full bg-warning" />
             <span className="text-sm text-muted-foreground">NOI Budget</span>
           </div>
         </div>
@@ -293,10 +293,10 @@ const FinancialPerformance = React.forwardRef<HTMLDivElement, FinancialPerforman
             <table className="w-full min-w-[400px] text-sm border-collapse">
               <thead>
                 <tr className="border-b border-border/50">
-                  <th className="pb-2 text-left text-[10px] font-bold uppercase tracking-widest text-foreground/40 w-full">Line Item</th>
-                  <th className="pb-2 pr-4 text-right text-[10px] font-bold uppercase tracking-widest text-foreground/40 whitespace-nowrap">Budget</th>
-                  <th className="pb-2 pr-4 text-right text-[10px] font-bold uppercase tracking-widest text-foreground/40 whitespace-nowrap">Actual</th>
-                  <th className="pb-2 text-right text-[10px] font-bold uppercase tracking-widest text-foreground/40 whitespace-nowrap">vs Budget</th>
+                  <th className="pb-2 text-left text-[10px] font-medium uppercase tracking-widest text-foreground/40 w-full">Line Item</th>
+                  <th className="pb-2 pr-4 text-right text-[10px] font-medium uppercase tracking-widest text-foreground/40 whitespace-nowrap">Budget</th>
+                  <th className="pb-2 pr-4 text-right text-[10px] font-medium uppercase tracking-widest text-foreground/40 whitespace-nowrap">Actual</th>
+                  <th className="pb-2 text-right text-[10px] font-medium uppercase tracking-widest text-foreground/40 whitespace-nowrap">vs Budget</th>
                 </tr>
               </thead>
               <tbody>

@@ -82,7 +82,7 @@ const VACANT_SPACES: VacantSpace[] = [
 ]
 
 export default function App() {
-  const [navCollapsed, setNavCollapsed] = React.useState(true)
+  const [navCollapsed, setNavCollapsed] = React.useState(false)
   const [selectedAssetId, setSelectedAssetId] = React.useState("vts-tower")
   const [currentPage, setCurrentPage] = React.useState("dashboard")
   const [profileMode, setProfileMode] = React.useState(false)
@@ -101,7 +101,7 @@ export default function App() {
     "stacking": "Stacking Plan", "spaces": "Spaces",
     "leases": "Leases", "critical-dates": "Critical Dates", "options-rights": "Options & Rights", "tenants": "Tenants",
     "deals": "Deals", "deal-tasks": "Deal Tasks", "tenant-coord": "Tenant Coordination", "requirements": "Requirements",
-    "planning": "Planning", "budgets": "Budgets", "appraisals": "Appraisals", "comps": "Comps",
+    "planning": "Planning", "budgets": "Budgets", "appraisals": "Appraisals", "comps": "Comps", "doc-vault": "Doc Vault",
     "market": "Market", "buildings": "Buildings", "listings": "Listings", "tourbooks": "My Tourbooks",
     "shares": "My Shares", "marketing-analytics": "Marketing Analytics", "inquiries": "Inquiries",
     "insights": "Insights", "leasing-activity": "Leasing Activity Report", "portfolio-dashboards": "Portfolio Dashboards",
@@ -117,7 +117,7 @@ export default function App() {
           <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center mb-5">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-primary opacity-60"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 21V9"/></svg>
           </div>
-          <h1 className="text-2xl font-semibold text-foreground mb-2">{PAGE_LABELS[page]}</h1>
+          <h1 className="text-2xl font-medium text-foreground mb-2">{PAGE_LABELS[page]}</h1>
           <p className="text-sm text-muted-foreground max-w-xs">This page is a placeholder. Content coming soon.</p>
         </div>
       )
@@ -151,7 +151,7 @@ export default function App() {
   if (profileMode) {
     return (
       <ProfileShell
-        onExit={() => { setProfileMode(false); setCurrentPage("dashboard"); setNavCollapsed(true) }}
+        onExit={() => { setProfileMode(false); setCurrentPage("dashboard"); setNavCollapsed(false) }}
         assets={ASSETS}
         portfolios={PORTFOLIOS}
         selectedAssetId={selectedAssetId}

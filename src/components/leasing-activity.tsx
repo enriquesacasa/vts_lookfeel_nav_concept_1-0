@@ -2,7 +2,7 @@ import * as React from "react"
 import { cn, cardBase } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
-import { Sparkles, ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react"
+import { Sparkle, ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react"
 
 export interface Deal {
   tenant: string
@@ -35,9 +35,9 @@ const STAGE_ORDER = ["Proposal", "LOI", "Lease Out", "Executed"] as const
 const STATUS_ORDER: Deal["status"][] = ["at-risk", "stalled", "active"]
 
 const STATUS_PILL: Record<Deal["status"], string> = {
-  active:    "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400",
-  stalled:   "bg-orange-500/10 text-orange-600 dark:bg-orange-500/15 dark:text-orange-400",
-  "at-risk": "bg-rose-500/10 text-rose-600 dark:bg-rose-500/15 dark:text-rose-400",
+  active:    "bg-success/10 text-success",
+  stalled:   "bg-warning/10 text-warning",
+  "at-risk": "bg-destructive/10 text-destructive",
 }
 
 const STATUS_LABEL: Record<Deal["status"], string> = {
@@ -55,7 +55,7 @@ function RentDelta({ base, budget }: { base: number; budget: number }) {
   return (
     <div className="text-right tabular-nums">
       <div className="text-sm font-medium text-foreground">${base.toFixed(2)}</div>
-      <div className={cn("text-[10px] font-semibold", over ? "text-emerald-500" : "text-rose-500")}>
+      <div className={cn("text-[10px] font-medium", over ? "text-success" : "text-destructive")}>
         {over ? "+" : ""}{pct}% vs ${budget.toFixed(2)}
       </div>
     </div>
@@ -105,7 +105,7 @@ const LeasingActivity = React.forwardRef<HTMLDivElement, LeasingActivityProps>(
         <th
           onClick={() => handleSort(col)}
           className={cn(
-            "pb-2 text-[10px] font-bold uppercase tracking-widest cursor-pointer select-none whitespace-nowrap transition-colors",
+            "pb-2 text-[10px] font-medium uppercase tracking-widest cursor-pointer select-none whitespace-nowrap transition-colors",
             right ? "text-right pl-3" : "text-left",
             sortKey === col ? "text-foreground/80" : "text-foreground/50",
             "hover:text-foreground/80",
@@ -124,15 +124,15 @@ const LeasingActivity = React.forwardRef<HTMLDivElement, LeasingActivityProps>(
       <div ref={ref} className={cn(cardBase, className)}>
         <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2 mb-6">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">Pipeline</p>
-            <h2 className="text-xl font-semibold text-foreground">Leasing Activity</h2>
+            <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">Pipeline</p>
+            <h2 className="text-xl font-medium text-foreground">Leasing Activity</h2>
           </div>
           <Button variant="outline" size="sm" className="shrink-0 text-primary border-primary bg-transparent hover:bg-primary/10 hover:text-primary dark:bg-white/8 dark:border-white/25 dark:text-white dark:hover:bg-white/15">
             View All Deals
           </Button>
         </div>
 
-        <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-3">Active Deals</p>
+        <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-3">Active Deals</p>
         <table className="w-full text-sm border-collapse">
           <thead>
             <tr className="border-b-2 border-border/60">
@@ -147,7 +147,7 @@ const LeasingActivity = React.forwardRef<HTMLDivElement, LeasingActivityProps>(
           <tbody>
             {sorted.map((d, i) => (
               <tr key={i} className={cn("cursor-pointer hover:bg-muted/40 dark:hover:bg-white/4 transition-colors", i > 0 && "border-t border-border/40")}>
-                <td className="py-2.5 font-semibold text-foreground text-sm whitespace-nowrap">{d.tenant}</td>
+                <td className="py-2.5 font-medium text-foreground text-sm whitespace-nowrap">{d.tenant}</td>
                 <td className="py-2.5 pl-3 text-sm text-muted-foreground whitespace-nowrap">
                   <div>{d.space}</div>
                   <div className="text-[10px]">{fmtSf(d.sf)}</div>
@@ -166,7 +166,7 @@ const LeasingActivity = React.forwardRef<HTMLDivElement, LeasingActivityProps>(
                   <div className="text-[10px] text-muted-foreground mt-0.5">{d.stage}</div>
                 </td>
                 <td className="py-2.5 pl-3">
-                  <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold", STATUS_PILL[d.status])}>
+                  <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium", STATUS_PILL[d.status])}>
                     {STATUS_LABEL[d.status]}
                   </span>
                 </td>
@@ -178,22 +178,22 @@ const LeasingActivity = React.forwardRef<HTMLDivElement, LeasingActivityProps>(
                     <TooltipTrigger render={<span />}>
                       <button
                         onClick={e => e.stopPropagation()}
-                        className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-primary/10 hover:bg-primary text-primary hover:text-white transition-all duration-150 shrink-0"
+                        className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-primary/10 hover:bg-primary text-primary hover:text-primary-foreground transition-all duration-150 shrink-0"
                       >
-                        <Sparkles className="h-3 w-3" />
+                        <Sparkle fill="currentColor" className="h-3 w-3" />
                       </button>
                     </TooltipTrigger>
                     <TooltipContent
                       side="top"
-                      className="bg-[oklch(0.22_0.18_278)] text-white border-transparent font-medium"
-                      arrowClassName="fill-[oklch(0.22_0.18_278)]"
+                      className="bg-sidebar text-sidebar-foreground border-transparent font-medium"
+                      arrowClassName="fill-sidebar"
                     >
                       <div className="flex flex-col gap-1">
-                        <div className="flex items-center gap-1.5 font-semibold text-white">
-                          <Sparkles className="h-3 w-3" />
+                        <div className="flex items-center gap-1.5 font-medium text-sidebar-foreground">
+                          <Sparkle fill="currentColor" className="h-3 w-3" />
                           Run Agent
                         </div>
-                        <p className="text-white/70 font-normal">Analyze this deal and suggest next steps</p>
+                        <p className="text-sidebar-foreground/70 font-normal">Analyze this deal and suggest next steps</p>
                       </div>
                     </TooltipContent>
                   </Tooltip>

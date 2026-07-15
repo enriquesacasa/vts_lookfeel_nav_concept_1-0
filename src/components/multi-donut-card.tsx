@@ -31,8 +31,8 @@ const MultiDonutCard = React.forwardRef<HTMLDivElement, MultiDonutCardProps>(
         className
       )}>
         <div className="mb-5">
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">{eyebrow}</p>
-          <h2 className="text-xl font-semibold text-foreground">{title}</h2>
+          <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">{eyebrow}</p>
+          <h2 className="text-xl font-medium text-foreground">{title}</h2>
         </div>
 
         <div className="flex items-center gap-4">
@@ -60,7 +60,7 @@ const MultiDonutCard = React.forwardRef<HTMLDivElement, MultiDonutCardProps>(
               </Pie>
             </PieChart>
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-              <span className="text-[12px] font-bold text-foreground leading-none">{centerLabel}</span>
+              <span className="text-[12px] font-medium text-foreground leading-none">{centerLabel}</span>
               {centerSub && (
                 <span className="text-[8px] text-muted-foreground mt-0.5">{centerSub}</span>
               )}
@@ -74,7 +74,7 @@ const MultiDonutCard = React.forwardRef<HTMLDivElement, MultiDonutCardProps>(
                   <span className={cn("h-2 w-2 rounded-full shrink-0", s.dotClass)} />
                   <span className="text-[10px] text-muted-foreground truncate">{s.label}</span>
                 </div>
-                <span className="text-[11px] font-semibold text-foreground tabular-nums shrink-0">{s.pct}%</span>
+                <span className="text-[11px] font-medium text-foreground tabular-nums shrink-0">{s.pct}%</span>
               </div>
             ))}
           </div>

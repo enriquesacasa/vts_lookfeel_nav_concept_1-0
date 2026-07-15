@@ -1,7 +1,7 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 import {
-  Sparkles, ArrowRight, Search, CheckCircle2, Loader2,
+  Sparkle, ArrowRight, Search, CheckCircle2, Loader2,
   Clock, ChevronRight, AlertTriangle,
 } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
@@ -102,7 +102,7 @@ const CARD = "border border-border bg-card"
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">
+    <p className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground mb-1">
       {children}
     </p>
   )
@@ -111,7 +111,7 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
 function SectionTitle({ children, action }: { children: React.ReactNode; action?: React.ReactNode }) {
   return (
     <div className="flex items-start justify-between mb-4">
-      <h2 className="text-xl font-semibold text-foreground">{children}</h2>
+      <h2 className="text-xl font-medium text-foreground">{children}</h2>
       {action}
     </div>
   )
@@ -119,7 +119,7 @@ function SectionTitle({ children, action }: { children: React.ReactNode; action?
 
 function ViewAll({ label = "View All" }: { label?: string }) {
   return (
-    <button className="text-xs font-semibold text-primary hover:text-primary/80 transition-colors flex items-center gap-1 mt-0.5">
+    <button className="text-xs font-medium text-primary hover:text-primary/80 transition-colors flex items-center gap-1 mt-0.5">
       {label} <ArrowRight className="h-3 w-3" />
     </button>
   )
@@ -130,7 +130,7 @@ function AgentCircleBtn({ label }: { label: string }) {
     <Tooltip>
       <TooltipTrigger render={<span />}>
         <button className="inline-flex items-center justify-center h-7 w-7 rounded-full bg-[#E5E2FD] hover:bg-[#5528FF] text-[#280F96] hover:text-white transition-all duration-150 shrink-0">
-          <Sparkles className="h-3.5 w-3.5" />
+          <Sparkle fill="currentColor" className="h-3.5 w-3.5" />
         </button>
       </TooltipTrigger>
       <TooltipContent
@@ -156,10 +156,10 @@ function AgentsHeader({ query, setQuery }: { query: string; setQuery: (v: string
       <div className="flex items-center gap-4 py-4 border-b border-border">
         {/* Title */}
         <div className="min-w-0">
-          <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">AI · Automation</p>
+          <p className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground mb-1">AI · Automation</p>
           <div className="flex items-center gap-2.5">
-            <Sparkles className="h-6 w-6 sm:h-7 sm:w-7 text-primary shrink-0" />
-            <h1 className="text-2xl sm:text-3xl font-bold text-foreground leading-tight">VTS Agents</h1>
+            <Sparkle fill="currentColor" className="h-6 w-6 sm:h-7 sm:w-7 text-primary shrink-0" />
+            <h1 className="text-2xl sm:text-3xl font-medium text-foreground leading-tight">VTS Agents</h1>
           </div>
         </div>
         {/* Stats */}
@@ -171,14 +171,14 @@ function AgentsHeader({ query, setQuery }: { query: string; setQuery: (v: string
           ].map((s, i) => (
             <div key={s.label} className={cn("text-right", i > 0 && "pl-6 border-l border-border")}>
               <p className="text-xs text-muted-foreground">{s.label}</p>
-              <p className="text-sm font-semibold text-foreground">{s.value}</p>
+              <p className="text-sm font-medium text-foreground">{s.value}</p>
             </div>
           ))}
         </div>
         {/* Actions */}
         <div className="flex items-center gap-2 shrink-0 md:ml-6">
-          <button className="hidden sm:inline-flex items-center gap-1.5 border border-primary text-primary-foreground bg-primary hover:bg-primary/90 transition-colors px-3.5 py-1.5 text-xs font-semibold">
-            <Sparkles className="h-3.5 w-3.5" />
+          <button className="hidden sm:inline-flex items-center gap-1.5 border border-primary text-primary-foreground bg-primary hover:bg-primary/90 transition-colors px-3.5 py-1.5 text-xs font-medium">
+            <Sparkle fill="currentColor" className="h-3.5 w-3.5" />
             Ask VTS AI
           </button>
           <button aria-label="Search" className="flex items-center justify-center h-8 w-8 border border-border hover:border-primary text-muted-foreground hover:text-primary transition-colors">
@@ -230,14 +230,14 @@ function RunningBanner() {
         <Loader2 className="h-4 w-4 text-[#8C82FF] animate-spin" />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold text-white">1 Agent Running</p>
+        <p className="text-sm font-medium text-white">1 Agent Running</p>
         <p className="text-xs text-white/55 truncate">Q3 NOI improvement opportunities · Northeast Corridor Portfolio</p>
       </div>
       <div className="flex items-center gap-2 shrink-0">
-        <button className="inline-flex items-center gap-1.5 text-xs font-semibold text-white/80 border border-white/20 px-3 py-1.5 hover:bg-white/10 transition-colors">
+        <button className="inline-flex items-center gap-1.5 text-xs font-medium text-white/80 border border-white/20 px-3 py-1.5 hover:bg-white/10 transition-colors">
           <AlertTriangle className="h-3 w-3" /> View Progress
         </button>
-        <button className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-[#5528FF] hover:bg-[#280F96] px-3 py-1.5 transition-colors">
+        <button className="inline-flex items-center gap-1.5 text-xs font-medium text-white bg-[#5528FF] hover:bg-[#280F96] px-3 py-1.5 transition-colors">
           All Agents <ArrowRight className="h-3 w-3" />
         </button>
       </div>
@@ -271,8 +271,8 @@ function RecentRunsCard({ className }: { className?: string; setQuery?: (v: stri
             <StatusIcon className={cn("h-4 w-4 mt-0.5 shrink-0", cfg.color, run.status === "running" && "animate-spin")} />
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between gap-2 mb-0.5">
-                <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors leading-snug">{run.title}</p>
-                <span className={cn("text-[10px] font-semibold px-1.5 py-0.5 border shrink-0 capitalize", statusChip)}>
+                <p className="text-sm font-medium text-foreground group-hover:text-primary transition-colors leading-snug">{run.title}</p>
+                <span className={cn("text-[10px] font-medium px-1.5 py-0.5 border shrink-0 capitalize", statusChip)}>
                   {cfg.label}
                 </span>
               </div>
@@ -310,7 +310,7 @@ function AgentTypesCard({ className, setQuery }: { className?: string; setQuery:
           className="px-4 py-3.5 border-b border-border last:border-0 group hover:bg-muted/40 transition-colors cursor-pointer"
         >
           <div className="flex items-center justify-between mb-0.5">
-            <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">{type.label}</p>
+            <p className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">{type.label}</p>
             <ChevronRight className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
           </div>
           <p className="text-xs text-muted-foreground mb-2.5 leading-relaxed">{type.description}</p>

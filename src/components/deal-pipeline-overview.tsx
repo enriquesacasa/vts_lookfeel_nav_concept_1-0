@@ -30,8 +30,8 @@ const DealPipelineOverview = React.forwardRef<HTMLDivElement, DealPipelineOvervi
       )}>
         <div className="flex items-start justify-between mb-6">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">Overview</p>
-            <h2 className="text-xl font-semibold text-foreground">Deal Pipeline</h2>
+            <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">Overview</p>
+            <h2 className="text-xl font-medium text-foreground">Deal Pipeline</h2>
           </div>
           <Button variant="outline" size="sm" className="shrink-0 text-primary border-primary bg-transparent hover:bg-primary/10 hover:text-primary dark:bg-white/8 dark:border-white/25 dark:text-white dark:hover:bg-white/15">View Deal Pipeline</Button>
         </div>
@@ -40,10 +40,10 @@ const DealPipelineOverview = React.forwardRef<HTMLDivElement, DealPipelineOvervi
           <table className="w-full text-sm border-collapse">
             <thead>
               <tr className="border-b-2 border-border/60">
-                <th className="text-left text-[10px] font-bold uppercase tracking-widest text-foreground/70 pb-2 w-[28%]">Stage</th>
-                <th className="text-left text-[10px] font-bold uppercase tracking-widest text-foreground/70 pb-2 w-[8%]">#</th>
+                <th className="text-left text-[10px] font-medium uppercase tracking-widest text-foreground/70 pb-2 w-[28%]">Stage</th>
+                <th className="text-left text-[10px] font-medium uppercase tracking-widest text-foreground/70 pb-2 w-[8%]">#</th>
                 <th className="pb-2" scope="col" aria-hidden="true" />
-                <th className="text-right text-[10px] font-bold uppercase tracking-widest text-foreground/70 pb-2 whitespace-nowrap">Size</th>
+                <th className="text-right text-[10px] font-medium uppercase tracking-widest text-foreground/70 pb-2 whitespace-nowrap">Size</th>
               </tr>
             </thead>
             <tbody>
@@ -65,10 +65,10 @@ const DealPipelineOverview = React.forwardRef<HTMLDivElement, DealPipelineOvervi
             </tbody>
             <tfoot>
               <tr className="border-t-2 border-border">
-                <td className="pt-3 text-xs font-bold text-foreground">Total</td>
-                <td className="pt-3 text-xs font-bold text-foreground">{totalStatus}</td>
+                <td className="pt-3 text-xs font-medium text-foreground">Total</td>
+                <td className="pt-3 text-xs font-medium text-foreground">{totalStatus}</td>
                 <td />
-                <td className="pt-3 text-right text-xs font-bold text-foreground tabular-nums whitespace-nowrap">{fmt(totalSf)}</td>
+                <td className="pt-3 text-right text-xs font-medium text-foreground tabular-nums whitespace-nowrap">{fmt(totalSf)}</td>
               </tr>
             </tfoot>
           </table>

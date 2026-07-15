@@ -1,7 +1,7 @@
 import * as React from "react"
 import { cn, cardBase } from "@/lib/utils"
 import {
-  Sparkles, ArrowRight, Clock, CheckCircle2, Loader2,
+  Sparkle, ArrowRight, Clock, CheckCircle2, Loader2,
   AlertTriangle, FileText, Search, ChevronRight,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -138,28 +138,24 @@ export function AgentsPage({ className }: AgentsPageProps) {
   return (
     <div className={cn("space-y-4", className)}>
 
-      {/* Page header — matches building header style */}
-      <div className="rounded-2xl overflow-hidden border border-white/20 shadow-sm">
-        <div className="building-header-gradient px-6 pt-5 pb-5">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-widest text-white/70 mb-2">AI · Automation</p>
-              <h1 className="text-2xl md:text-3xl font-bold text-white leading-tight mb-1.5 flex items-center gap-2.5">
-                <Sparkles className="h-7 w-7 text-violet-300 shrink-0" />
-                VTS Agents
-              </h1>
-              <p className="text-sm text-white/70">Ask anything about your portfolio. Agents research, analyze, and act on your behalf.</p>
-            </div>
-            <div className="flex items-center gap-2 shrink-0">
-              <button className="inline-flex items-center gap-1.5 rounded-full border border-white/40 bg-white/20 text-white hover:bg-white/30 transition-colors px-3.5 py-1.5 text-sm font-semibold">
-                <Sparkles className="h-3.5 w-3.5" />
-                Ask VTS AI
-              </button>
-              <button aria-label="Search" className="flex items-center justify-center h-8 w-8 rounded-full border border-white/40 bg-white/20 text-white hover:bg-white/30 transition-colors">
-                <Search className="h-3.5 w-3.5" />
-              </button>
-            </div>
-          </div>
+      {/* Page header */}
+      <div className="flex items-start gap-4 py-3">
+        <div className="shrink-0 w-16 h-16 sm:w-24 sm:h-24 rounded-xl overflow-hidden bg-primary/10 flex items-center justify-center">
+          <Sparkle fill="currentColor" className="h-7 w-7 sm:h-10 sm:w-10 text-primary" />
+        </div>
+        <div className="flex-1">
+          <p className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground mb-2">AI · Automation</p>
+          <h1 className="font-inter text-2xl sm:text-4xl font-medium text-foreground leading-tight mb-1.5 tracking-wide">VTS Agents</h1>
+          <p className="text-sm text-muted-foreground">Ask anything about your portfolio. Agents research, analyze, and act on your behalf.</p>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <button className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-primary bg-primary text-primary-foreground hover:bg-primary/90 transition-colors px-3.5 py-1.5 text-sm font-medium">
+            <Sparkle fill="currentColor" className="h-3.5 w-3.5" />
+            Ask VTS AI
+          </button>
+          <button aria-label="Search" className="flex items-center justify-center h-8 w-8 rounded-full border border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors">
+            <Search className="h-3.5 w-3.5" />
+          </button>
         </div>
       </div>
 
@@ -198,7 +194,7 @@ export function AgentsPage({ className }: AgentsPageProps) {
       <div className={cn(cardBase, "bg-[oklch(0.22_0.18_278)] border-transparent flex items-center gap-4")}>
         <Loader2 className="h-5 w-5 text-violet-400 animate-spin shrink-0" />
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-white">1 agent running</p>
+          <p className="text-sm font-medium text-white">1 agent running</p>
           <p className="text-sm text-white/60 truncate">Northeast Corridor Portfolio Q3 NOI improvement opportunities</p>
         </div>
         <Button variant="outline" size="sm" className="shrink-0 text-white/80 border-white/25 bg-transparent hover:bg-white/10 hover:text-white">
@@ -218,8 +214,8 @@ export function AgentsPage({ className }: AgentsPageProps) {
         <div className={cn(cardBase, "md:col-span-2")}>
           <div className="flex items-start justify-between gap-4 mb-6">
             <div>
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">History</p>
-              <h2 className="text-xl font-semibold text-foreground">Recent Agent Runs</h2>
+              <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">History</p>
+              <h2 className="text-xl font-medium text-foreground">Recent Agent Runs</h2>
             </div>
             <Button variant="outline" size="sm" className="shrink-0 text-primary border-primary bg-transparent hover:bg-primary/10 hover:text-primary dark:bg-white/8 dark:border-white/25 dark:text-white dark:hover:bg-white/15">
               View All Runs
@@ -234,7 +230,7 @@ export function AgentsPage({ className }: AgentsPageProps) {
                   <StatusIcon className={cn("h-4 w-4 mt-0.5 shrink-0", cfg.color, run.status === "running" && "animate-spin")} />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
-                      <p className="text-sm font-semibold text-foreground leading-snug group-hover:text-primary transition-colors">{run.title}</p>
+                      <p className="text-sm font-medium text-foreground leading-snug group-hover:text-primary transition-colors">{run.title}</p>
                       <ChevronRight className="h-3.5 w-3.5 text-muted-foreground shrink-0 mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
                     <div className="flex items-center gap-2 mt-0.5 flex-wrap">
@@ -258,15 +254,15 @@ export function AgentsPage({ className }: AgentsPageProps) {
         <div className={cn(cardBase)}>
           <div className="flex items-start justify-between gap-4 mb-6">
             <div>
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">Capabilities</p>
-              <h2 className="text-xl font-semibold text-foreground">Agent Types</h2>
+              <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">Capabilities</p>
+              <h2 className="text-xl font-medium text-foreground">Agent Types</h2>
             </div>
           </div>
           <div className="flex flex-col gap-2">
             {AGENT_TYPES.map(type => (
               <div key={type.id} className="rounded-xl border border-border/60 px-4 py-3.5 hover:bg-muted/50 hover:border-border cursor-pointer transition-all group">
                 <div className="flex items-center justify-between mb-1">
-                  <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">{type.label}</p>
+                  <p className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">{type.label}</p>
                   <ChevronRight className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
                 <p className="text-xs text-muted-foreground mb-2.5 leading-relaxed">{type.description}</p>

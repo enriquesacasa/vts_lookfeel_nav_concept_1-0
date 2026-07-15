@@ -5,7 +5,7 @@ import { Progress } from "@/components/ui/progress"
 import { cn } from "@/lib/utils"
 import {
   TrendingUp, TrendingDown, ChevronUp, ChevronDown, ChevronsUpDown,
-  ArrowRight, Sparkles, Search,
+  ArrowRight, Sparkle, Search,
 } from "lucide-react"
 
 // ── Data ─────────────────────────────────────────────────────────────────────
@@ -55,24 +55,24 @@ const NOI_DATA = [
 
 // ── Shared primitives ─────────────────────────────────────────────────────────
 
-const CARD = "border border-border bg-card"
+const CARD = "bg-card"
 
 const CATEGORY_STYLES = {
-  expiring: "bg-rose-50 text-rose-700 border-rose-200",
-  renewal:  "bg-violet-50 text-violet-700 border-violet-200",
-  options:  "bg-blue-50 text-blue-700 border-blue-200",
+  expiring: "bg-destructive/10 text-destructive border-destructive/20",
+  renewal:  "bg-primary/10 text-primary border-primary/20",
+  options:  "bg-secondary text-secondary-foreground border-border",
 } as const
 
 const STAGE_STYLES: Record<string, string> = {
-  "LOI":       "bg-[#E5E2FD] text-[#280F96] border-[#C2C8FF]",
-  "Proposal":  "bg-violet-50 text-violet-700 border-violet-200",
-  "Lease Out": "bg-emerald-50 text-emerald-700 border-emerald-200",
+  "LOI":       "bg-primary/10 text-primary border-primary/20",
+  "Proposal":  "bg-secondary text-secondary-foreground border-border",
+  "Lease Out": "bg-success/10 text-success border-success/20",
 }
 
 const STATUS_STYLES: Record<string, string> = {
-  "active":  "bg-emerald-50 text-emerald-700 border-emerald-200",
-  "stalled": "bg-orange-50 text-orange-700 border-orange-200",
-  "at-risk": "bg-rose-50 text-rose-700 border-rose-200",
+  "active":  "bg-success/10 text-success border-success/20",
+  "stalled": "bg-warning/10 text-warning border-warning/20",
+  "at-risk": "bg-destructive/10 text-destructive border-destructive/20",
 }
 
 const STAGE_ORDER  = ["LOI", "Proposal", "Lease Out"]
@@ -82,14 +82,14 @@ function AgentBtn({ label }: { label: string }) {
   return (
     <Tooltip>
       <TooltipTrigger render={<span />}>
-        <button className="inline-flex items-center justify-center h-7 w-7 rounded-full bg-[#E5E2FD] hover:bg-[#5528FF] text-[#280F96] hover:text-white transition-all duration-150 shrink-0">
-          <Sparkles className="h-3.5 w-3.5" />
+        <button className="inline-flex items-center justify-center h-7 w-7 rounded-full bg-primary/10 hover:bg-primary text-primary hover:text-primary-foreground transition-all duration-150 shrink-0">
+          <Sparkle fill="currentColor" className="h-3.5 w-3.5" />
         </button>
       </TooltipTrigger>
       <TooltipContent
         side="top"
-        className="bg-[#140532] text-white border-transparent font-medium text-xs"
-        arrowClassName="fill-[#140532] bg-[#140532]"
+        className="bg-sidebar text-sidebar-foreground border-transparent font-medium text-xs"
+        arrowClassName="fill-sidebar"
       >
         {label}
       </TooltipContent>
@@ -99,7 +99,7 @@ function AgentBtn({ label }: { label: string }) {
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">
+    <p className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground mb-1">
       {children}
     </p>
   )
@@ -108,7 +108,7 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
 function SectionTitle({ children, action }: { children: React.ReactNode; action?: React.ReactNode }) {
   return (
     <div className="flex items-start justify-between mb-3">
-      <h2 className="text-xl font-semibold text-foreground">{children}</h2>
+      <h2 className="text-xl font-medium text-foreground">{children}</h2>
       {action}
     </div>
   )
@@ -116,7 +116,7 @@ function SectionTitle({ children, action }: { children: React.ReactNode; action?
 
 function ViewAll({ label = "View All" }: { label?: string }) {
   return (
-    <button className="text-xs font-semibold text-primary hover:text-primary/80 transition-colors flex items-center gap-1 mt-0.5">
+    <button className="text-xs font-medium text-primary hover:text-primary/80 transition-colors flex items-center gap-1 mt-0.5">
       {label} <ArrowRight className="h-3 w-3" />
     </button>
   )
@@ -130,10 +130,10 @@ function KpiBar() {
       {KPIS.map(kpi => (
         <div key={kpi.label} className="px-6 py-5">
           <Eyebrow>{kpi.label}</Eyebrow>
-          <p className="text-3xl font-bold text-foreground tracking-tight mt-1">{kpi.value}</p>
+          <p className="text-3xl font-medium text-foreground tracking-tight mt-1">{kpi.value}</p>
           <p className={cn(
-            "text-xs font-semibold flex items-center gap-1 mt-1.5",
-            kpi.up ? "text-emerald-600" : "text-rose-500"
+            "text-xs font-medium flex items-center gap-1 mt-1.5",
+            kpi.up ? "text-success" : "text-destructive"
           )}>
             {kpi.up
               ? <TrendingUp className="h-3 w-3 shrink-0" />
@@ -150,15 +150,15 @@ function KpiBar() {
 
 function AgentsCta() {
   return (
-    <div className="border border-[#280F96] bg-[#140532] p-4 flex items-center gap-4">
-      <div className="h-8 w-8 bg-[#5528FF]/20 flex items-center justify-center shrink-0">
-        <Sparkles className="h-5 w-5 text-[#8C82FF]" />
+    <div className="border border-sidebar-border bg-sidebar p-4 flex items-center gap-4">
+      <div className="h-8 w-8 bg-primary/20 flex items-center justify-center shrink-0">
+        <Sparkle fill="currentColor" className="h-5 w-5 text-sidebar-primary" />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold text-white mb-0.5">VTS Agents Running</p>
-        <p className="text-xs text-white/55">Q3 NOI analysis in progress · 3 deals need attention · 2 approvals pending</p>
+        <p className="text-sm font-medium text-sidebar-foreground mb-0.5">VTS Agents Running</p>
+        <p className="text-xs text-sidebar-foreground/55">Q3 NOI analysis in progress · 3 deals need attention · 2 approvals pending</p>
       </div>
-      <button className="shrink-0 inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold text-white bg-[#5528FF] hover:bg-[#280F96] transition-colors whitespace-nowrap">
+      <button className="shrink-0 inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-medium text-primary-foreground bg-primary hover:bg-primary/80 transition-colors whitespace-nowrap">
         View Agents <ArrowRight className="h-3 w-3" />
       </button>
     </div>
@@ -177,7 +177,7 @@ function VacancyCard({ className }: { className?: string }) {
       <SectionTitle action={<ViewAll label="All Spaces" />}>Vacant Spaces</SectionTitle>
 
       <div className="flex items-end gap-3 mb-4">
-        <p className="text-5xl font-bold text-foreground tracking-tight">{occupiedPct}%</p>
+        <p className="text-5xl font-medium text-foreground tracking-tight">{occupiedPct}%</p>
         <div className="pb-1.5">
           <p className="text-sm font-medium text-muted-foreground">occupied</p>
           <p className="text-xs text-muted-foreground">957K of 1.37M sf</p>
@@ -188,18 +188,18 @@ function VacancyCard({ className }: { className?: string }) {
 
       {VACANT_SPACES.map((s, i) => {
         const chip = s.daysVacant > 120
-          ? "bg-rose-50 text-rose-700 border-rose-200"
+          ? "bg-destructive/10 text-destructive border-destructive/20"
           : s.daysVacant > 60
-          ? "bg-orange-50 text-orange-700 border-orange-200"
-          : "bg-emerald-50 text-emerald-700 border-emerald-200"
+          ? "bg-warning/10 text-warning border-warning/20"
+          : "bg-success/10 text-success border-success/20"
         return (
           <div key={i} className="flex items-center justify-between py-3 border-b border-border last:border-0 group">
             <div>
-              <p className="text-sm font-semibold text-foreground">{s.space}</p>
+              <p className="text-sm font-medium text-foreground">{s.space}</p>
               <p className="text-xs text-muted-foreground">{s.sf.toLocaleString()} sf</p>
             </div>
             <div className="flex items-center gap-2">
-              <span className={cn("text-[11px] font-semibold px-2 py-0.5 rounded-full border", chip)}>
+              <span className={cn("text-[11px] font-medium px-2 py-0.5 rounded-full border", chip)}>
                 {s.daysVacant}d vacant
               </span>
               <AgentBtn label="Analyze vacant space" />
@@ -221,9 +221,9 @@ function CriticalDatesCard({ className }: { className?: string }) {
 
       {CRITICAL_DATES.map((d, i) => {
         const monthChip = d.monthsOut <= 3
-          ? "bg-rose-50 text-rose-700 border-rose-200"
+          ? "bg-destructive/10 text-destructive border-destructive/20"
           : d.monthsOut <= 6
-          ? "bg-orange-50 text-orange-700 border-orange-200"
+          ? "bg-warning/10 text-warning border-warning/20"
           : "bg-muted text-muted-foreground border-border"
         return (
           <div
@@ -232,8 +232,8 @@ function CriticalDatesCard({ className }: { className?: string }) {
           >
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2 mb-0.5">
-                <p className="text-sm font-semibold text-foreground truncate">{d.tenant}</p>
-                <span className={cn("text-[10px] font-semibold px-1.5 py-0.5 rounded border shrink-0 capitalize", CATEGORY_STYLES[d.category])}>
+                <p className="text-sm font-medium text-foreground truncate">{d.tenant}</p>
+                <span className={cn("text-[10px] font-medium px-1.5 py-0.5 rounded border shrink-0 capitalize", CATEGORY_STYLES[d.category])}>
                   {d.category}
                 </span>
               </div>
@@ -242,7 +242,7 @@ function CriticalDatesCard({ className }: { className?: string }) {
             <div className="flex items-center gap-2 shrink-0">
               <div className="text-right">
                 <p className="text-xs font-medium text-foreground">{d.date}</p>
-                <span className={cn("text-[10px] font-semibold px-1.5 py-0.5 rounded border mt-0.5 inline-block", monthChip)}>
+                <span className={cn("text-[10px] font-medium px-1.5 py-0.5 rounded border mt-0.5 inline-block", monthChip)}>
                   {d.monthsOut} mo
                 </span>
               </div>
@@ -268,7 +268,7 @@ function FinancialCard({ className }: { className?: string }) {
       <div className="flex items-end gap-1.5 mb-4">
         {NOI_DATA.map(d => (
           <div key={d.month} className="flex-1 flex flex-col items-center gap-1">
-            <div className="w-full flex items-end gap-0.5" style={{ height: 64 }}>
+            <div className="w-full flex items-end gap-0.5 h-16">
               <div
                 className="flex-1 rounded-t-sm bg-primary/20"
                 style={{ height: Math.round((d.budget / maxVal) * 64) }}
@@ -302,8 +302,8 @@ function FinancialCard({ className }: { className?: string }) {
           <p className="text-sm text-muted-foreground">{row.label}</p>
           <div className="flex items-center gap-2">
             <div className="text-right">
-              <p className="text-sm font-semibold text-foreground">{row.value}</p>
-              <p className={cn("text-[11px] font-medium", row.pos ? "text-emerald-600" : "text-rose-500")}>{row.delta}</p>
+              <p className="text-sm font-medium text-foreground">{row.value}</p>
+              <p className={cn("text-[11px] font-medium", row.pos ? "text-success" : "text-destructive")}>{row.delta}</p>
             </div>
             <AgentBtn label="Analyze metric" />
           </div>
@@ -343,7 +343,7 @@ function LeasingActivityCard({ className }: { className?: string }) {
       <th
         onClick={sk ? () => handleSort(sk) : undefined}
         className={cn(
-          "px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-widest text-muted-foreground select-none",
+          "px-4 py-3 text-left text-[11px] font-medium uppercase tracking-widest text-muted-foreground select-none",
           sk && "cursor-pointer hover:text-foreground transition-colors"
         )}
       >
@@ -363,7 +363,7 @@ function LeasingActivityCard({ className }: { className?: string }) {
       <div className="px-4 pt-4 pb-3 flex items-start justify-between">
         <div>
           <Eyebrow>Active Pipeline</Eyebrow>
-          <h2 className="text-xl font-semibold text-foreground">Leasing Activity</h2>
+          <h2 className="text-xl font-medium text-foreground">Leasing Activity</h2>
         </div>
         <div className="flex items-center gap-2 pt-0.5">
           <span className="text-xs text-muted-foreground">{ACTIVE_DEALS.length} deals</span>
@@ -390,7 +390,7 @@ function LeasingActivityCard({ className }: { className?: string }) {
               return (
                 <tr key={i} className="border-b border-border last:border-0 hover:bg-muted/40 transition-colors group">
                   <td className="px-4 py-3">
-                    <p className="text-sm font-semibold text-foreground">{deal.tenant}</p>
+                    <p className="text-sm font-medium text-foreground">{deal.tenant}</p>
                     {"note" in deal && deal.note && (
                       <p className="text-[11px] text-muted-foreground mt-0.5">{deal.note}</p>
                     )}
@@ -398,19 +398,19 @@ function LeasingActivityCard({ className }: { className?: string }) {
                   <td className="px-4 py-3 text-sm text-muted-foreground whitespace-nowrap">{deal.space}</td>
                   <td className="px-4 py-3 text-sm text-foreground tabular-nums">{deal.sf.toLocaleString()}</td>
                   <td className="px-4 py-3">
-                    <span className={cn("text-[11px] font-semibold px-2 py-0.5 rounded border whitespace-nowrap", STAGE_STYLES[deal.stage])}>
+                    <span className={cn("text-[11px] font-medium px-2 py-0.5 rounded border whitespace-nowrap", STAGE_STYLES[deal.stage])}>
                       {deal.stage}
                     </span>
                   </td>
                   <td className="px-4 py-3">
-                    <span className={cn("text-[11px] font-semibold px-2 py-0.5 rounded border capitalize whitespace-nowrap", STATUS_STYLES[deal.status])}>
+                    <span className={cn("text-[11px] font-medium px-2 py-0.5 rounded border capitalize whitespace-nowrap", STATUS_STYLES[deal.status])}>
                       {deal.status.replace("-", " ")}
                     </span>
                   </td>
                   <td className="px-4 py-3">
-                    <p className="text-sm font-semibold text-foreground tabular-nums">${deal.baseRent.toFixed(2)}</p>
+                    <p className="text-sm font-medium text-foreground tabular-nums">${deal.baseRent.toFixed(2)}</p>
                     <p className={cn("text-[11px] font-medium tabular-nums",
-                      delta > 0 ? "text-emerald-600" : delta < 0 ? "text-rose-500" : "text-muted-foreground"
+                      delta > 0 ? "text-success" : delta < 0 ? "text-destructive" : "text-muted-foreground"
                     )}>
                       {delta > 0 ? `+$${delta.toFixed(2)}` : delta < 0 ? `-$${Math.abs(delta).toFixed(2)}` : "on budget"}
                     </p>
@@ -440,8 +440,8 @@ function AssetHeader() {
       />
       {/* Title */}
       <div className="min-w-0">
-        <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground mb-0.5">Asset Dashboard</p>
-        <h1 className="text-2xl sm:text-3xl font-bold text-foreground leading-tight">VTS Tower Headquarters</h1>
+        <p className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground mb-0.5">Asset Dashboard</p>
+        <h1 className="text-2xl sm:text-3xl font-medium text-foreground leading-tight">VTS Tower Headquarters</h1>
         <p className="text-xs text-muted-foreground mt-0.5 hidden sm:block">114 West 41st Street, New York, NY 10036 · Built 2017 · 52 Floors · Office</p>
       </div>
       {/* Stats */}
@@ -453,14 +453,14 @@ function AssetHeader() {
         ].map((s, i) => (
           <div key={s.label} className={cn("text-right", i > 0 && "pl-6 border-l border-border")}>
             <p className="text-xs text-muted-foreground">{s.label}</p>
-            <p className="text-sm font-semibold text-foreground">{s.value}</p>
+            <p className="text-sm font-medium text-foreground">{s.value}</p>
           </div>
         ))}
       </div>
       {/* Actions */}
       <div className="flex items-center gap-2 shrink-0 md:ml-6">
-        <button className="hidden sm:inline-flex items-center gap-1.5 border border-primary text-primary-foreground bg-primary hover:bg-primary/90 transition-colors px-3.5 py-1.5 text-xs font-semibold">
-          <Sparkles className="h-3.5 w-3.5" />
+        <button className="hidden sm:inline-flex items-center gap-1.5 border border-primary text-primary-foreground bg-primary hover:bg-primary/90 transition-colors px-3.5 py-1.5 text-xs font-medium">
+          <Sparkle fill="currentColor" className="h-3.5 w-3.5" />
           Ask VTS AI
         </button>
         <button aria-label="Search" className="flex items-center justify-center h-8 w-8 border border-border hover:border-primary text-muted-foreground hover:text-primary transition-colors">
