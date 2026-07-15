@@ -198,7 +198,11 @@ function DesktopNav({ className, onCollapsedChange, assets, portfolios, selected
   const [search, setSearch] = React.useState("")
   const selectorRef = React.useRef<HTMLDivElement>(null)
   const toggleSection = (id: string) => {
-    setOpenSections(prev => prev.has(id) ? new Set() : new Set([id]))
+    setOpenSections(prev => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      return next
+    })
   }
   const searchRef = React.useRef<HTMLInputElement>(null)
 
@@ -482,8 +486,8 @@ function DesktopNav({ className, onCollapsedChange, assets, portfolios, selected
                   <div
                     role="button"
                     tabIndex={0}
-                    onClick={() => { setActive(item.id); onNavItemClick?.(item.id) }}
-                    onKeyDown={e => (e.key === "Enter" || e.key === " ") && (setActive(item.id), onNavItemClick?.(item.id))}
+                    onClick={() => { setActive(item.id); onNavItemClick?.(item.id); setOpenSections(prev => new Set(prev.has(item.id) ? [item.id] : [])) }}
+                    onKeyDown={e => (e.key === "Enter" || e.key === " ") && (setActive(item.id), onNavItemClick?.(item.id), setOpenSections(prev => new Set(prev.has(item.id) ? [item.id] : [])))}
                     className="flex items-center gap-2.5 flex-1 px-2.5 py-2 cursor-pointer font-medium"
                   >
                     {item.icon && <item.icon className="h-[18px] w-[18px] shrink-0" />}
@@ -580,7 +584,11 @@ function MobileNav({ onLogoClick, onNavItemClick, activePage, assets, portfolios
   }
 
   const toggleSection = (id: string) => {
-    setOpenSections(prev => prev.has(id) ? new Set() : new Set([id]))
+    setOpenSections(prev => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      return next
+    })
   }
 
   const selectedAsset = assets?.find(a => a.id === selectedAssetId)
@@ -735,8 +743,8 @@ function MobileNav({ onLogoClick, onNavItemClick, activePage, assets, portfolios
                       active === item.id ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-sidebar-foreground/60 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground"
                     )}>
                       <div role="button" tabIndex={0}
-                        onClick={() => handleSelect(item.id)}
-                        onKeyDown={e => (e.key === "Enter" || e.key === " ") && handleSelect(item.id)}
+                        onClick={() => { handleSelect(item.id); setOpenSections(prev => new Set(prev.has(item.id) ? [item.id] : [])) }}
+                        onKeyDown={e => (e.key === "Enter" || e.key === " ") && (handleSelect(item.id), setOpenSections(prev => new Set(prev.has(item.id) ? [item.id] : [])))}
                         className="flex items-center gap-2.5 flex-1 px-2.5 py-2 cursor-pointer font-medium">
                         {item.icon && <item.icon className="h-[18px] w-[18px] shrink-0" />}
                         <span className="truncate">{item.label}</span>
@@ -748,11 +756,11 @@ function MobileNav({ onLogoClick, onNavItemClick, activePage, assets, portfolios
                       </button>
                     </div>
                   ) : (
-                    <NavRow {...item} active={active === item.id} collapsed={false} onClick={() => handleSelect(item.id)} />
+                    <NavRow {...item} active={active === item.id} collapsed={false} onClick={() => { handleSelect(item.id); setOpenSections(new Set()) }} />
                   )}
                   {isOpen && item.children?.map(child => (
                     <div key={child.id} className="pl-3">
-                      <NavRow {...child} active={active === child.id} collapsed={false} sub onClick={() => handleSelect(child.id)} />
+                      <NavRow {...child} active={active === child.id} collapsed={false} sub onClick={() => { handleSelect(child.id); setOpenSections(new Set([item.id])) }} />
                     </div>
                   ))}
                 </React.Fragment>

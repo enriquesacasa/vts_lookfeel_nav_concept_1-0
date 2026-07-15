@@ -124,7 +124,11 @@ export function ProfileShell({ onExit, assets, portfolios, selectedAssetId, onAs
   }, [dropdownOpen])
 
   const toggleSection = (id: string) => {
-    setOpenSections(prev => prev.has(id) ? new Set() : new Set([id]))
+    setOpenSections(prev => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      return next
+    })
   }
 
   const selectedAsset = assets.find(a => a.id === selectedAssetId)
@@ -363,7 +367,7 @@ export function ProfileShell({ onExit, assets, portfolios, selectedAssetId, onAs
                     chevron={hasChildren && !collapsed ? (isOpen ? "down" : "right") : undefined}
                     onClick={() => {
                       handleNavClick(item.id)
-                      if (hasChildren) toggleSection(item.id)
+                      if (hasChildren) setOpenSections(prev => prev.has(item.id) ? new Set() : new Set([item.id]))
                       else setOpenSections(new Set())
                     }}
                   />
