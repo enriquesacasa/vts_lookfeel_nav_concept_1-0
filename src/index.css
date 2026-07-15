@@ -171,6 +171,66 @@
     background: linear-gradient(135deg, oklch(0.16 0.20 278) 0%, oklch(0.28 0.26 280) 50%, oklch(0.40 0.28 285) 100%);
 }
 
+/* ── VTS Platform Theme (ProfileShell) ─────────────────────────────────── */
+/* Uses VTS Design System hex tokens. Applied via .vts-platform wrapper.    */
+.vts-platform {
+    --background: #F5F7FA;
+    --foreground: #140532;
+    --card: #FFFFFF;
+    --card-foreground: #140532;
+    --popover: #FFFFFF;
+    --popover-foreground: #140532;
+    --primary: #5528FF;
+    --primary-foreground: #FFFFFF;
+    --secondary: #E5E2FD;
+    --secondary-foreground: #280F96;
+    --muted: #F1F4F7;
+    --muted-foreground: #72777E;
+    --accent: #E5E2FD;
+    --accent-foreground: #280F96;
+    --destructive: oklch(0.577 0.245 27.325);
+    --border: #DBE2E7;
+    --input: #DBE2E7;
+    --ring: #5528FF;
+    --radius: 0.25rem;
+    --chart-1: #5528FF;
+    --chart-2: #00F0F0;
+    --chart-3: #8C82FF;
+    --chart-4: #280F96;
+    --chart-5: #C2C8FF;
+}
+
+.dark .vts-platform {
+    --background: #0A0214;
+    --foreground: #F5F7FA;
+    --card: #140532;
+    --card-foreground: #F5F7FA;
+    --popover: #140532;
+    --popover-foreground: #F5F7FA;
+    --primary: #7C55FF;
+    --primary-foreground: #FFFFFF;
+    --secondary: #280F96;
+    --secondary-foreground: #E5E2FD;
+    --muted: #1A0840;
+    --muted-foreground: #9E96C8;
+    --accent: #280F96;
+    --accent-foreground: #E5E2FD;
+    --destructive: oklch(0.704 0.191 22.216);
+    --border: #2A1560;
+    --input: #2A1560;
+    --ring: #7C55FF;
+    --radius: 0.25rem;
+    --chart-1: #7C55FF;
+    --chart-2: #00F0F0;
+    --chart-3: #8C82FF;
+    --chart-4: #5528FF;
+    --chart-5: #C2C8FF;
+}
+
+.vts-platform .building-header-gradient {
+    background: linear-gradient(135deg, #140532 0%, #280F96 55%, #5528FF 100%);
+}
+
 @layer base {
     * {
         @apply border-border outline-ring/50;

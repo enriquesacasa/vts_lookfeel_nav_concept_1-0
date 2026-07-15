@@ -22,7 +22,7 @@ function YearTick({ x, y, payload }: any) {
   )
 }
 
-function BarLabel({ x, y, width, value, index, data: bars }: any) {
+function BarLabel({ x, y, width, value: _value, index, data: bars }: any) {
   const bar = bars[index]
   if (!bar || bar.sf === 0) return null
   const cx = x + width / 2

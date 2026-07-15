@@ -1,7 +1,8 @@
 import * as React from "react"
 import { cn, cardBase } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { AlertTriangle, Clock } from "lucide-react"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+import { Sparkles, ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react"
 
 export interface Deal {
   tenant: string
@@ -18,20 +19,24 @@ export interface Deal {
 export interface DecisionItem {
   tenant: string
   action: string
-  dueBy: string
+  inApprovalFor: string
 }
 
 interface LeasingActivityProps {
   deals: Deal[]
-  decisions: DecisionItem[]
+  decisions?: DecisionItem[]
   className?: string
 }
 
+type SortKey = "tenant" | "space" | "sf" | "stage" | "status" | "baseRent"
+type SortDir = "asc" | "desc"
+
 const STAGE_ORDER = ["Proposal", "LOI", "Lease Out", "Executed"] as const
+const STATUS_ORDER: Deal["status"][] = ["at-risk", "stalled", "active"]
 
 const STATUS_PILL: Record<Deal["status"], string> = {
-  active:   "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400",
-  stalled:  "bg-orange-500/10 text-orange-600 dark:bg-orange-500/15 dark:text-orange-400",
+  active:    "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400",
+  stalled:   "bg-orange-500/10 text-orange-600 dark:bg-orange-500/15 dark:text-orange-400",
   "at-risk": "bg-rose-500/10 text-rose-600 dark:bg-rose-500/15 dark:text-rose-400",
 }
 
@@ -57,10 +62,63 @@ function RentDelta({ base, budget }: { base: number; budget: number }) {
   )
 }
 
+function SortIcon({ col, sortKey, sortDir }: { col: SortKey; sortKey: SortKey; sortDir: SortDir }) {
+  if (col !== sortKey) return <ChevronsUpDown className="h-3 w-3 opacity-40" />
+  return sortDir === "asc" ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />
+}
+
 const LeasingActivity = React.forwardRef<HTMLDivElement, LeasingActivityProps>(
-  ({ deals, decisions, className }, ref) => {
-    const atRisk = deals.filter(d => d.status === "stalled" || d.status === "at-risk")
-    const active = deals.filter(d => d.status === "active")
+  ({ deals, className }, ref) => {
+    const [sortKey, setSortKey] = React.useState<SortKey>("tenant")
+    const [sortDir, setSortDir] = React.useState<SortDir>("asc")
+
+    function handleSort(key: SortKey) {
+      if (key === sortKey) setSortDir(d => d === "asc" ? "desc" : "asc")
+      else { setSortKey(key); setSortDir("asc") }
+    }
+
+    const sorted = [...deals].sort((a, b) => {
+      let av: string | number
+      let bv: string | number
+      if (sortKey === "stage") {
+        av = STAGE_ORDER.indexOf(a.stage)
+        bv = STAGE_ORDER.indexOf(b.stage)
+      } else if (sortKey === "status") {
+        av = STATUS_ORDER.indexOf(a.status)
+        bv = STATUS_ORDER.indexOf(b.status)
+      } else if (sortKey === "space") {
+        av = a.space.toLowerCase()
+        bv = b.space.toLowerCase()
+      } else if (sortKey === "tenant") {
+        av = a.tenant.toLowerCase()
+        bv = b.tenant.toLowerCase()
+      } else {
+        av = a[sortKey] as number
+        bv = b[sortKey] as number
+      }
+      const cmp = av < bv ? -1 : av > bv ? 1 : 0
+      return sortDir === "asc" ? cmp : -cmp
+    })
+
+    function Th({ col, children, className: cls, right }: { col: SortKey; children: React.ReactNode; className?: string; right?: boolean }) {
+      return (
+        <th
+          onClick={() => handleSort(col)}
+          className={cn(
+            "pb-2 text-[10px] font-bold uppercase tracking-widest cursor-pointer select-none whitespace-nowrap transition-colors",
+            right ? "text-right pl-3" : "text-left",
+            sortKey === col ? "text-foreground/80" : "text-foreground/50",
+            "hover:text-foreground/80",
+            cls
+          )}
+        >
+          <span className={cn("inline-flex items-center gap-1", right && "justify-end w-full")}>
+            {children}
+            <SortIcon col={col} sortKey={sortKey} sortDir={sortDir} />
+          </span>
+        </th>
+      )
+    }
 
     return (
       <div ref={ref} className={cn(cardBase, className)}>
@@ -74,109 +132,76 @@ const LeasingActivity = React.forwardRef<HTMLDivElement, LeasingActivityProps>(
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-          {/* Left: Active Deals Table */}
-          <div className="lg:col-span-2">
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-3">Active Deals</p>
-            <table className="w-full text-sm border-collapse">
-              <thead>
-                <tr className="border-b-2 border-border/60">
-                  <th className="pb-2 text-left text-[10px] font-bold uppercase tracking-widest text-foreground/50">Tenant</th>
-                  <th className="pb-2 pl-3 text-left text-[10px] font-bold uppercase tracking-widest text-foreground/50">Space</th>
-                  <th className="pb-2 pl-3 text-left text-[10px] font-bold uppercase tracking-widest text-foreground/50">Stage</th>
-                  <th className="pb-2 pl-3 text-left text-[10px] font-bold uppercase tracking-widest text-foreground/50">Status</th>
-                  <th className="pb-2 pl-3 text-right text-[10px] font-bold uppercase tracking-widest text-foreground/50">Base Rent / Budget</th>
-                </tr>
-              </thead>
-              <tbody>
-                {deals.map((d, i) => (
-                  <tr key={i} className={cn("cursor-pointer hover:bg-muted/40 dark:hover:bg-white/4 transition-colors", i > 0 && "border-t border-border/40")}>
-                    <td className="py-2.5 font-semibold text-foreground text-sm whitespace-nowrap">{d.tenant}</td>
-                    <td className="py-2.5 pl-3 text-sm text-muted-foreground whitespace-nowrap">
-                      <div>{d.space}</div>
-                      <div className="text-[10px]">{fmtSf(d.sf)}</div>
-                    </td>
-                    <td className="py-2.5 pl-3 whitespace-nowrap">
-                      <div className="flex gap-1">
-                        {STAGE_ORDER.map(s => (
-                          <span key={s} className={cn(
-                            "h-1.5 w-5 rounded-full transition-colors",
-                            STAGE_ORDER.indexOf(s) <= STAGE_ORDER.indexOf(d.stage)
-                              ? "bg-primary"
-                              : "bg-muted-foreground/20"
-                          )} />
-                        ))}
+        <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-3">Active Deals</p>
+        <table className="w-full text-sm border-collapse">
+          <thead>
+            <tr className="border-b-2 border-border/60">
+              <Th col="tenant">Tenant</Th>
+              <Th col="space" className="pl-3">Space</Th>
+              <Th col="stage" className="pl-3">Stage</Th>
+              <Th col="status" className="pl-3">Status</Th>
+              <Th col="baseRent" right>Base Rent / Budget</Th>
+              <th className="pb-2 pl-2 w-8" />
+            </tr>
+          </thead>
+          <tbody>
+            {sorted.map((d, i) => (
+              <tr key={i} className={cn("cursor-pointer hover:bg-muted/40 dark:hover:bg-white/4 transition-colors", i > 0 && "border-t border-border/40")}>
+                <td className="py-2.5 font-semibold text-foreground text-sm whitespace-nowrap">{d.tenant}</td>
+                <td className="py-2.5 pl-3 text-sm text-muted-foreground whitespace-nowrap">
+                  <div>{d.space}</div>
+                  <div className="text-[10px]">{fmtSf(d.sf)}</div>
+                </td>
+                <td className="py-2.5 pl-3 whitespace-nowrap">
+                  <div className="flex gap-1">
+                    {STAGE_ORDER.map(s => (
+                      <span key={s} className={cn(
+                        "h-1.5 w-5 rounded-full transition-colors",
+                        STAGE_ORDER.indexOf(s) <= STAGE_ORDER.indexOf(d.stage)
+                          ? "bg-primary"
+                          : "bg-muted-foreground/20"
+                      )} />
+                    ))}
+                  </div>
+                  <div className="text-[10px] text-muted-foreground mt-0.5">{d.stage}</div>
+                </td>
+                <td className="py-2.5 pl-3">
+                  <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold", STATUS_PILL[d.status])}>
+                    {STATUS_LABEL[d.status]}
+                  </span>
+                </td>
+                <td className="py-2.5 pl-3">
+                  <RentDelta base={d.baseRent} budget={d.budgetRent} />
+                </td>
+                <td className="py-2.5 pl-2 text-right whitespace-nowrap">
+                  <Tooltip>
+                    <TooltipTrigger render={<span />}>
+                      <button
+                        onClick={e => e.stopPropagation()}
+                        className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-primary/10 hover:bg-primary text-primary hover:text-white transition-all duration-150 shrink-0"
+                      >
+                        <Sparkles className="h-3 w-3" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent
+                      side="top"
+                      className="bg-[oklch(0.22_0.18_278)] text-white border-transparent font-medium"
+                      arrowClassName="fill-[oklch(0.22_0.18_278)]"
+                    >
+                      <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-1.5 font-semibold text-white">
+                          <Sparkles className="h-3 w-3" />
+                          Run Agent
+                        </div>
+                        <p className="text-white/70 font-normal">Analyze this deal and suggest next steps</p>
                       </div>
-                      <div className="text-[10px] text-muted-foreground mt-0.5">{d.stage}</div>
-                    </td>
-                    <td className="py-2.5 pl-3">
-                      <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold", STATUS_PILL[d.status])}>
-                        {STATUS_LABEL[d.status]}
-                      </span>
-                    </td>
-                    <td className="py-2.5 pl-3">
-                      <RentDelta base={d.baseRent} budget={d.budgetRent} />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Right: At Risk + Decisions */}
-          <div className="flex flex-col gap-5">
-
-            {/* Stalled & At Risk */}
-            <div>
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-3">Stalled & At Risk</p>
-              {atRisk.length === 0 ? (
-                <p className="text-sm text-muted-foreground">No deals at risk</p>
-              ) : (
-                <div className="flex flex-col gap-2">
-                  {atRisk.map((d, i) => (
-                    <div key={i} className={cn(
-                      "flex items-start gap-2.5 rounded-lg p-3",
-                      d.status === "at-risk" ? "bg-rose-500/8 border border-rose-500/20" : "bg-orange-500/8 border border-orange-500/20"
-                    )}>
-                      <AlertTriangle className={cn("h-3.5 w-3.5 mt-0.5 shrink-0", d.status === "at-risk" ? "text-rose-500" : "text-orange-500")} />
-                      <div className="min-w-0">
-                        <p className="text-sm font-semibold text-foreground">{d.tenant}</p>
-                        <p className="text-xs text-muted-foreground">{d.space} · {d.stage}</p>
-                        {d.note && <p className="text-xs text-muted-foreground mt-0.5">{d.note}</p>}
-                        {d.stalledDays && <p className="text-[10px] font-semibold text-orange-500 mt-0.5">No activity in {d.stalledDays}d</p>}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className="h-px bg-border/50" />
-
-            {/* Decisions Needed Today */}
-            <div>
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-3">Decisions Needed Today</p>
-              {decisions.length === 0 ? (
-                <p className="text-sm text-muted-foreground">No decisions pending</p>
-              ) : (
-                <div className="flex flex-col gap-2">
-                  {decisions.map((item, i) => (
-                    <div key={i} className="flex items-start gap-2.5 rounded-lg bg-primary/6 border border-primary/15 p-3">
-                      <Clock className="h-3.5 w-3.5 mt-0.5 shrink-0 text-primary" />
-                      <div className="min-w-0">
-                        <p className="text-sm font-semibold text-foreground">{item.tenant}</p>
-                        <p className="text-xs text-muted-foreground">{item.action}</p>
-                        <p className="text-[10px] font-semibold text-primary mt-0.5">Due {item.dueBy}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-          </div>
-        </div>
+                    </TooltipContent>
+                  </Tooltip>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     )
   }

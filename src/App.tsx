@@ -5,40 +5,47 @@ import { AvailabilityOverview } from "@/components/availability-overview"
 import type { VacantSpace } from "@/components/availability-overview"
 import { LeasingActivity } from "@/components/leasing-activity"
 import type { Deal, DecisionItem } from "@/components/leasing-activity"
-import { TopTenants } from "@/components/top-tenants"
-import { ExpiringTenants } from "@/components/expiring-tenants"
-import { MultiDonutCard } from "@/components/multi-donut-card"
 import { CriticalDates } from "@/components/critical-dates"
 import type { CriticalDate } from "@/components/critical-dates"
 import { FinancialPerformance } from "@/components/financial-performance"
 import { ActionLevers } from "@/components/action-levers"
-import { OccupancyCard } from "@/components/occupancy-card"
-import type { MoveEvent, NearTermExpiration } from "@/components/occupancy-card"
+import { KpiBar } from "@/components/kpi-bar"
+import { LeasingAgents } from "@/components/leasing-agents"
+import { AgentsPage } from "@/components/agents-page"
+import { ProfileShell } from "@/components/profile-shell"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
 import buildingImg from "@/assets/building.jpg"
 
 export const ASSETS = [
-  { id: "vts-tower", name: "VTS Tower Headquarters", address: "114 West 41st Street, New York, NY 10036" },
-  { id: "one-financial", name: "One Financial Plaza", address: "1 Financial Plaza, Providence, RI 02903" },
-  { id: "empire-state", name: "Empire State Building", address: "350 5th Ave, New York, NY 10118" },
-  { id: "salesforce", name: "Salesforce Tower", address: "415 Mission St, San Francisco, CA 94105" },
-  { id: "willis", name: "Willis Tower", address: "233 S Wacker Dr, Chicago, IL 60606" },
-  { id: "hudson-yards", name: "30 Hudson Yards", address: "30 Hudson Yards, New York, NY 10001" },
-  { id: "one-wtc", name: "One World Trade Center", address: "285 Fulton St, New York, NY 10007" },
-  { id: "transamerica", name: "Transamerica Pyramid", address: "600 Montgomery St, San Francisco, CA 94111" },
-  { id: "peachtree", name: "One Peachtree Center", address: "303 Peachtree St NE, Atlanta, GA 30308" },
-  { id: "union-square", name: "Two Union Square", address: "601 Union St, Seattle, WA 98101" },
-  { id: "200-berkeley", name: "200 Berkeley Street", address: "200 Berkeley St, Boston, MA 02116" },
+  { id: "vts-tower",     name: "VTS Tower Headquarters",  address: "114 West 41st Street, New York, NY 10036" },
+  { id: "one-financial", name: "One Financial Plaza",      address: "1 Financial Plaza, Providence, RI 02903" },
+  { id: "empire-state",  name: "Empire State Building",    address: "350 5th Ave, New York, NY 10118" },
+  { id: "salesforce",    name: "Salesforce Tower",         address: "415 Mission St, San Francisco, CA 94105" },
+  { id: "willis",        name: "Willis Tower",             address: "233 S Wacker Dr, Chicago, IL 60606" },
+  { id: "hudson-yards",  name: "30 Hudson Yards",          address: "30 Hudson Yards, New York, NY 10001" },
+  { id: "one-wtc",       name: "One World Trade Center",   address: "285 Fulton St, New York, NY 10007" },
+  { id: "transamerica",  name: "Transamerica Pyramid",     address: "600 Montgomery St, San Francisco, CA 94111" },
+  { id: "peachtree",     name: "One Peachtree Center",     address: "303 Peachtree St NE, Atlanta, GA 30308" },
+  { id: "union-square",  name: "Two Union Square",         address: "601 Union St, Seattle, WA 98101" },
+  { id: "200-berkeley",  name: "200 Berkeley Street",      address: "200 Berkeley St, Boston, MA 02116" },
 ]
 
-const STATS = [
-  { label: "Year Built", value: "2017" },
-  { label: "Floors",     value: "52" },
-  { label: "Owned By",   value: "View The Space" },
-  { label: "Managed By", value: "CBRE" },
-  { label: "Leased By",  value: "JLL" },
-  { label: "RBA",        value: "900K", accent: true },
+export const PORTFOLIOS = [
+  { id: "northeast",   name: "Northeast Corridor",  assetIds: ["vts-tower", "one-financial", "empire-state", "one-wtc", "200-berkeley"] },
+  { id: "west-coast",  name: "West Coast Portfolio", assetIds: ["salesforce", "transamerica", "union-square"] },
+  { id: "midwest",     name: "Midwest Holdings",     assetIds: ["willis", "hudson-yards", "peachtree"] },
+]
+
+const STATS: { label: string; value: string; accent?: boolean }[] = []
+
+const KPIS = [
+  { label: "In-Place NOI",           value: "$29.1M",    subtitle: "+9.4% vs budget",       trend: "up"   as const },
+  { label: "Revenue at Risk (12mo)", value: "$234K/mo",  subtitle: "3 leases expiring",      trend: "down" as const },
+  { label: "Pipeline Upside",        value: "+$89K/mo",  subtitle: "if LOI+ deals execute",  trend: "up"   as const },
+  { label: "Managed By",             value: "CBRE" },
+  { label: "Leased By",              value: "JLL" },
+  { label: "Owned By",               value: "View The Space" },
 ]
 
 const ACTIVE_DEALS: Deal[] = [
@@ -51,83 +58,10 @@ const ACTIVE_DEALS: Deal[] = [
 ]
 
 const DECISIONS_TODAY: DecisionItem[] = [
-  { tenant: "NovaTech Inc.",   action: "Counter-proposal signature deadline",  dueBy: "5:00 PM" },
-  { tenant: "Apex Capital",    action: "Board approval needed for rent concession", dueBy: "EOD" },
+  { tenant: "NovaTech Inc.",   action: "Counter-proposal signature deadline",  inApprovalFor: "2 days" },
+  { tenant: "Apex Capital",    action: "Board approval needed for rent concession", inApprovalFor: "5 days" },
 ]
 
-const PORTFOLIO_DEAL_STAGES = [
-  { stage: "Proposals", status: 142, sizeSf: 2841200 },
-  { stage: "Leases Out", status: 28, sizeSf: 891400 },
-  { stage: "Dead Deals", status: 201, sizeSf: 8124500 },
-  { stage: "Leases Executed", status: 284, sizeSf: 11204800 },
-]
-
-const TOP_TENANTS = [
-  { name: "Ernst & Young",        pct: 8.9, value: "$112K/mo" },
-  { name: "HSBC Holdings plc",    pct: 7.7, value: "$97K/mo" },
-  { name: "Li & Fung Limited",    pct: 2.3, value: "$53K/mo" },
-  { name: "Test Technology",      pct: 2.2, value: "$20K/mo" },
-  { name: "One Digital Test",     pct: 1.4, value: "$29K/mo" },
-  { name: "Zillow Group, Inc.",   pct: 1.3, value: "$24K/mo" },
-  { name: "View the Space, Inc.", pct: 1.2, value: "$7.4K/mo" },
-  { name: "Parker Warby Reta...", pct: 1.1, value: "$77K/mo" },
-]
-
-const EXPIRING = [
-  { year: 2026, sf: 80,  revenue: "$923.8K" },
-  { year: 2027, sf: 45,  revenue: "$528K" },
-  { year: 2028, sf: 64,  revenue: "$861K" },
-  { year: 2029, sf: 30,  revenue: "$412K" },
-  { year: 2030, sf: 55,  revenue: "$750K" },
-  { year: 2031, sf: 20,  revenue: "$289K" },
-  { year: 2032, sf: 70,  revenue: "$1.1M" },
-  { year: 2033, sf: 38,  revenue: "$521K" },
-  { year: 2034, sf: 15,  revenue: "$198K" },
-]
-
-const INDUSTRY_SEGMENTS = [
-  { label: "Technology",   pct: 35, colorVar: "--color-chart-1", dotClass: "bg-chart-1" },
-  { label: "Finance",      pct: 25, colorVar: "--color-chart-2", dotClass: "bg-chart-2" },
-  { label: "Healthcare",   pct: 20, colorVar: "--color-chart-3", dotClass: "bg-chart-3" },
-  { label: "Retail",       pct: 12, colorVar: "--color-chart-4", dotClass: "bg-chart-4" },
-  { label: "Other",        pct: 8,  colorVar: "--color-chart-5", dotClass: "bg-chart-5" },
-]
-
-const SIZE_SEGMENTS = [
-  { label: "143,200 sf – 179,000 sf", pct: 54, colorVar: "--color-chart-1", dotClass: "bg-chart-1" },
-  { label: "107,400 sf – 143,199 sf", pct: 0,  colorVar: "--color-chart-2", dotClass: "bg-chart-2" },
-  { label: "71,600 sf – 107,399 sf",  pct: 13, colorVar: "--color-chart-3", dotClass: "bg-chart-3" },
-  { label: "35,800 sf – 71,599 sf",   pct: 24, colorVar: "--color-chart-4", dotClass: "bg-chart-4" },
-  { label: "0 sf – 35,799 sf",        pct: 9,  colorVar: "--color-chart-5", dotClass: "bg-chart-5" },
-]
-
-const RENT_SEGMENTS = [
-  { label: "$76.00 – $93.00", pct: 4,  colorVar: "--color-chart-1", dotClass: "bg-chart-1" },
-  { label: "$57.00 – $75.00", pct: 4,  colorVar: "--color-chart-2", dotClass: "bg-chart-2" },
-  { label: "$38.00 – $56.00", pct: 0,  colorVar: "--color-chart-3", dotClass: "bg-chart-3" },
-  { label: "$19.00 – $37.00", pct: 24, colorVar: "--color-chart-4", dotClass: "bg-chart-4" },
-  { label: "$0.00 – $18.00",  pct: 68, colorVar: "--color-chart-5", dotClass: "bg-chart-5" },
-]
-
-const PORTFOLIO_STATS = [
-  { label: "Total Assets", value: "11" },
-  { label: "Total RBA", value: "9.8M" },
-  { label: "Avg Occupancy", value: "71%" },
-  { label: "Total Revenue", value: "$2.8M/mo", accent: true },
-  { label: "Active Deals", value: "284" },
-  { label: "Exp. Leases (1yr)", value: "42" },
-]
-
-const PORTFOLIO_TOP_TENANTS = [
-  { name: "Ernst & Young", pct: 12.4, value: "$892K/mo" },
-  { name: "HSBC Holdings plc", pct: 9.1, value: "$654K/mo" },
-  { name: "Deloitte LLP", pct: 7.8, value: "$521K/mo" },
-  { name: "JP Morgan Chase", pct: 6.2, value: "$448K/mo" },
-  { name: "Google LLC", pct: 5.4, value: "$382K/mo" },
-  { name: "Salesforce Inc.", pct: 4.1, value: "$298K/mo" },
-  { name: "WeWork Companies", pct: 3.7, value: "$271K/mo" },
-  { name: "Amazon.com Inc.", pct: 3.2, value: "$234K/mo" },
-]
 
 const CRITICAL_DATES: CriticalDate[] = [
   { tenant: "Pfizer",              type: "Lease Expiration",              space: "Suite 1200",   sf: 117000, date: "Sep 15, 2026", monthsOut: 2,  category: "expiring" },
@@ -140,13 +74,6 @@ const CRITICAL_DATES: CriticalDate[] = [
   { tenant: "JPMorgan Chase",      type: "Expansion Option Deadline",     space: "Floor 6",      sf: 55800,  date: "Jun 30, 2027", monthsOut: 11, category: "options"  },
 ]
 
-const MOVE_EVENTS: MoveEvent[] = [
-  { tenant: "Deloitte LLP",     space: "Suite 500",   sf: 43000,  date: "Jul 1",  type: "move-in"  },
-  { tenant: "Pfizer",           space: "Suite 1200",  sf: 117000, date: "Apr 15", type: "move-out" },
-  { tenant: "NovaTech Inc.",    space: "Suite 800",   sf: 28500,  date: "Aug 1",  type: "move-in"  },
-  { tenant: "Legacy Partners",  space: "Floor 3",     sf: 21000,  date: "Sep 1",  type: "move-out" },
-]
-
 const VACANT_SPACES: VacantSpace[] = [
   { space: "Suite 2100",  sf: 34200, daysVacant: 210 },
   { space: "Floor 7",     sf: 52000, daysVacant: 145 },
@@ -154,28 +81,12 @@ const VACANT_SPACES: VacantSpace[] = [
   { space: "Floors 9–10", sf: 88000, daysVacant: 30  },
 ]
 
-const NEAR_TERM_EXPIRATIONS: NearTermExpiration[] = [
-  { tenant: "Pfizer",       space: "Suite 1200",  sf: 117000, date: "Apr 15, 2026" },
-  { tenant: "Deloitte LLP", space: "Suite 500",   sf: 43000,  date: "Jul 1, 2026"  },
-  { tenant: "Morgan Stanley", space: "Floors 8–11", sf: 116000, date: "Aug 1, 2026" },
-]
-
-const PORTFOLIO_EXPIRING = [
-  { year: 2026, sf: 412, revenue: "$4.8M" },
-  { year: 2027, sf: 284, revenue: "$3.2M" },
-  { year: 2028, sf: 521, revenue: "$6.1M" },
-  { year: 2029, sf: 198, revenue: "$2.3M" },
-  { year: 2030, sf: 347, revenue: "$4.1M" },
-  { year: 2031, sf: 142, revenue: "$1.7M" },
-  { year: 2032, sf: 489, revenue: "$5.8M" },
-  { year: 2033, sf: 224, revenue: "$2.6M" },
-  { year: 2034, sf: 98, revenue: "$1.1M" },
-]
-
 export default function App() {
   const [navCollapsed, setNavCollapsed] = React.useState(true)
   const [selectedAssetId, setSelectedAssetId] = React.useState("vts-tower")
-  const [darkMode, setDarkMode] = React.useState(false)
+  const [currentPage, setCurrentPage] = React.useState("dashboard")
+  const [profileMode, setProfileMode] = React.useState(false)
+  const [, setDarkMode] = React.useState(false)
   const isMobile = useIsMobile()
 
   const toggleDark = () => {
@@ -186,14 +97,83 @@ export default function App() {
     })
   }
 
+  const PAGE_LABELS: Record<string, string> = {
+    "stacking": "Stacking Plan", "spaces": "Spaces",
+    "leases": "Leases", "critical-dates": "Critical Dates", "options-rights": "Options & Rights", "tenants": "Tenants",
+    "deals": "Deals", "deal-tasks": "Deal Tasks", "tenant-coord": "Tenant Coordination", "requirements": "Requirements",
+    "planning": "Planning", "budgets": "Budgets", "appraisals": "Appraisals", "comps": "Comps",
+    "market": "Market", "buildings": "Buildings", "listings": "Listings", "tourbooks": "My Tourbooks",
+    "shares": "My Shares", "marketing-analytics": "Marketing Analytics", "inquiries": "Inquiries",
+    "insights": "Insights", "leasing-activity": "Leasing Activity Report", "portfolio-dashboards": "Portfolio Dashboards",
+    "portfolio-alerts": "Portfolio Alerts", "portfolio-reports": "Portfolio Reports", "lease-charts": "Lease Charts",
+    "abstraction": "Abstraction Management", "activity": "Activity Feed", "reminders": "Reminders",
+  }
+
+  const renderPage = (page: string) => {
+    if (page === "ai") return <AgentsPage />
+    if (page !== "dashboard" && PAGE_LABELS[page]) {
+      return (
+        <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
+          <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center mb-5">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-primary opacity-60"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 21V9"/></svg>
+          </div>
+          <h1 className="text-2xl font-semibold text-foreground mb-2">{PAGE_LABELS[page]}</h1>
+          <p className="text-sm text-muted-foreground max-w-xs">This page is a placeholder. Content coming soon.</p>
+        </div>
+      )
+    }
+    return (
+      <div className="space-y-4">
+        <BuildingHeader
+          image={buildingImg}
+          name="VTS Tower Headquarters"
+          address="114 West 41st Street, New York, NY 10036"
+          city="Built 2017 · 52 Floors · Office"
+          stats={STATS}
+        />
+        <KpiBar kpis={KPIS} />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <AvailabilityOverview occupiedSf={957638} vacantSf={410416} vacantSpaces={VACANT_SPACES} />
+          <CriticalDates dates={CRITICAL_DATES} className="md:col-span-2" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <FinancialPerformance className="md:col-span-2" />
+          <ActionLevers />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <LeasingActivity deals={ACTIVE_DEALS} className="md:col-span-2" />
+          <LeasingAgents deals={ACTIVE_DEALS} decisions={DECISIONS_TODAY} />
+        </div>
+      </div>
+    )
+  }
+
+  if (profileMode) {
+    return (
+      <ProfileShell
+        onExit={() => { setProfileMode(false); setCurrentPage("dashboard"); setNavCollapsed(true) }}
+        assets={ASSETS}
+        portfolios={PORTFOLIOS}
+        selectedAssetId={selectedAssetId}
+        onAssetChange={setSelectedAssetId}
+      />
+    )
+  }
+
   return (
     <div className="min-h-screen">
       <AppNav
         onCollapsedChange={setNavCollapsed}
         assets={ASSETS}
+        portfolios={PORTFOLIOS}
         selectedAssetId={selectedAssetId}
-        onAssetChange={setSelectedAssetId}
+        onAssetChange={id => { setSelectedAssetId(id); setCurrentPage("dashboard") }}
         onLogoClick={toggleDark}
+        onNavItemClick={id => {
+          if (id === "avatar") { setProfileMode(true) }
+          else setCurrentPage(id)
+        }}
+        activePage={currentPage}
       />
 
       <main
@@ -206,46 +186,7 @@ export default function App() {
               : "pl-[264px]"
         )}
       >
-          <div className="space-y-4">
-            <BuildingHeader
-              image={buildingImg}
-              name="VTS Tower Headquarters"
-              address="114 West 41st Street"
-              city="New York, NY 10036"
-              stats={STATS}
-            />
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <AvailabilityOverview occupiedSf={957638} vacantSf={410416} vacantSpaces={VACANT_SPACES} />
-              <CriticalDates dates={CRITICAL_DATES} className="md:col-span-2" />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <FinancialPerformance className="md:col-span-2" />
-              <ActionLevers />
-            </div>
-
-            <LeasingActivity deals={ACTIVE_DEALS} decisions={DECISIONS_TODAY} />
-
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <TopTenants tenants={TOP_TENANTS} className="md:col-span-2" />
-              <MultiDonutCard
-                eyebrow="Tenants"
-                title="Industry Distribution"
-                segments={INDUSTRY_SEGMENTS}
-                centerLabel="10"
-                centerSub="Industries"
-              />
-              <MultiDonutCard
-                eyebrow="Tenants"
-                title="Size Distribution"
-                segments={SIZE_SEGMENTS}
-                centerLabel="40.1K"
-                centerSub="sf avg"
-              />
-            </div>
-
-          </div>
+        {renderPage(currentPage)}
       </main>
     </div>
   )

@@ -5,7 +5,6 @@ import {
 } from "recharts"
 import { cn, cardBase } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { AlertTriangle, Zap, ShieldAlert } from "lucide-react"
 
 // -------------------------------------------------------------------
 // 2026 full-year chart data — actuals Jan–Jun, projected Jul–Dec
@@ -76,33 +75,6 @@ const noiBudgetTotal  = netRevBudget - expBudgetTotal
 
 // -------------------------------------------------------------------
 // Action levers
-// -------------------------------------------------------------------
-interface ActionItem {
-  type: "risk" | "upside" | "ops"
-  text: string; value: string; detail?: string
-}
-
-const ACTIONS: ActionItem[] = [
-  {
-    type: "risk",
-    text: "Leases expiring in < 12 mo",
-    value: "$234K/mo",
-    detail: "Pfizer · Morgan Stanley · Deloitte LLP",
-  },
-  {
-    type: "upside",
-    text: "LOI+ deals → NOI upside if executed",
-    value: "+$89K/mo",
-    detail: "NovaTech · Vertex Studios · Bluewave LLC",
-  },
-  {
-    type: "ops",
-    text: "2 tenants with outstanding AR > 30 days",
-    value: "$41K past due",
-    detail: "Meridian Health · Atlas Group",
-  },
-]
-
 // -------------------------------------------------------------------
 // SVG pattern defs for projected (striped) bars
 // -------------------------------------------------------------------
@@ -204,29 +176,6 @@ function BridgeRow({ item }: { item: RevenueItem }) {
         </td>
       </tr>
     </>
-  )
-}
-
-// -------------------------------------------------------------------
-// Action row
-// -------------------------------------------------------------------
-function ActionRow({ item }: { item: ActionItem }) {
-  const config = {
-    risk:   { bg: "bg-rose-500/8 border-rose-500/20",       icon: ShieldAlert,   color: "text-rose-500",    valColor: "text-rose-600 dark:text-rose-400"    },
-    upside: { bg: "bg-emerald-500/8 border-emerald-500/20", icon: Zap,           color: "text-emerald-500", valColor: "text-emerald-600 dark:text-emerald-400" },
-    ops:    { bg: "bg-orange-500/8 border-orange-500/20",   icon: AlertTriangle, color: "text-orange-500",  valColor: "text-orange-600 dark:text-orange-400"  },
-  }[item.type]
-  return (
-    <div className={cn("flex items-start gap-3 rounded-lg border p-3", config.bg)}>
-      <config.icon className={cn("h-3.5 w-3.5 mt-0.5 shrink-0", config.color)} />
-      <div className="flex-1 min-w-0">
-        <div className="flex items-start justify-between gap-2">
-          <p className="text-sm text-foreground leading-snug">{item.text}</p>
-          <span className={cn("text-sm font-bold tabular-nums shrink-0", config.valColor)}>{item.value}</span>
-        </div>
-        {item.detail && <p className="text-[11px] text-muted-foreground mt-0.5">{item.detail}</p>}
-      </div>
-    </div>
   )
 }
 

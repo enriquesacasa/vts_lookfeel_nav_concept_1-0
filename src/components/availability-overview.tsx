@@ -2,6 +2,8 @@ import * as React from "react"
 import { PieChart, Pie, Cell } from "recharts"
 import { cn, cardBase } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+import { Sparkles } from "lucide-react"
 
 export interface VacantSpace {
   space: string
@@ -98,19 +100,44 @@ const AvailabilityOverview = React.forwardRef<HTMLDivElement, AvailabilityOvervi
               <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-3">Vacant Spaces</p>
               <div className="flex flex-col gap-2">
                 {vacantSpaces.map((v, i) => (
-                  <div key={i} className="flex items-center justify-between gap-2 rounded-md px-2 py-1 -mx-2 cursor-pointer hover:bg-muted/40 dark:hover:bg-white/4 transition-colors">
+                  <div key={i} className="flex items-center justify-between gap-2 rounded-md px-2 py-1 -mx-2 cursor-pointer hover:bg-muted/40 dark:hover:bg-white/4 transition-colors group/space">
                     <div className="flex items-center gap-2 min-w-0">
                       <span className="text-sm font-medium text-foreground truncate">{v.space}</span>
                       <span className="text-sm text-muted-foreground shrink-0">{fmtK(v.sf)} sf</span>
                     </div>
-                    <span className={cn(
-                      "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold tabular-nums shrink-0",
-                      v.daysVacant > 180
-                        ? "bg-rose-500/10 text-rose-600 dark:bg-rose-500/15 dark:text-rose-400"
-                        : v.daysVacant > 90
-                          ? "bg-orange-500/10 text-orange-600 dark:bg-orange-500/15 dark:text-orange-400"
-                          : "bg-primary/10 text-primary dark:bg-primary/15"
-                    )}>{v.daysVacant} d</span>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className={cn(
+                        "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold tabular-nums",
+                        v.daysVacant > 180
+                          ? "bg-rose-500/10 text-rose-600 dark:bg-rose-500/15 dark:text-rose-400"
+                          : v.daysVacant > 90
+                            ? "bg-orange-500/10 text-orange-600 dark:bg-orange-500/15 dark:text-orange-400"
+                            : "bg-primary/10 text-primary dark:bg-primary/15"
+                      )}>{v.daysVacant} d</span>
+                      <Tooltip>
+                        <TooltipTrigger render={<span />}>
+                          <button
+                            onClick={e => e.stopPropagation()}
+                            className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-primary/10 hover:bg-primary text-primary hover:text-white transition-all duration-150"
+                          >
+                            <Sparkles className="h-3 w-3" />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent
+                          side="top"
+                          className="bg-[oklch(0.22_0.18_278)] text-white border-transparent font-medium"
+                          arrowClassName="fill-[oklch(0.22_0.18_278)] bg-[oklch(0.22_0.18_278)]"
+                        >
+                          <div className="flex flex-col gap-1">
+                            <div className="flex items-center gap-1.5 font-semibold text-white">
+                              <Sparkles className="h-3 w-3" />
+                              Run Agent
+                            </div>
+                            <p className="text-white/70 font-normal">Find prospects and draft an outreach plan for this space</p>
+                          </div>
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
                   </div>
                 ))}
               </div>

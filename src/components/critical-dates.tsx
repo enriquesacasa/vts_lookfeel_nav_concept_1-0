@@ -1,7 +1,7 @@
 import * as React from "react"
-import { createPortal } from "react-dom"
 import { cn, cardBase } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { ChevronUp, ChevronDown, ChevronsUpDown, Sparkles } from "lucide-react"
 
 type DateCategory = "expiring" | "renewal" | "options" | "all"
@@ -59,42 +59,30 @@ interface AIButtonProps {
 }
 
 function AIButton({ onClick }: AIButtonProps) {
-  const [pos, setPos] = React.useState<{ top: number; right: number } | null>(null)
-  const btnRef = React.useRef<HTMLButtonElement>(null)
-
-  function handleMouseEnter() {
-    if (!btnRef.current) return
-    const r = btnRef.current.getBoundingClientRect()
-    setPos({ top: r.top, right: window.innerWidth - r.right })
-  }
-
   return (
-    <>
-      <button
-        ref={btnRef}
-        onClick={onClick}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={() => setPos(null)}
-        className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-primary/10 hover:bg-primary text-primary hover:text-white transition-all duration-150 shrink-0"
-      >
-        <Sparkles className="h-3 w-3" />
-      </button>
-      {pos && createPortal(
-        <div
-          className="pointer-events-none z-[9999]"
-          style={{ position: "fixed", top: pos.top - 8, right: pos.right, transform: "translateY(-100%)" }}
+    <Tooltip>
+      <TooltipTrigger render={<span />}>
+        <button
+          onClick={onClick}
+          className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-primary/10 hover:bg-primary text-primary hover:text-white transition-all duration-150 shrink-0"
         >
-          <div className="rounded-lg bg-foreground text-background text-xs px-3 py-2 shadow-lg leading-snug w-56">
-            <p className="font-semibold mb-0.5">Run AI Agent</p>
-            <p className="opacity-70">Kick off an agentic workflow to research, draft a response plan, and surface next steps for this date.</p>
+          <Sparkles className="h-3 w-3" />
+        </button>
+      </TooltipTrigger>
+      <TooltipContent
+        side="top"
+        className="bg-[oklch(0.22_0.18_278)] text-white border-transparent font-medium"
+        arrowClassName="fill-[oklch(0.22_0.18_278)]"
+      >
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-1.5 font-semibold text-white">
+            <Sparkles className="h-3 w-3" />
+            Run Agent
           </div>
-          <div className="flex justify-end pr-2">
-            <div className="w-2 h-2 bg-foreground rotate-45 -mt-1" />
-          </div>
-        </div>,
-        document.body
-      )}
-    </>
+          <p className="text-white/70 font-normal">Research this date and surface next steps</p>
+        </div>
+      </TooltipContent>
+    </Tooltip>
   )
 }
 
@@ -144,7 +132,7 @@ const CriticalDates = React.forwardRef<HTMLDivElement, CriticalDatesProps>(
         {/* Header */}
         <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">Upcoming</p>
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">Upcoming 12 Mo</p>
             <h2 className="text-xl font-semibold text-foreground">Critical Dates</h2>
           </div>
           <Button
