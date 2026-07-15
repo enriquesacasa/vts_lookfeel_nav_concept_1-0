@@ -102,7 +102,7 @@ const CARD = "border border-border bg-card"
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground mb-1">
+    <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">
       {children}
     </p>
   )
@@ -156,7 +156,7 @@ function AgentsHeader({ query, setQuery }: { query: string; setQuery: (v: string
       <div className="flex items-center gap-4 py-4 border-b border-border">
         {/* Title */}
         <div className="min-w-0">
-          <p className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground mb-1">AI · Automation</p>
+          <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">AI · Automation</p>
           <div className="flex items-center gap-2.5">
             <Sparkle fill="currentColor" className="h-6 w-6 sm:h-7 sm:w-7 text-primary shrink-0" />
             <h1 className="text-2xl sm:text-3xl font-medium text-foreground leading-tight">VTS Agents</h1>
