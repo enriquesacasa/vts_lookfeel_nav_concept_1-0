@@ -145,7 +145,7 @@ export function AgentsPage({ className }: AgentsPageProps) {
         </div>
         <div className="flex-1">
           <p className="text-[11px] font-medium uppercasest text-muted-foreground mb-2">AI · Automation</p>
-          <h1 className="font-inter text-2xl sm:text-4xl font-medium text-foreground leading-tight mb-1.5">VTS Agents</h1>
+          <h1 className="font-inter text-2xl sm:text-4xl font-semibold text-foreground leading-tight mb-1.5">VTS Agents</h1>
           <p className="text-sm text-muted-foreground">Ask anything about your portfolio. Agents research, analyze, and act on your behalf.</p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
