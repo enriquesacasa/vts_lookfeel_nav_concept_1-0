@@ -406,7 +406,7 @@ export function ProfileShell({ onExit, assets, portfolios, selectedAssetId, onAs
                     chevron={hasChildren && !collapsed ? (isOpen ? "down" : "right") : undefined}
                     onClick={() => {
                       handleNavClick(item.id)
-                      if (hasChildren) setOpenSections(prev => prev.has(item.id) ? new Set() : new Set([item.id]))
+                      if (hasChildren) setOpenSections(new Set([item.id]))
                       else setOpenSections(new Set())
                     }}
                   />
