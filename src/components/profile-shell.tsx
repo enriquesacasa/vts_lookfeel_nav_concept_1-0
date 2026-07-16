@@ -78,32 +78,41 @@ const BOTTOM_ITEMS = [
 
 // ── Placeholder page ─────────────────────────────────────────────────────────
 
-function PlaceholderPage({ label, icon: Icon }: { label: string; icon: React.ElementType }) {
+function PlaceholderPage({ label, icon: Icon, selectionHeader }: { label: string; icon: React.ElementType; selectionHeader?: React.ReactNode }) {
   return (
-    <div className="p-8 space-y-6">
-      <h1 className="text-2xl font-medium text-foreground flex items-center gap-2.5">
-        <Icon className="h-6 w-6 text-[#5528FF]" />
-        {label}
-      </h1>
-      <div className="rounded-2xl border border-border bg-card p-8 flex items-center justify-center min-h-[200px]">
-        <p className="text-sm text-muted-foreground">Content coming soon</p>
+    <div className="p-4 sm:p-6 space-y-4">
+      {selectionHeader}
+      <div className="flex flex-col items-center justify-center min-h-[40vh] text-center px-4">
+        <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center mb-5">
+          <Icon className="h-6 w-6 text-primary opacity-60" />
+        </div>
+        <h2 className="text-2xl font-medium text-foreground mb-2">{label}</h2>
+        <p className="text-sm text-muted-foreground max-w-xs">This page is a placeholder. Content coming soon.</p>
       </div>
     </div>
   )
 }
 
-// ── Portfolio overview (all assets) ─────────────────────────────────────────
+// ── Selection header (shared across overview + placeholder pages) ────────────
 
-function PortfolioOverview() {
+function SelectionHeader({ name, subtitle, eyebrow }: { name: string; subtitle: string; eyebrow: string }) {
+  return (
+    <div className="flex items-start gap-4 py-3 border-b border-border mb-4">
+      <div className="flex-1">
+        <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">{eyebrow}</p>
+        <h1 className="text-2xl sm:text-4xl font-semibold tracking-tight text-foreground leading-tight mb-1.5">{name}</h1>
+        <p className="text-sm text-muted-foreground">{subtitle}</p>
+      </div>
+    </div>
+  )
+}
+
+// ── Portfolio overview ────────────────────────────────────────────────────────
+
+function PortfolioOverview({ name, subtitle }: { name: string; subtitle: string }) {
   return (
     <div className="p-4 sm:p-6 space-y-4">
-      <div className="flex items-start gap-4 py-3 border-b border-border">
-        <div className="flex-1">
-          <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">Portfolio</p>
-          <h1 className="text-2xl sm:text-4xl font-semibold tracking-tight text-foreground leading-tight mb-1.5">All assets</h1>
-          <p className="text-sm text-muted-foreground">11 properties across 5 markets</p>
-        </div>
-      </div>
+      <SelectionHeader name={name} subtitle={subtitle} eyebrow="Portfolio" />
       <div className="flex flex-wrap divide-x divide-border/60 border border-border bg-card overflow-hidden rounded-lg">
         {[
           { label: "Total portfolio NOI", value: "$312M" },
@@ -163,23 +172,37 @@ export function ProfileShell({ onExit, assets, portfolios, selectedAssetId, onAs
   }, [dropdownOpen])
 
   const selectedAsset = assets.find(a => a.id === selectedAssetId)
+  const selectedPortfolio = portfolios.find(p => p.id === selectedAssetId)
 
   const filteredNavItems = React.useMemo(() => {
-    const base = NAV_ITEMS.filter(item => selectedAssetId !== "all" || item.id !== "stacking")
-    if (selectedAssetId !== "all") return base
+    const isPortfolioOrAll = selectedAssetId === "all" || !!portfolios.find(p => p.id === selectedAssetId)
+    const base = NAV_ITEMS.filter(item => !isPortfolioOrAll || item.id !== "stacking")
+    if (!isPortfolioOrAll) return base
     const dashIdx = base.findIndex(i => i.id === "dashboard")
     return [...base.slice(0, dashIdx + 1), ...PORTFOLIO_ITEMS, ...base.slice(dashIdx + 1)]
-  }, [selectedAssetId])
+  }, [selectedAssetId, portfolios])
 
   const allFlat = filteredNavItems.flatMap(i => [i, ...(i.children ?? [])])
   const activeItem = [...allFlat, AI_ITEM, ...BOTTOM_ITEMS].find(i => i.id === activePage)
 
+  const selectionHeader = selectedAssetId === "all"
+    ? <SelectionHeader name="All assets" subtitle="11 properties across 5 markets" eyebrow="Portfolio" />
+    : selectedPortfolio
+      ? <SelectionHeader name={selectedPortfolio.name} subtitle={`${selectedPortfolio.assetIds.length} properties`} eyebrow="Portfolio" />
+      : selectedAsset
+        ? <SelectionHeader name={selectedAsset.name} subtitle={selectedAsset.address} eyebrow="Asset" />
+        : null
+
   const renderContent = () => {
-    if (activePage === "dashboard" && selectedAssetId === "all") return <PortfolioOverview />
+    if (activePage === "dashboard" && (selectedAssetId === "all" || selectedPortfolio))
+      return <PortfolioOverview
+        name={selectedAssetId === "all" ? "All assets" : selectedPortfolio!.name}
+        subtitle={selectedAssetId === "all" ? "11 properties across 5 markets" : `${selectedPortfolio!.assetIds.length} properties`}
+      />
     if (activePage === "dashboard") return <VtsDashboard />
     if (activePage === "ai") return <VtsAgentsPage />
     if (activeItem && !("divider" in activeItem && activeItem.divider))
-      return <PlaceholderPage label={activeItem.label} icon={activeItem.icon} />
+      return <PlaceholderPage label={activeItem.label} icon={activeItem.icon} selectionHeader={selectionHeader} />
     return null
   }
 

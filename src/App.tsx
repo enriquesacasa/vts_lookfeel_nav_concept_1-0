@@ -110,22 +110,50 @@ export default function App() {
     "assets": "Assets", "markets": "Markets", "cities": "Cities",
   }
 
+  const selectedPortfolio = PORTFOLIOS.find(p => p.id === selectedAssetId)
+  const selectedAsset = ASSETS.find(a => a.id === selectedAssetId)
+
+  const renderSelectionHeader = () => {
+    if (selectedAssetId === "all") return (
+      <div className="flex items-start gap-4 py-3 border-b border-border mb-4">
+        <div className="flex-1">
+          <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">Portfolio</p>
+          <h1 className="text-2xl sm:text-4xl font-semibold tracking-tight text-foreground leading-tight mb-1.5">All assets</h1>
+          <p className="text-sm text-muted-foreground">11 properties across 5 markets</p>
+        </div>
+      </div>
+    )
+    if (selectedPortfolio) return (
+      <div className="flex items-start gap-4 py-3 border-b border-border mb-4">
+        <div className="flex-1">
+          <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">Portfolio</p>
+          <h1 className="text-2xl sm:text-4xl font-semibold tracking-tight text-foreground leading-tight mb-1.5">{selectedPortfolio.name}</h1>
+          <p className="text-sm text-muted-foreground">{selectedPortfolio.assetIds.length} properties</p>
+        </div>
+      </div>
+    )
+    if (selectedAsset) return (
+      <div className="flex items-start gap-4 py-3 border-b border-border mb-4">
+        <div className="flex-1">
+          <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">Asset</p>
+          <h1 className="text-2xl sm:text-4xl font-semibold tracking-tight text-foreground leading-tight mb-1.5">{selectedAsset.name}</h1>
+          <p className="text-sm text-muted-foreground">{selectedAsset.address}</p>
+        </div>
+      </div>
+    )
+    return null
+  }
+
   const renderPage = (page: string) => {
     if (page === "ai") return <AgentsPage />
-    if (page === "dashboard" && selectedAssetId === "all") return (
+    if (page === "dashboard" && (selectedAssetId === "all" || selectedPortfolio)) return (
       <div className="space-y-4">
-        <div className="flex items-start gap-4 py-3">
-          <div className="flex-1">
-            <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">Portfolio</p>
-            <h1 className="text-2xl sm:text-4xl font-semibold tracking-tight text-foreground leading-tight mb-1.5">All Assets</h1>
-            <p className="text-sm text-muted-foreground">11 properties across 5 markets</p>
-          </div>
-        </div>
+        {renderSelectionHeader()}
         <KpiBar kpis={[
           { label: "Total portfolio NOI", value: "$312M" },
           { label: "Occupancy",           value: "91.4%" },
           { label: "Total SF",            value: "4.2M sf" },
-          { label: "Markets",             value: "5" },
+          { label: "Markets",             value: selectedPortfolio ? String(new Set(selectedPortfolio.assetIds.map(() => "market")).size) : "5" },
         ]} />
         <div className="flex flex-col items-center justify-center min-h-[200px] text-center px-4 border border-border rounded-lg bg-card">
           <p className="text-sm text-muted-foreground">Portfolio dashboard content coming soon</p>
@@ -134,12 +162,15 @@ export default function App() {
     )
     if (page !== "dashboard" && PAGE_LABELS[page]) {
       return (
-        <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
-          <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center mb-5">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-primary opacity-60"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 21V9"/></svg>
+        <div>
+          {renderSelectionHeader()}
+          <div className="flex flex-col items-center justify-center min-h-[40vh] text-center px-4">
+            <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center mb-5">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-primary opacity-60"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 21V9"/></svg>
+            </div>
+            <h1 className="text-2xl font-medium text-foreground mb-2">{PAGE_LABELS[page]}</h1>
+            <p className="text-sm text-muted-foreground max-w-xs">This page is a placeholder. Content coming soon.</p>
           </div>
-          <h1 className="text-2xl font-medium text-foreground mb-2">{PAGE_LABELS[page]}</h1>
-          <p className="text-sm text-muted-foreground max-w-xs">This page is a placeholder. Content coming soon.</p>
         </div>
       )
     }
