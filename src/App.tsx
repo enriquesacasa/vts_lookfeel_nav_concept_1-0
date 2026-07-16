@@ -38,20 +38,37 @@ export const PORTFOLIOS = [
 ]
 
 const ASSET_DETAILS: Record<string, { city: string; image: string }> = {
-  "vts-tower":     { city: "Built 2017 · 52 floors · Office",   image: "https://loremflickr.com/400/300/office,glass,tower?lock=805" },
-  "one-financial": { city: "Built 1992 · 36 floors · Office",   image: "https://loremflickr.com/400/300/office,building?lock=22" },
-  "empire-state":  { city: "Built 1931 · 102 floors · Office",  image: "https://loremflickr.com/400/300/skyscraper,newyork?lock=33" },
-  "salesforce":    { city: "Built 2018 · 61 floors · Office",   image: "https://loremflickr.com/400/300/modern,tower?lock=44" },
-  "willis":        { city: "Built 1973 · 110 floors · Office",  image: "https://loremflickr.com/400/300/skyscraper,chicago?lock=55" },
-  "hudson-yards":  { city: "Built 2019 · 73 floors · Office",   image: "https://loremflickr.com/400/300/architecture,facade?lock=66" },
-  "one-wtc":       { city: "Built 2014 · 104 floors · Office",  image: "https://loremflickr.com/400/300/tower,glass?lock=77" },
-  "transamerica":  { city: "Built 1972 · 48 floors · Office",   image: "https://loremflickr.com/400/300/architecture,pyramid?lock=88" },
-  "peachtree":     { city: "Built 1992 · 60 floors · Office",   image: "https://loremflickr.com/400/300/highrise,office?lock=99" },
-  "union-square":  { city: "Built 1989 · 56 floors · Office",   image: "https://loremflickr.com/400/300/building,corporate?lock=110" },
-  "200-berkeley":  { city: "Built 1947 · 28 floors · Office",   image: "https://loremflickr.com/400/300/building,boston?lock=121" },
+  "vts-tower":     { city: "Built 2017 · 52 floors · Office",   image: "https://loremflickr.com/800/500/office,building,glass?lock=1" },
+  "one-financial": { city: "Built 1992 · 36 floors · Office",   image: "https://loremflickr.com/800/500/office,building,glass?lock=2" },
+  "empire-state":  { city: "Built 1931 · 102 floors · Office",  image: "https://loremflickr.com/800/500/office,building,glass?lock=3" },
+  "salesforce":    { city: "Built 2018 · 61 floors · Office",   image: "https://loremflickr.com/800/500/office,building,glass?lock=4" },
+  "willis":        { city: "Built 1973 · 110 floors · Office",  image: "https://loremflickr.com/800/500/office,building,glass?lock=5" },
+  "hudson-yards":  { city: "Built 2019 · 73 floors · Office",   image: "https://loremflickr.com/800/500/office,building,glass?lock=6" },
+  "one-wtc":       { city: "Built 2014 · 104 floors · Office",  image: "https://loremflickr.com/800/500/office,building,glass?lock=7" },
+  "transamerica":  { city: "Built 1972 · 48 floors · Office",   image: "https://loremflickr.com/800/500/office,building,glass?lock=8" },
+  "peachtree":     { city: "Built 1992 · 60 floors · Office",   image: "https://loremflickr.com/800/500/office,building,glass?lock=9" },
+  "union-square":  { city: "Built 1989 · 56 floors · Office",   image: "https://loremflickr.com/800/500/office,building,glass?lock=10" },
+  "200-berkeley":  { city: "Built 1947 · 28 floors · Office",   image: "https://loremflickr.com/800/500/office,building,glass?lock=11" },
 }
 
 const STATS: { label: string; value: string; accent?: boolean }[] = []
+
+const ASSET_KPIS: Record<string, {
+  occupancy: number; noi: string; noiBudgetDelta: string; noiBudgetUp: boolean;
+  expiring12mo: number; activeDeals: number; alert?: string
+}> = {
+  "vts-tower":     { occupancy: 70, noi: "$29.1M", noiBudgetDelta: "+9.4%", noiBudgetUp: true,  expiring12mo: 3, activeDeals: 6 },
+  "one-financial": { occupancy: 88, noi: "$18.4M", noiBudgetDelta: "+2.1%", noiBudgetUp: true,  expiring12mo: 1, activeDeals: 2 },
+  "empire-state":  { occupancy: 94, noi: "$41.2M", noiBudgetDelta: "-1.3%", noiBudgetUp: false, expiring12mo: 5, activeDeals: 4, alert: "2 options expiring" },
+  "salesforce":    { occupancy: 82, noi: "$55.8M", noiBudgetDelta: "+5.7%", noiBudgetUp: true,  expiring12mo: 2, activeDeals: 3 },
+  "willis":        { occupancy: 76, noi: "$33.0M", noiBudgetDelta: "-3.1%", noiBudgetUp: false, expiring12mo: 4, activeDeals: 1, alert: "Below occupancy target" },
+  "hudson-yards":  { occupancy: 97, noi: "$62.4M", noiBudgetDelta: "+11.2%", noiBudgetUp: true, expiring12mo: 0, activeDeals: 5 },
+  "one-wtc":       { occupancy: 91, noi: "$48.7M", noiBudgetDelta: "+3.8%", noiBudgetUp: true,  expiring12mo: 2, activeDeals: 2 },
+  "transamerica":  { occupancy: 68, noi: "$14.2M", noiBudgetDelta: "-6.5%", noiBudgetUp: false, expiring12mo: 6, activeDeals: 3, alert: "High vacancy risk" },
+  "peachtree":     { occupancy: 85, noi: "$22.1M", noiBudgetDelta: "+1.9%", noiBudgetUp: true,  expiring12mo: 1, activeDeals: 0 },
+  "union-square":  { occupancy: 93, noi: "$31.5M", noiBudgetDelta: "+4.4%", noiBudgetUp: true,  expiring12mo: 3, activeDeals: 4 },
+  "200-berkeley":  { occupancy: 79, noi: "$19.8M", noiBudgetDelta: "-0.8%", noiBudgetUp: false, expiring12mo: 2, activeDeals: 1 },
+}
 
 const KPIS = [
   { label: "In-place NOI",           value: "$29.1M",    subtitle: "+9.4% vs budget",  trend: "up"   as const },
@@ -166,16 +183,96 @@ export default function App() {
           { label: "Total SF",            value: "4.2M sf", subtitle: "across all assets" },
           { label: "Markets",             value: selectedPortfolio ? String(new Set(selectedPortfolio.assetIds.map(() => "market")).size) : "5" },
         ]} className="mt-4" />
-        <div className="flex flex-col items-center justify-center flex-1 text-center px-4 border border-border rounded-2xl bg-white dark:bg-card mt-4">
+        <div className="flex flex-col items-center justify-center flex-1 text-center px-4 rounded-2xl bg-white/70 dark:bg-white/8 backdrop-blur-md mt-4">
           <p className="text-sm text-muted-foreground">Portfolio dashboard content coming soon</p>
         </div>
       </div>
     )
+    if (page === "assets" && (selectedAssetId === "all" || selectedPortfolio)) {
+      const visibleAssets = selectedPortfolio
+        ? ASSETS.filter(a => selectedPortfolio.assetIds.includes(a.id))
+        : ASSETS
+      return (
+        <div className="space-y-4">
+          <BuildingHeader {...headerProps} />
+          <KpiBar kpis={[
+            { label: "Total portfolio NOI", value: "$312M",   subtitle: "+4.2% vs budget",  trend: "up"   as const },
+            { label: "Occupancy",           value: "91.4%",  subtitle: "+0.8% vs budget",  trend: "up"   as const },
+            { label: "Total SF",            value: "4.2M sf", subtitle: "across all assets" },
+            { label: "Markets",             value: selectedPortfolio ? "1" : "5" },
+          ]} />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {visibleAssets.map(asset => {
+              const kpi = ASSET_KPIS[asset.id]
+              const detail = ASSET_DETAILS[asset.id]
+              if (!kpi) return null
+              return (
+                <div
+                  key={asset.id}
+                  className="group cursor-pointer rounded-2xl overflow-hidden bg-white/70 dark:bg-white/8 backdrop-blur-md hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200"
+                  onClick={() => { setSelectedAssetId(asset.id); setCurrentPage("dashboard") }}
+                >
+                  {/* Hero image */}
+                  <div className="relative h-44 overflow-hidden">
+                    <img src={detail?.image} alt={asset.name} className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                    {kpi.alert && (
+                      <div className="absolute top-3 right-3">
+                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-white bg-destructive rounded-full px-2.5 py-1">
+                          ⚠ {kpi.alert}
+                        </span>
+                      </div>
+                    )}
+                    <div className="absolute bottom-0 left-0 right-0 px-4 pb-3">
+                      <p className="text-[10px] font-medium uppercase tracking-widest text-white/60 mb-0.5">{detail?.city}</p>
+                      <h3 className="font-semibold text-white text-base leading-tight">{asset.name}</h3>
+                      <p className="text-xs text-white/60 truncate">{asset.address}</p>
+                    </div>
+                  </div>
+
+                  {/* Stats */}
+                  <div className="px-4 py-3">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="flex-1 h-1 rounded-full bg-border overflow-hidden">
+                        <div
+                          className={cn("h-full rounded-full", kpi.occupancy >= 90 ? "bg-success" : kpi.occupancy >= 75 ? "bg-primary" : "bg-warning")}
+                          style={{ width: `${kpi.occupancy}%` }}
+                        />
+                      </div>
+                      <span className="text-xs font-medium text-foreground tabular-nums shrink-0">{kpi.occupancy}% occupied</span>
+                    </div>
+                    <div className="grid grid-cols-3 divide-x divide-border/60">
+                      <div className="pr-3">
+                        <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-0.5">NOI</p>
+                        <p className="text-sm font-semibold text-foreground">{kpi.noi}</p>
+                        <p className={cn("text-xs font-medium", kpi.noiBudgetUp ? "text-success" : "text-destructive")}>{kpi.noiBudgetDelta} vs budget</p>
+                      </div>
+                      <div className="px-3">
+                        <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-0.5">Expiring</p>
+                        <p className="text-sm font-semibold text-foreground">{kpi.expiring12mo} lease{kpi.expiring12mo !== 1 ? "s" : ""}</p>
+                        <p className={cn("text-xs font-medium", kpi.expiring12mo > 3 ? "text-destructive" : kpi.expiring12mo > 0 ? "text-warning" : "text-muted-foreground")}>
+                          {kpi.expiring12mo === 0 ? "None" : kpi.expiring12mo > 3 ? "Action needed" : "12-month"}
+                        </p>
+                      </div>
+                      <div className="pl-3">
+                        <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-0.5">Deals</p>
+                        <p className="text-sm font-semibold text-foreground">{kpi.activeDeals}</p>
+                        <p className="text-xs text-muted-foreground">active</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )
+    }
     if (page !== "dashboard" && PAGE_LABELS[page]) {
       return (
         <div className="flex flex-col" style={{minHeight: 'calc(100vh - 2rem)'}}>
           <BuildingHeader {...headerProps} />
-          <div className="flex flex-col items-center justify-center flex-1 text-center px-4 rounded-2xl bg-white dark:bg-card border border-border mt-4">
+          <div className="flex flex-col items-center justify-center flex-1 text-center px-4 rounded-2xl bg-white/70 dark:bg-white/8 backdrop-blur-md mt-4">
             <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center mb-5">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-primary opacity-60"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 21V9"/></svg>
             </div>
