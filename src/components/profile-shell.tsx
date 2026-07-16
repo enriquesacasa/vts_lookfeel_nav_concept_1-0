@@ -50,22 +50,6 @@ const NAV_ITEMS: NavItem[] = [
     { id: "comps",      label: "Comps",             icon: BarChart2 },
   ]},
   { id: "doc-vault",    label: "Doc vault",        icon: Archive },
-  { id: "div-insights", label: "",                 icon: LayoutGrid, divider: true },
-  { id: "market",       label: "Market",           icon: Globe, children: [
-    { id: "buildings",           label: "Buildings",             icon: Building2 },
-    { id: "listings",            label: "Listings",              icon: MapPin },
-    { id: "tourbooks",           label: "My tourbooks",          icon: BookOpen },
-    { id: "shares",              label: "My shares",             icon: Share2 },
-    { id: "marketing-analytics", label: "Marketing analytics",   icon: TrendingUp },
-    { id: "inquiries",           label: "Inquiries",             icon: MessageSquare },
-  ]},
-  { id: "insights",     label: "Insights",         icon: TrendingUp, children: [
-    { id: "leasing-activity",     label: "Leasing activity report", icon: FileBarChart },
-    { id: "portfolio-dashboards", label: "Portfolio dashboards",    icon: LayoutGrid },
-    { id: "portfolio-alerts",     label: "Portfolio alerts",        icon: BellRingIcon },
-    { id: "portfolio-reports",    label: "Portfolio reports",       icon: ClipboardList },
-    { id: "lease-charts",         label: "Lease charts",            icon: BarChart2 },
-  ]},
 ]
 
 const AI_ITEM = { id: "ai", label: "VTS Agents", icon: Sparkle }
@@ -173,6 +157,7 @@ export function ProfileShell({ onExit, assets, portfolios, selectedAssetId, onAs
 
   const selectedAsset = assets.find(a => a.id === selectedAssetId)
   const selectedPortfolio = portfolios.find(p => p.id === selectedAssetId)
+  const selectorLabel = selectedAssetId === "all" ? "All assets" : (selectedAsset?.name ?? selectedPortfolio?.name ?? "Select asset")
 
   const filteredNavItems = React.useMemo(() => {
     const isPortfolioOrAll = selectedAssetId === "all" || !!portfolios.find(p => p.id === selectedAssetId)
@@ -301,7 +286,7 @@ export function ProfileShell({ onExit, assets, portfolios, selectedAssetId, onAs
           {collapsed ? (
             <button
               onClick={() => setDropdownOpen(v => !v)}
-              title={selectedAsset?.name ?? "Select asset"}
+              title={selectorLabel}
               className="w-full flex items-center justify-center p-2 rounded-lg text-white/50 hover:text-white hover:bg-white/10 transition-colors"
             >
               <Building2 className="h-[15px] w-[15px]" />
@@ -318,7 +303,7 @@ export function ProfileShell({ onExit, assets, portfolios, selectedAssetId, onAs
             >
               <Building2 className="h-3.5 w-3.5 shrink-0 text-white/50" />
               <span className="text-xs font-medium text-white/80 flex-1 text-left">
-                {selectedAssetId === "all" ? "All assets" : (selectedAsset?.name ?? "All assets")}
+                {selectorLabel}
               </span>
               <ChevronDown className={cn("h-3 w-3 shrink-0 text-white/40 transition-transform", dropdownOpen && "rotate-180")} />
             </button>
@@ -406,13 +391,6 @@ export function ProfileShell({ onExit, assets, portfolios, selectedAssetId, onAs
           })()}
         </div>
 
-        {/* VTS Agents */}
-        <div className={cn("mb-1", collapsed ? "px-2" : "px-3")}>
-          <SidebarRow item={AI_ITEM} active={activePage === "ai"} collapsed={collapsed} accent onClick={() => handleNavClick("ai")} />
-        </div>
-
-        <div className="mx-3 h-px bg-white/8 mb-1" />
-
         {/* Main nav */}
         <nav className="flex-1 overflow-y-auto pb-2 scrollbar-none">
           <div className={cn("space-y-0.5", collapsed ? "px-2" : "px-3")}>
@@ -441,6 +419,9 @@ export function ProfileShell({ onExit, assets, portfolios, selectedAssetId, onAs
                 </React.Fragment>
               )
             })}
+            <div className={cn(collapsed ? "px-0" : "")}>
+              <SidebarRow item={AI_ITEM} active={activePage === "ai"} collapsed={collapsed} accent onClick={() => handleNavClick("ai")} />
+            </div>
           </div>
         </nav>
 

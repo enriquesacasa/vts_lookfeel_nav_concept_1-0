@@ -38,25 +38,25 @@ export const PORTFOLIOS = [
 ]
 
 const ASSET_DETAILS: Record<string, { city: string; image: string }> = {
-  "vts-tower":     { city: "Built 2017 · 52 floors · Office",   image: "https://picsum.photos/seed/vtsbld/400/300" },
-  "one-financial": { city: "Built 1992 · 36 floors · Office",   image: "https://picsum.photos/seed/finplz/400/300" },
-  "empire-state":  { city: "Built 1931 · 102 floors · Office",  image: "https://picsum.photos/seed/empire/400/300" },
-  "salesforce":    { city: "Built 2018 · 61 floors · Office",   image: "https://picsum.photos/seed/sfctr/400/300"  },
-  "willis":        { city: "Built 1973 · 110 floors · Office",  image: "https://picsum.photos/seed/willis/400/300" },
-  "hudson-yards":  { city: "Built 2019 · 73 floors · Office",   image: "https://picsum.photos/seed/hudson/400/300" },
-  "one-wtc":       { city: "Built 2014 · 104 floors · Office",  image: "https://picsum.photos/seed/onewtc/400/300" },
-  "transamerica":  { city: "Built 1972 · 48 floors · Office",   image: "https://picsum.photos/seed/transam/400/300" },
-  "peachtree":     { city: "Built 1992 · 60 floors · Office",   image: "https://picsum.photos/seed/peacht/400/300" },
-  "union-square":  { city: "Built 1989 · 56 floors · Office",   image: "https://picsum.photos/seed/unionsq/400/300" },
-  "200-berkeley":  { city: "Built 1947 · 28 floors · Office",   image: "https://picsum.photos/seed/berk200/400/300" },
+  "vts-tower":     { city: "Built 2017 · 52 floors · Office",   image: "https://loremflickr.com/400/300/office,glass,tower?lock=805" },
+  "one-financial": { city: "Built 1992 · 36 floors · Office",   image: "https://loremflickr.com/400/300/office,building?lock=22" },
+  "empire-state":  { city: "Built 1931 · 102 floors · Office",  image: "https://loremflickr.com/400/300/skyscraper,newyork?lock=33" },
+  "salesforce":    { city: "Built 2018 · 61 floors · Office",   image: "https://loremflickr.com/400/300/modern,tower?lock=44" },
+  "willis":        { city: "Built 1973 · 110 floors · Office",  image: "https://loremflickr.com/400/300/skyscraper,chicago?lock=55" },
+  "hudson-yards":  { city: "Built 2019 · 73 floors · Office",   image: "https://loremflickr.com/400/300/architecture,facade?lock=66" },
+  "one-wtc":       { city: "Built 2014 · 104 floors · Office",  image: "https://loremflickr.com/400/300/tower,glass?lock=77" },
+  "transamerica":  { city: "Built 1972 · 48 floors · Office",   image: "https://loremflickr.com/400/300/architecture,pyramid?lock=88" },
+  "peachtree":     { city: "Built 1992 · 60 floors · Office",   image: "https://loremflickr.com/400/300/highrise,office?lock=99" },
+  "union-square":  { city: "Built 1989 · 56 floors · Office",   image: "https://loremflickr.com/400/300/building,corporate?lock=110" },
+  "200-berkeley":  { city: "Built 1947 · 28 floors · Office",   image: "https://loremflickr.com/400/300/building,boston?lock=121" },
 }
 
 const STATS: { label: string; value: string; accent?: boolean }[] = []
 
 const KPIS = [
-  { label: "In-place NOI",           value: "$29.1M",    subtitle: "+9.4% vs budget",       trend: "up"   as const },
-  { label: "Revenue at risk (12mo)", value: "$234K/mo",  subtitle: "3 leases expiring",      trend: "down" as const },
-  { label: "Pipeline upside",        value: "+$89K/mo",  subtitle: "if LOI+ deals execute",  trend: "up"   as const },
+  { label: "In-place NOI",           value: "$29.1M",    subtitle: "+9.4% vs budget",  trend: "up"   as const },
+  { label: "Revenue at risk (12mo)", value: "$234K/mo",  subtitle: "-$18K vs budget",  trend: "down" as const },
+  { label: "Pipeline upside",        value: "+$89K/mo",  subtitle: "+$12K vs budget",  trend: "up"   as const },
   { label: "Managed by",             value: "CBRE" },
   { label: "Leased by",              value: "JLL" },
   { label: "Owned by",               value: "View The Space" },
@@ -160,25 +160,53 @@ export default function App() {
 
   const renderPage = (page: string) => {
     if (page === "ai") return <AgentsPage />
+
+    const assetDetail = ASSET_DETAILS[selectedAssetId]
+
+    // Compute header props depending on selection
+    const headerProps = (() => {
+      if (selectedAssetId === "all") return {
+        city: "Overview",
+        name: "All assets",
+        address: "11 properties across 5 markets",
+        image: undefined,
+        stats: [] as typeof STATS,
+      }
+      if (selectedPortfolio) return {
+        city: "Portfolio",
+        name: selectedPortfolio.name,
+        address: `${selectedPortfolio.assetIds.length} properties`,
+        image: undefined,
+        stats: [] as typeof STATS,
+      }
+      return {
+        city: assetDetail?.city ?? "Built 2017 · 52 floors · Office",
+        name: selectedAsset?.name ?? "VTS Tower Headquarters",
+        address: selectedAsset?.address ?? "114 West 41st Street, New York, NY 10036",
+        image: assetDetail?.image ?? buildingImg,
+        stats: STATS,
+      }
+    })()
+
     if (page === "dashboard" && (selectedAssetId === "all" || selectedPortfolio)) return (
-      <div className="space-y-4">
-        {renderSelectionHeader()}
+      <div className="flex flex-col" style={{minHeight: 'calc(100vh - 2rem)'}}>
+        <BuildingHeader {...headerProps} />
         <KpiBar kpis={[
-          { label: "Total portfolio NOI", value: "$312M" },
-          { label: "Occupancy",           value: "91.4%" },
-          { label: "Total SF",            value: "4.2M sf" },
+          { label: "Total portfolio NOI", value: "$312M",   subtitle: "+4.2% vs budget",  trend: "up"   as const },
+          { label: "Occupancy",           value: "91.4%",  subtitle: "+0.8% vs budget",  trend: "up"   as const },
+          { label: "Total SF",            value: "4.2M sf", subtitle: "across all assets" },
           { label: "Markets",             value: selectedPortfolio ? String(new Set(selectedPortfolio.assetIds.map(() => "market")).size) : "5" },
-        ]} />
-        <div className="flex flex-col items-center justify-center min-h-[200px] text-center px-4 border border-border rounded-lg bg-card">
+        ]} className="mt-4" />
+        <div className="flex flex-col items-center justify-center flex-1 text-center px-4 border border-border rounded-2xl bg-white dark:bg-card mt-4">
           <p className="text-sm text-muted-foreground">Portfolio dashboard content coming soon</p>
         </div>
       </div>
     )
     if (page !== "dashboard" && PAGE_LABELS[page]) {
       return (
-        <div>
-          {renderSelectionHeader()}
-          <div className="flex flex-col items-center justify-center min-h-[40vh] text-center px-4">
+        <div className="flex flex-col" style={{minHeight: 'calc(100vh - 2rem)'}}>
+          <BuildingHeader {...headerProps} />
+          <div className="flex flex-col items-center justify-center flex-1 text-center px-4 rounded-2xl bg-white dark:bg-card border border-border mt-4">
             <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center mb-5">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-primary opacity-60"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 21V9"/></svg>
             </div>
@@ -188,16 +216,9 @@ export default function App() {
         </div>
       )
     }
-    const assetDetail = ASSET_DETAILS[selectedAssetId]
     return (
       <div className="space-y-4">
-        <BuildingHeader
-          image={assetDetail?.image ?? buildingImg}
-          name={selectedAsset?.name ?? "VTS Tower Headquarters"}
-          address={selectedAsset?.address ?? "114 West 41st Street, New York, NY 10036"}
-          city={assetDetail?.city ?? "Built 2017 · 52 floors · office"}
-          stats={STATS}
-        />
+        <BuildingHeader {...headerProps} />
         <KpiBar kpis={KPIS} />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <AvailabilityOverview occupiedSf={957638} vacantSf={410416} vacantSpaces={VACANT_SPACES} />

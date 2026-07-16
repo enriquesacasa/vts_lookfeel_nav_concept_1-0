@@ -23,8 +23,9 @@ const BuildingHeader = React.forwardRef<HTMLDivElement, BuildingHeaderProps>(
       {/* Hero section */}
       <div className="flex items-start gap-4 py-3">
         {image && (
-          <div className="shrink-0 w-16 h-16 sm:w-24 sm:h-24 rounded-xl overflow-hidden">
+          <div className="relative shrink-0 w-16 h-16 sm:w-24 sm:h-24 rounded-xl overflow-hidden">
             <img src={image} alt={name} className="w-full h-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/30" />
           </div>
         )}
         <div className="flex-1">

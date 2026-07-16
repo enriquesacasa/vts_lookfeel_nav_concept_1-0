@@ -82,22 +82,6 @@ const navStructure: NavItem[] = [
     { id: "comps",      label: "Comps",         icon: BarChart2 },
   ]},
   { id: "doc-vault",    label: "Doc vault",     icon: Archive },
-  { id: "div-insights", label: "",              divider: true },
-  { id: "market",       label: "Market",        icon: Globe, children: [
-    { id: "buildings",          label: "Buildings",            icon: Building2 },
-    { id: "listings",           label: "Listings",             icon: MapPin },
-    { id: "tourbooks",          label: "My tourbooks",         icon: BookOpen },
-    { id: "shares",             label: "My shares",            icon: Share2 },
-    { id: "marketing-analytics",label: "Marketing analytics",  icon: TrendingUp },
-    { id: "inquiries",          label: "Inquiries",            icon: MessageSquare },
-  ]},
-  { id: "insights",     label: "Insights",      icon: TrendingUp, children: [
-    { id: "leasing-activity",    label: "Leasing activity report", icon: FileBarChart },
-    { id: "portfolio-dashboards",label: "Portfolio dashboards",    icon: LayoutGrid },
-    { id: "portfolio-alerts",    label: "Portfolio alerts",        icon: BellRing },
-    { id: "portfolio-reports",   label: "Portfolio reports",       icon: ClipboardList },
-    { id: "lease-charts",        label: "Lease charts",            icon: BarChart2 },
-  ]},
 ]
 
 const aiItem = { id: "ai", label: "VTS Agents", icon: Sparkle, accent: true, small: false }
@@ -228,13 +212,16 @@ function DesktopNav({ className, onCollapsedChange, assets, portfolios, selected
   }
 
   const selectedAsset = assets?.find(a => a.id === selectedAssetId)
+  const selectedPortfolio = portfolios?.find(p => p.id === selectedAssetId)
+  const selectorLabel = selectedAssetId === "all" ? "All assets" : (selectedAsset?.name ?? selectedPortfolio?.name ?? "Select asset")
 
   const filteredNav = React.useMemo(() => {
-    const base = navStructure.filter(item => selectedAssetId !== "all" || item.id !== "stacking")
-    if (selectedAssetId !== "all") return base
+    const isPortfolioOrAll = selectedAssetId === "all" || (portfolios ?? []).some(p => p.id === selectedAssetId)
+    const base = navStructure.filter(item => !isPortfolioOrAll || item.id !== "stacking")
+    if (!isPortfolioOrAll) return base
     const dashIdx = base.findIndex(i => i.id === "dashboard")
     return [...base.slice(0, dashIdx + 1), ...portfolioItems, ...base.slice(dashIdx + 1)]
-  }, [selectedAssetId])
+  }, [selectedAssetId, portfolios])
 
   return (
     <nav
@@ -296,7 +283,7 @@ function DesktopNav({ className, onCollapsedChange, assets, portfolios, selected
                 <div
                   role="button"
                   tabIndex={0}
-                  aria-label={selectedAssetId === "all" ? "All assets" : (selectedAsset?.name ?? "Select asset")}
+                  aria-label={selectorLabel}
                   onClick={() => setDropdownOpen(v => !v)}
                   onKeyDown={e => (e.key === "Enter" || e.key === " ") && setDropdownOpen(v => !v)}
                   className={cn(
@@ -308,7 +295,7 @@ function DesktopNav({ className, onCollapsedChange, assets, portfolios, selected
                 </div>
               </TooltipTrigger>
               <TooltipContent side="right" className="bg-[oklch(0.22_0.18_278)] text-white border-transparent text-xs font-medium" arrowClassName="fill-[oklch(0.22_0.18_278)]">
-                {selectedAssetId === "all" ? "All assets" : (selectedAsset?.name ?? "Select asset")}
+                {selectorLabel}
               </TooltipContent>
             </Tooltip>
           ) : (
@@ -319,12 +306,12 @@ function DesktopNav({ className, onCollapsedChange, assets, portfolios, selected
               onKeyDown={e => (e.key === "Enter" || e.key === " ") && setDropdownOpen(v => !v)}
               className={cn(
                 "rounded-xl px-2.5 py-2 w-full flex items-center gap-2.5 cursor-pointer transition-colors border border-sidebar-foreground/20",
-                dropdownOpen ? "bg-sidebar-accent/70" : "bg-sidebar-accent/40 hover:bg-sidebar-accent/60"
+                dropdownOpen ? "bg-sidebar-accent/70 dark:bg-sidebar-accent" : "bg-sidebar-accent/40 hover:bg-sidebar-accent/60 dark:bg-sidebar-accent dark:hover:bg-sidebar-accent"
               )}
             >
               <Building2 className="h-3.5 w-3.5 shrink-0 text-sidebar-foreground/60" />
               <span className="text-xs font-medium text-sidebar-foreground flex-1">
-                {selectedAssetId === "all" ? "All assets" : (selectedAsset?.name ?? "Select asset")}
+                {selectorLabel}
               </span>
               <ChevronDown className={cn("h-3.5 w-3.5 shrink-0 text-sidebar-foreground/60 transition-transform duration-200", dropdownOpen && "rotate-180")} />
             </div>
@@ -454,17 +441,6 @@ function DesktopNav({ className, onCollapsedChange, assets, portfolios, selected
         </div>
       )}
 
-      <Separator className="mb-3 bg-sidebar-border" />
-
-      {/* VTS Agents */}
-      <NavRow
-        key={aiItem.id}
-        {...aiItem}
-        active={active === aiItem.id}
-        collapsed={collapsed}
-        onClick={() => { setActive(aiItem.id); onNavItemClick?.(aiItem.id) }}
-      />
-
       {/* Main nav */}
       <div className="flex flex-col gap-0.5 flex-1 overflow-y-auto">
         {filteredNav.map(item => {
@@ -531,6 +507,15 @@ function DesktopNav({ className, onCollapsedChange, assets, portfolios, selected
             </React.Fragment>
           )
         })}
+
+        {/* VTS Agents */}
+        <NavRow
+          key={aiItem.id}
+          {...aiItem}
+          active={active === aiItem.id}
+          collapsed={collapsed}
+          onClick={() => { setActive(aiItem.id); onNavItemClick?.(aiItem.id) }}
+        />
       </div>
 
       <Separator className="my-3 bg-sidebar-border" />
@@ -593,13 +578,16 @@ function MobileNav({ onLogoClick, onNavItemClick, activePage, assets, portfolios
   }
 
   const selectedAsset = assets?.find(a => a.id === selectedAssetId)
+  const selectedPortfolio = portfolios?.find(p => p.id === selectedAssetId)
+  const selectorLabel = selectedAssetId === "all" ? "All assets" : (selectedAsset?.name ?? selectedPortfolio?.name ?? "Select asset")
 
   const filteredNav = React.useMemo(() => {
-    const base = navStructure.filter(item => selectedAssetId !== "all" || item.id !== "stacking")
-    if (selectedAssetId !== "all") return base
+    const isPortfolioOrAll = selectedAssetId === "all" || (portfolios ?? []).some(p => p.id === selectedAssetId)
+    const base = navStructure.filter(item => !isPortfolioOrAll || item.id !== "stacking")
+    if (!isPortfolioOrAll) return base
     const dashIdx = base.findIndex(i => i.id === "dashboard")
     return [...base.slice(0, dashIdx + 1), ...portfolioItems, ...base.slice(dashIdx + 1)]
-  }, [selectedAssetId])
+  }, [selectedAssetId, portfolios])
 
   const VTSLogo = () => (
     <svg width="555" height="160" viewBox="0 0 555 160" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-[1.4rem] w-auto opacity-90">
@@ -645,11 +633,11 @@ function MobileNav({ onLogoClick, onNavItemClick, activePage, assets, portfolios
                 onKeyDown={e => (e.key === "Enter" || e.key === " ") && setAssetDropdownOpen(v => !v)}
                 className={cn(
                   "rounded-xl px-2.5 py-2 w-full flex items-center gap-2.5 cursor-pointer transition-colors border border-sidebar-foreground/20",
-                  assetDropdownOpen ? "bg-sidebar-accent/70" : "bg-sidebar-accent/40 hover:bg-sidebar-accent/60"
+                  assetDropdownOpen ? "bg-sidebar-accent/70 dark:bg-sidebar-accent" : "bg-sidebar-accent/40 hover:bg-sidebar-accent/60 dark:bg-sidebar-accent dark:hover:bg-sidebar-accent"
                 )}>
                 <Building2 className="h-3.5 w-3.5 shrink-0 text-sidebar-foreground/60" />
                 <span className="text-xs font-medium text-sidebar-foreground flex-1">
-                  {selectedAssetId === "all" ? "All assets" : (selectedAsset?.name ?? "Select asset")}
+                  {selectorLabel}
                 </span>
                 <ChevronDown className={cn("h-3.5 w-3.5 shrink-0 text-sidebar-foreground/60 transition-transform duration-200", assetDropdownOpen && "rotate-180")} />
               </div>

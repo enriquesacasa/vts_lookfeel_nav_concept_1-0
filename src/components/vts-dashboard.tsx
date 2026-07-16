@@ -11,10 +11,10 @@ import {
 // ── Data ─────────────────────────────────────────────────────────────────────
 
 const KPIS = [
-  { label: "In-Place NOI",    value: "$29.1M",   delta: "+9.4% vs budget",  up: true  },
-  { label: "Revenue at Risk", value: "$234K/mo", delta: "3 leases expiring", up: false },
-  { label: "Pipeline Upside", value: "+$89K/mo", delta: "if LOI+ closes",   up: true  },
-  { label: "Occupancy",       value: "70.0%",    delta: "957K of 1.37M sf", up: true  },
+  { label: "In-Place NOI",    value: "$29.1M",   delta: "+9.4% vs budget",   up: true  },
+  { label: "Revenue at Risk", value: "$234K/mo", delta: "-$18K vs budget",   up: false },
+  { label: "Pipeline Upside", value: "+$89K/mo", delta: "+$12K vs budget",   up: true  },
+  { label: "Occupancy",       value: "70.0%",    delta: "-2.1% vs budget",   up: false },
 ]
 
 const VACANT_SPACES = [

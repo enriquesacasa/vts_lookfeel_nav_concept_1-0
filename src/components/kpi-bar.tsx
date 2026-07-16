@@ -22,6 +22,14 @@ const KpiBar = React.forwardRef<HTMLDivElement, KpiBarProps>(
             {kpi.label}
           </p>
           <p className="text-xl font-semibold text-foreground">{kpi.value}</p>
+          {kpi.subtitle && (
+            <p className={cn(
+              "text-xs font-medium mt-1",
+              kpi.trend === "up" ? "text-success" : kpi.trend === "down" ? "text-destructive" : "text-muted-foreground"
+            )}>
+              {kpi.subtitle}
+            </p>
+          )}
         </div>
       ))}
     </div>
