@@ -14,7 +14,7 @@ const RECENT_RUNS = [
     title: "12-month lease expiry risk analysis",
     asset: "VTS Tower Headquarters",
     status: "complete" as const,
-    category: "Lease Risk",
+    category: "Lease risk",
     time: "2 min ago",
     summary: "3 leases totaling $234K/mo expire before Oct 2026. Pfizer and Morgan Stanley are highest priority.",
   },
@@ -40,7 +40,7 @@ const RECENT_RUNS = [
     title: "KPMG Suite 3400 renewal strategy",
     asset: "VTS Tower Headquarters",
     status: "pending" as const,
-    category: "Lease Strategy",
+    category: "Lease strategy",
     time: "Queued",
   },
   {
@@ -48,7 +48,7 @@ const RECENT_RUNS = [
     title: "Midtown Manhattan comparable lease transactions",
     asset: "Market",
     status: "complete" as const,
-    category: "Market Intel",
+    category: "Market intel",
     time: "1 hr ago",
     summary: "Avg asking rent up 4.2% YoY. 14 comps identified in the 40–120K sf range.",
   },
@@ -57,7 +57,7 @@ const RECENT_RUNS = [
 const AGENT_TYPES = [
   {
     id: "lease-risk",
-    label: "Lease Risk",
+    label: "Lease risk",
     description: "Analyze expiring leases, renewal probability, and revenue exposure.",
     prompts: ["What leases expire in the next 6 months?", "Which tenants are most likely not to renew?"],
   },
@@ -75,7 +75,7 @@ const AGENT_TYPES = [
   },
   {
     id: "market",
-    label: "Market Intel",
+    label: "Market intel",
     description: "Pull comparable deals, track trends, and benchmark performance.",
     prompts: ["What are comparable rents in Midtown?", "How does our occupancy compare to the market?"],
   },
@@ -165,7 +165,7 @@ function AgentsHeader({ query, setQuery }: { query: string; setQuery: (v: string
         {/* Stats */}
         <div className="hidden md:flex items-center gap-6 ml-auto shrink-0">
           {[
-            { label: "Agents Run", value: "142" },
+            { label: "Agents run", value: "142" },
             { label: "Running",    value: "1"   },
             { label: "Completed",  value: "98%" },
           ].map((s, i) => (

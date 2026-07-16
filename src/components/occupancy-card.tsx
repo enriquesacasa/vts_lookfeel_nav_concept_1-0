@@ -75,9 +75,9 @@ const OccupancyCard = React.forwardRef<HTMLDivElement, OccupancyCardProps>(
 
         <div className="h-px bg-border/50" />
 
-        {/* Section 2: Upcoming Move-Ins & Move-Outs */}
+        {/* Section 2: Upcoming move-ins & move-outs */}
         <div>
-          <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-2">Upcoming Move-Ins & Move-Outs</p>
+          <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-2">Upcoming move-ins & move-outs</p>
           <div className="flex flex-col gap-1.5">
             {moveEvents.map((e, i) => (
               <div key={i} className="flex items-center justify-between gap-2">
@@ -99,9 +99,9 @@ const OccupancyCard = React.forwardRef<HTMLDivElement, OccupancyCardProps>(
 
         <div className="h-px bg-border/50" />
 
-        {/* Section 3: Vacant Spaces */}
+        {/* Section 3: Vacant spaces */}
         <div>
-          <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-2">Vacant Spaces</p>
+          <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-2">Vacant spaces</p>
           <div className="flex flex-col gap-1.5">
             {vacantSpaces.map((v, i) => (
               <div key={i} className="flex items-center justify-between gap-2">

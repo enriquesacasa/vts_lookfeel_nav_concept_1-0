@@ -174,7 +174,7 @@ function VacancyCard({ className }: { className?: string }) {
   return (
     <div className={cn(CARD, "p-4", className)}>
       <Eyebrow>Availability</Eyebrow>
-      <SectionTitle action={<ViewAll label="All Spaces" />}>Vacant Spaces</SectionTitle>
+      <SectionTitle action={<ViewAll label="All spaces" />}>Vacant spaces</SectionTitle>
 
       <div className="flex items-end gap-3 mb-4">
         <p className="text-5xl font-medium text-foreground tracking-tight">{occupiedPct}%</p>
@@ -211,13 +211,13 @@ function VacancyCard({ className }: { className?: string }) {
   )
 }
 
-// ── Critical Dates card ───────────────────────────────────────────────────────
+// ── Critical dates card ───────────────────────────────────────────────────────
 
 function CriticalDatesCard({ className }: { className?: string }) {
   return (
     <div className={cn(CARD, "p-4", className)}>
       <Eyebrow>Upcoming 12 Mo</Eyebrow>
-      <SectionTitle action={<ViewAll />}>Critical Dates</SectionTitle>
+      <SectionTitle action={<ViewAll />}>Critical dates</SectionTitle>
 
       {CRITICAL_DATES.map((d, i) => {
         const monthChip = d.monthsOut <= 3
@@ -362,12 +362,12 @@ function LeasingActivityCard({ className }: { className?: string }) {
     <div className={cn(CARD, "overflow-hidden", className)}>
       <div className="px-4 pt-4 pb-3 flex items-start justify-between">
         <div>
-          <Eyebrow>Active Pipeline</Eyebrow>
+          <Eyebrow>Active pipeline</Eyebrow>
           <h2 className="text-xl font-medium text-foreground">Leasing activity</h2>
         </div>
         <div className="flex items-center gap-2 pt-0.5">
           <span className="text-xs text-muted-foreground">{ACTIVE_DEALS.length} deals</span>
-          <ViewAll label="All Deals" />
+          <ViewAll label="All deals" />
         </div>
       </div>
 
@@ -380,7 +380,7 @@ function LeasingActivityCard({ className }: { className?: string }) {
               <Th label="SF"        sk="sf"        />
               <Th label="Stage"     sk="stage"     />
               <Th label="Status"    sk="status"    />
-              <Th label="Base Rent" sk="baseRent"  />
+              <Th label="Base rent" sk="baseRent"  />
               <Th label=""                         />
             </tr>
           </thead>
@@ -440,7 +440,7 @@ function AssetHeader() {
       />
       {/* Title */}
       <div className="min-w-0">
-        <p className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground mb-0.5">Asset Dashboard</p>
+        <p className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground mb-0.5">Asset dashboard</p>
         <h1 className="text-2xl sm:text-3xl font-medium text-foreground leading-tight">VTS Tower Headquarters</h1>
         <p className="text-xs text-muted-foreground mt-0.5 hidden sm:block">114 West 41st Street, New York, NY 10036 · Built 2017 · 52 Floors · Office</p>
       </div>

@@ -70,9 +70,9 @@ const LeasingAgents = React.forwardRef<HTMLDivElement, LeasingAgentsProps>(
           )}
         </div>
 
-        {/* Approvals Needed */}
+        {/* Approvals needed */}
         <div>
-          <p className="text-[10px] font-medium uppercase tracking-widest mb-2 text-sidebar-foreground/50">Approvals Needed</p>
+          <p className="text-[10px] font-medium uppercase tracking-widest mb-2 text-sidebar-foreground/50">Approvals needed</p>
           {decisions.length === 0 ? (
             <p className="text-sm text-sidebar-foreground/40">No approvals pending</p>
           ) : (

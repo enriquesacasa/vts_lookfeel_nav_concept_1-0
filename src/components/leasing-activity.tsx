@@ -43,7 +43,7 @@ const STATUS_PILL: Record<Deal["status"], string> = {
 const STATUS_LABEL: Record<Deal["status"], string> = {
   active: "Active",
   stalled: "Stalled",
-  "at-risk": "At Risk",
+  "at-risk": "At risk",
 }
 
 function fmtSf(n: number) { return `${(n / 1000).toFixed(0)}K sf` }
@@ -132,7 +132,7 @@ const LeasingActivity = React.forwardRef<HTMLDivElement, LeasingActivityProps>(
           </Button>
         </div>
 
-        <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-3">Active Deals</p>
+        <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-3">Active deals</p>
         <table className="w-full text-sm border-collapse">
           <thead>
             <tr className="border-b-2 border-border/60">
@@ -140,7 +140,7 @@ const LeasingActivity = React.forwardRef<HTMLDivElement, LeasingActivityProps>(
               <Th col="space" className="pl-3">Space</Th>
               <Th col="stage" className="pl-3">Stage</Th>
               <Th col="status" className="pl-3">Status</Th>
-              <Th col="baseRent" right>Base Rent / Budget</Th>
+              <Th col="baseRent" right>Base rent / budget</Th>
               <th className="pb-2 pl-2 w-8" />
             </tr>
           </thead>

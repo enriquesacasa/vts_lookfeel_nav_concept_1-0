@@ -296,7 +296,7 @@ function DesktopNav({ className, onCollapsedChange, assets, portfolios, selected
                 <div
                   role="button"
                   tabIndex={0}
-                  aria-label={selectedAssetId === "all" ? "All Assets" : (selectedAsset?.name ?? "Select Asset")}
+                  aria-label={selectedAssetId === "all" ? "All assets" : (selectedAsset?.name ?? "Select asset")}
                   onClick={() => setDropdownOpen(v => !v)}
                   onKeyDown={e => (e.key === "Enter" || e.key === " ") && setDropdownOpen(v => !v)}
                   className={cn(
@@ -308,7 +308,7 @@ function DesktopNav({ className, onCollapsedChange, assets, portfolios, selected
                 </div>
               </TooltipTrigger>
               <TooltipContent side="right" className="bg-[oklch(0.22_0.18_278)] text-white border-transparent text-xs font-medium" arrowClassName="fill-[oklch(0.22_0.18_278)]">
-                {selectedAssetId === "all" ? "All Assets" : (selectedAsset?.name ?? "Select Asset")}
+                {selectedAssetId === "all" ? "All assets" : (selectedAsset?.name ?? "Select asset")}
               </TooltipContent>
             </Tooltip>
           ) : (
@@ -324,7 +324,7 @@ function DesktopNav({ className, onCollapsedChange, assets, portfolios, selected
             >
               <Building2 className="h-3.5 w-3.5 shrink-0 text-sidebar-foreground/60" />
               <span className="text-xs font-medium text-sidebar-foreground flex-1">
-                {selectedAssetId === "all" ? "All Assets" : (selectedAsset?.name ?? "Select Asset")}
+                {selectedAssetId === "all" ? "All assets" : (selectedAsset?.name ?? "Select asset")}
               </span>
               <ChevronDown className={cn("h-3.5 w-3.5 shrink-0 text-sidebar-foreground/60 transition-transform duration-200", dropdownOpen && "rotate-180")} />
             </div>
@@ -648,7 +648,7 @@ function MobileNav({ onLogoClick, onNavItemClick, activePage, assets, portfolios
                 )}>
                 <Building2 className="h-3.5 w-3.5 shrink-0 text-sidebar-foreground/60" />
                 <span className="text-xs font-medium text-sidebar-foreground flex-1">
-                  {selectedAssetId === "all" ? "All Assets" : (selectedAsset?.name ?? "Select Asset")}
+                  {selectedAssetId === "all" ? "All assets" : (selectedAsset?.name ?? "Select asset")}
                 </span>
                 <ChevronDown className={cn("h-3.5 w-3.5 shrink-0 text-sidebar-foreground/60 transition-transform duration-200", assetDropdownOpen && "rotate-180")} />
               </div>

@@ -29,7 +29,7 @@ const RECENT_RUNS: AgentRun[] = [
     title: "12-month lease expiry risk analysis",
     asset: "VTS Tower Headquarters",
     status: "complete",
-    category: "Lease Risk",
+    category: "Lease risk",
     time: "2 min ago",
     summary: "3 leases totaling $234K/mo expire before Oct 2026. Pfizer and Morgan Stanley are highest priority.",
   },
@@ -55,7 +55,7 @@ const RECENT_RUNS: AgentRun[] = [
     title: "KPMG Suite 3400 renewal strategy",
     asset: "VTS Tower Headquarters",
     status: "pending",
-    category: "Lease Strategy",
+    category: "Lease strategy",
     time: "Queued",
   },
   {
@@ -63,7 +63,7 @@ const RECENT_RUNS: AgentRun[] = [
     title: "Midtown Manhattan comparable lease transactions",
     asset: "Market",
     status: "complete",
-    category: "Market Intel",
+    category: "Market intel",
     time: "1 hr ago",
     summary: "Avg asking rent up 4.2% YoY. 14 comps identified in the 40–120K sf range.",
   },
@@ -72,7 +72,7 @@ const RECENT_RUNS: AgentRun[] = [
 const AGENT_TYPES: AgentType[] = [
   {
     id: "lease-risk",
-    label: "Lease Risk",
+    label: "Lease risk",
     description: "Analyze expiring leases, renewal probability, and revenue exposure.",
     examplePrompts: [
       "What leases expire in the next 6 months?",
@@ -99,7 +99,7 @@ const AGENT_TYPES: AgentType[] = [
   },
   {
     id: "market",
-    label: "Market Intel",
+    label: "Market intel",
     description: "Pull comparable deals, track trends, and benchmark performance.",
     examplePrompts: [
       "What are comparable rents in Midtown?",

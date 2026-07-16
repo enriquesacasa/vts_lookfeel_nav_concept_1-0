@@ -278,7 +278,7 @@ export function ProfileShell({ onExit, assets, portfolios, selectedAssetId, onAs
           {collapsed ? (
             <button
               onClick={() => setDropdownOpen(v => !v)}
-              title={selectedAsset?.name ?? "Select Asset"}
+              title={selectedAsset?.name ?? "Select asset"}
               className="w-full flex items-center justify-center p-2 rounded-lg text-white/50 hover:text-white hover:bg-white/10 transition-colors"
             >
               <Building2 className="h-[15px] w-[15px]" />
@@ -295,7 +295,7 @@ export function ProfileShell({ onExit, assets, portfolios, selectedAssetId, onAs
             >
               <Building2 className="h-3.5 w-3.5 shrink-0 text-white/50" />
               <span className="text-xs font-medium text-white/80 flex-1 text-left">
-                {selectedAssetId === "all" ? "All Assets" : (selectedAsset?.name ?? "All Assets")}
+                {selectedAssetId === "all" ? "All assets" : (selectedAsset?.name ?? "All assets")}
               </span>
               <ChevronDown className={cn("h-3 w-3 shrink-0 text-white/40 transition-transform", dropdownOpen && "rotate-180")} />
             </button>

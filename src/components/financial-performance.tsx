@@ -189,8 +189,8 @@ interface FinancialPerformanceProps {
 const FinancialPerformance = React.forwardRef<HTMLDivElement, FinancialPerformanceProps>(
   ({ className }, ref) => {
     const bridgeRows: RevenueItem[] = [
-      { label: "Gross Revenue (YTD)",  budget: grossRevBudget,  actual: grossRevActual                        },
-      { label: "Total Expenses (YTD)", budget: -expBudgetTotal, actual: -expActualTotal, invertGood: true     },
+      { label: "Gross revenue (YTD)",  budget: grossRevBudget,  actual: grossRevActual                        },
+      { label: "Total expenses (YTD)", budget: -expBudgetTotal, actual: -expActualTotal, invertGood: true     },
       { label: "NOI (YTD)",            budget: noiBudgetTotal,  actual: noiActualTotal, bold: true, separatorBefore: true },
     ]
 
@@ -220,13 +220,13 @@ const FinancialPerformance = React.forwardRef<HTMLDivElement, FinancialPerforman
                 <Cell key={i} fill={m.isProjected ? "url(#stripe-rev-proj)" : "var(--color-primary)"} />
               ))}
             </Bar>
-            <Bar dataKey="revBudget"    name="Revenue Budget"  barSize={20} radius={[2,2,0,0]} isAnimationActive={false} fill="var(--color-primary)" fillOpacity={0.18} />
-            <Bar dataKey="expValue"     name="Total Expenses"  barSize={20} radius={[2,2,0,0]} isAnimationActive={false}>
+            <Bar dataKey="revBudget"    name="Revenue budget"  barSize={20} radius={[2,2,0,0]} isAnimationActive={false} fill="var(--color-primary)" fillOpacity={0.18} />
+            <Bar dataKey="expValue"     name="Total expenses"  barSize={20} radius={[2,2,0,0]} isAnimationActive={false}>
               {CHART_DATA_NOI.map((m, i) => (
                 <Cell key={i} fill={m.expIsProjected ? "url(#stripe-exp-proj)" : "var(--color-destructive)"} />
               ))}
             </Bar>
-            <Bar dataKey="expBudgetLine" name="Expenses Budget" barSize={20} radius={[2,2,0,0]} isAnimationActive={false} fill="var(--color-destructive)" fillOpacity={0.18} />
+            <Bar dataKey="expBudgetLine" name="Expenses budget" barSize={20} radius={[2,2,0,0]} isAnimationActive={false} fill="var(--color-destructive)" fillOpacity={0.18} />
             <Line dataKey="noiActual"    name="NOI Actual"    type="monotone" stroke="var(--color-success)" strokeWidth={2.5} dot={{ fill: "var(--color-success)", r: 3, strokeWidth: 0 }} activeDot={{ r: 4 }} isAnimationActive={false} connectNulls={false} />
             <Line dataKey="noiProjected" name="NOI Projected" type="monotone" stroke="var(--color-success)" strokeWidth={2} strokeDasharray="4 3" dot={false} isAnimationActive={false} connectNulls={false} />
             <Line dataKey="noiBudget"    name="NOI Budget"    type="monotone" stroke="var(--color-warning)" strokeWidth={2} dot={false} isAnimationActive={false} />
@@ -237,7 +237,7 @@ const FinancialPerformance = React.forwardRef<HTMLDivElement, FinancialPerforman
         <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 mt-3 mb-6">
           <div className="flex items-center gap-1.5">
             <span className="h-2.5 w-2.5 rounded-sm shrink-0" style={{ background: "var(--color-primary)" }} />
-            <span className="text-sm text-muted-foreground">Revenue Actual</span>
+            <span className="text-sm text-muted-foreground">Revenue actual</span>
           </div>
           <div className="flex items-center gap-1.5">
             <svg width="10" height="10" className="shrink-0 rounded-sm overflow-hidden">
@@ -248,15 +248,15 @@ const FinancialPerformance = React.forwardRef<HTMLDivElement, FinancialPerforman
               </defs>
               <rect width="10" height="10" fill="url(#leg-rev-proj)" />
             </svg>
-            <span className="text-sm text-muted-foreground">Revenue Projected</span>
+            <span className="text-sm text-muted-foreground">Revenue projected</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="h-2.5 w-2.5 rounded-sm shrink-0" style={{ background: "var(--color-primary)", opacity: 0.22 }} />
-            <span className="text-sm text-muted-foreground">Revenue Budget</span>
+            <span className="text-sm text-muted-foreground">Revenue budget</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="h-2.5 w-2.5 rounded-sm shrink-0 bg-destructive" />
-            <span className="text-sm text-muted-foreground">Expenses Actual</span>
+            <span className="text-sm text-muted-foreground">Expenses actual</span>
           </div>
           <div className="flex items-center gap-1.5">
             <svg width="10" height="10" className="shrink-0 rounded-sm overflow-hidden">
@@ -267,11 +267,11 @@ const FinancialPerformance = React.forwardRef<HTMLDivElement, FinancialPerforman
               </defs>
               <rect width="10" height="10" fill="url(#leg-exp-proj)" />
             </svg>
-            <span className="text-sm text-muted-foreground">Expenses Projected</span>
+            <span className="text-sm text-muted-foreground">Expenses projected</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="h-2.5 w-2.5 rounded-sm shrink-0 bg-destructive/20" />
-            <span className="text-sm text-muted-foreground">Expenses Budget</span>
+            <span className="text-sm text-muted-foreground">Expenses budget</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="h-0.5 w-4 shrink-0 rounded-full bg-success" />
@@ -293,7 +293,7 @@ const FinancialPerformance = React.forwardRef<HTMLDivElement, FinancialPerforman
             <table className="w-full min-w-[400px] text-sm border-collapse">
               <thead>
                 <tr className="border-b border-border/50">
-                  <th className="pb-2 text-left text-[10px] font-medium uppercase tracking-widest text-foreground/40 w-full">Line Item</th>
+                  <th className="pb-2 text-left text-[10px] font-medium uppercase tracking-widest text-foreground/40 w-full">Line item</th>
                   <th className="pb-2 pr-4 text-right text-[10px] font-medium uppercase tracking-widest text-foreground/40 whitespace-nowrap">Budget</th>
                   <th className="pb-2 pr-4 text-right text-[10px] font-medium uppercase tracking-widest text-foreground/40 whitespace-nowrap">Actual</th>
                   <th className="pb-2 text-right text-[10px] font-medium uppercase tracking-widest text-foreground/40 whitespace-nowrap">vs Budget</th>
