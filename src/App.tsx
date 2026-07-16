@@ -154,34 +154,21 @@ export default function App() {
         name: "All assets",
         address: "11 properties across 5 markets",
         image: undefined,
-        stats: [
-          { label: "Total NOI",  value: "$312M"   },
-          { label: "Occupancy",  value: "91.4%"   },
-          { label: "Total SF",   value: "4.2M sf" },
-          { label: "Markets",    value: "5"       },
-        ],
+        stats: [] as { label: string; value: string; accent?: boolean }[],
       }
       if (selectedPortfolio) return {
         city: "Portfolio",
         name: selectedPortfolio.name,
         address: `${selectedPortfolio.assetIds.length} properties`,
         image: undefined,
-        stats: [
-          { label: "Total NOI",   value: "$312M"  },
-          { label: "Occupancy",   value: "91.4%"  },
-          { label: "Properties",  value: String(selectedPortfolio.assetIds.length) },
-        ],
+        stats: [] as { label: string; value: string; accent?: boolean }[],
       }
       return {
-        city: "Asset Dashboard",
+        city: assetDetail?.city ?? "Built 2017 · 52 floors · Office",
         name: selectedAsset?.name ?? "VTS Tower Headquarters",
-        address: [selectedAsset?.address, assetDetail?.city].filter(Boolean).join(" · "),
+        address: selectedAsset?.address ?? "114 West 41st Street, New York, NY 10036",
         image: assetDetail?.image ?? buildingImg,
-        stats: [
-          { label: "Total SF", value: "1.37M"  },
-          { label: "Floors",   value: "52"      },
-          { label: "Managed",  value: "CBRE"    },
-        ],
+        stats: [] as { label: string; value: string; accent?: boolean }[],
       }
     })()
 
