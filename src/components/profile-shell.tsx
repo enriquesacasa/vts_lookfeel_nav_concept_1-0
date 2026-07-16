@@ -2,10 +2,9 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 import {
   LayoutGrid, Layers, FileText, Handshake, Wallet, Scale, BarChart2, Calculator, Archive,
-  Globe, Sparkle, BellRing, Activity, UserCircle,
+  Sparkle, BellRing, Activity, UserCircle,
   ChevronRight, ChevronDown, Building2, CalendarDays, Users,
   SquareStack, ShieldCheck, ClipboardList, UsersRound, ListChecks,
-  MapPin,
   PanelLeftClose, PanelLeftOpen, Search, Menu, X,
 } from "lucide-react"
 import { VtsAgentsPage } from "@/components/vts-agents-page"
@@ -22,12 +21,7 @@ interface NavItem {
   divider?: boolean
 }
 
-const PORTFOLIO_ITEMS: NavItem[] = [
-  { id: "assets", label: "Assets", icon: Building2, children: [
-    { id: "markets", label: "Markets", icon: Globe },
-    { id: "cities",  label: "Cities",  icon: MapPin },
-  ]},
-]
+const PORTFOLIO_ITEMS: NavItem[] = []
 
 const NAV_ITEMS: NavItem[] = [
   { id: "dashboard",    label: "Overview",      icon: LayoutGrid },
@@ -79,13 +73,41 @@ function PlaceholderPage({ label, icon: Icon, selectionHeader }: { label: string
 
 // ── Selection header (shared across overview + placeholder pages) ────────────
 
-function SelectionHeader({ name, subtitle, eyebrow }: { name: string; subtitle: string; eyebrow: string }) {
+interface Stat { label: string; value: string }
+
+function SelectionHeader({ name, subtitle, eyebrow, image, stats = [] }: {
+  name: string; subtitle: string; eyebrow: string; image?: string; stats?: Stat[]
+}) {
   return (
-    <div className="flex items-start gap-4 py-3 border-b border-border mb-4">
-      <div className="flex-1">
-        <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">{eyebrow}</p>
-        <h1 className="text-2xl sm:text-4xl font-semibold tracking-tight text-foreground leading-tight mb-1.5">{name}</h1>
-        <p className="text-sm text-muted-foreground">{subtitle}</p>
+    <div className="flex items-center gap-4 py-3 border-b border-border mb-4">
+      {image && (
+        <div className="shrink-0 w-16 h-16 rounded-xl overflow-hidden hidden sm:block">
+          <img src={image} alt={name} className="w-full h-full object-cover" />
+        </div>
+      )}
+      <div className="flex-1 min-w-0">
+        <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-0.5">{eyebrow}</p>
+        <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-foreground leading-tight">{name}</h1>
+        <p className="text-sm text-muted-foreground mt-0.5 truncate">{subtitle}</p>
+      </div>
+      {stats.length > 0 && (
+        <div className="hidden md:flex items-stretch divide-x divide-border shrink-0">
+          {stats.map(s => (
+            <div key={s.label} className="px-5 text-right">
+              <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-0.5">{s.label}</p>
+              <p className="text-sm font-semibold text-foreground">{s.value}</p>
+            </div>
+          ))}
+        </div>
+      )}
+      <div className="flex items-center gap-2 shrink-0">
+        <button className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-primary bg-primary text-primary-foreground hover:bg-primary/90 transition-colors px-3.5 py-1.5 text-sm font-medium">
+          <Sparkle fill="currentColor" className="h-3.5 w-3.5" />
+          Ask VTS AI
+        </button>
+        <button aria-label="Search" className="flex items-center justify-center h-8 w-8 rounded-full border border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors">
+          <Search className="h-3.5 w-3.5" />
+        </button>
       </div>
     </div>
   )
@@ -96,7 +118,9 @@ function SelectionHeader({ name, subtitle, eyebrow }: { name: string; subtitle: 
 function PortfolioOverview({ name, subtitle }: { name: string; subtitle: string }) {
   return (
     <div className="p-4 sm:p-6 space-y-4">
-      <SelectionHeader name={name} subtitle={subtitle} eyebrow="Portfolio" />
+      <SelectionHeader name={name} subtitle={subtitle} eyebrow="Portfolio"
+        stats={[{ label: "Total NOI", value: "$312M" }, { label: "Occupancy", value: "91.4%" }, { label: "Markets", value: "5" }]}
+      />
       <div className="flex flex-wrap divide-x divide-border/60 border border-border bg-card overflow-hidden rounded-lg">
         {[
           { label: "Total portfolio NOI", value: "$312M" },
@@ -171,11 +195,17 @@ export function ProfileShell({ onExit, assets, portfolios, selectedAssetId, onAs
   const activeItem = [...allFlat, AI_ITEM, ...BOTTOM_ITEMS].find(i => i.id === activePage)
 
   const selectionHeader = selectedAssetId === "all"
-    ? <SelectionHeader name="All assets" subtitle="11 properties across 5 markets" eyebrow="Portfolio" />
+    ? <SelectionHeader name="All assets" subtitle="11 properties across 5 markets" eyebrow="Overview"
+        stats={[{ label: "Total NOI", value: "$312M" }, { label: "Occupancy", value: "91.4%" }, { label: "Total SF", value: "4.2M sf" }, { label: "Markets", value: "5" }]}
+      />
     : selectedPortfolio
-      ? <SelectionHeader name={selectedPortfolio.name} subtitle={`${selectedPortfolio.assetIds.length} properties`} eyebrow="Portfolio" />
+      ? <SelectionHeader name={selectedPortfolio.name} subtitle={`${selectedPortfolio.assetIds.length} properties`} eyebrow="Portfolio"
+          stats={[{ label: "Total NOI", value: "$312M" }, { label: "Occupancy", value: "91.4%" }, { label: "Properties", value: String(selectedPortfolio.assetIds.length) }]}
+        />
       : selectedAsset
-        ? <SelectionHeader name={selectedAsset.name} subtitle={selectedAsset.address} eyebrow="Asset" />
+        ? <SelectionHeader name={selectedAsset.name} subtitle={selectedAsset.address} eyebrow="Asset Dashboard"
+            stats={[{ label: "Total SF", value: "1.37M" }, { label: "Floors", value: "52" }, { label: "Managed", value: "CBRE" }]}
+          />
         : null
 
   const renderContent = () => {

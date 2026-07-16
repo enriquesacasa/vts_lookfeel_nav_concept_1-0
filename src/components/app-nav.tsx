@@ -20,8 +20,6 @@ import {
   Scale,
   BarChart2,
   Calculator,
-  Globe,
-  MapPin,
   Sparkle,
   Activity,
   BellRing,
@@ -49,12 +47,7 @@ interface NavItem {
   divider?: boolean
 }
 
-const portfolioItems: NavItem[] = [
-  { id: "assets", label: "Assets", icon: Building2, children: [
-    { id: "markets", label: "Markets", icon: Globe },
-    { id: "cities",  label: "Cities",  icon: MapPin },
-  ]},
-]
+const portfolioItems: NavItem[] = []
 
 const navStructure: NavItem[] = [
   { id: "dashboard",    label: "Overview",     icon: LayoutGrid },

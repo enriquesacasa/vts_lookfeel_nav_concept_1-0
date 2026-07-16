@@ -12,8 +12,6 @@ import { ActionLevers } from "@/components/action-levers"
 import { KpiBar } from "@/components/kpi-bar"
 import { LeasingAgents } from "@/components/leasing-agents"
 import { AgentsPage } from "@/components/agents-page"
-import { PortfolioOverview } from "@/components/portfolio-overview"
-import type { PortfolioAsset } from "@/components/portfolio-overview"
 import { ProfileShell } from "@/components/profile-shell"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
@@ -52,8 +50,6 @@ const ASSET_DETAILS: Record<string, { city: string; image: string }> = {
   "union-square":  { city: "Built 1989 · 56 floors · Office",   image: "https://loremflickr.com/800/500/office,building,glass?lock=10" },
   "200-berkeley":  { city: "Built 1947 · 28 floors · Office",   image: "https://loremflickr.com/800/500/office,building,glass?lock=11" },
 }
-
-const STATS: { label: string; value: string; accent?: boolean }[] = []
 
 const ASSET_KPIS: Record<string, {
   occupancy: number; noi: string; noiBudgetDelta: string; noiBudgetUp: boolean;
@@ -158,50 +154,38 @@ export default function App() {
         name: "All assets",
         address: "11 properties across 5 markets",
         image: undefined,
-        stats: [] as typeof STATS,
+        stats: [
+          { label: "Total NOI",  value: "$312M"   },
+          { label: "Occupancy",  value: "91.4%"   },
+          { label: "Total SF",   value: "4.2M sf" },
+          { label: "Markets",    value: "5"       },
+        ],
       }
       if (selectedPortfolio) return {
         city: "Portfolio",
         name: selectedPortfolio.name,
         address: `${selectedPortfolio.assetIds.length} properties`,
         image: undefined,
-        stats: [] as typeof STATS,
+        stats: [
+          { label: "Total NOI",   value: "$312M"  },
+          { label: "Occupancy",   value: "91.4%"  },
+          { label: "Properties",  value: String(selectedPortfolio.assetIds.length) },
+        ],
       }
       return {
-        city: assetDetail?.city ?? "Built 2017 · 52 floors · Office",
+        city: "Asset Dashboard",
         name: selectedAsset?.name ?? "VTS Tower Headquarters",
-        address: selectedAsset?.address ?? "114 West 41st Street, New York, NY 10036",
+        address: [selectedAsset?.address, assetDetail?.city].filter(Boolean).join(" · "),
         image: assetDetail?.image ?? buildingImg,
-        stats: STATS,
+        stats: [
+          { label: "Total SF", value: "1.37M"  },
+          { label: "Floors",   value: "52"      },
+          { label: "Managed",  value: "CBRE"    },
+        ],
       }
     })()
 
     if (page === "dashboard" && (selectedAssetId === "all" || selectedPortfolio)) {
-      const visibleAssets = selectedPortfolio
-        ? ASSETS.filter(a => selectedPortfolio.assetIds.includes(a.id))
-        : ASSETS
-      const portfolioAssets: PortfolioAsset[] = visibleAssets.map(a => ({
-        ...a,
-        ...ASSET_KPIS[a.id],
-      }))
-      return (
-        <div className="space-y-4">
-          <BuildingHeader {...headerProps} />
-          <KpiBar kpis={[
-            { label: "Total portfolio NOI", value: "$312M",   subtitle: "+4.2% vs budget",  trend: "up"   as const },
-            { label: "Occupancy",           value: "91.4%",  subtitle: "+0.8% vs budget",  trend: "up"   as const },
-            { label: "Total SF",            value: "4.2M sf", subtitle: "across all assets" },
-            { label: "Markets",             value: selectedPortfolio ? "1" : "5" },
-          ]} />
-          <PortfolioOverview
-            assets={portfolioAssets}
-            label={selectedPortfolio ? selectedPortfolio.name : "All assets"}
-            onAssetClick={id => { setSelectedAssetId(id); setCurrentPage("dashboard") }}
-          />
-        </div>
-      )
-    }
-    if (page === "assets" && (selectedAssetId === "all" || selectedPortfolio)) {
       const visibleAssets = selectedPortfolio
         ? ASSETS.filter(a => selectedPortfolio.assetIds.includes(a.id))
         : ASSETS
@@ -225,7 +209,6 @@ export default function App() {
                   className="group cursor-pointer rounded-2xl overflow-hidden bg-white/70 dark:bg-white/8 backdrop-blur-md hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200"
                   onClick={() => { setSelectedAssetId(asset.id); setCurrentPage("dashboard") }}
                 >
-                  {/* Hero image */}
                   <div className="relative h-44 overflow-hidden">
                     <img src={detail?.image} alt={asset.name} className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
@@ -242,8 +225,6 @@ export default function App() {
                       <p className="text-xs text-white/60 truncate">{asset.address}</p>
                     </div>
                   </div>
-
-                  {/* Stats */}
                   <div className="px-4 py-3">
                     <div className="flex items-center gap-2 mb-3">
                       <div className="flex-1 h-1 rounded-full bg-border overflow-hidden">
