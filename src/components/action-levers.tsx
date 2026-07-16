@@ -89,7 +89,7 @@ const ActionLevers = React.forwardRef<HTMLDivElement, ActionLeversProps>(
         <div className="flex items-start justify-between gap-2">
           <div>
             <p className="text-[10px] font-medium uppercase tracking-widest mb-1 text-sidebar-foreground/70">VTS Agents</p>
-            <h2 className="text-xl font-semibold text-sidebar-foreground">Financial Levers</h2>
+            <h2 className="text-xl font-semibold text-sidebar-foreground">Financial levers</h2>
           </div>
           <Button variant="outline" size="sm" className="shrink-0 text-white/80 border-white/25 bg-transparent hover:bg-white/10 hover:text-white dark:bg-white/8 dark:border-white/25 dark:text-white dark:hover:bg-white/15">
             View Active Agents

@@ -200,7 +200,7 @@ const FinancialPerformance = React.forwardRef<HTMLDivElement, FinancialPerforman
         <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2 mb-5">
           <div>
             <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">2026</p>
-            <h2 className="text-xl font-semibold text-foreground">Financial Performance</h2>
+            <h2 className="text-xl font-semibold text-foreground">Financial performance</h2>
           </div>
           <Button variant="outline" size="sm" className="shrink-0 text-primary border-primary bg-transparent hover:bg-primary/10 hover:text-primary dark:bg-white/8 dark:border-white/25 dark:text-white dark:hover:bg-white/15">
             View Full Report

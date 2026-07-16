@@ -313,7 +313,7 @@ function FinancialCard({ className }: { className?: string }) {
   )
 }
 
-// ── Leasing Activity table ────────────────────────────────────────────────────
+// ── Leasing activity table ────────────────────────────────────────────────────
 
 type SortKey = "tenant" | "sf" | "stage" | "status" | "baseRent"
 
@@ -363,7 +363,7 @@ function LeasingActivityCard({ className }: { className?: string }) {
       <div className="px-4 pt-4 pb-3 flex items-start justify-between">
         <div>
           <Eyebrow>Active Pipeline</Eyebrow>
-          <h2 className="text-xl font-medium text-foreground">Leasing Activity</h2>
+          <h2 className="text-xl font-medium text-foreground">Leasing activity</h2>
         </div>
         <div className="flex items-center gap-2 pt-0.5">
           <span className="text-xs text-muted-foreground">{ACTIVE_DEALS.length} deals</span>
