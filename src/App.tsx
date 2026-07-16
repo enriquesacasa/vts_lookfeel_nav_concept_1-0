@@ -37,6 +37,20 @@ export const PORTFOLIOS = [
   { id: "midwest",     name: "Midwest Holdings",     assetIds: ["willis", "hudson-yards", "peachtree"] },
 ]
 
+const ASSET_DETAILS: Record<string, { city: string; image: string }> = {
+  "vts-tower":     { city: "Built 2017 · 52 floors · Office",   image: "https://picsum.photos/seed/vtsbld/400/300" },
+  "one-financial": { city: "Built 1992 · 36 floors · Office",   image: "https://picsum.photos/seed/finplz/400/300" },
+  "empire-state":  { city: "Built 1931 · 102 floors · Office",  image: "https://picsum.photos/seed/empire/400/300" },
+  "salesforce":    { city: "Built 2018 · 61 floors · Office",   image: "https://picsum.photos/seed/sfctr/400/300"  },
+  "willis":        { city: "Built 1973 · 110 floors · Office",  image: "https://picsum.photos/seed/willis/400/300" },
+  "hudson-yards":  { city: "Built 2019 · 73 floors · Office",   image: "https://picsum.photos/seed/hudson/400/300" },
+  "one-wtc":       { city: "Built 2014 · 104 floors · Office",  image: "https://picsum.photos/seed/onewtc/400/300" },
+  "transamerica":  { city: "Built 1972 · 48 floors · Office",   image: "https://picsum.photos/seed/transam/400/300" },
+  "peachtree":     { city: "Built 1992 · 60 floors · Office",   image: "https://picsum.photos/seed/peacht/400/300" },
+  "union-square":  { city: "Built 1989 · 56 floors · Office",   image: "https://picsum.photos/seed/unionsq/400/300" },
+  "200-berkeley":  { city: "Built 1947 · 28 floors · Office",   image: "https://picsum.photos/seed/berk200/400/300" },
+}
+
 const STATS: { label: string; value: string; accent?: boolean }[] = []
 
 const KPIS = [
@@ -174,13 +188,14 @@ export default function App() {
         </div>
       )
     }
+    const assetDetail = ASSET_DETAILS[selectedAssetId]
     return (
       <div className="space-y-4">
         <BuildingHeader
-          image={buildingImg}
-          name="VTS Tower Headquarters"
-          address="114 West 41st Street, New York, NY 10036"
-          city="Built 2017 · 52 floors · office"
+          image={assetDetail?.image ?? buildingImg}
+          name={selectedAsset?.name ?? "VTS Tower Headquarters"}
+          address={selectedAsset?.address ?? "114 West 41st Street, New York, NY 10036"}
+          city={assetDetail?.city ?? "Built 2017 · 52 floors · office"}
           stats={STATS}
         />
         <KpiBar kpis={KPIS} />
