@@ -472,6 +472,7 @@ function DesktopNav({ className, onCollapsedChange, assets, portfolios, selected
 
           const hasChildren = !!item.children?.length
           const isOpen = openSections.has(item.id)
+          const isChildActive = !!item.children?.some(c => c.id === active)
 
           return (
             <React.Fragment key={item.id}>
@@ -504,7 +505,7 @@ function DesktopNav({ className, onCollapsedChange, assets, portfolios, selected
               ) : (
                 <NavRow
                   {...item}
-                  active={active === item.id}
+                  active={active === item.id || (collapsed && isChildActive)}
                   collapsed={collapsed}
                   onClick={() => {
                     setActive(item.id)
