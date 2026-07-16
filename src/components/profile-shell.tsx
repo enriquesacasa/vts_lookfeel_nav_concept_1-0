@@ -2,10 +2,10 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 import {
   LayoutGrid, Layers, FileText, Handshake, Wallet, Scale, BarChart2, Calculator, Archive,
-  Globe, TrendingUp, Sparkle, BellRing, Activity, UserCircle,
+  Globe, Sparkle, BellRing, Activity, UserCircle,
   ChevronRight, ChevronDown, Building2, CalendarDays, Users,
   SquareStack, ShieldCheck, ClipboardList, UsersRound, ListChecks,
-  MapPin, BookOpen, Share2, MessageSquare, FileBarChart, BellRing as BellRingIcon,
+  MapPin,
   PanelLeftClose, PanelLeftOpen, Search, Menu, X,
 } from "lucide-react"
 import { VtsAgentsPage } from "@/components/vts-agents-page"

@@ -127,37 +127,6 @@ export default function App() {
   const selectedPortfolio = PORTFOLIOS.find(p => p.id === selectedAssetId)
   const selectedAsset = ASSETS.find(a => a.id === selectedAssetId)
 
-  const renderSelectionHeader = () => {
-    if (selectedAssetId === "all") return (
-      <div className="flex items-start gap-4 py-3 border-b border-border mb-4">
-        <div className="flex-1">
-          <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">Portfolio</p>
-          <h1 className="text-2xl sm:text-4xl font-semibold tracking-tight text-foreground leading-tight mb-1.5">All assets</h1>
-          <p className="text-sm text-muted-foreground">11 properties across 5 markets</p>
-        </div>
-      </div>
-    )
-    if (selectedPortfolio) return (
-      <div className="flex items-start gap-4 py-3 border-b border-border mb-4">
-        <div className="flex-1">
-          <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">Portfolio</p>
-          <h1 className="text-2xl sm:text-4xl font-semibold tracking-tight text-foreground leading-tight mb-1.5">{selectedPortfolio.name}</h1>
-          <p className="text-sm text-muted-foreground">{selectedPortfolio.assetIds.length} properties</p>
-        </div>
-      </div>
-    )
-    if (selectedAsset) return (
-      <div className="flex items-start gap-4 py-3 border-b border-border mb-4">
-        <div className="flex-1">
-          <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">Asset</p>
-          <h1 className="text-2xl sm:text-4xl font-semibold tracking-tight text-foreground leading-tight mb-1.5">{selectedAsset.name}</h1>
-          <p className="text-sm text-muted-foreground">{selectedAsset.address}</p>
-        </div>
-      </div>
-    )
-    return null
-  }
-
   const renderPage = (page: string) => {
     if (page === "ai") return <AgentsPage />
 
