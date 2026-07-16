@@ -132,15 +132,15 @@ const CriticalDates = React.forwardRef<HTMLDivElement, CriticalDatesProps>(
         {/* Header */}
         <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
           <div>
-            <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">Upcoming 12 Mo</p>
-            <h2 className="text-xl font-semibold text-foreground">Critical Dates</h2>
+            <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">Upcoming 12 mo</p>
+            <h2 className="text-xl font-semibold text-foreground">Critical dates</h2>
           </div>
           <Button
             variant="outline"
             size="sm"
             className="shrink-0 text-primary border-primary bg-transparent hover:bg-primary/10 hover:text-primary dark:bg-white/8 dark:border-white/25 dark:text-white dark:hover:bg-white/15"
           >
-            View Critical Dates
+            View critical dates
           </Button>
         </div>
 

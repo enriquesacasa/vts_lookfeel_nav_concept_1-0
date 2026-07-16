@@ -31,17 +31,17 @@ const PORTFOLIO_ITEMS: NavItem[] = [
 
 const NAV_ITEMS: NavItem[] = [
   { id: "dashboard",    label: "Overview",      icon: LayoutGrid },
-  { id: "stacking",     label: "Stacking Plan", icon: Layers, children: [
+  { id: "stacking",     label: "Stacking plan", icon: Layers, children: [
     { id: "spaces",     label: "Spaces",         icon: SquareStack },
   ]},
   { id: "leases",       label: "Leases",         icon: FileText, children: [
-    { id: "critical-dates",   label: "Critical Dates",    icon: CalendarDays },
-    { id: "options-rights",   label: "Options & Rights",  icon: ShieldCheck },
+    { id: "critical-dates",   label: "Critical dates",    icon: CalendarDays },
+    { id: "options-rights",   label: "Options & rights",  icon: ShieldCheck },
   ]},
   { id: "tenants",      label: "Tenants",        icon: Users },
   { id: "deals",        label: "Deals",          icon: Handshake, children: [
-    { id: "deal-tasks",       label: "Deal Tasks",          icon: ClipboardList },
-    { id: "tenant-coord",     label: "Tenant Coordination", icon: UsersRound },
+    { id: "deal-tasks",       label: "Deal tasks",          icon: ClipboardList },
+    { id: "tenant-coord",     label: "Tenant coordination", icon: UsersRound },
     { id: "requirements",     label: "Requirements",        icon: ListChecks },
   ]},
   { id: "planning",     label: "Planning",         icon: Calculator, children: [
@@ -49,29 +49,29 @@ const NAV_ITEMS: NavItem[] = [
     { id: "appraisals", label: "Appraisals",       icon: Scale },
     { id: "comps",      label: "Comps",             icon: BarChart2 },
   ]},
-  { id: "doc-vault",    label: "Doc Vault",        icon: Archive },
+  { id: "doc-vault",    label: "Doc vault",        icon: Archive },
   { id: "div-insights", label: "",                 icon: LayoutGrid, divider: true },
   { id: "market",       label: "Market",           icon: Globe, children: [
     { id: "buildings",           label: "Buildings",             icon: Building2 },
     { id: "listings",            label: "Listings",              icon: MapPin },
-    { id: "tourbooks",           label: "My Tourbooks",          icon: BookOpen },
-    { id: "shares",              label: "My Shares",             icon: Share2 },
-    { id: "marketing-analytics", label: "Marketing Analytics",   icon: TrendingUp },
+    { id: "tourbooks",           label: "My tourbooks",          icon: BookOpen },
+    { id: "shares",              label: "My shares",             icon: Share2 },
+    { id: "marketing-analytics", label: "Marketing analytics",   icon: TrendingUp },
     { id: "inquiries",           label: "Inquiries",             icon: MessageSquare },
   ]},
   { id: "insights",     label: "Insights",         icon: TrendingUp, children: [
-    { id: "leasing-activity",     label: "Leasing Activity Report", icon: FileBarChart },
-    { id: "portfolio-dashboards", label: "Portfolio Dashboards",    icon: LayoutGrid },
-    { id: "portfolio-alerts",     label: "Portfolio Alerts",        icon: BellRingIcon },
-    { id: "portfolio-reports",    label: "Portfolio Reports",       icon: ClipboardList },
-    { id: "lease-charts",         label: "Lease Charts",            icon: BarChart2 },
+    { id: "leasing-activity",     label: "Leasing activity report", icon: FileBarChart },
+    { id: "portfolio-dashboards", label: "Portfolio dashboards",    icon: LayoutGrid },
+    { id: "portfolio-alerts",     label: "Portfolio alerts",        icon: BellRingIcon },
+    { id: "portfolio-reports",    label: "Portfolio reports",       icon: ClipboardList },
+    { id: "lease-charts",         label: "Lease charts",            icon: BarChart2 },
   ]},
 ]
 
 const AI_ITEM = { id: "ai", label: "VTS Agents", icon: Sparkle }
 
 const BOTTOM_ITEMS = [
-  { id: "activity",    label: "Activity Feed", icon: Activity },
+  { id: "activity",    label: "Activity feed", icon: Activity },
   { id: "reminders",  label: "Reminders",     icon: BellRing },
   { id: "avatar",     label: "Profile",       icon: UserCircle },
 ]
@@ -106,7 +106,7 @@ function PortfolioOverview() {
       </div>
       <div className="flex flex-wrap divide-x divide-border/60 border border-border bg-card overflow-hidden rounded-lg">
         {[
-          { label: "Total Portfolio NOI", value: "$312M" },
+          { label: "Total portfolio NOI", value: "$312M" },
           { label: "Occupancy",           value: "91.4%" },
           { label: "Total SF",            value: "4.2M sf" },
           { label: "Markets",             value: "5" },

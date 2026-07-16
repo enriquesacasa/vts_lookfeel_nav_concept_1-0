@@ -156,7 +156,7 @@ function AgentsHeader({ query, setQuery }: { query: string; setQuery: (v: string
       <div className="flex items-center gap-4 py-4 border-b border-border">
         {/* Title */}
         <div className="min-w-0">
-          <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">AI · Automation</p>
+          <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">AI · automation</p>
           <div className="flex items-center gap-2.5">
             <Sparkle fill="currentColor" className="h-6 w-6 sm:h-7 sm:w-7 text-primary shrink-0" />
             <h1 className="text-2xl sm:text-3xl font-medium text-foreground leading-tight">VTS Agents</h1>
@@ -230,15 +230,15 @@ function RunningBanner() {
         <Loader2 className="h-4 w-4 text-[#8C82FF] animate-spin" />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-white">1 Agent Running</p>
+        <p className="text-sm font-medium text-white">1 agent running</p>
         <p className="text-xs text-white/55 truncate">Q3 NOI improvement opportunities · Northeast Corridor Portfolio</p>
       </div>
       <div className="flex items-center gap-2 shrink-0">
         <button className="inline-flex items-center gap-1.5 text-xs font-medium text-white/80 border border-white/20 px-3 py-1.5 hover:bg-white/10 transition-colors">
-          <AlertTriangle className="h-3 w-3" /> View Progress
+          <AlertTriangle className="h-3 w-3" /> View progress
         </button>
         <button className="inline-flex items-center gap-1.5 text-xs font-medium text-white bg-[#5528FF] hover:bg-[#280F96] px-3 py-1.5 transition-colors">
-          All Agents <ArrowRight className="h-3 w-3" />
+          All agents <ArrowRight className="h-3 w-3" />
         </button>
       </div>
     </div>
@@ -252,7 +252,7 @@ function RecentRunsCard({ className }: { className?: string; setQuery?: (v: stri
     <div className={cn(CARD, className)}>
       <div className="px-4 pt-4 pb-3 border-b border-border">
         <Eyebrow>History</Eyebrow>
-        <SectionTitle action={<ViewAll label="All Runs" />}>Recent Agent Runs</SectionTitle>
+        <SectionTitle action={<ViewAll label="All runs" />}>Recent agent runs</SectionTitle>
       </div>
 
       {RECENT_RUNS.map((run) => {
@@ -301,7 +301,7 @@ function AgentTypesCard({ className, setQuery }: { className?: string; setQuery:
     <div className={cn(CARD, className)}>
       <div className="px-4 pt-4 pb-3 border-b border-border">
         <Eyebrow>Capabilities</Eyebrow>
-        <SectionTitle>Agent Types</SectionTitle>
+        <SectionTitle>Agent types</SectionTitle>
       </div>
 
       {AGENT_TYPES.map((type) => (

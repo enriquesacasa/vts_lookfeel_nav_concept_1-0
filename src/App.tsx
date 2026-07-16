@@ -40,12 +40,12 @@ export const PORTFOLIOS = [
 const STATS: { label: string; value: string; accent?: boolean }[] = []
 
 const KPIS = [
-  { label: "In-Place NOI",           value: "$29.1M",    subtitle: "+9.4% vs budget",       trend: "up"   as const },
-  { label: "Revenue at Risk (12mo)", value: "$234K/mo",  subtitle: "3 leases expiring",      trend: "down" as const },
-  { label: "Pipeline Upside",        value: "+$89K/mo",  subtitle: "if LOI+ deals execute",  trend: "up"   as const },
-  { label: "Managed By",             value: "CBRE" },
-  { label: "Leased By",              value: "JLL" },
-  { label: "Owned By",               value: "View The Space" },
+  { label: "In-place NOI",           value: "$29.1M",    subtitle: "+9.4% vs budget",       trend: "up"   as const },
+  { label: "Revenue at risk (12mo)", value: "$234K/mo",  subtitle: "3 leases expiring",      trend: "down" as const },
+  { label: "Pipeline upside",        value: "+$89K/mo",  subtitle: "if LOI+ deals execute",  trend: "up"   as const },
+  { label: "Managed by",             value: "CBRE" },
+  { label: "Leased by",              value: "JLL" },
+  { label: "Owned by",               value: "View The Space" },
 ]
 
 const ACTIVE_DEALS: Deal[] = [
@@ -98,15 +98,15 @@ export default function App() {
   }
 
   const PAGE_LABELS: Record<string, string> = {
-    "stacking": "Stacking Plan", "spaces": "Spaces",
-    "leases": "Leases", "critical-dates": "Critical Dates", "options-rights": "Options & Rights", "tenants": "Tenants",
-    "deals": "Deals", "deal-tasks": "Deal Tasks", "tenant-coord": "Tenant Coordination", "requirements": "Requirements",
-    "planning": "Planning", "budgets": "Budgets", "appraisals": "Appraisals", "comps": "Comps", "doc-vault": "Doc Vault",
-    "market": "Market", "buildings": "Buildings", "listings": "Listings", "tourbooks": "My Tourbooks",
-    "shares": "My Shares", "marketing-analytics": "Marketing Analytics", "inquiries": "Inquiries",
-    "insights": "Insights", "leasing-activity": "Leasing Activity Report", "portfolio-dashboards": "Portfolio Dashboards",
-    "portfolio-alerts": "Portfolio Alerts", "portfolio-reports": "Portfolio Reports", "lease-charts": "Lease Charts",
-    "abstraction": "Abstraction Management", "activity": "Activity Feed", "reminders": "Reminders",
+    "stacking": "Stacking plan", "spaces": "Spaces",
+    "leases": "Leases", "critical-dates": "Critical dates", "options-rights": "Options & rights", "tenants": "Tenants",
+    "deals": "Deals", "deal-tasks": "Deal tasks", "tenant-coord": "Tenant coordination", "requirements": "Requirements",
+    "planning": "Planning", "budgets": "Budgets", "appraisals": "Appraisals", "comps": "Comps", "doc-vault": "Doc vault",
+    "market": "Market", "buildings": "Buildings", "listings": "Listings", "tourbooks": "My tourbooks",
+    "shares": "My shares", "marketing-analytics": "Marketing analytics", "inquiries": "Inquiries",
+    "insights": "Insights", "leasing-activity": "Leasing activity report", "portfolio-dashboards": "Portfolio dashboards",
+    "portfolio-alerts": "Portfolio alerts", "portfolio-reports": "Portfolio reports", "lease-charts": "Lease charts",
+    "abstraction": "Abstraction management", "activity": "Activity feed", "reminders": "Reminders",
     "assets": "Assets", "markets": "Markets", "cities": "Cities",
   }
 
@@ -122,7 +122,7 @@ export default function App() {
           </div>
         </div>
         <KpiBar kpis={[
-          { label: "Total Portfolio NOI", value: "$312M" },
+          { label: "Total portfolio NOI", value: "$312M" },
           { label: "Occupancy",           value: "91.4%" },
           { label: "Total SF",            value: "4.2M sf" },
           { label: "Markets",             value: "5" },
@@ -149,7 +149,7 @@ export default function App() {
           image={buildingImg}
           name="VTS Tower Headquarters"
           address="114 West 41st Street, New York, NY 10036"
-          city="Built 2017 · 52 Floors · Office"
+          city="Built 2017 · 52 floors · office"
           stats={STATS}
         />
         <KpiBar kpis={KPIS} />

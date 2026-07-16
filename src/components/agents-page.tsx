@@ -144,7 +144,7 @@ export function AgentsPage({ className }: AgentsPageProps) {
           <Sparkle fill="currentColor" className="h-7 w-7 sm:h-10 sm:w-10 text-primary" />
         </div>
         <div className="flex-1">
-          <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">AI · Automation</p>
+          <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">AI · automation</p>
           <h1 className="font-inter text-2xl sm:text-4xl font-semibold text-foreground leading-tight mb-1.5">VTS Agents</h1>
           <p className="text-sm text-muted-foreground">Ask anything about your portfolio. Agents research, analyze, and act on your behalf.</p>
         </div>
@@ -199,11 +199,11 @@ export function AgentsPage({ className }: AgentsPageProps) {
         </div>
         <Button variant="outline" size="sm" className="shrink-0 text-white/80 border-white/25 bg-transparent hover:bg-white/10 hover:text-white">
           <AlertTriangle className="h-3.5 w-3.5 mr-1.5" />
-          View Progress
+          View progress
         </Button>
         <Button variant="outline" size="sm" className="shrink-0 text-white/80 border-white/25 bg-transparent hover:bg-white/10 hover:text-white">
           <FileText className="h-3.5 w-3.5 mr-1.5" />
-          All Agents
+          All agents
         </Button>
       </div>
 
@@ -215,10 +215,10 @@ export function AgentsPage({ className }: AgentsPageProps) {
           <div className="flex items-start justify-between gap-4 mb-6">
             <div>
               <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">History</p>
-              <h2 className="text-xl font-semibold text-foreground">Recent Agent Runs</h2>
+              <h2 className="text-xl font-semibold text-foreground">Recent agent runs</h2>
             </div>
             <Button variant="outline" size="sm" className="shrink-0 text-primary border-primary bg-transparent hover:bg-primary/10 hover:text-primary dark:bg-white/8 dark:border-white/25 dark:text-white dark:hover:bg-white/15">
-              View All Runs
+              View all runs
             </Button>
           </div>
           <div className="flex flex-col gap-2">
@@ -255,7 +255,7 @@ export function AgentsPage({ className }: AgentsPageProps) {
           <div className="flex items-start justify-between gap-4 mb-6">
             <div>
               <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">Capabilities</p>
-              <h2 className="text-xl font-semibold text-foreground">Agent Types</h2>
+              <h2 className="text-xl font-semibold text-foreground">Agent types</h2>
             </div>
           </div>
           <div className="flex flex-col gap-2">
