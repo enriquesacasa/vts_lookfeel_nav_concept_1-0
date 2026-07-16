@@ -12,6 +12,8 @@ import { ActionLevers } from "@/components/action-levers"
 import { KpiBar } from "@/components/kpi-bar"
 import { LeasingAgents } from "@/components/leasing-agents"
 import { AgentsPage } from "@/components/agents-page"
+import { PortfolioOverview } from "@/components/portfolio-overview"
+import type { PortfolioAsset } from "@/components/portfolio-overview"
 import { ProfileShell } from "@/components/profile-shell"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
@@ -174,20 +176,31 @@ export default function App() {
       }
     })()
 
-    if (page === "dashboard" && (selectedAssetId === "all" || selectedPortfolio)) return (
-      <div className="flex flex-col" style={{minHeight: 'calc(100vh - 2rem)'}}>
-        <BuildingHeader {...headerProps} />
-        <KpiBar kpis={[
-          { label: "Total portfolio NOI", value: "$312M",   subtitle: "+4.2% vs budget",  trend: "up"   as const },
-          { label: "Occupancy",           value: "91.4%",  subtitle: "+0.8% vs budget",  trend: "up"   as const },
-          { label: "Total SF",            value: "4.2M sf", subtitle: "across all assets" },
-          { label: "Markets",             value: selectedPortfolio ? String(new Set(selectedPortfolio.assetIds.map(() => "market")).size) : "5" },
-        ]} className="mt-4" />
-        <div className="flex flex-col items-center justify-center flex-1 text-center px-4 rounded-2xl bg-white/70 dark:bg-white/8 backdrop-blur-md mt-4">
-          <p className="text-sm text-muted-foreground">Portfolio dashboard content coming soon</p>
+    if (page === "dashboard" && (selectedAssetId === "all" || selectedPortfolio)) {
+      const visibleAssets = selectedPortfolio
+        ? ASSETS.filter(a => selectedPortfolio.assetIds.includes(a.id))
+        : ASSETS
+      const portfolioAssets: PortfolioAsset[] = visibleAssets.map(a => ({
+        ...a,
+        ...ASSET_KPIS[a.id],
+      }))
+      return (
+        <div className="space-y-4">
+          <BuildingHeader {...headerProps} />
+          <KpiBar kpis={[
+            { label: "Total portfolio NOI", value: "$312M",   subtitle: "+4.2% vs budget",  trend: "up"   as const },
+            { label: "Occupancy",           value: "91.4%",  subtitle: "+0.8% vs budget",  trend: "up"   as const },
+            { label: "Total SF",            value: "4.2M sf", subtitle: "across all assets" },
+            { label: "Markets",             value: selectedPortfolio ? "1" : "5" },
+          ]} />
+          <PortfolioOverview
+            assets={portfolioAssets}
+            label={selectedPortfolio ? selectedPortfolio.name : "All assets"}
+            onAssetClick={id => { setSelectedAssetId(id); setCurrentPage("dashboard") }}
+          />
         </div>
-      </div>
-    )
+      )
+    }
     if (page === "assets" && (selectedAssetId === "all" || selectedPortfolio)) {
       const visibleAssets = selectedPortfolio
         ? ASSETS.filter(a => selectedPortfolio.assetIds.includes(a.id))
