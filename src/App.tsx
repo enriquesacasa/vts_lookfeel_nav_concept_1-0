@@ -107,10 +107,31 @@ export default function App() {
     "insights": "Insights", "leasing-activity": "Leasing Activity Report", "portfolio-dashboards": "Portfolio Dashboards",
     "portfolio-alerts": "Portfolio Alerts", "portfolio-reports": "Portfolio Reports", "lease-charts": "Lease Charts",
     "abstraction": "Abstraction Management", "activity": "Activity Feed", "reminders": "Reminders",
+    "assets": "Assets", "markets": "Markets", "cities": "Cities",
   }
 
   const renderPage = (page: string) => {
     if (page === "ai") return <AgentsPage />
+    if (page === "dashboard" && selectedAssetId === "all") return (
+      <div className="space-y-4">
+        <div className="flex items-start gap-4 py-3">
+          <div className="flex-1">
+            <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">Portfolio</p>
+            <h1 className="text-2xl sm:text-4xl font-semibold tracking-tight text-foreground leading-tight mb-1.5">All Assets</h1>
+            <p className="text-sm text-muted-foreground">11 properties across 5 markets</p>
+          </div>
+        </div>
+        <KpiBar kpis={[
+          { label: "Total Portfolio NOI", value: "$312M" },
+          { label: "Occupancy",           value: "91.4%" },
+          { label: "Total SF",            value: "4.2M sf" },
+          { label: "Markets",             value: "5" },
+        ]} />
+        <div className="flex flex-col items-center justify-center min-h-[200px] text-center px-4 border border-border rounded-lg bg-card">
+          <p className="text-sm text-muted-foreground">Portfolio dashboard content coming soon</p>
+        </div>
+      </div>
+    )
     if (page !== "dashboard" && PAGE_LABELS[page]) {
       return (
         <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">

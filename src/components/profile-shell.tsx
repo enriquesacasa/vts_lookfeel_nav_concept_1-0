@@ -22,6 +22,13 @@ interface NavItem {
   divider?: boolean
 }
 
+const PORTFOLIO_ITEMS: NavItem[] = [
+  { id: "assets", label: "Assets", icon: Building2, children: [
+    { id: "markets", label: "Markets", icon: Globe },
+    { id: "cities",  label: "Cities",  icon: MapPin },
+  ]},
+]
+
 const NAV_ITEMS: NavItem[] = [
   { id: "dashboard",    label: "Overview",      icon: LayoutGrid },
   { id: "stacking",     label: "Stacking Plan", icon: Layers, children: [
@@ -85,6 +92,38 @@ function PlaceholderPage({ label, icon: Icon }: { label: string; icon: React.Ele
   )
 }
 
+// ── Portfolio overview (all assets) ─────────────────────────────────────────
+
+function PortfolioOverview() {
+  return (
+    <div className="p-4 sm:p-6 space-y-4">
+      <div className="flex items-start gap-4 py-3 border-b border-border">
+        <div className="flex-1">
+          <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">Portfolio</p>
+          <h1 className="text-2xl sm:text-4xl font-semibold tracking-tight text-foreground leading-tight mb-1.5">All Assets</h1>
+          <p className="text-sm text-muted-foreground">11 properties across 5 markets</p>
+        </div>
+      </div>
+      <div className="flex flex-wrap divide-x divide-border/60 border border-border bg-card overflow-hidden rounded-lg">
+        {[
+          { label: "Total Portfolio NOI", value: "$312M" },
+          { label: "Occupancy",           value: "91.4%" },
+          { label: "Total SF",            value: "4.2M sf" },
+          { label: "Markets",             value: "5" },
+        ].map(kpi => (
+          <div key={kpi.label} className="flex-1 min-w-[120px] px-5 py-4">
+            <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">{kpi.label}</p>
+            <p className="text-xl font-semibold text-foreground">{kpi.value}</p>
+          </div>
+        ))}
+      </div>
+      <div className="rounded-lg border border-border bg-card p-6 flex items-center justify-center min-h-[200px]">
+        <p className="text-sm text-muted-foreground">Portfolio dashboard content coming soon</p>
+      </div>
+    </div>
+  )
+}
+
 // ── Shell ─────────────────────────────────────────────────────────────────────
 
 interface ProfileShellProps {
@@ -125,10 +164,18 @@ export function ProfileShell({ onExit, assets, portfolios, selectedAssetId, onAs
 
   const selectedAsset = assets.find(a => a.id === selectedAssetId)
 
-  const allFlat = NAV_ITEMS.flatMap(i => [i, ...(i.children ?? [])])
+  const filteredNavItems = React.useMemo(() => {
+    const base = NAV_ITEMS.filter(item => selectedAssetId !== "all" || item.id !== "stacking")
+    if (selectedAssetId !== "all") return base
+    const dashIdx = base.findIndex(i => i.id === "dashboard")
+    return [...base.slice(0, dashIdx + 1), ...PORTFOLIO_ITEMS, ...base.slice(dashIdx + 1)]
+  }, [selectedAssetId])
+
+  const allFlat = filteredNavItems.flatMap(i => [i, ...(i.children ?? [])])
   const activeItem = [...allFlat, AI_ITEM, ...BOTTOM_ITEMS].find(i => i.id === activePage)
 
   const renderContent = () => {
+    if (activePage === "dashboard" && selectedAssetId === "all") return <PortfolioOverview />
     if (activePage === "dashboard") return <VtsDashboard />
     if (activePage === "ai") return <VtsAgentsPage />
     if (activeItem && !("divider" in activeItem && activeItem.divider))
@@ -346,7 +393,7 @@ export function ProfileShell({ onExit, assets, portfolios, selectedAssetId, onAs
         {/* Main nav */}
         <nav className="flex-1 overflow-y-auto pb-2 scrollbar-none">
           <div className={cn("space-y-0.5", collapsed ? "px-2" : "px-3")}>
-            {NAV_ITEMS.map(item => {
+            {filteredNavItems.map(item => {
               if (item.divider) return <div key={item.id} className="h-px bg-white/8 my-2" />
               const hasChildren = !!item.children?.length
               const isOpen = openSections.has(item.id)
