@@ -203,7 +203,7 @@ const FinancialPerformance = React.forwardRef<HTMLDivElement, FinancialPerforman
             <h2 className="text-xl font-semibold text-foreground">Financial performance</h2>
           </div>
           <Button variant="outline" size="sm" className="shrink-0 text-primary border-primary bg-transparent hover:bg-primary/10 hover:text-primary dark:bg-white/8 dark:border-white/25 dark:text-white dark:hover:bg-white/15">
-            View Full Report
+            View full report
           </Button>
         </div>
 

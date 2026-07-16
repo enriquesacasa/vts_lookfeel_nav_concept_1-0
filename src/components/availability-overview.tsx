@@ -131,7 +131,7 @@ const AvailabilityOverview = React.forwardRef<HTMLDivElement, AvailabilityOvervi
                           <div className="flex flex-col gap-1">
                             <div className="flex items-center gap-1.5 font-medium text-sidebar-foreground">
                               <Sparkle fill="currentColor" className="h-3 w-3" />
-                              Run Agent
+                              Run agent
                             </div>
                             <p className="text-sidebar-foreground/70 font-normal">Find prospects and draft an outreach plan for this space</p>
                           </div>

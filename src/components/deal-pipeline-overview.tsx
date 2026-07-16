@@ -33,7 +33,7 @@ const DealPipelineOverview = React.forwardRef<HTMLDivElement, DealPipelineOvervi
             <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">Overview</p>
             <h2 className="text-xl font-semibold text-foreground">Deal pipeline</h2>
           </div>
-          <Button variant="outline" size="sm" className="shrink-0 text-primary border-primary bg-transparent hover:bg-primary/10 hover:text-primary dark:bg-white/8 dark:border-white/25 dark:text-white dark:hover:bg-white/15">View Deal pipeline</Button>
+          <Button variant="outline" size="sm" className="shrink-0 text-primary border-primary bg-transparent hover:bg-primary/10 hover:text-primary dark:bg-white/8 dark:border-white/25 dark:text-white dark:hover:bg-white/15">View deal pipeline</Button>
         </div>
 
         <div className="w-full overflow-x-auto">

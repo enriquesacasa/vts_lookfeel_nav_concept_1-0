@@ -100,7 +100,7 @@ function PortfolioOverview() {
       <div className="flex items-start gap-4 py-3 border-b border-border">
         <div className="flex-1">
           <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">Portfolio</p>
-          <h1 className="text-2xl sm:text-4xl font-semibold tracking-tight text-foreground leading-tight mb-1.5">All Assets</h1>
+          <h1 className="text-2xl sm:text-4xl font-semibold tracking-tight text-foreground leading-tight mb-1.5">All assets</h1>
           <p className="text-sm text-muted-foreground">11 properties across 5 markets</p>
         </div>
       </div>
@@ -335,7 +335,7 @@ export function ProfileShell({ onExit, assets, portfolios, selectedAssetId, onAs
                             selectedAssetId === "all" ? "bg-[#5528FF] text-white" : "text-white/70 hover:bg-white/8 hover:text-white"
                           )}>
                           <Layers className="h-3.5 w-3.5 shrink-0 opacity-60" />
-                          <p className="text-xs font-medium">All Assets</p>
+                          <p className="text-xs font-medium">All assets</p>
                         </button>
                       </div>
                     )}

@@ -363,7 +363,7 @@ function DesktopNav({ className, onCollapsedChange, assets, portfolios, selected
                   </div>
 
                   <div className="max-h-[360px] overflow-y-auto">
-                    {/* All Assets option */}
+                    {/* All assets option */}
                     {!q && (
                       <div className="px-1.5 pt-2 pb-1">
                         <div
@@ -379,7 +379,7 @@ function DesktopNav({ className, onCollapsedChange, assets, portfolios, selected
                           <div className="h-6 w-6 rounded-md bg-sidebar-primary/20 flex items-center justify-center shrink-0">
                             <Layers className="h-3.5 w-3.5 text-sidebar-primary" />
                           </div>
-                          <span className="text-xs font-medium">All Assets</span>
+                          <span className="text-xs font-medium">All assets</span>
                           {selectedAssetId === "all" && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-sidebar-primary shrink-0" />}
                         </div>
                       </div>
@@ -677,7 +677,7 @@ function MobileNav({ onLogoClick, onNavItemClick, activePage, assets, portfolios
                               <div className="h-6 w-6 rounded-md bg-sidebar-primary/20 flex items-center justify-center shrink-0">
                                 <Layers className="h-3.5 w-3.5 text-sidebar-primary" />
                               </div>
-                              <span className="text-xs font-medium">All Assets</span>
+                              <span className="text-xs font-medium">All assets</span>
                               {selectedAssetId === "all" && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-sidebar-primary shrink-0" />}
                             </div>
                           </div>

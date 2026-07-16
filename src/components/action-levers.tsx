@@ -62,7 +62,7 @@ function ActionRow({ item, onRun }: { item: ActionItem; onRun: () => void }) {
               className="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-all duration-150 opacity-0 group-hover/row:opacity-100 bg-sidebar-foreground/10 hover:bg-sidebar-foreground/20 text-sidebar-foreground/80"
             >
               <Sparkle fill="currentColor" className="h-3 w-3" />
-              Run Agent
+              Run agent
             </button>
           </div>
           {item.detail && (
@@ -92,7 +92,7 @@ const ActionLevers = React.forwardRef<HTMLDivElement, ActionLeversProps>(
             <h2 className="text-xl font-semibold text-sidebar-foreground">Financial levers</h2>
           </div>
           <Button variant="outline" size="sm" className="shrink-0 text-white/80 border-white/25 bg-transparent hover:bg-white/10 hover:text-white dark:bg-white/8 dark:border-white/25 dark:text-white dark:hover:bg-white/15">
-            View Active Agents
+            View active agents
           </Button>
         </div>
 

@@ -26,7 +26,7 @@ const LeasingAgents = React.forwardRef<HTMLDivElement, LeasingAgentsProps>(
             <h2 className="text-xl font-semibold text-sidebar-foreground">Leasing actions</h2>
           </div>
           <Button variant="outline" size="sm" className="shrink-0 text-white/80 border-white/25 bg-transparent hover:bg-white/10 hover:text-white dark:bg-white/8 dark:border-white/25 dark:text-white dark:hover:bg-white/15">
-            View Active Agents
+            View active agents
           </Button>
         </div>
 
@@ -57,7 +57,7 @@ const LeasingAgents = React.forwardRef<HTMLDivElement, LeasingAgentsProps>(
                       <p className="text-sm font-medium text-sidebar-foreground/90">{d.tenant}</p>
                       <button className="inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-sm font-medium opacity-0 group-hover/row:opacity-100 transition-all bg-sidebar-foreground/10 hover:bg-sidebar-foreground/20 text-sidebar-foreground/80 shrink-0">
                         <Sparkle fill="currentColor" className="h-3 w-3" />
-                        Run Agent
+                        Run agent
                       </button>
                     </div>
                     <p className="text-sm text-sidebar-foreground/55">{d.space} · {d.stage}</p>
@@ -85,7 +85,7 @@ const LeasingAgents = React.forwardRef<HTMLDivElement, LeasingAgentsProps>(
                       <p className="text-sm font-medium text-sidebar-foreground/90">{item.tenant}</p>
                       <button className="inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-sm font-medium opacity-0 group-hover/row:opacity-100 transition-all bg-sidebar-foreground/10 hover:bg-sidebar-foreground/20 text-sidebar-foreground/80 shrink-0">
                         <Sparkle fill="currentColor" className="h-3 w-3" />
-                        Run Agent
+                        Run agent
                       </button>
                     </div>
                     <p className="text-sm text-sidebar-foreground/55">{item.action}</p>

@@ -128,7 +128,7 @@ const LeasingActivity = React.forwardRef<HTMLDivElement, LeasingActivityProps>(
             <h2 className="text-xl font-semibold text-foreground">Leasing activity</h2>
           </div>
           <Button variant="outline" size="sm" className="shrink-0 text-primary border-primary bg-transparent hover:bg-primary/10 hover:text-primary dark:bg-white/8 dark:border-white/25 dark:text-white dark:hover:bg-white/15">
-            View All Deals
+            View all deals
           </Button>
         </div>
 
@@ -191,7 +191,7 @@ const LeasingActivity = React.forwardRef<HTMLDivElement, LeasingActivityProps>(
                       <div className="flex flex-col gap-1">
                         <div className="flex items-center gap-1.5 font-medium text-sidebar-foreground">
                           <Sparkle fill="currentColor" className="h-3 w-3" />
-                          Run Agent
+                          Run agent
                         </div>
                         <p className="text-sidebar-foreground/70 font-normal">Analyze this deal and suggest next steps</p>
                       </div>
