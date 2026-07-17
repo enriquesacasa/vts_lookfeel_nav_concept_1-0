@@ -532,7 +532,12 @@ export function DealsPage() {
                     </span>
                   </td>
                   <td className="py-3 pl-2">
-                    <button className="text-muted-foreground hover:text-foreground"><MoreHorizontal className="h-4 w-4" /></button>
+                    <div className="flex items-center gap-1">
+                      <button className="inline-flex items-center justify-center h-7 w-7 rounded-full bg-primary/10 hover:bg-primary text-primary hover:text-primary-foreground transition-all duration-150 shrink-0">
+                        <Sparkle fill="currentColor" className="h-3.5 w-3.5" />
+                      </button>
+                      <button className="text-muted-foreground hover:text-foreground"><MoreHorizontal className="h-4 w-4" /></button>
+                    </div>
                   </td>
                 </tr>
               )
