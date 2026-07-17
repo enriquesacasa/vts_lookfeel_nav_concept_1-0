@@ -195,7 +195,7 @@ function PipelineViz({ deals, className }: { deals: Deal[]; className?: string }
               {isExecuted && <div className="w-px self-stretch bg-border/50 mx-1" />}
               <div className="flex-1 flex flex-col items-center gap-1 h-full justify-end">
                 <div className="text-xs font-medium text-muted-foreground tabular-nums">{count > 0 ? count : ""}</div>
-                <div className="w-full relative" style={{ height: `${Math.max(count / maxCount * 100, count > 0 ? 4 : 1)}%` }}>
+                <div className="w-full relative px-1.5" style={{ height: `${Math.max(count / maxCount * 100, count > 0 ? 4 : 1)}%` }}>
                   <div className="w-full h-full rounded-t-md overflow-hidden flex flex-col-reverse">
                     {active  > 0 && <div className="w-full" style={{ height: `${(active / count) * 100}%`, background: isExecuted ? "var(--color-primary)" : "var(--color-success)" }} />}
                     {stalled > 0 && <div className="w-full bg-warning/70"  style={{ height: `${(stalled / count) * 100}%` }} />}
