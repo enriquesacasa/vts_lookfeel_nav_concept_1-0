@@ -9,6 +9,7 @@ import {
 } from "lucide-react"
 import { VtsAgentsPage } from "@/components/vts-agents-page"
 import { VtsDashboard } from "@/components/vts-dashboard"
+import { ASSETS, ASSET_DETAILS, ASSET_KPIS, PORTFOLIOS } from "@/App"
 
 interface Asset { id: string; name: string; address: string }
 interface Portfolio { id: string; name: string; assetIds: string[] }
@@ -71,41 +72,52 @@ function PlaceholderPage({ label, icon: Icon, selectionHeader }: { label: string
   )
 }
 
-// ── Selection header (shared across overview + placeholder pages) ────────────
+// ── Page header (shared across all V2 pages) ─────────────────────────────────
 
 interface Stat { label: string; value: string }
 
-function SelectionHeader({ name, subtitle, eyebrow, image, stats = [] }: {
-  name: string; subtitle: string; eyebrow: string; image?: string; stats?: Stat[]
+function MultiImage({ assetIds }: { assetIds: string[] }) {
+  const ids = assetIds.slice(0, 4)
+  return (
+    <div className="h-14 w-20 grid grid-cols-2 gap-px overflow-hidden shrink-0 hidden sm:grid">
+      {ids.map(id => (
+        <img key={id} src={ASSET_DETAILS[id]?.image} alt="" className="w-full h-full object-cover" />
+      ))}
+    </div>
+  )
+}
+
+function PageHeader({ name, subtitle, eyebrow, image, stats = [] }: {
+  name: string; subtitle: string; eyebrow: string; image?: string | React.ReactNode; stats?: Stat[]
 }) {
   return (
-    <div className="flex items-center gap-4 py-3 border-b border-border mb-4">
+    <div className="flex items-center gap-4 py-4 border-b border-border">
       {image && (
-        <div className="shrink-0 w-16 h-16 rounded-xl overflow-hidden hidden sm:block">
-          <img src={image} alt={name} className="w-full h-full object-cover" />
-        </div>
+        typeof image === "string"
+          ? <img src={image} alt={name} className="h-14 w-20 object-cover shrink-0 hidden sm:block" />
+          : <>{image}</>
       )}
-      <div className="flex-1 min-w-0">
-        <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-0.5">{eyebrow}</p>
-        <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-foreground leading-tight">{name}</h1>
-        <p className="text-sm text-muted-foreground mt-0.5 truncate">{subtitle}</p>
+      <div className="min-w-0">
+        <p className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground mb-0.5">{eyebrow}</p>
+        <h1 className="text-2xl sm:text-3xl font-medium text-foreground leading-tight">{name}</h1>
+        <p className="text-xs text-muted-foreground mt-0.5 hidden sm:block truncate">{subtitle}</p>
       </div>
       {stats.length > 0 && (
-        <div className="hidden md:flex items-stretch divide-x divide-border shrink-0">
-          {stats.map(s => (
-            <div key={s.label} className="px-5 text-right">
-              <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-0.5">{s.label}</p>
-              <p className="text-sm font-semibold text-foreground">{s.value}</p>
+        <div className="hidden md:flex items-center gap-6 ml-auto shrink-0">
+          {stats.map((s, i) => (
+            <div key={s.label} className={cn("text-right", i > 0 && "pl-6 border-l border-border")}>
+              <p className="text-xs text-muted-foreground">{s.label}</p>
+              <p className="text-sm font-medium text-foreground">{s.value}</p>
             </div>
           ))}
         </div>
       )}
-      <div className="flex items-center gap-2 shrink-0">
-        <button className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-primary bg-primary text-primary-foreground hover:bg-primary/90 transition-colors px-3.5 py-1.5 text-sm font-medium">
+      <div className="flex items-center gap-2 shrink-0 md:ml-6">
+        <button className="hidden sm:inline-flex items-center gap-1.5 border border-primary bg-primary text-primary-foreground hover:bg-primary/90 transition-colors px-3.5 py-1.5 text-xs font-medium">
           <Sparkle fill="currentColor" className="h-3.5 w-3.5" />
           Ask VTS AI
         </button>
-        <button aria-label="Search" className="flex items-center justify-center h-8 w-8 rounded-full border border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors">
+        <button aria-label="Search" className="flex items-center justify-center h-8 w-8 border border-border hover:border-primary text-muted-foreground hover:text-primary transition-colors">
           <Search className="h-3.5 w-3.5" />
         </button>
       </div>
@@ -115,27 +127,92 @@ function SelectionHeader({ name, subtitle, eyebrow, image, stats = [] }: {
 
 // ── Portfolio overview ────────────────────────────────────────────────────────
 
-function PortfolioOverview({ name, subtitle }: { name: string; subtitle: string }) {
+function PortfolioOverview({ name, subtitle, eyebrow, portfolioId, onAssetSelect }: {
+  name: string; subtitle: string; eyebrow: string; portfolioId?: string
+  onAssetSelect: (id: string) => void
+}) {
+  const portfolio = portfolioId ? PORTFOLIOS.find(p => p.id === portfolioId) : null
+  const visibleAssets = portfolio
+    ? ASSETS.filter(a => portfolio.assetIds.includes(a.id))
+    : ASSETS
+
+  const allStats = portfolioId
+    ? [{ label: "Total NOI", value: "$312M" }, { label: "Occupancy", value: "91.4%" }, { label: "Properties", value: String(portfolio?.assetIds.length ?? 0) }]
+    : [{ label: "Total NOI", value: "$312M" }, { label: "Occupancy", value: "91.4%" }, { label: "Total SF", value: "4.2M sf" }, { label: "Markets", value: "5" }]
+
   return (
     <div className="p-4 sm:p-6 space-y-4">
-      <SelectionHeader name={name} subtitle={subtitle} eyebrow="Portfolio"
-        stats={[{ label: "Total NOI", value: "$312M" }, { label: "Occupancy", value: "91.4%" }, { label: "Markets", value: "5" }]}
+      <PageHeader name={name} subtitle={subtitle} eyebrow={eyebrow}
+        image={portfolioId
+          ? <MultiImage assetIds={portfolio?.assetIds ?? []} />
+          : <MultiImage assetIds={ASSETS.map(a => a.id)} />
+        }
+        stats={allStats}
       />
-      <div className="flex flex-wrap divide-x divide-border/60 border border-border bg-card overflow-hidden rounded-lg">
-        {[
-          { label: "Total portfolio NOI", value: "$312M" },
-          { label: "Occupancy",           value: "91.4%" },
-          { label: "Total SF",            value: "4.2M sf" },
-          { label: "Markets",             value: "5" },
-        ].map(kpi => (
-          <div key={kpi.label} className="flex-1 min-w-[120px] px-5 py-4">
-            <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">{kpi.label}</p>
-            <p className="text-xl font-semibold text-foreground">{kpi.value}</p>
-          </div>
-        ))}
-      </div>
-      <div className="rounded-lg border border-border bg-card p-6 flex items-center justify-center min-h-[200px]">
-        <p className="text-sm text-muted-foreground">Portfolio dashboard content coming soon</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {visibleAssets.map(asset => {
+          const kpi = ASSET_KPIS[asset.id]
+          const detail = ASSET_DETAILS[asset.id]
+          if (!kpi) return null
+          return (
+            <div
+              key={asset.id}
+              className="group cursor-pointer overflow-hidden bg-card"
+              onClick={() => onAssetSelect(asset.id)}
+            >
+              <div className="relative h-44 overflow-hidden">
+                <img src={detail?.image} alt={asset.name} className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                {kpi.alert && (
+                  <div className="absolute top-3 right-3">
+                    <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded border bg-white text-destructive border-destructive/40">
+                      ⚠ {kpi.alert}
+                    </span>
+                  </div>
+                )}
+                <div className="absolute bottom-0 left-0 right-0 px-4 pb-3">
+                  <p className="text-[10px] font-medium uppercase tracking-widest text-white/60 mb-0.5">{detail?.city}</p>
+                  <h3 className="font-semibold text-white text-base leading-tight">{asset.name}</h3>
+                  <p className="text-xs text-white/60 truncate">{asset.address}</p>
+                </div>
+              </div>
+              <div className="px-4 py-3">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="flex-1 h-1.5 rounded-full bg-secondary overflow-hidden">
+                    <div
+                      className={cn("h-full rounded-full", kpi.occupancy >= 90 ? "bg-success" : kpi.occupancy >= 75 ? "bg-primary" : "bg-warning")}
+                      style={{ width: `${kpi.occupancy}%` }}
+                    />
+                  </div>
+                  <span className="text-xs font-medium text-foreground tabular-nums shrink-0">{kpi.occupancy}% occupied</span>
+                </div>
+                <div className="grid grid-cols-3 divide-x divide-border/60">
+                  <div className="pr-3">
+                    <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-0.5">NOI</p>
+                    <p className="text-sm font-semibold text-foreground">{kpi.noi}</p>
+                    <p className={cn("text-xs font-medium", kpi.noiBudgetUp ? "text-success" : "text-destructive")}>{kpi.noiBudgetDelta} vs budget</p>
+                  </div>
+                  <div className="px-3">
+                    <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-0.5">Expiring</p>
+                    <p className="text-sm font-semibold text-foreground">{kpi.expiring12mo} lease{kpi.expiring12mo !== 1 ? "s" : ""}</p>
+                    <span className={cn("text-[10px] font-medium px-1.5 py-0.5 rounded border inline-block mt-0.5",
+                      kpi.expiring12mo > 3 ? "bg-destructive/10 text-destructive border-destructive/20"
+                      : kpi.expiring12mo > 0 ? "bg-warning/10 text-warning border-warning/20"
+                      : "bg-secondary text-muted-foreground border-border"
+                    )}>
+                      {kpi.expiring12mo === 0 ? "None" : kpi.expiring12mo > 3 ? "Action needed" : "12-month"}
+                    </span>
+                  </div>
+                  <div className="pl-3">
+                    <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-0.5">Deals</p>
+                    <p className="text-sm font-semibold text-foreground">{kpi.activeDeals}</p>
+                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded border inline-block mt-0.5 bg-secondary text-muted-foreground border-border">active</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )
+        })}
       </div>
     </div>
   )
@@ -194,30 +271,53 @@ export function ProfileShell({ onExit, assets, portfolios, selectedAssetId, onAs
   const allFlat = filteredNavItems.flatMap(i => [i, ...(i.children ?? [])])
   const activeItem = [...allFlat, AI_ITEM, ...BOTTOM_ITEMS].find(i => i.id === activePage)
 
-  const selectionHeader = selectedAssetId === "all"
-    ? <SelectionHeader name="All assets" subtitle="11 properties across 5 markets" eyebrow="Overview"
+  const assetDetail = ASSET_DETAILS[selectedAssetId]
+
+  const isDashboard = activePage === "dashboard"
+  const pageLabel = activeItem && !("divider" in activeItem && activeItem.divider) ? activeItem.label : undefined
+
+  const buildSelectionHeader = (overrideName?: string) => selectedAssetId === "all"
+    ? <PageHeader name={overrideName ?? "All assets"} subtitle="11 properties across 5 markets" eyebrow="Overview"
+        image={<MultiImage assetIds={ASSETS.map(a => a.id)} />}
         stats={[{ label: "Total NOI", value: "$312M" }, { label: "Occupancy", value: "91.4%" }, { label: "Total SF", value: "4.2M sf" }, { label: "Markets", value: "5" }]}
       />
     : selectedPortfolio
-      ? <SelectionHeader name={selectedPortfolio.name} subtitle={`${selectedPortfolio.assetIds.length} properties`} eyebrow="Portfolio"
+      ? <PageHeader name={overrideName ?? selectedPortfolio.name} subtitle={`${selectedPortfolio.assetIds.length} properties`} eyebrow="Portfolio"
+          image={<MultiImage assetIds={selectedPortfolio.assetIds} />}
           stats={[{ label: "Total NOI", value: "$312M" }, { label: "Occupancy", value: "91.4%" }, { label: "Properties", value: String(selectedPortfolio.assetIds.length) }]}
         />
       : selectedAsset
-        ? <SelectionHeader name={selectedAsset.name} subtitle={selectedAsset.address} eyebrow="Asset Dashboard"
+        ? <PageHeader name={overrideName ?? selectedAsset.name} subtitle={`${selectedAsset.address}${assetDetail ? ` · ${assetDetail.city}` : ""}`} eyebrow={isDashboard ? "Asset Dashboard" : (assetDetail?.city ?? "Asset")}
+            image={assetDetail?.image}
             stats={[{ label: "Total SF", value: "1.37M" }, { label: "Floors", value: "52" }, { label: "Managed", value: "CBRE" }]}
           />
         : null
 
+  const selectionHeader = buildSelectionHeader()
+  const pagedHeaderName = pageLabel
+    ? selectedAssetId === "all"
+      ? `All assets: ${pageLabel}`
+      : selectedPortfolio
+        ? `${selectedPortfolio.name}: ${pageLabel}`
+        : selectedAsset
+          ? `${selectedAsset.name}: ${pageLabel}`
+          : undefined
+    : undefined
+  const pagedHeader = pagedHeaderName ? buildSelectionHeader(pagedHeaderName) : selectionHeader
+
   const renderContent = () => {
     if (activePage === "dashboard" && (selectedAssetId === "all" || selectedPortfolio))
       return <PortfolioOverview
-        name={selectedAssetId === "all" ? "All assets" : selectedPortfolio!.name}
+        name={pagedHeaderName ?? (selectedAssetId === "all" ? "All assets" : selectedPortfolio!.name)}
         subtitle={selectedAssetId === "all" ? "11 properties across 5 markets" : `${selectedPortfolio!.assetIds.length} properties`}
+        eyebrow={selectedAssetId === "all" ? "Overview" : "Portfolio"}
+        portfolioId={selectedPortfolio?.id}
+        onAssetSelect={id => { onAssetChange(id); setActivePage("dashboard") }}
       />
-    if (activePage === "dashboard") return <VtsDashboard />
+    if (activePage === "dashboard") return <VtsDashboard header={pagedHeader} />
     if (activePage === "ai") return <VtsAgentsPage />
     if (activeItem && !("divider" in activeItem && activeItem.divider))
-      return <PlaceholderPage label={activeItem.label} icon={activeItem.icon} selectionHeader={selectionHeader} />
+      return <PlaceholderPage label={activeItem.label} icon={activeItem.icon} selectionHeader={pagedHeader} />
     return null
   }
 
@@ -331,11 +431,11 @@ export function ProfileShell({ onExit, assets, portfolios, selectedAssetId, onAs
                   : "bg-white/8 border-white/12 hover:bg-white/12"
               )}
             >
-              <Building2 className="h-3.5 w-3.5 shrink-0 text-white/50" />
-              <span className="text-xs font-medium text-white/80 flex-1 text-left">
+              <Building2 className="h-[18px] w-[18px] shrink-0 text-white/50" />
+              <span className="text-sm font-medium text-white/80 flex-1 text-left">
                 {selectorLabel}
               </span>
-              <ChevronDown className={cn("h-3 w-3 shrink-0 text-white/40 transition-transform", dropdownOpen && "rotate-180")} />
+              <ChevronDown className={cn("h-4 w-4 shrink-0 text-white/40 transition-transform", dropdownOpen && "rotate-180")} />
             </button>
           )}
 
@@ -346,77 +446,89 @@ export function ProfileShell({ onExit, assets, portfolios, selectedAssetId, onAs
               a.name.toLowerCase().includes(q) || a.address.toLowerCase().includes(q)
             )
             const filteredPortfolios = portfolios.filter(p => p.name.toLowerCase().includes(q))
-            const select = (id: string) => { onAssetChange(id); setDropdownOpen(false) }
+            const select = (id: string) => {
+              const newIsPortfolioOrAll = id === "all" || portfolios.some(p => p.id === id)
+              if (newIsPortfolioOrAll && (activePage === "stacking" || activePage === "spaces")) {
+                setActivePage("dashboard")
+              }
+              onAssetChange(id)
+              setDropdownOpen(false)
+            }
             return (
-              <div className={cn(
-                "absolute z-[200] w-[260px]",
-                collapsed ? "top-0 left-[calc(100%+8px)]" : "top-full left-0 mt-1"
-              )}>
-                <div className="rounded-xl border border-white/15 bg-[#1a0a3d] shadow-xl overflow-hidden flex flex-col">
-                  <div className="px-2.5 pt-2.5 pb-2 border-b border-white/10">
-                    <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-white/8">
-                      <Search className="h-3.5 w-3.5 shrink-0 text-white/40" />
-                      <input
-                        ref={searchRef}
-                        value={search}
-                        onChange={e => setSearch(e.target.value)}
-                        placeholder="Search properties…"
-                        className="flex-1 bg-transparent text-xs text-white placeholder:text-white/40 outline-none"
-                      />
+              <>
+                {/* Mobile backdrop */}
+                <div className="fixed inset-0 z-[199] md:hidden" onClick={() => { setDropdownOpen(false); setSearch("") }} />
+                <div className={cn(
+                  "fixed left-3 right-3 top-[140px] z-[200]",
+                  "md:absolute md:right-auto md:w-[340px]",
+                  collapsed ? "md:top-0 md:left-[calc(100%+8px)]" : "md:top-full md:left-0 md:mt-1"
+                )}>
+                  <div className="rounded-xl border border-white/15 bg-[#1a0a3d] shadow-xl overflow-hidden flex flex-col">
+                    <div className="px-2.5 pt-2.5 pb-2 border-b border-white/10">
+                      <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-white/8">
+                        <Search className="h-3.5 w-3.5 shrink-0 text-white/40" />
+                        <input
+                          ref={searchRef}
+                          value={search}
+                          onChange={e => setSearch(e.target.value)}
+                          placeholder="Search properties…"
+                          className="flex-1 bg-transparent text-xs text-white placeholder:text-white/40 outline-none"
+                        />
+                      </div>
+                    </div>
+                    <div className="max-h-[480px] overflow-y-auto">
+                      {!q && (
+                        <div className="px-1.5 pt-2 pb-1">
+                          <button onClick={() => select("all")}
+                            className={cn("w-full flex items-center gap-2.5 px-2.5 py-2.5 rounded-lg transition-colors text-left",
+                              selectedAssetId === "all" ? "bg-[#5528FF] text-white" : "text-white/70 hover:bg-white/8 hover:text-white"
+                            )}>
+                            <Layers className="h-[18px] w-[18px] shrink-0 opacity-60" />
+                            <p className="text-sm font-medium">All assets</p>
+                          </button>
+                        </div>
+                      )}
+                      {filteredPortfolios.length > 0 && (
+                        <div className="px-1.5 pt-2 pb-1">
+                          <p className="px-2 pb-1 text-[10px] font-medium uppercase tracking-widest text-white/35">Portfolios</p>
+                          {filteredPortfolios.map(p => (
+                            <button key={p.id} onClick={() => select(p.id)}
+                              className={cn("w-full flex items-center gap-2.5 px-2.5 py-2.5 rounded-lg transition-colors text-left",
+                                selectedAssetId === p.id ? "bg-[#5528FF] text-white" : "text-white/70 hover:bg-white/8 hover:text-white"
+                              )}>
+                              <Layers className="h-[18px] w-[18px] shrink-0 opacity-60" />
+                              <div className="min-w-0">
+                                <p className="text-sm font-medium truncate">{p.name}</p>
+                                <p className="text-xs text-white/45">{p.assetIds.length} properties</p>
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                      {filteredAssets.length > 0 && (
+                        <div className="px-1.5 pt-2 pb-1.5">
+                          <p className="px-2 pb-1 text-[10px] font-medium uppercase tracking-widest text-white/35">Properties</p>
+                          {filteredAssets.map(a => (
+                            <button key={a.id} onClick={() => select(a.id)}
+                              className={cn("w-full flex items-center gap-2.5 px-2.5 py-2.5 rounded-lg transition-colors text-left",
+                                selectedAssetId === a.id ? "bg-[#5528FF] text-white" : "text-white/70 hover:bg-white/8 hover:text-white"
+                              )}>
+                              <Building2 className="h-[18px] w-[18px] shrink-0 opacity-50" />
+                              <div className="min-w-0">
+                                <p className="text-sm font-medium truncate">{a.name}</p>
+                                <p className="text-xs text-white/45 truncate">{a.address}</p>
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                      {filteredAssets.length === 0 && filteredPortfolios.length === 0 && (
+                        <p className="px-4 py-5 text-center text-xs text-white/40">No results for "{search}"</p>
+                      )}
                     </div>
                   </div>
-                  <div className="max-h-[320px] overflow-y-auto">
-                    {!q && (
-                      <div className="px-1.5 pt-2 pb-1">
-                        <button onClick={() => select("all")}
-                          className={cn("w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg transition-colors text-left",
-                            selectedAssetId === "all" ? "bg-[#5528FF] text-white" : "text-white/70 hover:bg-white/8 hover:text-white"
-                          )}>
-                          <Layers className="h-3.5 w-3.5 shrink-0 opacity-60" />
-                          <p className="text-xs font-medium">All assets</p>
-                        </button>
-                      </div>
-                    )}
-                    {filteredPortfolios.length > 0 && (
-                      <div className="px-1.5 pt-2 pb-1">
-                        <p className="px-2 pb-1 text-[10px] font-medium uppercase tracking-widest text-white/35">Portfolios</p>
-                        {filteredPortfolios.map(p => (
-                          <button key={p.id} onClick={() => select(p.id)}
-                            className={cn("w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg transition-colors text-left",
-                              selectedAssetId === p.id ? "bg-[#5528FF] text-white" : "text-white/70 hover:bg-white/8 hover:text-white"
-                            )}>
-                            <Layers className="h-3.5 w-3.5 shrink-0 opacity-60" />
-                            <div className="min-w-0">
-                              <p className="text-xs font-medium truncate">{p.name}</p>
-                              <p className="text-[10px] text-white/45">{p.assetIds.length} properties</p>
-                            </div>
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                    {filteredAssets.length > 0 && (
-                      <div className="px-1.5 pt-2 pb-1.5">
-                        <p className="px-2 pb-1 text-[10px] font-medium uppercase tracking-widest text-white/35">Properties</p>
-                        {filteredAssets.map(a => (
-                          <button key={a.id} onClick={() => select(a.id)}
-                            className={cn("w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg transition-colors text-left",
-                              selectedAssetId === a.id ? "bg-[#5528FF] text-white" : "text-white/70 hover:bg-white/8 hover:text-white"
-                            )}>
-                            <Building2 className="h-3.5 w-3.5 shrink-0 opacity-50" />
-                            <div className="min-w-0">
-                              <p className="text-xs font-medium truncate">{a.name}</p>
-                              <p className="text-[10px] text-white/45 truncate">{a.address}</p>
-                            </div>
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                    {filteredAssets.length === 0 && filteredPortfolios.length === 0 && (
-                      <p className="px-4 py-5 text-center text-xs text-white/40">No results for "{search}"</p>
-                    )}
-                  </div>
                 </div>
-              </div>
+              </>
             )
           })()}
         </div>
@@ -441,9 +553,9 @@ export function ProfileShell({ onExit, assets, portfolios, selectedAssetId, onAs
                       else setOpenSections(new Set())
                     }}
                   />
-                  {!collapsed && isOpen && item.children?.map(child => (
-                    <div key={child.id} className="pl-3">
-                      <SidebarRow item={child} active={activePage === child.id} collapsed={false} onClick={() => { handleNavClick(child.id); setOpenSections(new Set([item.id])) }} />
+                  {((!collapsed && isOpen) || (collapsed && (activePage === item.id || item.children?.some(c => c.id === activePage)))) && item.children?.map(child => (
+                    <div key={child.id} className={cn(!collapsed && "pl-3")}>
+                      <SidebarRow item={child} active={activePage === child.id} collapsed={collapsed} onClick={() => { handleNavClick(child.id); setOpenSections(new Set([item.id])) }} />
                     </div>
                   ))}
                 </React.Fragment>

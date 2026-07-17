@@ -12,10 +12,22 @@ import { ActionLevers } from "@/components/action-levers"
 import { KpiBar } from "@/components/kpi-bar"
 import { LeasingAgents } from "@/components/leasing-agents"
 import { AgentsPage } from "@/components/agents-page"
+import { DealsPage } from "@/components/deals-page"
 import { ProfileShell } from "@/components/profile-shell"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
 import buildingImg from "@/assets/building.jpg"
+
+function MultiImage({ assetIds }: { assetIds: string[] }) {
+  const ids = assetIds.slice(0, 4)
+  return (
+    <div className="shrink-0 w-16 h-16 sm:w-24 sm:h-24 grid grid-cols-2 gap-px rounded-xl overflow-hidden">
+      {ids.map(id => (
+        <img key={id} src={ASSET_DETAILS[id]?.image} alt="" className="w-full h-full object-cover" />
+      ))}
+    </div>
+  )
+}
 
 export const ASSETS = [
   { id: "vts-tower",     name: "VTS Tower Headquarters",  address: "114 West 41st Street, New York, NY 10036" },
@@ -37,7 +49,7 @@ export const PORTFOLIOS = [
   { id: "midwest",     name: "Midwest Holdings",     assetIds: ["willis", "hudson-yards", "peachtree"] },
 ]
 
-const ASSET_DETAILS: Record<string, { city: string; image: string }> = {
+export const ASSET_DETAILS: Record<string, { city: string; image: string }> = {
   "vts-tower":     { city: "Built 2017 · 52 floors · Office",   image: "https://loremflickr.com/800/500/office,building,glass?lock=1" },
   "one-financial": { city: "Built 1992 · 36 floors · Office",   image: "https://loremflickr.com/800/500/office,building,glass?lock=2" },
   "empire-state":  { city: "Built 1931 · 102 floors · Office",  image: "https://loremflickr.com/800/500/office,building,glass?lock=3" },
@@ -51,7 +63,7 @@ const ASSET_DETAILS: Record<string, { city: string; image: string }> = {
   "200-berkeley":  { city: "Built 1947 · 28 floors · Office",   image: "https://loremflickr.com/800/500/office,building,glass?lock=11" },
 }
 
-const ASSET_KPIS: Record<string, {
+export const ASSET_KPIS: Record<string, {
   occupancy: number; noi: string; noiBudgetDelta: string; noiBudgetUp: boolean;
   expiring12mo: number; activeDeals: number; alert?: string
 }> = {
@@ -127,6 +139,7 @@ export default function App() {
   }
 
   const PAGE_LABELS: Record<string, string> = {
+    "dashboard": "Overview",
     "stacking": "Stacking plan", "spaces": "Spaces",
     "leases": "Leases", "critical-dates": "Critical dates", "options-rights": "Options & rights", "tenants": "Tenants",
     "deals": "Deals", "deal-tasks": "Deal tasks", "tenant-coord": "Tenant coordination", "requirements": "Requirements",
@@ -153,14 +166,14 @@ export default function App() {
         city: "Overview",
         name: "All assets",
         address: "11 properties across 5 markets",
-        image: undefined,
+        image: <MultiImage assetIds={ASSETS.map(a => a.id)} />,
         stats: [] as { label: string; value: string; accent?: boolean }[],
       }
       if (selectedPortfolio) return {
         city: "Portfolio",
         name: selectedPortfolio.name,
         address: `${selectedPortfolio.assetIds.length} properties`,
-        image: undefined,
+        image: <MultiImage assetIds={selectedPortfolio.assetIds} />,
         stats: [] as { label: string; value: string; accent?: boolean }[],
       }
       return {
@@ -172,13 +185,31 @@ export default function App() {
       }
     })()
 
+    // Show "AssetName PageLabel" with page label in mid-grey (includes "Overview" on dashboard)
+    const pageLabel = PAGE_LABELS[page]
+    const pagedHeaderProps = pageLabel
+      ? { ...headerProps, name: (
+          <span>
+            <span className="font-semibold">{headerProps.name}</span>{" "}
+            <span className="text-muted-foreground font-light"> | {pageLabel}</span>
+          </span>
+        )}
+      : headerProps
+
+    if (page === "deals") return (
+      <div className="space-y-4">
+        <BuildingHeader {...pagedHeaderProps} />
+        <DealsPage />
+      </div>
+    )
+
     if (page === "dashboard" && (selectedAssetId === "all" || selectedPortfolio)) {
       const visibleAssets = selectedPortfolio
         ? ASSETS.filter(a => selectedPortfolio.assetIds.includes(a.id))
         : ASSETS
       return (
         <div className="space-y-4">
-          <BuildingHeader {...headerProps} />
+          <BuildingHeader {...pagedHeaderProps} />
           <KpiBar kpis={[
             { label: "Total portfolio NOI", value: "$312M",   subtitle: "+4.2% vs budget",  trend: "up"   as const },
             { label: "Occupancy",           value: "91.4%",  subtitle: "+0.8% vs budget",  trend: "up"   as const },
@@ -249,10 +280,10 @@ export default function App() {
         </div>
       )
     }
-    if (page !== "dashboard" && PAGE_LABELS[page]) {
+    if (PAGE_LABELS[page] && page !== "dashboard") {
       return (
         <div className="flex flex-col" style={{minHeight: 'calc(100vh - 2rem)'}}>
-          <BuildingHeader {...headerProps} />
+          <BuildingHeader {...pagedHeaderProps} />
           <div className="flex flex-col items-center justify-center flex-1 text-center px-4 rounded-2xl bg-white/70 dark:bg-white/8 backdrop-blur-md mt-4">
             <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center mb-5">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-primary opacity-60"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 21V9"/></svg>
@@ -265,7 +296,7 @@ export default function App() {
     }
     return (
       <div className="space-y-4">
-        <BuildingHeader {...headerProps} />
+        <BuildingHeader {...pagedHeaderProps} />
         <KpiBar kpis={KPIS} />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <AvailabilityOverview occupiedSf={957638} vacantSf={410416} vacantSpaces={VACANT_SPACES} />
@@ -302,7 +333,13 @@ export default function App() {
         assets={ASSETS}
         portfolios={PORTFOLIOS}
         selectedAssetId={selectedAssetId}
-        onAssetChange={id => { setSelectedAssetId(id); setCurrentPage("dashboard") }}
+        onAssetChange={id => {
+          const newIsPortfolioOrAll = id === "all" || PORTFOLIOS.some(p => p.id === id)
+          if (newIsPortfolioOrAll && (currentPage === "stacking" || currentPage === "spaces")) {
+            setCurrentPage("dashboard")
+          }
+          setSelectedAssetId(id)
+        }}
         onLogoClick={toggleDark}
         onNavItemClick={id => {
           if (id === "avatar") { setProfileMode(true) }
