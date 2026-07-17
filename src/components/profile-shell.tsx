@@ -9,6 +9,7 @@ import {
 } from "lucide-react"
 import { VtsAgentsPage } from "@/components/vts-agents-page"
 import { VtsDashboard } from "@/components/vts-dashboard"
+import { DealsPage } from "@/components/deals-page"
 import { ASSETS, ASSET_DETAILS, ASSET_KPIS, PORTFOLIOS } from "@/App"
 
 interface Asset { id: string; name: string; address: string }
@@ -316,6 +317,12 @@ export function ProfileShell({ onExit, assets, portfolios, selectedAssetId, onAs
       />
     if (activePage === "dashboard") return <VtsDashboard header={pagedHeader} />
     if (activePage === "ai") return <VtsAgentsPage />
+    if (activePage === "deals") return (
+      <div className="p-4 sm:p-6 space-y-4">
+        {pagedHeader}
+        <DealsPage variant="v2" />
+      </div>
+    )
     if (activeItem && !("divider" in activeItem && activeItem.divider))
       return <PlaceholderPage label={activeItem.label} icon={activeItem.icon} selectionHeader={pagedHeader} />
     return null

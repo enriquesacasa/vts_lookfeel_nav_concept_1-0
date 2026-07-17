@@ -1,5 +1,7 @@
 import * as React from "react"
 import { cn, cardBase } from "@/lib/utils"
+
+const CardCtx = React.createContext(cardBase)
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -189,9 +191,10 @@ function PipelineViz({ deals, className }: { deals: Deal[]; className?: string }
     stalled: deals.filter(d => d.stage === s && d.status === "stalled").length,
   }))
   const maxCount = Math.max(...byStageCounts.map(s => s.count), 1)
+  const card = React.useContext(CardCtx)
 
   return (
-    <div className={cn(cardBase, "flex flex-col", className)}>
+    <div className={cn(card, "flex flex-col", className)}>
       <div className="flex items-start justify-between mb-1">
         <div>
           <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">Deal Pipeline</p>
@@ -246,8 +249,9 @@ const AI_ACTIONS = [
 ]
 
 function AiInsightCard() {
+  const card = React.useContext(CardCtx)
   return (
-    <div className={cn(cardBase, "border-transparent flex flex-col gap-4 bg-sidebar-accent")}>
+    <div className={cn(card, "border-transparent flex flex-col gap-4 bg-sidebar-accent")}>
       <div className="flex items-start justify-between gap-2">
         <div>
           <p className="text-[10px] font-medium uppercase tracking-widest mb-1 text-sidebar-foreground/70">VTS Agents</p>
@@ -301,8 +305,9 @@ function KpiSummary({ deals }: { deals: Deal[] }) {
     { label: "Need Attention", value: String(atRisk + stalled),       sub: null as null },
   ]
 
+  const card = React.useContext(CardCtx)
   return (
-    <div className={cn(cardBase, "!p-0 overflow-hidden flex flex-wrap divide-x divide-border/60")}>
+    <div className={cn(card, "!p-0 overflow-hidden flex flex-wrap divide-x divide-border/60")}>
       {kpis.map(k => (
         <div key={k.label} className="flex-1 min-w-[120px] px-5 py-4">
           <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">{k.label}</p>
@@ -342,7 +347,8 @@ const STATUS_TABS: { label: string; value: Status | "all" }[] = [
 
 // ── Main page ─────────────────────────────────────────────────────────────────
 
-export function DealsPage() {
+export function DealsPage({ variant = "v1" }: { variant?: "v1" | "v2" }) {
+  const card = variant === "v2" ? "bg-card p-5" : cardBase
   const [keyword, setKeyword] = React.useState("")
   const [statusFilter, setStatusFilter] = React.useState<Status | "all">("all")
   const [stageFilter, setStageFilter] = React.useState<Stage | "all">("all")
@@ -381,6 +387,7 @@ export function DealsPage() {
   }
 
   return (
+    <CardCtx.Provider value={card}>
     <div className="space-y-4">
       <KpiSummary deals={DEALS} />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch">
@@ -391,7 +398,7 @@ export function DealsPage() {
       </div>
 
       {/* Deals table */}
-      <div className={cn(cardBase)}>
+      <div className={cn(card)}>
         {/* Status tabs + search */}
         <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
           <div className="flex gap-1 rounded-lg bg-muted/60 dark:bg-white/6 p-1 overflow-x-auto">
@@ -588,5 +595,6 @@ export function DealsPage() {
         </div>
       </div>
     </div>
+    </CardCtx.Provider>
   )
 }
