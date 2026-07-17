@@ -202,7 +202,7 @@ function PipelineViz({ deals, className }: { deals: Deal[]; className?: string }
                     {count === 0 && <div className="w-full h-1 bg-border rounded" />}
                   </div>
                 </div>
-                <div className={cn("text-xs text-center leading-tight font-semibold", isExecuted ? "text-emerald-600" : "text-muted-foreground")}>{stage}</div>
+                <div className="text-xs text-center leading-tight font-semibold text-muted-foreground">{stage}</div>
                 {sf > 0 && <div className="text-[10px] text-muted-foreground/70">{fmtSf(sf)}</div>}
               </div>
             </React.Fragment>
