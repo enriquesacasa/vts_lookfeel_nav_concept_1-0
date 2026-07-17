@@ -1,4 +1,5 @@
 import * as React from "react"
+import { Sparkle } from "lucide-react"
 import { AppNav } from "@/components/app-nav"
 import { BuildingHeader } from "@/components/building-header"
 import { AvailabilityOverview } from "@/components/availability-overview"
@@ -207,13 +208,32 @@ export default function App() {
     "portfolio-alerts": "Portfolio alerts", "portfolio-reports": "Portfolio reports", "lease-charts": "Lease charts",
     "abstraction": "Abstraction management", "activity": "Activity feed", "reminders": "Reminders",
     "assets": "Assets", "markets": "Markets", "cities": "Cities",
+    "ai": "VTS Agents",
   }
 
   const selectedPortfolio = PORTFOLIOS.find(p => p.id === selectedAssetId)
   const selectedAsset = ASSETS.find(a => a.id === selectedAssetId)
 
   const renderPage = (page: string) => {
-    if (page === "ai") return <AgentsPage />
+    if (page === "ai") {
+      const aiImage = (
+        <div className="shrink-0 w-16 h-16 sm:w-24 sm:h-24 rounded-xl overflow-hidden bg-primary/10 flex items-center justify-center">
+          <Sparkle fill="currentColor" className="h-7 w-7 sm:h-10 sm:w-10 text-primary" />
+        </div>
+      )
+      return (
+        <div className="space-y-4">
+          <BuildingHeader
+            image={aiImage}
+            city="AI · Automation"
+            name={<span><span className="font-semibold">VTS Agents</span></span>}
+            address="Ask anything about your portfolio. Agents research, analyze, and act on your behalf."
+            stats={[]}
+          />
+          <AgentsPage />
+        </div>
+      )
+    }
 
     const assetDetail = ASSET_DETAILS[selectedAssetId]
 

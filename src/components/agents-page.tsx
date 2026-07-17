@@ -138,27 +138,6 @@ export function AgentsPage({ className }: AgentsPageProps) {
   return (
     <div className={cn("space-y-4", className)}>
 
-      {/* Page header */}
-      <div className="flex items-start gap-4 py-3">
-        <div className="shrink-0 w-16 h-16 sm:w-24 sm:h-24 rounded-xl overflow-hidden bg-primary/10 flex items-center justify-center">
-          <Sparkle fill="currentColor" className="h-7 w-7 sm:h-10 sm:w-10 text-primary" />
-        </div>
-        <div className="flex-1">
-          <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">AI · automation</p>
-          <h1 className="font-inter text-2xl sm:text-4xl font-semibold text-foreground leading-tight mb-1.5">VTS Agents</h1>
-          <p className="text-sm text-muted-foreground">Ask anything about your portfolio. Agents research, analyze, and act on your behalf.</p>
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
-          <button className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-primary bg-primary text-primary-foreground hover:bg-primary/90 transition-colors px-3.5 py-1.5 text-sm font-medium">
-            <Sparkle fill="currentColor" className="h-3.5 w-3.5" />
-            Ask VTS AI
-          </button>
-          <button aria-label="Search" className="flex items-center justify-center h-8 w-8 rounded-full border border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors">
-            <Search className="h-3.5 w-3.5" />
-          </button>
-        </div>
-      </div>
-
       {/* Query bar card */}
       <div className={cn(cardBase)}>
         <div className="flex items-center gap-3 rounded-xl bg-muted/50 border border-border px-4 py-3 focus-within:border-primary/40 focus-within:bg-background transition-colors">
