@@ -107,17 +107,17 @@ export const PORTFOLIOS = [
 ]
 
 export const ASSET_DETAILS: Record<string, { city: string; image: string }> = {
-  "vts-tower":     { city: "Built 2017 · 52 floors · Office",   image: "https://picsum.photos/seed/vts1/800/500" },
-  "one-financial": { city: "Built 1992 · 36 floors · Office",   image: "https://picsum.photos/seed/fin2/800/500" },
-  "empire-state":  { city: "Built 1931 · 102 floors · Office",  image: "https://picsum.photos/seed/emp3/800/500" },
-  "salesforce":    { city: "Built 2018 · 61 floors · Office",   image: "https://picsum.photos/seed/sfc4/800/500" },
-  "willis":        { city: "Built 1973 · 110 floors · Office",  image: "https://picsum.photos/seed/wil5/800/500" },
-  "hudson-yards":  { city: "Built 2019 · 73 floors · Office",   image: "https://picsum.photos/seed/hud6/800/500" },
-  "one-wtc":       { city: "Built 2014 · 104 floors · Office",  image: "https://picsum.photos/seed/wtc7/800/500" },
-  "transamerica":  { city: "Built 1972 · 48 floors · Office",   image: "https://picsum.photos/seed/tra8/800/500" },
-  "peachtree":     { city: "Built 1992 · 60 floors · Office",   image: "https://picsum.photos/seed/pea9/800/500" },
-  "union-square":  { city: "Built 1989 · 56 floors · Office",   image: "https://picsum.photos/seed/uni10/800/500" },
-  "200-berkeley":  { city: "Built 1947 · 28 floors · Office",   image: "https://picsum.photos/seed/ber11/800/500" },
+  "vts-tower":     { city: "Built 2017 · 52 floors · Office",   image: "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&h=500&fit=crop&auto=format" },
+  "one-financial": { city: "Built 1992 · 36 floors · Office",   image: "https://images.unsplash.com/photo-1554435493-93422e8220c8?w=800&h=500&fit=crop&auto=format" },
+  "empire-state":  { city: "Built 1931 · 102 floors · Office",  image: "https://images.unsplash.com/photo-1499092346589-b9b6be3e94b2?w=800&h=500&fit=crop&auto=format" },
+  "salesforce":    { city: "Built 2018 · 61 floors · Office",   image: "https://images.unsplash.com/photo-1464938050520-ef2270bb8ce8?w=800&h=500&fit=crop&auto=format" },
+  "willis":        { city: "Built 1973 · 110 floors · Office",  image: "https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=800&h=500&fit=crop&auto=format" },
+  "hudson-yards":  { city: "Built 2019 · 73 floors · Office",   image: "https://images.unsplash.com/photo-1560179707-f14e90ef3623?w=800&h=500&fit=crop&auto=format" },
+  "one-wtc":       { city: "Built 2014 · 104 floors · Office",  image: "https://images.unsplash.com/photo-1518005020951-eccb494ad742?w=800&h=500&fit=crop&auto=format" },
+  "transamerica":  { city: "Built 1972 · 48 floors · Office",   image: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&h=500&fit=crop&auto=format" },
+  "peachtree":     { city: "Built 1992 · 60 floors · Office",   image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&h=500&fit=crop&auto=format" },
+  "union-square":  { city: "Built 1989 · 56 floors · Office",   image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&h=500&fit=crop&auto=format" },
+  "200-berkeley":  { city: "Built 1947 · 28 floors · Office",   image: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&h=500&fit=crop&auto=format" },
 }
 
 export const ASSET_KPIS: Record<string, {
