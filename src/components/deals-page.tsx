@@ -17,8 +17,14 @@ function AgentBtn({ label }: { label: string }) {
           <Sparkle fill="currentColor" className="h-3.5 w-3.5" />
         </button>
       </TooltipTrigger>
-      <TooltipContent side="top" className="bg-sidebar text-sidebar-foreground border-transparent font-medium text-xs" arrowClassName="fill-sidebar">
-        {label}
+      <TooltipContent side="top" className="bg-sidebar text-sidebar-foreground border-transparent font-medium" arrowClassName="fill-sidebar">
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-1.5 font-medium text-sidebar-foreground">
+            <Sparkle fill="currentColor" className="h-3 w-3" />
+            Run agent
+          </div>
+          <p className="text-sidebar-foreground/70 font-normal">{label}</p>
+        </div>
       </TooltipContent>
     </Tooltip>
   )
