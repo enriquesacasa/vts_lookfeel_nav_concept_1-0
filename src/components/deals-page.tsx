@@ -179,9 +179,10 @@ function PipelineViz({ deals, className }: { deals: Deal[]; className?: string }
           </h2>
         </div>
         <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1">
-          <span className="flex items-center gap-1.5"><span className="inline-block w-2 h-2 rounded-full bg-destructive/70" />At risk</span>
+          <span className="flex items-center gap-1.5"><span className="inline-block w-2 h-2 rounded-full bg-destructive/70" />At Risk</span>
           <span className="flex items-center gap-1.5"><span className="inline-block w-2 h-2 rounded-full bg-warning/70" />Stalled</span>
-          <span className="flex items-center gap-1.5"><span className="inline-block w-2 h-2 rounded-full bg-primary/80" />Active</span>
+          <span className="flex items-center gap-1.5"><span className="inline-block w-2 h-2 rounded-full bg-success/80" />Active</span>
+          <span className="flex items-center gap-1.5"><span className="inline-block w-2 h-2 rounded-full bg-primary/80" />Executed</span>
         </div>
       </div>
 
@@ -196,7 +197,7 @@ function PipelineViz({ deals, className }: { deals: Deal[]; className?: string }
                 <div className="text-xs font-medium text-muted-foreground tabular-nums">{count > 0 ? count : ""}</div>
                 <div className="w-full relative" style={{ height: `${Math.max(count / maxCount * 100, count > 0 ? 4 : 1)}%` }}>
                   <div className="w-full h-full rounded-t-md overflow-hidden flex flex-col-reverse">
-                    {active  > 0 && <div className="w-full" style={{ height: `${(active / count) * 100}%`, background: "var(--color-primary)" }} />}
+                    {active  > 0 && <div className="w-full" style={{ height: `${(active / count) * 100}%`, background: isExecuted ? "var(--color-primary)" : "var(--color-success)" }} />}
                     {stalled > 0 && <div className="w-full bg-warning/70"  style={{ height: `${(stalled / count) * 100}%` }} />}
                     {atRisk  > 0 && <div className="w-full bg-destructive/70" style={{ height: `${(atRisk / count) * 100}%` }} />}
                     {count === 0 && <div className="w-full h-1 bg-border rounded" />}
