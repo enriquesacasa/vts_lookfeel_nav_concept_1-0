@@ -298,7 +298,7 @@ function KpiSummary({ deals }: { deals: Deal[] }) {
     { label: "Active Deals",   value: String(active.length),          sub: `${executed} executed this month` },
     { label: "Pipeline SF",    value: fmtSf(totalSf),                 sub: "across active pipeline" },
     { label: "Avg NER / sf",   value: `$${avgNer.toFixed(0)}`,        sub: "active deals only", trend: avgNer >= 60 ? "up" as const : undefined },
-    { label: "Need Attention", value: String(atRisk + stalled),       sub: `${atRisk} at-risk · ${stalled} stalled`, trend: (atRisk + stalled) > 0 ? "down" as const : undefined },
+    { label: "Need Attention", value: String(atRisk + stalled),       sub: null as null },
   ]
 
   return (
@@ -307,9 +307,16 @@ function KpiSummary({ deals }: { deals: Deal[] }) {
         <div key={k.label} className="flex-1 min-w-[120px] px-5 py-4">
           <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">{k.label}</p>
           <p className="text-xl font-semibold text-foreground">{k.value}</p>
-          <p className={cn("text-xs font-medium mt-1",
-            k.trend === "up" ? "text-success" : k.trend === "down" ? "text-destructive" : "text-muted-foreground"
-          )}>{k.sub}</p>
+          {k.label === "Need Attention" ? (
+            <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+              <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium", STATUS_CONFIG["at-risk"].cls)}>{atRisk} At Risk</span>
+              <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium", STATUS_CONFIG["stalled"].cls)}>{stalled} Stalled</span>
+            </div>
+          ) : (
+            <p className={cn("text-xs font-medium mt-1",
+              k.trend === "up" ? "text-success" : k.trend === "down" ? "text-destructive" : "text-muted-foreground"
+            )}>{k.sub}</p>
+          )}
         </div>
       ))}
     </div>
