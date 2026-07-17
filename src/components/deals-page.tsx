@@ -325,7 +325,7 @@ function KpiSummary({ deals }: { deals: Deal[] }) {
   const kpis = [
     { label: "Active Deals",   value: String(active.length),          sub: `${executed} executed this month` },
     { label: "Pipeline SF",    value: fmtSf(totalSf),                 sub: "across active pipeline" },
-    { label: "Avg NER / sf",   value: `$${avgNer.toFixed(0)}`,        sub: "active deals only", trend: avgNer >= 60 ? "up" as const : undefined },
+    { label: "Avg NER / sf",   value: `$${avgNer.toFixed(0)}`,        sub: "active deals only", trend: avgNer >= 60 ? "up" as const : "down" as const },
     { label: "Need Attention", value: String(atRisk + stalled),       sub: null as null },
   ]
 

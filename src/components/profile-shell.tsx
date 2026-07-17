@@ -76,7 +76,7 @@ function PlaceholderPage({ label, icon: Icon, selectionHeader }: { label: string
 
 // ── Page header (shared across all V2 pages) ─────────────────────────────────
 
-interface Stat { label: string; value: string }
+
 
 function MultiImage({ assetIds }: { assetIds: string[] }) {
   const ids = assetIds.slice(0, 4)
