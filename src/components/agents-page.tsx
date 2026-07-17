@@ -1,7 +1,7 @@
 import * as React from "react"
 import { cn, cardBase } from "@/lib/utils"
 import {
-  Sparkle, ArrowRight, Clock, CheckCircle2, Loader2,
+  ArrowRight, Clock, CheckCircle2, Loader2,
   AlertTriangle, FileText, Search, ChevronRight,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"

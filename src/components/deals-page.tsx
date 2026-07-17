@@ -250,35 +250,59 @@ const AI_ACTIONS = [
 
 function AiInsightCard() {
   const card = React.useContext(CardCtx)
+  const isV2 = card !== cardBase
   return (
-    <div className={cn(card, "border-transparent flex flex-col gap-4 bg-sidebar-accent")}>
-      <div className="flex items-start justify-between gap-2">
-        <div>
-          <p className="text-[10px] font-medium uppercase tracking-widest mb-1 text-sidebar-foreground/70">VTS Agents</p>
-          <h2 className="text-xl font-semibold text-sidebar-foreground">Deal intelligence</h2>
+    <div className={cn(
+      isV2
+        ? "border border-sidebar-border bg-sidebar flex flex-col gap-0"
+        : cn(card, "border-transparent flex flex-col gap-4 bg-sidebar-accent")
+    )}>
+      {/* Header */}
+      <div className={cn("flex items-center justify-between gap-2", isV2 ? "px-4 py-3 border-b border-sidebar-border" : "")}>
+        <div className={cn("flex items-center gap-2.5", !isV2 && "flex-col items-start gap-0")}>
+          {isV2 && <div className="h-7 w-7 bg-primary/20 flex items-center justify-center shrink-0">
+            <Sparkle fill="currentColor" className="h-4 w-4 text-sidebar-primary" />
+          </div>}
+          {!isV2 && <p className="text-[10px] font-medium uppercase tracking-widest mb-1 text-sidebar-foreground/70">VTS Agents</p>}
+          <p className={cn("font-medium text-sidebar-foreground", isV2 ? "text-sm" : "text-xl font-semibold")}>
+            {isV2 ? "VTS Agents" : "Deal intelligence"}
+          </p>
         </div>
-        <Button variant="outline" size="sm" className="shrink-0 text-white/80 border-white/25 bg-transparent hover:bg-white/10 hover:text-white dark:bg-white/8 dark:border-white/25 dark:text-white dark:hover:bg-white/15">
+        <Button variant="outline" size="sm" className={cn(
+          "shrink-0 text-white/80 border-white/25 bg-transparent hover:bg-white/10 hover:text-white dark:bg-white/8 dark:border-white/25 dark:text-white dark:hover:bg-white/15",
+          isV2 && "rounded-none"
+        )}>
           View Active Agents
         </Button>
       </div>
-      <div className="rounded-lg px-3 py-2 flex items-center gap-2 bg-white/10">
+
+      {/* Summary alert */}
+      <div className={cn("flex items-center gap-2", isV2 ? "px-4 py-2.5 border-b border-sidebar-border" : "rounded-lg px-3 py-2 bg-white/10")}>
         <Sparkle fill="currentColor" className="h-4 w-4 shrink-0 text-sidebar-primary" />
         <p className="text-sm leading-snug text-sidebar-foreground/70">
           3 deal risks identified: <span className="text-sidebar-primary font-medium">$1.8M NOI at risk</span>
         </p>
       </div>
-      <div className="flex flex-col gap-2">
+
+      {/* Action rows */}
+      <div className={cn("flex flex-col", isV2 ? "" : "gap-2")}>
         {AI_ACTIONS.map((item, i) => (
-          <div key={i} className="rounded-lg border border-primary/25 bg-primary/15 px-3 py-2.5 group/row">
-            <div className="flex items-center gap-2.5">
-              <Sparkle fill="currentColor" className="h-3.5 w-3.5 shrink-0 text-sidebar-primary" />
-              <p className="text-sm text-sidebar-foreground/85 flex-1 min-w-0 truncate">{item.text}</p>
-              <div className="relative shrink-0">
-                <span className="text-sm font-medium tabular-nums text-sidebar-primary transition-opacity duration-150 group-hover/row:opacity-0">{item.value}</span>
-                <button className="absolute inset-y-0 right-0 inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium opacity-0 group-hover/row:opacity-100 transition-opacity duration-150 bg-sidebar-foreground/10 hover:bg-sidebar-foreground/20 text-sidebar-foreground/80 whitespace-nowrap">
-                  <Sparkle fill="currentColor" className="h-3 w-3" />Run agent
-                </button>
-              </div>
+          <div key={i} className={cn(
+            "group/row",
+            isV2
+              ? "flex items-center gap-3 px-4 py-3 border-b border-sidebar-border/50 last:border-0 hover:bg-sidebar-accent/40 transition-colors"
+              : "rounded-lg border border-primary/25 bg-primary/15 px-3 py-2.5"
+          )}>
+            <Sparkle fill="currentColor" className="h-3.5 w-3.5 shrink-0 text-sidebar-primary" />
+            <p className="text-sm text-sidebar-foreground/85 flex-1 min-w-0 truncate">{item.text}</p>
+            <div className="relative shrink-0">
+              <span className="text-sm font-medium tabular-nums text-sidebar-primary transition-opacity duration-150 group-hover/row:opacity-0">{item.value}</span>
+              <button className={cn(
+                "absolute inset-y-0 right-0 inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium opacity-0 group-hover/row:opacity-100 transition-opacity duration-150 text-sidebar-foreground/80 whitespace-nowrap",
+                isV2 ? "bg-sidebar-foreground/10 hover:bg-sidebar-foreground/20" : "rounded-md bg-sidebar-foreground/10 hover:bg-sidebar-foreground/20"
+              )}>
+                <Sparkle fill="currentColor" className="h-3 w-3" />Run agent
+              </button>
             </div>
           </div>
         ))}

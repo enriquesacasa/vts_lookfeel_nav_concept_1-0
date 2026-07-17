@@ -5,8 +5,9 @@ import { Progress } from "@/components/ui/progress"
 import { cn } from "@/lib/utils"
 import {
   TrendingUp, TrendingDown, ChevronUp, ChevronDown, ChevronsUpDown,
-  ArrowRight, Sparkle, Search,
+  ArrowRight, Sparkle,
 } from "lucide-react"
+import { PageHeader } from "@/components/page-header"
 
 // ── Data ─────────────────────────────────────────────────────────────────────
 
@@ -430,51 +431,11 @@ function LeasingActivityCard({ className }: { className?: string }) {
 
 // ── Root ──────────────────────────────────────────────────────────────────────
 
-function AssetHeader() {
-  return (
-    <div className="flex items-center gap-4 py-4 border-b border-border">
-      <img
-        src={buildingImg}
-        alt="VTS Tower Headquarters"
-        className="h-14 w-20 object-cover shrink-0 hidden sm:block"
-      />
-      {/* Title */}
-      <div className="min-w-0">
-        <p className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground mb-0.5">Asset dashboard</p>
-        <h1 className="text-2xl sm:text-3xl font-medium text-foreground leading-tight">VTS Tower Headquarters</h1>
-        <p className="text-xs text-muted-foreground mt-0.5 hidden sm:block">114 West 41st Street, New York, NY 10036 · Built 2017 · 52 Floors · Office</p>
-      </div>
-      {/* Stats */}
-      <div className="hidden md:flex items-center gap-6 ml-auto shrink-0">
-        {[
-          { label: "Total SF", value: "1.37M" },
-          { label: "Floors",   value: "52"    },
-          { label: "Managed",  value: "CBRE"  },
-        ].map((s, i) => (
-          <div key={s.label} className={cn("text-right", i > 0 && "pl-6 border-l border-border")}>
-            <p className="text-xs text-muted-foreground">{s.label}</p>
-            <p className="text-sm font-medium text-foreground">{s.value}</p>
-          </div>
-        ))}
-      </div>
-      {/* Actions */}
-      <div className="flex items-center gap-2 shrink-0 md:ml-6">
-        <button className="hidden sm:inline-flex items-center gap-1.5 border border-primary text-primary-foreground bg-primary hover:bg-primary/90 transition-colors px-3.5 py-1.5 text-xs font-medium">
-          <Sparkle fill="currentColor" className="h-3.5 w-3.5" />
-          Ask VTS AI
-        </button>
-        <button aria-label="Search" className="flex items-center justify-center h-8 w-8 border border-border hover:border-primary text-muted-foreground hover:text-primary transition-colors">
-          <Search className="h-3.5 w-3.5" />
-        </button>
-      </div>
-    </div>
-  )
-}
 
-export function VtsDashboard() {
+export function VtsDashboard({ header }: { header?: React.ReactNode } = {}) {
   return (
-    <div className="space-y-3 p-4">
-      <AssetHeader />
+    <div className="space-y-3 p-4 sm:p-6">
+      {header ?? <PageHeader eyebrow="Asset Dashboard" name="VTS Tower Headquarters" subtitle="114 West 41st Street, New York, NY 10036 · Built 2017 · 52 Floors · Office" image={buildingImg} stats={[{ label: "Total SF", value: "1.37M" }, { label: "Floors", value: "52" }, { label: "Managed", value: "CBRE" }]} />}
 
       <KpiBar />
 

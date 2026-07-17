@@ -4,6 +4,7 @@ import {
   Sparkle, ArrowRight, Search, CheckCircle2, Loader2,
   Clock, ChevronRight, AlertTriangle,
 } from "lucide-react"
+import { PageHeader } from "@/components/page-header"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 
 // ── Data ─────────────────────────────────────────────────────────────────────
@@ -150,42 +151,21 @@ function AgentsHeader({ query, setQuery }: { query: string; setQuery: (v: string
   const inputRef = React.useRef<HTMLInputElement>(null)
   React.useEffect(() => { setTimeout(() => inputRef.current?.focus(), 100) }, [])
 
+  const sparkleIcon = (
+    <div className="h-full w-full bg-primary/10 flex items-center justify-center">
+      <Sparkle fill="currentColor" className="h-6 w-6 text-primary" />
+    </div>
+  )
+
   return (
     <div>
-      {/* Title bar */}
-      <div className="flex items-center gap-4 py-4 border-b border-border">
-        {/* Title */}
-        <div className="min-w-0">
-          <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">AI · automation</p>
-          <div className="flex items-center gap-2.5">
-            <Sparkle fill="currentColor" className="h-6 w-6 sm:h-7 sm:w-7 text-primary shrink-0" />
-            <h1 className="text-2xl sm:text-3xl font-medium text-foreground leading-tight">VTS Agents</h1>
-          </div>
-        </div>
-        {/* Stats */}
-        <div className="hidden md:flex items-center gap-6 ml-auto shrink-0">
-          {[
-            { label: "Agents run", value: "142" },
-            { label: "Running",    value: "1"   },
-            { label: "Completed",  value: "98%" },
-          ].map((s, i) => (
-            <div key={s.label} className={cn("text-right", i > 0 && "pl-6 border-l border-border")}>
-              <p className="text-xs text-muted-foreground">{s.label}</p>
-              <p className="text-sm font-medium text-foreground">{s.value}</p>
-            </div>
-          ))}
-        </div>
-        {/* Actions */}
-        <div className="flex items-center gap-2 shrink-0 md:ml-6">
-          <button className="hidden sm:inline-flex items-center gap-1.5 border border-primary text-primary-foreground bg-primary hover:bg-primary/90 transition-colors px-3.5 py-1.5 text-xs font-medium">
-            <Sparkle fill="currentColor" className="h-3.5 w-3.5" />
-            Ask VTS AI
-          </button>
-          <button aria-label="Search" className="flex items-center justify-center h-8 w-8 border border-border hover:border-primary text-muted-foreground hover:text-primary transition-colors">
-            <Search className="h-3.5 w-3.5" />
-          </button>
-        </div>
-      </div>
+      <PageHeader
+        eyebrow="AI · Automation"
+        name="VTS Agents"
+        subtitle="Ask anything about your portfolio. Agents research, analyze, and act on your behalf."
+        image={sparkleIcon}
+        stats={[{ label: "Agents Run", value: "142" }, { label: "Running", value: "1" }, { label: "Completed", value: "98%" }]}
+      />
 
       {/* Search bar */}
       <div className={cn(CARD, "mt-3 px-4 py-3")}>

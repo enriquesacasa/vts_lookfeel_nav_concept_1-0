@@ -9,6 +9,13 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
     port: parseInt(process.env.PORT ?? '5174'),
+    proxy: {
+      '/logo-proxy': {
+        target: 'https://logo.clearbit.com',
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\/logo-proxy/, ''),
+      },
+    },
   },
   resolve: {
     alias: {

@@ -197,6 +197,15 @@ function DesktopNav({ className, onCollapsedChange, assets, portfolios, selected
   const toggle = (val: boolean) => {
     setCollapsed(val)
     onCollapsedChange?.(val)
+    if (!val) {
+      // When expanding, re-open the section that owns the active item
+      const parentSection = navStructure.find(item =>
+        item.id === active || item.children?.some(c => c.id === active)
+      )
+      if (parentSection?.children?.length) {
+        setOpenSections(new Set([parentSection.id]))
+      }
+    }
   }
 
   const selectedAsset = assets?.find(a => a.id === selectedAssetId)
@@ -293,15 +302,17 @@ function DesktopNav({ className, onCollapsedChange, assets, portfolios, selected
               onClick={() => setDropdownOpen(v => !v)}
               onKeyDown={e => (e.key === "Enter" || e.key === " ") && setDropdownOpen(v => !v)}
               className={cn(
-                "rounded-xl px-2.5 py-2 w-full flex items-center gap-2.5 cursor-pointer transition-colors border border-sidebar-foreground/20",
-                dropdownOpen ? "bg-sidebar-accent/70 dark:bg-sidebar-accent" : "bg-sidebar-accent/40 hover:bg-sidebar-accent/60 dark:bg-sidebar-accent dark:hover:bg-sidebar-accent"
+                "rounded-xl px-3 py-2.5 w-full flex items-center gap-2.5 cursor-pointer transition-colors border",
+                dropdownOpen
+                  ? "bg-sidebar-accent/70 border-sidebar-foreground/30 dark:bg-white/20 dark:border-white/30"
+                  : "bg-sidebar-accent/40 border-sidebar-foreground/20 hover:bg-sidebar-accent/60 dark:bg-white/12 dark:border-white/20 dark:hover:bg-white/18"
               )}
             >
-              <Building2 className="h-3.5 w-3.5 shrink-0 text-sidebar-foreground/60" />
-              <span className="text-xs font-medium text-sidebar-foreground flex-1">
+              <Building2 className="h-[18px] w-[18px] shrink-0 text-sidebar-foreground/60" />
+              <span className="text-sm font-medium text-sidebar-foreground flex-1">
                 {selectorLabel}
               </span>
-              <ChevronDown className={cn("h-3.5 w-3.5 shrink-0 text-sidebar-foreground/60 transition-transform duration-200", dropdownOpen && "rotate-180")} />
+              <ChevronDown className={cn("h-4 w-4 shrink-0 text-sidebar-foreground/60 transition-transform duration-200", dropdownOpen && "rotate-180")} />
             </div>
           )}
 
@@ -318,7 +329,7 @@ function DesktopNav({ className, onCollapsedChange, assets, portfolios, selected
             return (
               <div
                 className={cn(
-                  "absolute z-[200] w-[268px]",
+                  "absolute z-[200] w-[340px]",
                   collapsed ? "top-0 left-[calc(100%+12px)]" : "top-full left-0 mt-1"
                 )}
               >
@@ -337,7 +348,7 @@ function DesktopNav({ className, onCollapsedChange, assets, portfolios, selected
                     </div>
                   </div>
 
-                  <div className="max-h-[360px] overflow-y-auto">
+                  <div className="max-h-[480px] overflow-y-auto">
                     {/* All assets option */}
                     {!q && (
                       <div className="px-1.5 pt-2 pb-1">
@@ -347,14 +358,14 @@ function DesktopNav({ className, onCollapsedChange, assets, portfolios, selected
                           onClick={() => select("all")}
                           onKeyDown={e => (e.key === "Enter" || e.key === " ") && select("all")}
                           className={cn(
-                            "flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer transition-colors",
+                            "flex items-center gap-2.5 px-2.5 py-2.5 rounded-lg cursor-pointer transition-colors",
                             selectedAssetId === "all" ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-sidebar-foreground hover:bg-sidebar-accent/60"
                           )}
                         >
-                          <div className="h-6 w-6 rounded-md bg-sidebar-primary/20 flex items-center justify-center shrink-0">
-                            <Layers className="h-3.5 w-3.5 text-sidebar-primary" />
+                          <div className="h-8 w-8 rounded-md bg-sidebar-primary/20 flex items-center justify-center shrink-0">
+                            <Layers className="h-[18px] w-[18px] text-sidebar-primary" />
                           </div>
-                          <span className="text-xs font-medium">All assets</span>
+                          <span className="text-sm font-medium">All assets</span>
                           {selectedAssetId === "all" && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-sidebar-primary shrink-0" />}
                         </div>
                       </div>
@@ -371,16 +382,16 @@ function DesktopNav({ className, onCollapsedChange, assets, portfolios, selected
                             onClick={() => select(p.id)}
                             onKeyDown={e => (e.key === "Enter" || e.key === " ") && select(p.id)}
                             className={cn(
-                              "flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer transition-colors",
+                              "flex items-center gap-2.5 px-2.5 py-2.5 rounded-lg cursor-pointer transition-colors",
                               selectedAssetId === p.id ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-sidebar-foreground hover:bg-sidebar-accent/60"
                             )}
                           >
-                            <div className="h-6 w-6 rounded-md bg-sidebar-primary/20 flex items-center justify-center shrink-0">
-                              <Layers className="h-3.5 w-3.5 text-sidebar-primary" />
+                            <div className="h-8 w-8 rounded-md bg-sidebar-primary/20 flex items-center justify-center shrink-0">
+                              <Layers className="h-[18px] w-[18px] text-sidebar-primary" />
                             </div>
                             <div className="flex flex-col min-w-0">
-                              <span className="text-xs font-medium truncate">{p.name}</span>
-                              <span className="text-[10px] text-sidebar-foreground/60">{p.assetIds.length} properties</span>
+                              <span className="text-sm font-medium truncate">{p.name}</span>
+                              <span className="text-xs text-sidebar-foreground/60">{p.assetIds.length} properties</span>
                             </div>
                             {selectedAssetId === p.id && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-sidebar-primary shrink-0" />}
                           </div>
@@ -402,14 +413,14 @@ function DesktopNav({ className, onCollapsedChange, assets, portfolios, selected
                               onClick={() => select(asset.id)}
                               onKeyDown={e => (e.key === "Enter" || e.key === " ") && select(asset.id)}
                               className={cn(
-                                "flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer transition-colors",
+                                "flex items-center gap-2.5 px-2.5 py-2.5 rounded-lg cursor-pointer transition-colors",
                                 isSelected ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-sidebar-foreground hover:bg-sidebar-accent/60"
                               )}
                             >
-                              <Building2 className="h-3.5 w-3.5 shrink-0 opacity-50" />
+                              <Building2 className="h-[18px] w-[18px] shrink-0 opacity-50" />
                               <div className="flex flex-col min-w-0">
-                                <span className="text-xs font-medium truncate">{asset.name}</span>
-                                <span className="text-[10px] text-sidebar-foreground/60 truncate">{asset.address}</span>
+                                <span className="text-sm font-medium truncate">{asset.name}</span>
+                                <span className="text-xs text-sidebar-foreground/60 truncate">{asset.address}</span>
                               </div>
                               {isSelected && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-sidebar-primary shrink-0" />}
                             </div>
@@ -469,7 +480,7 @@ function DesktopNav({ className, onCollapsedChange, assets, portfolios, selected
               ) : (
                 <NavRow
                   {...item}
-                  active={active === item.id || (collapsed && isChildActive)}
+                  active={active === item.id}
                   collapsed={collapsed}
                   onClick={() => {
                     setActive(item.id)
@@ -481,13 +492,13 @@ function DesktopNav({ className, onCollapsedChange, assets, portfolios, selected
               )}
 
               {/* Children */}
-              {!collapsed && isOpen && item.children?.map(child => (
-                <div key={child.id} className="pl-3">
+              {((!collapsed && isOpen) || (collapsed && (active === item.id || isChildActive))) && item.children?.map(child => (
+                <div key={child.id} className={cn(!collapsed && "pl-3")}>
                   <NavRow
                     {...child}
                     active={active === child.id}
-                    collapsed={false}
-                    sub
+                    collapsed={collapsed}
+                    sub={!collapsed}
                     onClick={() => { setActive(child.id); onNavItemClick?.(child.id); setOpenSections(new Set([item.id])) }}
                   />
                 </div>
@@ -620,14 +631,14 @@ function MobileNav({ onLogoClick, onNavItemClick, activePage, assets, portfolios
                 onClick={() => setAssetDropdownOpen(v => !v)}
                 onKeyDown={e => (e.key === "Enter" || e.key === " ") && setAssetDropdownOpen(v => !v)}
                 className={cn(
-                  "rounded-xl px-2.5 py-2 w-full flex items-center gap-2.5 cursor-pointer transition-colors border border-sidebar-foreground/20",
+                  "rounded-xl px-3 py-2.5 w-full flex items-center gap-2.5 cursor-pointer transition-colors border border-sidebar-foreground/20",
                   assetDropdownOpen ? "bg-sidebar-accent/70 dark:bg-sidebar-accent" : "bg-sidebar-accent/40 hover:bg-sidebar-accent/60 dark:bg-sidebar-accent dark:hover:bg-sidebar-accent"
                 )}>
-                <Building2 className="h-3.5 w-3.5 shrink-0 text-sidebar-foreground/60" />
-                <span className="text-xs font-medium text-sidebar-foreground flex-1">
+                <Building2 className="h-[18px] w-[18px] shrink-0 text-sidebar-foreground/60" />
+                <span className="text-sm font-medium text-sidebar-foreground flex-1">
                   {selectorLabel}
                 </span>
-                <ChevronDown className={cn("h-3.5 w-3.5 shrink-0 text-sidebar-foreground/60 transition-transform duration-200", assetDropdownOpen && "rotate-180")} />
+                <ChevronDown className={cn("h-4 w-4 shrink-0 text-sidebar-foreground/60 transition-transform duration-200", assetDropdownOpen && "rotate-180")} />
               </div>
 
               {assetDropdownOpen && (() => {
@@ -636,8 +647,9 @@ function MobileNav({ onLogoClick, onNavItemClick, activePage, assets, portfolios
                 const filteredPortfolios = (portfolios ?? []).filter(p => p.name.toLowerCase().includes(q))
                 const select = (id: string) => { onAssetChange?.(id); setAssetDropdownOpen(false) }
                 return (
-                  <div className="absolute top-full left-0 mt-1 z-[200] w-full">
-                    <div className="rounded-xl border border-sidebar-border bg-sidebar shadow-xl shadow-black/40 overflow-hidden flex flex-col">
+                  <>
+                    <div className="fixed inset-0 z-[199]" onClick={() => setAssetDropdownOpen(false)} />
+                    <div className="fixed left-3 right-3 top-[130px] z-[200] rounded-xl border border-sidebar-border bg-sidebar shadow-xl shadow-black/40 overflow-hidden flex flex-col">
                       <div className="px-2.5 pt-2.5 pb-2 border-b border-sidebar-border">
                         <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-sidebar-accent/40">
                           <Search className="h-3.5 w-3.5 shrink-0 text-sidebar-foreground/40" />
@@ -650,11 +662,11 @@ function MobileNav({ onLogoClick, onNavItemClick, activePage, assets, portfolios
                         {!q && (
                           <div className="px-1.5 pt-2 pb-1">
                             <div role="button" tabIndex={0} onClick={() => select("all")} onKeyDown={e => (e.key === "Enter" || e.key === " ") && select("all")}
-                              className={cn("flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer transition-colors", selectedAssetId === "all" ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-sidebar-foreground hover:bg-sidebar-accent/60")}>
-                              <div className="h-6 w-6 rounded-md bg-sidebar-primary/20 flex items-center justify-center shrink-0">
-                                <Layers className="h-3.5 w-3.5 text-sidebar-primary" />
+                              className={cn("flex items-center gap-2.5 px-2.5 py-2.5 rounded-lg cursor-pointer transition-colors", selectedAssetId === "all" ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-sidebar-foreground hover:bg-sidebar-accent/60")}>
+                              <div className="h-8 w-8 rounded-md bg-sidebar-primary/20 flex items-center justify-center shrink-0">
+                                <Layers className="h-[18px] w-[18px] text-sidebar-primary" />
                               </div>
-                              <span className="text-xs font-medium">All assets</span>
+                              <span className="text-sm font-medium">All assets</span>
                               {selectedAssetId === "all" && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-sidebar-primary shrink-0" />}
                             </div>
                           </div>
@@ -664,13 +676,13 @@ function MobileNav({ onLogoClick, onNavItemClick, activePage, assets, portfolios
                             <p className="px-2 pb-1 text-[10px] font-medium uppercase tracking-widest text-sidebar-foreground/50">Portfolios</p>
                             {filteredPortfolios.map(p => (
                               <div key={p.id} role="button" tabIndex={0} onClick={() => select(p.id)} onKeyDown={e => (e.key === "Enter" || e.key === " ") && select(p.id)}
-                                className={cn("flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer transition-colors", selectedAssetId === p.id ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-sidebar-foreground hover:bg-sidebar-accent/60")}>
-                                <div className="h-6 w-6 rounded-md bg-sidebar-primary/20 flex items-center justify-center shrink-0">
-                                  <Layers className="h-3.5 w-3.5 text-sidebar-primary" />
+                                className={cn("flex items-center gap-2.5 px-2.5 py-2.5 rounded-lg cursor-pointer transition-colors", selectedAssetId === p.id ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-sidebar-foreground hover:bg-sidebar-accent/60")}>
+                                <div className="h-8 w-8 rounded-md bg-sidebar-primary/20 flex items-center justify-center shrink-0">
+                                  <Layers className="h-[18px] w-[18px] text-sidebar-primary" />
                                 </div>
                                 <div className="flex flex-col min-w-0">
-                                  <span className="text-xs font-medium truncate">{p.name}</span>
-                                  <span className="text-[10px] text-sidebar-foreground/60">{p.assetIds.length} properties</span>
+                                  <span className="text-sm font-medium truncate">{p.name}</span>
+                                  <span className="text-xs text-sidebar-foreground/60">{p.assetIds.length} properties</span>
                                 </div>
                                 {selectedAssetId === p.id && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-sidebar-primary shrink-0" />}
                               </div>
@@ -682,11 +694,11 @@ function MobileNav({ onLogoClick, onNavItemClick, activePage, assets, portfolios
                             <p className="px-2 pb-1 text-[10px] font-medium uppercase tracking-widest text-sidebar-foreground/50">Properties</p>
                             {filteredAssets.map(asset => (
                               <div key={asset.id} role="button" tabIndex={0} onClick={() => select(asset.id)} onKeyDown={e => (e.key === "Enter" || e.key === " ") && select(asset.id)}
-                                className={cn("flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer transition-colors", asset.id === selectedAssetId ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-sidebar-foreground hover:bg-sidebar-accent/60")}>
-                                <Building2 className="h-3.5 w-3.5 shrink-0 opacity-50" />
+                                className={cn("flex items-center gap-2.5 px-2.5 py-2.5 rounded-lg cursor-pointer transition-colors", asset.id === selectedAssetId ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-sidebar-foreground hover:bg-sidebar-accent/60")}>
+                                <Building2 className="h-[18px] w-[18px] shrink-0 opacity-50" />
                                 <div className="flex flex-col min-w-0">
-                                  <span className="text-xs font-medium truncate">{asset.name}</span>
-                                  <span className="text-[10px] text-sidebar-foreground/60 truncate">{asset.address}</span>
+                                  <span className="text-sm font-medium truncate">{asset.name}</span>
+                                  <span className="text-xs text-sidebar-foreground/60 truncate">{asset.address}</span>
                                 </div>
                                 {asset.id === selectedAssetId && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-sidebar-primary shrink-0" />}
                               </div>
@@ -698,7 +710,7 @@ function MobileNav({ onLogoClick, onNavItemClick, activePage, assets, portfolios
                         )}
                       </div>
                     </div>
-                  </div>
+                  </>
                 )
               })()}
             </div>
