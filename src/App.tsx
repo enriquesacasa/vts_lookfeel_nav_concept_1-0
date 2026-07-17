@@ -18,6 +18,63 @@ import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
 import buildingImg from "@/assets/building.jpg"
 
+const ASSET_MARKET: Record<string, string> = {
+  "vts-tower":     "New York",
+  "one-financial": "Providence",
+  "empire-state":  "New York",
+  "salesforce":    "San Francisco",
+  "willis":        "Chicago",
+  "hudson-yards":  "New York",
+  "one-wtc":       "New York",
+  "transamerica":  "San Francisco",
+  "peachtree":     "Atlanta",
+  "union-square":  "Seattle",
+  "200-berkeley":  "Boston",
+}
+
+const PILL_BASE = "inline-flex items-center rounded-full bg-primary/10 text-primary px-2.5 py-1 text-sm font-medium tabular-nums transition-colors cursor-pointer select-none hover:bg-primary/20"
+
+function HeaderPill({ label, items, onItemClick }: {
+  label: string
+  items: string[]
+  onItemClick?: (index: number) => void
+}) {
+  const [open, setOpen] = React.useState(false)
+  const ref = React.useRef<HTMLDivElement>(null)
+
+  React.useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener("mousedown", handler)
+    return () => document.removeEventListener("mousedown", handler)
+  }, [])
+
+  return (
+    <div ref={ref} className="relative">
+      <span className={PILL_BASE} onClick={() => setOpen(o => !o)}>{label}</span>
+      {open && (
+        <div className="absolute top-full left-0 mt-1.5 z-50 min-w-52 rounded-xl border border-sidebar-border bg-sidebar shadow-xl shadow-black/40 overflow-hidden flex flex-col">
+          {items.map((item, i) => (
+            <button
+              key={item}
+              className={cn(
+                "w-full text-left px-3 py-2 text-sm transition-colors",
+                onItemClick
+                  ? "text-sidebar-foreground hover:bg-sidebar-accent/60"
+                  : "text-sidebar-foreground/80 cursor-default"
+              )}
+              onClick={() => { if (onItemClick) { onItemClick(i); setOpen(false) } }}
+            >
+              {item}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 function MultiImage({ assetIds }: { assetIds: string[] }) {
   const ids = assetIds.slice(0, 4)
   return (
@@ -162,19 +219,34 @@ export default function App() {
 
     // Compute header props depending on selection
     const headerProps = (() => {
-      if (selectedAssetId === "all") return {
-        city: "Overview",
-        name: "All assets",
-        address: "11 properties across 5 markets",
-        image: <MultiImage assetIds={ASSETS.map(a => a.id)} />,
-        stats: [] as { label: string; value: string; accent?: boolean }[],
+      if (selectedAssetId === "all") {
+        const allMarkets = [...new Set(ASSETS.map(a => ASSET_MARKET[a.id]).filter(Boolean))].sort()
+        return {
+          city: "Overview",
+          name: "All assets",
+          address: "",
+          image: <MultiImage assetIds={ASSETS.map(a => a.id)} />,
+          stats: [] as { label: string; value: string; accent?: boolean }[],
+          badges: <>
+            <HeaderPill label={`${ASSETS.length} Assets`} items={ASSETS.map(a => a.name)} onItemClick={i => { setSelectedAssetId(ASSETS[i].id); setCurrentPage("dashboard") }} />
+            <HeaderPill label={`${allMarkets.length} Markets`} items={allMarkets} />
+          </>,
+        }
       }
-      if (selectedPortfolio) return {
-        city: "Portfolio",
-        name: selectedPortfolio.name,
-        address: `${selectedPortfolio.assetIds.length} properties`,
-        image: <MultiImage assetIds={selectedPortfolio.assetIds} />,
-        stats: [] as { label: string; value: string; accent?: boolean }[],
+      if (selectedPortfolio) {
+        const portfolioAssets = ASSETS.filter(a => selectedPortfolio.assetIds.includes(a.id))
+        const portfolioMarkets = [...new Set(selectedPortfolio.assetIds.map(id => ASSET_MARKET[id]).filter(Boolean))].sort()
+        return {
+          city: "Portfolio",
+          name: selectedPortfolio.name,
+          address: "",
+          image: <MultiImage assetIds={selectedPortfolio.assetIds} />,
+          stats: [] as { label: string; value: string; accent?: boolean }[],
+          badges: <>
+            <HeaderPill label={`${selectedPortfolio.assetIds.length} Assets`} items={portfolioAssets.map(a => a.name)} onItemClick={i => { setSelectedAssetId(portfolioAssets[i].id); setCurrentPage("dashboard") }} />
+            <HeaderPill label={`${portfolioMarkets.length} Market${portfolioMarkets.length !== 1 ? "s" : ""}`} items={portfolioMarkets} />
+          </>,
+        }
       }
       return {
         city: assetDetail?.city ?? "Built 2017 · 52 floors · Office",

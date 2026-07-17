@@ -14,12 +14,13 @@ interface BuildingHeaderProps {
   address: string
   city: string
   stats: BuildingStat[]
+  badges?: React.ReactNode
   className?: string
 }
 
 const BuildingHeader = React.forwardRef<HTMLDivElement, BuildingHeaderProps>(
-  ({ image, name, address, city, stats, className }, ref) => (
-    <div ref={ref} className={cn("overflow-hidden", className)}>
+  ({ image, name, address, city, stats, badges, className }, ref) => (
+    <div ref={ref} className={cn(className)}>
       {/* Hero section */}
       <div className="flex items-center gap-4 py-3">
         {image && (
@@ -32,7 +33,7 @@ const BuildingHeader = React.forwardRef<HTMLDivElement, BuildingHeaderProps>(
         )}
         <div className="flex-1">
           {city && (
-            <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">
+            <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground mb-1">
               {city}
             </p>
           )}
@@ -40,6 +41,7 @@ const BuildingHeader = React.forwardRef<HTMLDivElement, BuildingHeaderProps>(
             {name}
           </h1>
           <p className="text-sm text-muted-foreground">{address}</p>
+          {badges && <div className="flex flex-wrap gap-1.5 mt-2">{badges}</div>}
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <button className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-primary bg-primary text-primary-foreground hover:bg-primary/90 transition-colors px-3.5 py-1.5 text-sm font-medium">
