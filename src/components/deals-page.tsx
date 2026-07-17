@@ -291,7 +291,7 @@ function AiInsightCard() {
             "group/row",
             isV2
               ? "flex items-center gap-3 px-4 py-3 border-b border-sidebar-border/50 last:border-0 hover:bg-sidebar-accent/40 transition-colors"
-              : "rounded-lg border border-primary/25 bg-primary/15 px-3 py-2.5"
+              : "flex items-center gap-3 rounded-lg border border-primary/25 bg-primary/15 px-3 py-2.5"
           )}>
             <Sparkle fill="currentColor" className="h-3.5 w-3.5 shrink-0 text-sidebar-primary" />
             <p className="text-sm text-sidebar-foreground/85 flex-1 min-w-0 truncate">{item.text}</p>
