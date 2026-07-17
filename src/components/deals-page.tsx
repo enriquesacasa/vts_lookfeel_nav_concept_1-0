@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input"
 import {
   Sparkle, Search, ChevronUp, ChevronDown, ChevronsUpDown,
   ChevronLeft, ChevronRight, AlertTriangle, Clock,
-  CheckCircle2, MoreHorizontal, X,
+  CheckCircle2, MoreHorizontal,
 } from "lucide-react"
 
 // ── Tenant logos ─────────────────────────────────────────────────────────────
@@ -130,25 +130,6 @@ const DEALS: Deal[] = [
 
 const STAGES: Stage[] = ["Inquiry", "Touring", "Proposal", "LOI", "Legal", "Lease Out", "Executed"]
 
-const STAGE_COLOR: Record<Stage, string> = {
-  "Inquiry":   "bg-slate-400",
-  "Touring":   "bg-blue-400",
-  "Proposal":  "bg-violet-500",
-  "LOI":       "bg-indigo-500",
-  "Legal":     "bg-amber-500",
-  "Lease Out": "bg-orange-500",
-  "Executed":  "bg-emerald-500",
-}
-
-const STAGE_TEXT: Record<Stage, string> = {
-  "Inquiry":   "text-slate-500 dark:text-slate-400",
-  "Touring":   "text-blue-600 dark:text-blue-400",
-  "Proposal":  "text-violet-600 dark:text-violet-400",
-  "LOI":       "text-indigo-600 dark:text-indigo-400",
-  "Legal":     "text-amber-600 dark:text-amber-400",
-  "Lease Out": "text-orange-600 dark:text-orange-400",
-  "Executed":  "text-emerald-600 dark:text-emerald-400",
-}
 
 const STATUS_CONFIG: Record<Status, { label: string; icon: React.ElementType; cls: string }> = {
   active:   { label: "Active",    icon: CheckCircle2, cls: "text-success bg-success/10" },
@@ -205,7 +186,7 @@ function PipelineViz({ deals, className }: { deals: Deal[]; className?: string }
       </div>
 
       <div className="flex items-end gap-2 flex-1 min-h-0 mt-5">
-        {byStageCounts.map(({ stage, count, sf, atRisk, stalled }, i) => {
+        {byStageCounts.map(({ stage, count, sf, atRisk, stalled }) => {
           const active = count - atRisk - stalled
           const isExecuted = stage === "Executed"
           return (
