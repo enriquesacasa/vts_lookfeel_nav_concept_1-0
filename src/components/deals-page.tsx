@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import {
   Sparkle, Search, ChevronUp, ChevronDown, ChevronsUpDown,
   ChevronLeft, ChevronRight, AlertTriangle, Clock,
-  CheckCircle2,
+  CheckCircle2, TrendingUp, TrendingDown,
 } from "lucide-react"
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
 
@@ -306,21 +306,26 @@ function KpiSummary({ deals }: { deals: Deal[] }) {
   ]
 
   const card = React.useContext(CardCtx)
+  const isV2 = card !== cardBase
   return (
-    <div className={cn(card, "!p-0 overflow-hidden flex flex-wrap divide-x divide-border/60")}>
+    <div className={cn(card, "!p-0 overflow-hidden flex flex-wrap divide-x", isV2 ? "divide-border" : "divide-border/60")}>
       {kpis.map(k => (
-        <div key={k.label} className="flex-1 min-w-[120px] px-5 py-4">
-          <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">{k.label}</p>
-          <p className="text-xl font-semibold text-foreground">{k.value}</p>
+        <div key={k.label} className={cn("flex-1 min-w-[120px]", isV2 ? "px-6 py-5" : "px-5 py-4")}>
+          <p className={cn("font-medium uppercase tracking-widest text-muted-foreground mb-1", isV2 ? "text-[11px]" : "text-[10px]")}>{k.label}</p>
+          <p className={cn("font-medium text-foreground", isV2 ? "text-3xl tracking-tight mt-1" : "text-xl font-semibold")}>{k.value}</p>
           {k.label === "Need Attention" ? (
             <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
               <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium", STATUS_CONFIG["at-risk"].cls)}>{atRisk} At Risk</span>
               <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium", STATUS_CONFIG["stalled"].cls)}>{stalled} Stalled</span>
             </div>
           ) : (
-            <p className={cn("text-xs font-medium mt-1",
+            <p className={cn("text-xs font-medium mt-1.5 flex items-center gap-1",
               k.trend === "up" ? "text-success" : k.trend === "down" ? "text-destructive" : "text-muted-foreground"
-            )}>{k.sub}</p>
+            )}>
+              {isV2 && k.trend === "up" && <TrendingUp className="h-3 w-3 shrink-0" />}
+              {isV2 && k.trend === "down" && <TrendingDown className="h-3 w-3 shrink-0" />}
+              {k.sub}
+            </p>
           )}
         </div>
       ))}
