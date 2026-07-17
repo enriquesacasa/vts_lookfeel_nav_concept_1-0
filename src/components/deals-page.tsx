@@ -5,8 +5,24 @@ import { Input } from "@/components/ui/input"
 import {
   Sparkle, Search, ChevronUp, ChevronDown, ChevronsUpDown,
   ChevronLeft, ChevronRight, AlertTriangle, Clock,
-  CheckCircle2, MoreHorizontal,
+  CheckCircle2,
 } from "lucide-react"
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
+
+function AgentBtn({ label }: { label: string }) {
+  return (
+    <Tooltip>
+      <TooltipTrigger render={<span />}>
+        <button className="inline-flex items-center justify-center h-7 w-7 rounded-full bg-primary/10 hover:bg-primary text-primary hover:text-primary-foreground transition-all duration-150 shrink-0">
+          <Sparkle fill="currentColor" className="h-3.5 w-3.5" />
+        </button>
+      </TooltipTrigger>
+      <TooltipContent side="top" className="bg-sidebar text-sidebar-foreground border-transparent font-medium text-xs" arrowClassName="fill-sidebar">
+        {label}
+      </TooltipContent>
+    </Tooltip>
+  )
+}
 
 // ── Tenant logos ─────────────────────────────────────────────────────────────
 
@@ -532,12 +548,7 @@ export function DealsPage() {
                     </span>
                   </td>
                   <td className="py-3 pl-2">
-                    <div className="flex items-center gap-1">
-                      <button className="inline-flex items-center justify-center h-7 w-7 rounded-full bg-primary/10 hover:bg-primary text-primary hover:text-primary-foreground transition-all duration-150 shrink-0">
-                        <Sparkle fill="currentColor" className="h-3.5 w-3.5" />
-                      </button>
-                      <button className="text-muted-foreground hover:text-foreground"><MoreHorizontal className="h-4 w-4" /></button>
-                    </div>
+                    <AgentBtn label="Analyze deal" />
                   </td>
                 </tr>
               )
