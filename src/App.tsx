@@ -206,7 +206,7 @@ export default function App() {
     "shares": "My shares", "marketing-analytics": "Marketing analytics", "inquiries": "Inquiries",
     "insights": "Insights", "leasing-activity": "Leasing activity report", "portfolio-dashboards": "Portfolio dashboards",
     "portfolio-alerts": "Portfolio alerts", "portfolio-reports": "Portfolio reports", "lease-charts": "Lease charts",
-    "abstraction": "Abstraction management", "activity": "Activity feed", "reminders": "Reminders",
+    "abstraction": "Abstraction", "activity": "Activity feed", "reminders": "Reminders",
     "assets": "Assets", "markets": "Markets", "cities": "Cities",
     "ai": "VTS Agents",
   }
