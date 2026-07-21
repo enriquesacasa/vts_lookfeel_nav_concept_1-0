@@ -60,9 +60,9 @@ const navStructure: NavItem[] = [
   ]},
   { id: "tenants",      label: "Tenants",       icon: Users },
   { id: "deals",        label: "Deals",         icon: Handshake, children: [
+    { id: "requirements",      label: "Requirements",      icon: ListChecks },
     { id: "deal-tasks",        label: "Deal tasks",        icon: ClipboardList },
     { id: "tenant-coord",      label: "Tenant coordination", icon: UsersRound },
-    { id: "requirements",      label: "Requirements",      icon: ListChecks },
   ]},
   { id: "planning",     label: "Planning",      icon: Calculator, children: [
     { id: "budgets",    label: "Budgets",       icon: Wallet },
