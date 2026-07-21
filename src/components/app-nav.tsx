@@ -30,6 +30,7 @@ import {
   X as XIcon,
   Search,
   Archive,
+  GitMerge,
   type LucideIcon,
 } from "lucide-react"
 
@@ -59,8 +60,8 @@ const navStructure: NavItem[] = [
     { id: "options-rights",    label: "Options & rights",  icon: ShieldCheck },
   ]},
   { id: "tenants",      label: "Tenants",       icon: Users },
+  { id: "requirements", label: "Requirements",  icon: ListChecks },
   { id: "deals",        label: "Deals",         icon: Handshake, children: [
-    { id: "requirements",      label: "Requirements",      icon: ListChecks },
     { id: "deal-tasks",        label: "Deal tasks",        icon: ClipboardList },
     { id: "tenant-coord",      label: "Tenant coordination", icon: UsersRound },
   ]},
@@ -69,7 +70,9 @@ const navStructure: NavItem[] = [
     { id: "appraisals", label: "Appraisals",    icon: Scale },
     { id: "comps",      label: "Comps",         icon: BarChart2 },
   ]},
-  { id: "doc-vault",    label: "Doc vault",     icon: Archive },
+  { id: "doc-vault",    label: "Doc vault",     icon: Archive, children: [
+    { id: "abstraction", label: "Abstraction management", icon: GitMerge },
+  ]},
 ]
 
 const aiItem = { id: "ai", label: "VTS Agents", icon: Sparkle, accent: true, small: false }

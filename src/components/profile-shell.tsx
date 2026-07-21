@@ -4,7 +4,7 @@ import {
   LayoutGrid, Layers, FileText, Handshake, Wallet, Scale, BarChart2, Calculator, Archive,
   Sparkle, BellRing, Activity, UserCircle,
   ChevronRight, ChevronDown, Building2, CalendarDays, Users,
-  SquareStack, ShieldCheck, ClipboardList, UsersRound, ListChecks,
+  SquareStack, ShieldCheck, ClipboardList, UsersRound, ListChecks, GitMerge,
   PanelLeftClose, PanelLeftOpen, Search, Menu, X,
 } from "lucide-react"
 import { VtsAgentsPage } from "@/components/vts-agents-page"
@@ -36,8 +36,8 @@ const NAV_ITEMS: NavItem[] = [
     { id: "options-rights",   label: "Options & rights",  icon: ShieldCheck },
   ]},
   { id: "tenants",      label: "Tenants",        icon: Users },
+  { id: "requirements", label: "Requirements",   icon: ListChecks },
   { id: "deals",        label: "Deals",          icon: Handshake, children: [
-    { id: "requirements",     label: "Requirements",        icon: ListChecks },
     { id: "deal-tasks",       label: "Deal tasks",          icon: ClipboardList },
     { id: "tenant-coord",     label: "Tenant coordination", icon: UsersRound },
   ]},
@@ -46,7 +46,9 @@ const NAV_ITEMS: NavItem[] = [
     { id: "appraisals", label: "Appraisals",       icon: Scale },
     { id: "comps",      label: "Comps",             icon: BarChart2 },
   ]},
-  { id: "doc-vault",    label: "Doc vault",        icon: Archive },
+  { id: "doc-vault",    label: "Doc vault",        icon: Archive, children: [
+    { id: "abstraction", label: "Abstraction management", icon: GitMerge },
+  ]},
 ]
 
 const AI_ITEM = { id: "ai", label: "VTS Agents", icon: Sparkle }
