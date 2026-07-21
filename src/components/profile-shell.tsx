@@ -47,7 +47,7 @@ const NAV_ITEMS: NavItem[] = [
     { id: "comps",      label: "Comps",             icon: BarChart2 },
   ]},
   { id: "doc-vault",    label: "Doc vault",        icon: Archive, children: [
-    { id: "abstraction", label: "Abstraction management", icon: GitMerge },
+    { id: "abstraction", label: "Abstraction", icon: GitMerge },
   ]},
 ]
 
