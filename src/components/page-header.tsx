@@ -5,7 +5,7 @@ import { Sparkle, Search } from "lucide-react"
 interface Stat { label: string; value: string }
 
 export function PageHeader({ name, subtitle, eyebrow, image, stats = [] }: {
-  name: string; subtitle: string; eyebrow: string; image?: string | React.ReactNode; stats?: Stat[]
+  name: string | React.ReactNode; subtitle: string; eyebrow: string; image?: string | React.ReactNode; stats?: Stat[]
 }) {
   return (
     <div className="flex items-center gap-4 py-4 border-b border-border">
