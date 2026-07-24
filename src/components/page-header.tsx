@@ -12,7 +12,7 @@ export function PageHeader({ name, subtitle, eyebrow, image, stats = [] }: {
       {image && (
         <div className="aspect-video h-[72px] overflow-hidden shrink-0 hidden sm:block">
           {typeof image === "string"
-            ? <img src={image} alt={name} className="h-full w-full object-cover" />
+            ? <img src={image} alt="" className="h-full w-full object-cover" />
             : <div className="h-full w-full">{image}</div>
           }
         </div>
