@@ -97,7 +97,7 @@ function TenantAvatar({ name }: { name: string }) {
 type Stage = "Inquiry" | "Touring" | "Proposal" | "LOI" | "Legal" | "Lease Out" | "Executed"
 type Status = "active" | "stalled" | "at-risk" | "executed"
 
-interface Deal {
+export interface Deal {
   id: string
   tenant: string
   dealType: "New Deal" | "Renewal" | "Expansion"
@@ -376,7 +376,7 @@ const STATUS_TABS: { label: string; value: Status | "all" }[] = [
 
 // ── Main page ─────────────────────────────────────────────────────────────────
 
-export function DealsPage({ variant = "v1" }: { variant?: "v1" | "v2" }) {
+export function DealsPage({ variant = "v1", onDealClick }: { variant?: "v1" | "v2"; onDealClick?: (deal: Deal) => void }) {
   const card = variant === "v2" ? "bg-card p-5" : cardBase
   const [keyword, setKeyword] = React.useState("")
   const [statusFilter, setStatusFilter] = React.useState<Status | "all">("all")
@@ -531,7 +531,7 @@ export function DealsPage({ variant = "v1" }: { variant?: "v1" | "v2" }) {
               const noiPct = deal.budgetNoi > 0 ? Math.round((noiDiff / deal.budgetNoi) * 100) : 0
               function fmtNoi(n: number) { return n >= 1000000 ? `$${(n / 1000000).toFixed(1)}M` : `$${(n / 1000).toFixed(0)}K` }
               return (
-                <tr key={deal.id} className={cn("cursor-pointer hover:bg-muted/40 dark:hover:bg-white/4 transition-colors", i > 0 && "border-t border-border/40")}>
+                <tr key={deal.id} onClick={() => onDealClick?.(deal)} className={cn("cursor-pointer hover:bg-muted/40 dark:hover:bg-white/4 transition-colors", i > 0 && "border-t border-border/40")}>
                   <td className="py-3">
                     <div className="flex items-center gap-2.5">
                       <TenantAvatar name={deal.tenant} />

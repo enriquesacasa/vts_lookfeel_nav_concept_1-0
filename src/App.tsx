@@ -14,6 +14,8 @@ import { KpiBar } from "@/components/kpi-bar"
 import { LeasingAgents } from "@/components/leasing-agents"
 import { AgentsPage } from "@/components/agents-page"
 import { DealsPage } from "@/components/deals-page"
+import type { Deal as DealsPageDeal } from "@/components/deals-page"
+import { DealProfile, TenantLogoImage } from "@/components/deal-profile"
 import { ProfileShell } from "@/components/profile-shell"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
@@ -185,6 +187,7 @@ export default function App() {
   const [selectedAssetId, setSelectedAssetId] = React.useState("vts-tower")
   const [currentPage, setCurrentPage] = React.useState("dashboard")
   const [profileMode, setProfileMode] = React.useState(false)
+  const [selectedDeal, setSelectedDeal] = React.useState<DealsPageDeal | null>(null)
   const [, setDarkMode] = React.useState(false)
   const isMobile = useIsMobile()
 
@@ -288,12 +291,24 @@ export default function App() {
         )}
       : headerProps
 
-    if (page === "deals") return (
-      <div className="space-y-4">
-        <BuildingHeader {...pagedHeaderProps} />
-        <DealsPage />
-      </div>
-    )
+    if (page === "deals") {
+      const dealHeaderProps = selectedDeal ? {
+        city: selectedDeal.asset,
+        name: (<span><span className="font-semibold">{selectedDeal.tenant}</span>{" "}<span className="text-muted-foreground font-light">| {selectedDeal.dealType}</span></span>),
+        address: `${selectedDeal.space} · ${selectedDeal.sf.toLocaleString()} sf`,
+        image: <div className="relative shrink-0 w-16 h-16 sm:w-24 sm:h-24 rounded-xl overflow-hidden"><TenantLogoImage name={selectedDeal.tenant} /></div>,
+        stats: [],
+      } : pagedHeaderProps
+      return (
+        <div className="space-y-4">
+          <BuildingHeader {...dealHeaderProps} />
+          {selectedDeal
+            ? <DealProfile deal={selectedDeal} onBack={() => setSelectedDeal(null)} variant="v1" />
+            : <DealsPage onDealClick={deal => setSelectedDeal(deal)} />
+          }
+        </div>
+      )
+    }
 
     if (page === "dashboard" && (selectedAssetId === "all" || selectedPortfolio)) {
       const visibleAssets = selectedPortfolio
@@ -435,7 +450,7 @@ export default function App() {
         onLogoClick={toggleDark}
         onNavItemClick={id => {
           if (id === "avatar") { setProfileMode(true) }
-          else setCurrentPage(id)
+          else { setCurrentPage(id); setSelectedDeal(null) }
         }}
         activePage={currentPage}
       />

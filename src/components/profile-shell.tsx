@@ -11,6 +11,8 @@ import { VtsAgentsPage } from "@/components/vts-agents-page"
 import { PageHeader } from "@/components/page-header"
 import { VtsDashboard } from "@/components/vts-dashboard"
 import { DealsPage } from "@/components/deals-page"
+import type { Deal } from "@/components/deals-page"
+import { DealProfile, TenantLogoImage } from "@/components/deal-profile"
 import { ASSETS, ASSET_DETAILS, ASSET_KPIS, PORTFOLIOS } from "@/App"
 
 interface Asset { id: string; name: string; address: string }
@@ -199,6 +201,7 @@ export function ProfileShell({ onExit, assets, portfolios, selectedAssetId, onAs
   const [activePage, setActivePage] = React.useState("dashboard")
   const [collapsed, setCollapsed] = React.useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false)
+  const [selectedDeal, setSelectedDeal] = React.useState<Deal | null>(null)
   const toggleDark = () => {
     document.documentElement.classList.toggle("dark")
   }
@@ -283,12 +286,29 @@ export function ProfileShell({ onExit, assets, portfolios, selectedAssetId, onAs
       />
     if (activePage === "dashboard") return <VtsDashboard header={pagedHeader} />
     if (activePage === "ai") return <VtsAgentsPage />
-    if (activePage === "deals") return (
-      <div className="p-4 sm:p-6 space-y-4">
-        {pagedHeader}
-        <DealsPage variant="v2" />
-      </div>
-    )
+    if (activePage === "deals") {
+      const dealHeader = selectedDeal
+        ? <PageHeader
+            eyebrow={selectedDeal.asset}
+            name={<span><span className="font-semibold">{selectedDeal.tenant}</span>{" "}<span className="text-muted-foreground font-light">| {selectedDeal.dealType}</span></span>}
+            subtitle={`${selectedDeal.space} · ${selectedDeal.sf.toLocaleString()} sf`}
+            image={<TenantLogoImage name={selectedDeal.tenant} />}
+            stats={[
+              { label: "Stage", value: selectedDeal.stage },
+              ...(selectedDeal.ner > 0 ? [{ label: "NER", value: `$${selectedDeal.ner.toFixed(2)} psf` }] : []),
+            ]}
+          />
+        : pagedHeader
+      return (
+        <div className="p-4 sm:p-6 space-y-4">
+          {dealHeader}
+          {selectedDeal
+            ? <DealProfile deal={selectedDeal} onBack={() => setSelectedDeal(null)} variant="v2" />
+            : <DealsPage variant="v2" onDealClick={deal => setSelectedDeal(deal)} />
+          }
+        </div>
+      )
+    }
     if (activeItem && !("divider" in activeItem && activeItem.divider))
       return <PlaceholderPage label={activeItem.label} icon={activeItem.icon} selectionHeader={pagedHeader} />
     return null
@@ -297,6 +317,7 @@ export function ProfileShell({ onExit, assets, portfolios, selectedAssetId, onAs
   const handleNavClick = (pageId: string) => {
     setActivePage(pageId)
     setMobileMenuOpen(false)
+    setSelectedDeal(null)
   }
 
   return (
