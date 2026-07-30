@@ -53,44 +53,22 @@ export function TenantLogoImage({ name }: { name: string }) {
 interface DealProfileProps {
   deal: Deal
   onBack: () => void
-  variant?: "v1" | "v2"
 }
 
-export function DealProfile({ deal, onBack, variant = "v1" }: DealProfileProps) {
-  const breadcrumb = (
-    <nav className="inline-flex items-center gap-1 text-xs text-muted-foreground mb-4">
-      <button onClick={onBack} className="hover:text-foreground transition-colors">Deals</button>
-      <ChevronRight className="h-3 w-3 shrink-0" />
-      <span className="text-foreground font-medium">{deal.tenant}</span>
-    </nav>
-  )
-
-  const iconAndContent = (
-    <>
-      <div className="rounded-full bg-secondary p-3 flex items-center justify-center mb-5">
-        <Handshake className="w-6 h-6 text-primary opacity-60" />
-      </div>
-      <h1 className="text-2xl font-medium text-foreground mb-2">Deal profile</h1>
-      <p className="text-sm text-muted-foreground max-w-xs">This page is a placeholder. Content coming soon.</p>
-    </>
-  )
-
-  if (variant === "v2") {
-    return (
-      <div className="flex flex-col min-h-[40vh] text-center px-4">
-        {breadcrumb}
-        <div className="flex flex-col items-center justify-center flex-1">
-          {iconAndContent}
-        </div>
-      </div>
-    )
-  }
-
+export function DealProfile({ deal, onBack }: DealProfileProps) {
   return (
     <div className="flex flex-col rounded-2xl bg-white/70 dark:bg-white/8 backdrop-blur-md mt-4 p-4" style={{ minHeight: "calc(100vh - 12rem)" }}>
-      {breadcrumb}
+      <nav className="inline-flex items-center gap-1 text-xs text-muted-foreground mb-4">
+        <button onClick={onBack} className="hover:text-foreground transition-colors">Deals</button>
+        <ChevronRight className="h-3 w-3 shrink-0" />
+        <span className="text-foreground font-medium">{deal.tenant}</span>
+      </nav>
       <div className="flex flex-col items-center justify-center flex-1 text-center">
-        {iconAndContent}
+        <div className="rounded-full bg-secondary p-3 flex items-center justify-center mb-5">
+          <Handshake className="w-6 h-6 text-primary opacity-60" />
+        </div>
+        <h1 className="text-2xl font-medium text-foreground mb-2">Deal profile</h1>
+        <p className="text-sm text-muted-foreground max-w-xs">This page is a placeholder. Content coming soon.</p>
       </div>
     </div>
   )

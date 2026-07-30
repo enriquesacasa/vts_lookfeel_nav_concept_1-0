@@ -376,8 +376,8 @@ const STATUS_TABS: { label: string; value: Status | "all" }[] = [
 
 // ── Main page ─────────────────────────────────────────────────────────────────
 
-export function DealsPage({ variant = "v1", onDealClick }: { variant?: "v1" | "v2"; onDealClick?: (deal: Deal) => void }) {
-  const card = variant === "v2" ? "bg-card p-5" : cardBase
+export function DealsPage({ onDealClick }: { onDealClick?: (deal: Deal) => void }) {
+  const card = cardBase
   const [keyword, setKeyword] = React.useState("")
   const [statusFilter, setStatusFilter] = React.useState<Status | "all">("all")
   const [stageFilter, setStageFilter] = React.useState<Stage | "all">("all")

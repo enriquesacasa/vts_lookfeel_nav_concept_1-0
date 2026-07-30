@@ -59,114 +59,104 @@
 }
 
 /* ─── VTS Light ─────────────────────────────────────────────────────────── */
-/* Lavender-tinted white backgrounds, deep violet primary                    */
 :root {
-    /* VTS violet — matches the purple in CTAs & "AI POWERED" badge */
-    --primary: oklch(0.48 0.24 278);
+    /* Muted periwinkle — matches image's chart accent (#9090D4 lightened for light bg) */
+    --primary: oklch(0.50 0.14 278);
     --primary-foreground: oklch(1 0 0);
 
-    /* Soft lavender page background */
-    --background: oklch(0.974 0.014 280);
-    --foreground: oklch(0.14 0.02 278);
+    --background: oklch(0.965 0.005 258);
+    --foreground: oklch(0.13 0.008 258);
 
-    /* Cards are white with the faintest lavender cast */
-    --card: oklch(1 0.004 280);
-    --card-foreground: oklch(0.14 0.02 278);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.13 0.008 258);
 
-    --popover: oklch(1 0.004 280);
-    --popover-foreground: oklch(0.14 0.02 278);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.13 0.008 258);
 
-    /* Secondary — light lavender pill/badge bg */
-    --secondary: oklch(0.92 0.03 278);
-    --secondary-foreground: oklch(0.38 0.14 278);
+    --secondary: oklch(0.92 0.008 258);
+    --secondary-foreground: oklch(0.32 0.06 278);
 
-    --muted: oklch(0.945 0.018 278);
-    --muted-foreground: oklch(0.50 0.05 278);
+    --muted: oklch(0.94 0.005 258);
+    --muted-foreground: oklch(0.52 0.02 258);
 
-    /* Accent — the translucent purple used on hover states & tags */
-    --accent: oklch(0.90 0.05 282);
-    --accent-foreground: oklch(0.38 0.18 278);
+    --accent: oklch(0.90 0.04 278);
+    --accent-foreground: oklch(0.32 0.12 278);
 
     --destructive: oklch(0.577 0.245 27.325);
     --success: oklch(0.52 0.18 155);
     --warning: oklch(0.62 0.15 65);
 
-    --border: oklch(0.88 0.02 278);
-    --input: oklch(0.88 0.02 278);
-    --ring: oklch(0.48 0.24 278);
+    --border: oklch(0.88 0.008 258);
+    --input: oklch(0.88 0.008 258);
+    --ring: oklch(0.50 0.14 278);
 
-    /* Chart palette — violet → indigo → periwinkle → slate-blue → teal */
-    --chart-1: oklch(0.48 0.24 278);
-    --chart-2: oklch(0.60 0.20 258);
-    --chart-3: oklch(0.68 0.15 298);
-    --chart-4: oklch(0.56 0.18 238);
-    --chart-5: oklch(0.64 0.12 218);
+    --chart-1: oklch(0.50 0.14 278);
+    --chart-2: oklch(0.62 0.11 258);
+    --chart-3: oklch(0.66 0.10 298);
+    --chart-4: oklch(0.58 0.12 238);
+    --chart-5: oklch(0.64 0.09 218);
 
     --radius: 0.5rem;
 
-    /* Sidebar — dark violet */
-    --sidebar: oklch(0.18 0.02 278);
-    --sidebar-foreground: oklch(0.92 0.01 278);
-    --sidebar-primary: oklch(0.68 0.20 278);
-    --sidebar-primary-foreground: oklch(0.14 0.02 278);
-    --sidebar-accent: oklch(0.28 0.10 278);
-    --sidebar-accent-foreground: oklch(0.95 0.02 278);
+    --sidebar: oklch(0.13 0.005 258);
+    --sidebar-foreground: oklch(0.90 0.008 258);
+    --sidebar-primary: oklch(0.67 0.13 278);
+    --sidebar-primary-foreground: oklch(0.13 0.005 258);
+    --sidebar-accent: oklch(0.22 0.05 278);
+    --sidebar-accent-foreground: oklch(0.95 0.008 258);
     --sidebar-border: oklch(1 0 0 / 8%);
-    --sidebar-ring: oklch(0.68 0.20 278);
+    --sidebar-ring: oklch(0.67 0.13 278);
 }
 
 /* ─── VTS Dark ──────────────────────────────────────────────────────────── */
-/* Inverted from light mode — dark lavender backgrounds, light text          */
+/* Near-pure-black bg, muted periwinkle accent matching image (#9090D4)      */
 .dark {
-    /* Primary stays vivid but lighter for dark bg legibility */
-    --primary: oklch(0.72 0.24 278);
-    --primary-foreground: oklch(0.14 0.02 278);
+    /* Muted periwinkle — the soft lavender used for highlighted bars/metrics */
+    --primary: oklch(0.67 0.13 278);
+    --primary-foreground: oklch(0.13 0.005 258);
 
-    /* Inverted background/foreground from light */
-    --background: oklch(0.14 0.014 280);
-    --foreground: oklch(0.974 0.014 280);
+    --background: oklch(0.13 0.005 258);
+    --foreground: oklch(0.95 0.005 258);
 
-    /* Cards: inverted from near-white to near-dark */
-    --card: oklch(0.18 0.004 280);
-    --card-foreground: oklch(0.974 0.014 280);
+    /* Cards barely elevated above background */
+    --card: oklch(0.18 0.005 258);
+    --card-foreground: oklch(0.95 0.005 258);
 
-    --popover: oklch(0.18 0.004 280);
-    --popover-foreground: oklch(0.974 0.014 280);
+    --popover: oklch(0.18 0.005 258);
+    --popover-foreground: oklch(0.95 0.005 258);
 
-    /* Inverted secondary */
-    --secondary: oklch(0.22 0.03 278);
-    --secondary-foreground: oklch(0.86 0.14 278);
+    /* Dark gray for non-highlighted chart bars and secondary surfaces */
+    --secondary: oklch(0.26 0.006 258);
+    --secondary-foreground: oklch(0.85 0.008 258);
 
-    --muted: oklch(0.20 0.018 278);
-    --muted-foreground: oklch(0.62 0.05 278);
+    --muted: oklch(0.21 0.005 258);
+    --muted-foreground: oklch(0.58 0.008 258);
 
-    /* Inverted accent */
-    --accent: oklch(0.24 0.05 282);
-    --accent-foreground: oklch(0.86 0.18 278);
+    --accent: oklch(0.28 0.06 278);
+    --accent-foreground: oklch(0.85 0.10 278);
 
     --destructive: oklch(0.704 0.191 22.216);
     --success: oklch(0.65 0.18 155);
     --warning: oklch(0.75 0.14 65);
 
-    --border: oklch(0.26 0.02 278);
-    --input: oklch(0.26 0.02 278);
-    --ring: oklch(0.72 0.24 278);
+    --border: oklch(0.24 0.005 258);
+    --input: oklch(0.24 0.005 258);
+    --ring: oklch(0.67 0.13 278);
 
-    /* Chart palette — same hues, lighter for dark bg */
-    --chart-1: oklch(0.72 0.24 278);
-    --chart-2: oklch(0.74 0.20 258);
-    --chart-3: oklch(0.76 0.15 298);
-    --chart-4: oklch(0.70 0.18 238);
-    --chart-5: oklch(0.72 0.12 218);
+    --chart-1: oklch(0.67 0.13 278);
+    --chart-2: oklch(0.65 0.10 258);
+    --chart-3: oklch(0.68 0.10 298);
+    --chart-4: oklch(0.63 0.11 238);
+    --chart-5: oklch(0.65 0.08 218);
 
-    --sidebar: oklch(0.12 0.014 280 / 0.7);
-    --sidebar-foreground: oklch(0.92 0.01 278);
-    --sidebar-primary: oklch(0.68 0.20 278);
-    --sidebar-primary-foreground: oklch(0.12 0.004 280);
-    --sidebar-accent: oklch(0.28 0.12 278);
-    --sidebar-accent-foreground: oklch(0.95 0.02 278);
+    --sidebar: oklch(0.11 0.004 258);
+    --sidebar-foreground: oklch(0.90 0.005 258);
+    --sidebar-primary: oklch(0.67 0.13 278);
+    --sidebar-primary-foreground: oklch(0.13 0.005 258);
+    --sidebar-accent: oklch(0.22 0.05 278);
+    --sidebar-accent-foreground: oklch(0.93 0.005 258);
     --sidebar-border: oklch(1 0 0 / 8%);
-    --sidebar-ring: oklch(0.68 0.20 278);
+    --sidebar-ring: oklch(0.67 0.13 278);
 }
 
 .dark .nav-glow {
@@ -177,65 +167,6 @@
     background: linear-gradient(135deg, oklch(0.16 0.20 278) 0%, oklch(0.28 0.26 280) 50%, oklch(0.40 0.28 285) 100%);
 }
 
-/* ── VTS Platform Theme (ProfileShell) ─────────────────────────────────── */
-/* Uses VTS Design System hex tokens. Applied via .vts-platform wrapper.    */
-.vts-platform {
-    --background: #F5F7FA;
-    --foreground: #140532;
-    --card: #FFFFFF;
-    --card-foreground: #140532;
-    --popover: #FFFFFF;
-    --popover-foreground: #140532;
-    --primary: #5528FF;
-    --primary-foreground: #FFFFFF;
-    --secondary: #E5E2FD;
-    --secondary-foreground: #280F96;
-    --muted: #F1F4F7;
-    --muted-foreground: #72777E;
-    --accent: #E5E2FD;
-    --accent-foreground: #280F96;
-    --destructive: oklch(0.577 0.245 27.325);
-    --border: #DBE2E7;
-    --input: #DBE2E7;
-    --ring: #5528FF;
-    --radius: 0.25rem;
-    --chart-1: #5528FF;
-    --chart-2: #00F0F0;
-    --chart-3: #8C82FF;
-    --chart-4: #280F96;
-    --chart-5: #C2C8FF;
-}
-
-.dark .vts-platform {
-    --background: #0A0214;
-    --foreground: #F5F7FA;
-    --card: #140532;
-    --card-foreground: #F5F7FA;
-    --popover: #140532;
-    --popover-foreground: #F5F7FA;
-    --primary: #7C55FF;
-    --primary-foreground: #FFFFFF;
-    --secondary: #280F96;
-    --secondary-foreground: #E5E2FD;
-    --muted: #1A0840;
-    --muted-foreground: #9E96C8;
-    --accent: #280F96;
-    --accent-foreground: #E5E2FD;
-    --destructive: oklch(0.704 0.191 22.216);
-    --border: #2A1560;
-    --input: #2A1560;
-    --ring: #7C55FF;
-    --radius: 0.25rem;
-    --chart-1: #7C55FF;
-    --chart-2: #00F0F0;
-    --chart-3: #8C82FF;
-    --chart-4: #5528FF;
-    --chart-5: #C2C8FF;
-}
-
-.vts-platform .building-header-gradient {
-    background: linear-gradient(135deg, #140532 0%, #280F96 55%, #5528FF 100%);
-}
 
 @layer base {
     * {
@@ -251,10 +182,9 @@
     }
     .dark body {
         background:
-            radial-gradient(ellipse 80% 70% at 15% 55%, oklch(0.22 0.20 285) 0%, transparent 60%),
-            radial-gradient(ellipse 60% 60% at 5% 95%, oklch(0.22 0.18 245) 0%, transparent 55%),
-            radial-gradient(ellipse 50% 50% at 85% 10%, oklch(0.10 0.02 280) 0%, transparent 50%),
-            oklch(0.12 0.02 280);
+            radial-gradient(ellipse 65% 55% at 100% 0%, oklch(0.62 0.09 285 / 0.35) 0%, transparent 60%),
+            radial-gradient(ellipse 55% 50% at 0% 100%, oklch(0.62 0.09 285 / 0.28) 0%, transparent 55%),
+            oklch(0.13 0.005 258);
     }
     html {
         @apply font-sans;

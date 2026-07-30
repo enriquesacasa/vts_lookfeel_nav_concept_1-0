@@ -16,8 +16,7 @@ import { AgentsPage } from "@/components/agents-page"
 import { DealsPage } from "@/components/deals-page"
 import type { Deal as DealsPageDeal } from "@/components/deals-page"
 import { DealProfile, TenantLogoImage } from "@/components/deal-profile"
-import { ProfileShell } from "@/components/profile-shell"
-import { useIsMobile } from "@/hooks/use-mobile"
+import { ThemeShowcase } from "@/components/theme-showcase"
 import { cn } from "@/lib/utils"
 import buildingImg from "@/assets/building.jpg"
 
@@ -186,13 +185,11 @@ export default function App() {
   const [navCollapsed, setNavCollapsed] = React.useState(false)
   const [selectedAssetId, setSelectedAssetId] = React.useState("vts-tower")
   const [currentPage, setCurrentPage] = React.useState("dashboard")
-  const [profileMode, setProfileMode] = React.useState(false)
   const [selectedDeal, setSelectedDeal] = React.useState<DealsPageDeal | null>(null)
-  const [, setDarkMode] = React.useState(false)
-  const isMobile = useIsMobile()
+  const [isDark, setIsDark] = React.useState(false)
 
   const toggleDark = () => {
-    setDarkMode(d => {
+    setIsDark(d => {
       const next = !d
       document.documentElement.classList.toggle("dark", next)
       return next
@@ -218,6 +215,10 @@ export default function App() {
   const selectedAsset = ASSETS.find(a => a.id === selectedAssetId)
 
   const renderPage = (page: string) => {
+    if (page === "avatar") {
+      return <ThemeShowcase isDark={isDark} onToggleDark={toggleDark} />
+    }
+
     if (page === "ai") {
       const aiImage = (
         <div className="shrink-0 w-16 h-16 sm:w-24 sm:h-24 rounded-xl overflow-hidden bg-primary/10 flex items-center justify-center">
@@ -303,7 +304,7 @@ export default function App() {
         <div className="space-y-4">
           <BuildingHeader {...dealHeaderProps} />
           {selectedDeal
-            ? <DealProfile deal={selectedDeal} onBack={() => setSelectedDeal(null)} variant="v1" />
+            ? <DealProfile deal={selectedDeal} onBack={() => setSelectedDeal(null)} />
             : <DealsPage onDealClick={deal => setSelectedDeal(deal)} />
           }
         </div>
@@ -421,18 +422,6 @@ export default function App() {
     )
   }
 
-  if (profileMode) {
-    return (
-      <ProfileShell
-        onExit={() => { setProfileMode(false); setCurrentPage("dashboard"); setNavCollapsed(false) }}
-        assets={ASSETS}
-        portfolios={PORTFOLIOS}
-        selectedAssetId={selectedAssetId}
-        onAssetChange={setSelectedAssetId}
-      />
-    )
-  }
-
   return (
     <div className="min-h-screen">
       <AppNav
@@ -448,21 +437,14 @@ export default function App() {
           setSelectedAssetId(id)
         }}
         onLogoClick={toggleDark}
-        onNavItemClick={id => {
-          if (id === "avatar") { setProfileMode(true) }
-          else { setCurrentPage(id); setSelectedDeal(null) }
-        }}
+        onNavItemClick={id => { setCurrentPage(id); setSelectedDeal(null) }}
         activePage={currentPage}
       />
 
       <main
         className={cn(
           "transition-all duration-300 ease-in-out pt-4 pr-4 pb-4 overflow-x-hidden",
-          isMobile
-            ? "pl-4 pt-[72px]"
-            : navCollapsed
-              ? "pl-[104px]"
-              : "pl-[264px]"
+          navCollapsed ? "pl-[104px]" : "pl-[264px]"
         )}
       >
         {renderPage(currentPage)}
