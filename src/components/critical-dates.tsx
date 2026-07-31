@@ -130,7 +130,7 @@ const CriticalDates = React.forwardRef<HTMLDivElement, CriticalDatesProps>(
         <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
           <div>
             <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">Upcoming 12 mo</p>
-            <h2 className="text-xl font-medium text-foreground">Critical dates</h2>
+            <h2 className="text-xl font-semibold text-foreground">Critical dates</h2>
           </div>
           <Button variant="outline" size="sm" className="shrink-0">
             View critical dates

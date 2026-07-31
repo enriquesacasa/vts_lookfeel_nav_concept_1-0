@@ -347,7 +347,7 @@ function ApprovalCard({ onApprove, onDecline }: { onApprove: () => void; onDecli
       <div className="flex items-start justify-between gap-3 px-5 py-4 border-b border-border/50">
         <div>
           <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">Approval required</p>
-          <h2 className="text-xl font-medium text-foreground">Proposal 3</h2>
+          <h2 className="text-xl font-semibold text-foreground">Proposal 3</h2>
         </div>
         <Badge variant="outline" className="text-warning border-warning/40 bg-warning/10 shrink-0 text-xs mt-1">
           <Clock className="h-3 w-3 mr-1" /> Pending
@@ -515,7 +515,7 @@ export function DealProfile({ deal, onBack }: DealProfileProps) {
         <div className="flex items-start justify-between gap-2">
           <div>
             <p className="text-[10px] font-medium uppercase tracking-widest mb-1 text-sidebar-foreground/70">VTS Agents</p>
-            <h2 className="text-xl font-medium text-sidebar-foreground">Deal Actions</h2>
+            <h2 className="text-xl font-semibold text-sidebar-foreground">Deal Actions</h2>
           </div>
           <Button variant="outline" size="sm" className="shrink-0 text-white border-white/30 hover:bg-white/10 hover:text-white">
             View All Agents
@@ -571,50 +571,48 @@ export function DealProfile({ deal, onBack }: DealProfileProps) {
 
       {/* Cash flow comparison */}
       <div className={cardBase}>
-        <div className="flex items-center flex-wrap gap-x-3 gap-y-2 mb-4">
-          <div className="flex items-center gap-2 shrink-0">
-            <div>
-              <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-0.5">Comparison</p>
-              <h2 className="text-xl font-medium text-foreground leading-none">Proposals</h2>
-            </div>
-            <div className="relative">
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-1.5 text-xs"
-                onClick={() => setAddSourceOpen(o => !o)}
-              >
-                <Plus className="h-3.5 w-3.5" /> Add Source
-              </Button>
-              {addSourceOpen && (
-                <div className="absolute left-0 top-full mt-1 z-20 bg-popover border border-border rounded-lg shadow-lg p-1 min-w-[180px]">
-                  {EXTRA_SOURCES.map(src => {
-                    const active = extraCols.includes(String(src.key))
-                    return (
-                      <button
-                        key={String(src.key)}
-                        onClick={() => { toggleSource(String(src.key)); setAddSourceOpen(false) }}
-                        className={cn(
-                          "w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm text-left transition-colors",
-                          active
-                            ? "bg-primary/10 text-primary font-medium"
-                            : "text-foreground hover:bg-muted"
-                        )}
-                      >
-                        {active && <Check className="h-3.5 w-3.5 shrink-0" />}
-                        {!active && <span className="h-3.5 w-3.5 shrink-0" />}
-                        <div>
-                          <p className="leading-none">{src.label}</p>
-                          <p className="text-[10px] text-muted-foreground mt-0.5">{src.sub}</p>
-                        </div>
-                      </button>
-                    )
-                  })}
-                </div>
-              )}
-            </div>
+        <div className="flex items-center flex-wrap gap-x-5 gap-y-2 mb-4">
+          <div className="shrink-0">
+            <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-0.5">Comparison</p>
+            <h2 className="text-xl font-medium text-foreground leading-none">Proposals</h2>
           </div>
-          <div className="flex gap-1 rounded-lg bg-muted/60 dark:bg-white/6 p-1 shrink-0 ml-auto">
+          <div className="relative ml-auto">
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1.5 text-xs"
+              onClick={() => setAddSourceOpen(o => !o)}
+            >
+              <Plus className="h-3.5 w-3.5" /> Add Source
+            </Button>
+            {addSourceOpen && (
+              <div className="absolute right-0 top-full mt-1 z-20 bg-popover border border-border rounded-lg shadow-lg p-1 min-w-[180px]">
+                {EXTRA_SOURCES.map(src => {
+                  const active = extraCols.includes(String(src.key))
+                  return (
+                    <button
+                      key={String(src.key)}
+                      onClick={() => { toggleSource(String(src.key)); setAddSourceOpen(false) }}
+                      className={cn(
+                        "w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm text-left transition-colors",
+                        active
+                          ? "bg-primary/10 text-primary font-medium"
+                          : "text-foreground hover:bg-muted"
+                      )}
+                    >
+                      {active && <Check className="h-3.5 w-3.5 shrink-0" />}
+                      {!active && <span className="h-3.5 w-3.5 shrink-0" />}
+                      <div>
+                        <p className="leading-none">{src.label}</p>
+                        <p className="text-[10px] text-muted-foreground mt-0.5">{src.sub}</p>
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+          <div className="flex gap-1 rounded-lg bg-muted/60 dark:bg-white/6 p-1 shrink-0">
               {([
                 { key: "total",    label: "Total $"   },
                 { key: "perSfYr",  label: "$/SF/Yr"   },
@@ -634,7 +632,7 @@ export function DealProfile({ deal, onBack }: DealProfileProps) {
                 </button>
               ))}
           </div>
-          <div className="flex gap-1 rounded-lg bg-muted/60 dark:bg-white/6 p-1 shrink-0 ml-10">
+          <div className="flex gap-1 rounded-lg bg-muted/60 dark:bg-white/6 p-1 shrink-0">
             {([
               { key: null,           label: "Δ Off"              },
               { key: "budget",       label: "Δ vs Budget"      },

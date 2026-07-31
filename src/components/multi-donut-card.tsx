@@ -32,7 +32,7 @@ const MultiDonutCard = React.forwardRef<HTMLDivElement, MultiDonutCardProps>(
       )}>
         <div className="mb-5">
           <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">{eyebrow}</p>
-          <h2 className="text-xl font-medium text-foreground">{title}</h2>
+          <h2 className="text-xl font-semibold text-foreground">{title}</h2>
         </div>
 
         <div className="flex items-center gap-4">

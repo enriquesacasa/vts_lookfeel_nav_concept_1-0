@@ -198,7 +198,7 @@ function PipelineViz({ deals, className }: { deals: Deal[]; className?: string }
       <div className="flex items-start justify-between mb-1">
         <div>
           <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">Deal Pipeline</p>
-          <h2 className="text-xl font-medium text-foreground">
+          <h2 className="text-xl font-semibold text-foreground">
             {deals.filter(d => d.stage !== "Executed").length} active deals
             <span className="text-muted-foreground font-normal text-base ml-2">· {fmtSf(deals.filter(d => d.stage !== "Executed").reduce((a, d) => a + d.sf, 0))} in pipeline</span>
           </h2>
