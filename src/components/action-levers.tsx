@@ -57,13 +57,15 @@ function ActionRow({ item, onRun }: { item: ActionItem; onRun: () => void }) {
               <TrendingUp className="h-3 w-3 shrink-0 text-sidebar-foreground/50" />
               <span className="text-sm text-sidebar-foreground/60">{item.impact}</span>
             </div>
-            <button
+            <Button
+              variant="outline"
+              size="sm"
               onClick={onRun}
-              className="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-all duration-150 opacity-0 group-hover/row:opacity-100 bg-sidebar-foreground/10 hover:bg-sidebar-foreground/20 text-sidebar-foreground/80"
+              className="opacity-0 group-hover/row:opacity-100 gap-1.5 text-white border-white/30 hover:bg-white/10 hover:text-white"
             >
-              <Sparkle fill="currentColor" className="h-3 w-3" />
+              <Sparkle className="h-3 w-3" />
               Run agent
-            </button>
+            </Button>
           </div>
           {item.detail && (
             <p className="text-sm mt-0.5 text-sidebar-foreground/50">{item.detail}</p>
@@ -89,16 +91,16 @@ const ActionLevers = React.forwardRef<HTMLDivElement, ActionLeversProps>(
         <div className="flex items-start justify-between gap-2">
           <div>
             <p className="text-[10px] font-medium uppercase tracking-widest mb-1 text-sidebar-foreground/70">VTS Agents</p>
-            <h2 className="text-xl font-semibold text-sidebar-foreground">Financial levers</h2>
+            <h2 className="text-xl font-medium text-sidebar-foreground">Financial levers</h2>
           </div>
-          <Button variant="outline" size="sm" className="shrink-0 text-white/80 border-white/25 bg-transparent hover:bg-white/10 hover:text-white dark:bg-white/8 dark:border-white/25 dark:text-white dark:hover:bg-white/15">
+          <Button variant="outline" size="sm" className="shrink-0 text-white border-white/30 hover:bg-white/10 hover:text-white">
             View active agents
           </Button>
         </div>
 
         {/* Summary bar */}
-        <div className="rounded-lg px-3 py-2 flex items-center gap-2 bg-white/10">
-          <Sparkle fill="currentColor" className="h-4 w-4 shrink-0 text-sidebar-primary" />
+        <div className="rounded-lg px-3 py-2 flex items-center gap-2 bg-sidebar-foreground/10">
+          <Sparkle className="h-4 w-4 shrink-0 text-sidebar-primary" />
           <p className="text-sm leading-snug text-sidebar-foreground/70">
             3 financial improvements identified: <span className="text-sidebar-primary font-medium">$1.1M upside</span>
           </p>

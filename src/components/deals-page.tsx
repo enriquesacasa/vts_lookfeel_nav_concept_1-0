@@ -15,14 +15,14 @@ function AgentBtn({ label }: { label: string }) {
   return (
     <Tooltip>
       <TooltipTrigger render={<span />}>
-        <button className="inline-flex items-center justify-center h-7 w-7 rounded-full bg-primary/10 hover:bg-primary text-primary hover:text-primary-foreground transition-all duration-150 shrink-0">
-          <Sparkle fill="currentColor" className="h-3.5 w-3.5" />
-        </button>
+        <Button variant="secondary" size="icon" className="h-7 w-7 shrink-0">
+          <Sparkle className="h-3.5 w-3.5" />
+        </Button>
       </TooltipTrigger>
       <TooltipContent side="top" className="bg-sidebar text-sidebar-foreground border-transparent font-medium" arrowClassName="fill-sidebar">
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-1.5 font-medium text-sidebar-foreground">
-            <Sparkle fill="currentColor" className="h-3 w-3" />
+            <Sparkle className="h-3 w-3" />
             Run agent
           </div>
           <p className="text-sidebar-foreground/70 font-normal">{label}</p>
@@ -84,7 +84,7 @@ function TenantAvatar({ name }: { name: string }) {
   }
   return (
     <div
-      className="h-7 w-7 rounded-full flex items-center justify-center text-[10px] font-bold text-white shrink-0 ring-1 ring-border/30"
+      className="h-7 w-7 rounded-full flex items-center justify-center text-[10px] font-medium text-white shrink-0 ring-1 ring-border/30"
       style={{ background: `hsl(${hue} 55% 45%)` }}
     >
       {initials}
@@ -198,7 +198,7 @@ function PipelineViz({ deals, className }: { deals: Deal[]; className?: string }
       <div className="flex items-start justify-between mb-1">
         <div>
           <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">Deal Pipeline</p>
-          <h2 className="text-xl font-semibold text-foreground">
+          <h2 className="text-xl font-medium text-foreground">
             {deals.filter(d => d.stage !== "Executed").length} active deals
             <span className="text-muted-foreground font-normal text-base ml-2">· {fmtSf(deals.filter(d => d.stage !== "Executed").reduce((a, d) => a + d.sf, 0))} in pipeline</span>
           </h2>
@@ -228,7 +228,7 @@ function PipelineViz({ deals, className }: { deals: Deal[]; className?: string }
                     {count === 0 && <div className="w-full h-1 bg-border rounded" />}
                   </div>
                 </div>
-                <div className="text-xs text-center leading-tight font-semibold text-muted-foreground">{stage}</div>
+                <div className="text-xs text-center leading-tight font-medium text-muted-foreground">{stage}</div>
                 {sf > 0 && <div className="text-[10px] text-muted-foreground/70">{fmtSf(sf)}</div>}
               </div>
             </React.Fragment>
@@ -260,16 +260,16 @@ function AiInsightCard() {
       {/* Header */}
       <div className={cn("flex items-center justify-between gap-2", isV2 ? "px-4 py-3 border-b border-sidebar-border" : "")}>
         <div className={cn("flex items-center gap-2.5", !isV2 && "flex-col items-start gap-0")}>
-          {isV2 && <div className="h-7 w-7 bg-primary/20 flex items-center justify-center shrink-0">
-            <Sparkle fill="currentColor" className="h-4 w-4 text-sidebar-primary" />
+          {isV2 && <div className="h-7 w-7 bg-ai/20 flex items-center justify-center shrink-0">
+            <Sparkle className="h-4 w-4 text-sidebar-primary" />
           </div>}
           {!isV2 && <p className="text-[10px] font-medium uppercase tracking-widest mb-1 text-sidebar-foreground/70">VTS Agents</p>}
-          <p className={cn("font-medium text-sidebar-foreground", isV2 ? "text-sm" : "text-xl font-semibold")}>
+          <p className={cn("font-medium text-sidebar-foreground", isV2 ? "text-sm" : "text-xl font-medium")}>
             {isV2 ? "VTS Agents" : "Deal intelligence"}
           </p>
         </div>
         <Button variant="outline" size="sm" className={cn(
-          "shrink-0 text-white/80 border-white/25 bg-transparent hover:bg-white/10 hover:text-white dark:bg-white/8 dark:border-white/25 dark:text-white dark:hover:bg-white/15",
+          "shrink-0 text-white border-white/30 hover:bg-white/10 hover:text-white",
           isV2 && "rounded-none"
         )}>
           View Active Agents
@@ -277,8 +277,8 @@ function AiInsightCard() {
       </div>
 
       {/* Summary alert */}
-      <div className={cn("flex items-center gap-2", isV2 ? "px-4 py-2.5 border-b border-sidebar-border" : "rounded-lg px-3 py-2 bg-white/10")}>
-        <Sparkle fill="currentColor" className="h-4 w-4 shrink-0 text-sidebar-primary" />
+      <div className={cn("flex items-center gap-2", isV2 ? "px-4 py-2.5 border-b border-sidebar-border" : "rounded-lg px-3 py-2 bg-sidebar-foreground/10")}>
+        <Sparkle className="h-4 w-4 shrink-0 text-sidebar-primary" />
         <p className="text-sm leading-snug text-sidebar-foreground/70">
           3 deal risks identified: <span className="text-sidebar-primary font-medium">$1.8M NOI at risk</span>
         </p>
@@ -293,16 +293,13 @@ function AiInsightCard() {
               ? "flex items-center gap-3 px-4 py-3 border-b border-sidebar-border/50 last:border-0 hover:bg-sidebar-accent/40 transition-colors"
               : "flex items-center gap-3 rounded-lg border border-primary/25 bg-primary/15 px-3 py-2.5"
           )}>
-            <Sparkle fill="currentColor" className="h-3.5 w-3.5 shrink-0 text-sidebar-primary" />
+            <Sparkle className="h-3.5 w-3.5 shrink-0 text-sidebar-primary" />
             <p className="text-sm text-sidebar-foreground/85 flex-1 min-w-0 truncate">{item.text}</p>
             <div className="relative shrink-0">
               <span className="text-sm font-medium tabular-nums text-sidebar-primary transition-opacity duration-150 group-hover/row:opacity-0">{item.value}</span>
-              <button className={cn(
-                "absolute inset-y-0 right-0 inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium opacity-0 group-hover/row:opacity-100 transition-opacity duration-150 text-sidebar-foreground/80 whitespace-nowrap",
-                isV2 ? "bg-sidebar-foreground/10 hover:bg-sidebar-foreground/20" : "rounded-md bg-sidebar-foreground/10 hover:bg-sidebar-foreground/20"
-              )}>
-                <Sparkle fill="currentColor" className="h-3 w-3" />Run agent
-              </button>
+              <Button variant="outline" size="sm" className="absolute inset-y-0 right-0 gap-1.5 opacity-0 group-hover/row:opacity-100 transition-opacity duration-150 text-xs whitespace-nowrap my-auto h-auto py-1 text-white border-white/30 hover:bg-white/10 hover:text-white">
+                <Sparkle className="h-3 w-3" />Run agent
+              </Button>
             </div>
           </div>
         ))}
@@ -336,7 +333,7 @@ function KpiSummary({ deals }: { deals: Deal[] }) {
       {kpis.map(k => (
         <div key={k.label} className={cn("flex-1 min-w-[120px]", isV2 ? "px-6 py-5" : "px-5 py-4")}>
           <p className={cn("font-medium uppercase tracking-widest text-muted-foreground mb-1", isV2 ? "text-[11px]" : "text-[10px]")}>{k.label}</p>
-          <p className={cn("font-medium text-foreground", isV2 ? "text-3xl tracking-tight mt-1" : "text-xl font-semibold")}>{k.value}</p>
+          <p className={cn("font-medium text-foreground", isV2 ? "text-3xl tracking-tight mt-1" : "text-2xl font-medium")}>{k.value}</p>
           {k.label === "Need Attention" ? (
             <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
               <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium", STATUS_CONFIG["at-risk"].cls)}>{atRisk} At Risk</span>
@@ -438,7 +435,7 @@ export function DealsPage({ onDealClick }: { onDealClick?: (deal: Deal) => void 
                 className={cn(
                   "rounded-md px-3 py-1.5 text-xs font-medium transition-all whitespace-nowrap",
                   statusFilter === tab.value
-                    ? "bg-primary text-white shadow-sm"
+                    ? "bg-primary text-primary-foreground shadow-sm"
                     : "text-muted-foreground hover:bg-background/70 dark:hover:bg-white/8 hover:text-foreground"
                 )}
               >
@@ -463,7 +460,7 @@ export function DealsPage({ onDealClick }: { onDealClick?: (deal: Deal) => void 
                 className={cn(
                   "rounded-md px-3 py-1.5 text-xs font-medium transition-all whitespace-nowrap",
                   stageFilter === "all"
-                    ? "bg-primary text-white shadow-sm"
+                    ? "bg-primary text-primary-foreground shadow-sm"
                     : "text-muted-foreground hover:bg-background/70 dark:hover:bg-white/8 hover:text-foreground"
                 )}
               >All stages</button>

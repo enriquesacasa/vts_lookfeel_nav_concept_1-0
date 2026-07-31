@@ -41,9 +41,9 @@ const AvailabilityOverview = React.forwardRef<HTMLDivElement, AvailabilityOvervi
         <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2 mb-6">
           <div>
             <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">Overview</p>
-            <h2 className="text-xl font-semibold text-foreground">Occupancy</h2>
+            <h2 className="text-xl font-medium text-foreground">Occupancy</h2>
           </div>
-          <Button variant="outline" size="sm" className="shrink-0 text-primary border-primary bg-transparent hover:bg-primary/10 hover:text-primary dark:bg-white/8 dark:border-white/25 dark:text-white dark:hover:bg-white/15">
+          <Button variant="outline" size="sm" className="shrink-0">
             View stacking plan
           </Button>
         </div>
@@ -60,7 +60,7 @@ const AvailabilityOverview = React.forwardRef<HTMLDivElement, AvailabilityOvervi
             </PieChart>
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
               <span className="text-[9px] font-medium uppercase tracking-widest text-muted-foreground">Total SF</span>
-              <span className="text-lg font-semibold text-foreground">{fmtM(totalSf)}</span>
+              <span className="text-lg font-medium text-foreground">{fmtM(totalSf)}</span>
             </div>
           </div>
 
@@ -73,7 +73,7 @@ const AvailabilityOverview = React.forwardRef<HTMLDivElement, AvailabilityOvervi
                 </div>
                 <span className="text-sm font-medium text-muted-foreground">{occupiedPct}%</span>
               </div>
-              <p className="text-xl font-semibold pl-4 whitespace-nowrap" style={{ color: "var(--color-primary)" }}>
+              <p className="text-xl font-medium pl-4 whitespace-nowrap" style={{ color: "var(--color-primary)" }}>
                 {fmt(occupiedSf)}<span className="text-xs font-normal text-muted-foreground ml-1">sf</span>
               </p>
             </div>
@@ -86,7 +86,7 @@ const AvailabilityOverview = React.forwardRef<HTMLDivElement, AvailabilityOvervi
                 </div>
                 <span className="text-sm font-medium text-muted-foreground">{vacantPct}%</span>
               </div>
-              <p className="text-xl font-semibold text-foreground pl-4 whitespace-nowrap">
+              <p className="text-xl font-medium text-foreground pl-4 whitespace-nowrap">
                 {fmt(vacantSf)}<span className="text-xs font-normal text-muted-foreground ml-1">sf</span>
               </p>
             </div>
@@ -116,12 +116,14 @@ const AvailabilityOverview = React.forwardRef<HTMLDivElement, AvailabilityOvervi
                       )}>{v.daysVacant} d</span>
                       <Tooltip>
                         <TooltipTrigger render={<span />}>
-                          <button
+                          <Button
+                            variant="secondary"
+                            size="icon"
                             onClick={e => e.stopPropagation()}
-                            className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-primary/10 hover:bg-primary text-primary hover:text-primary-foreground transition-all duration-150"
+                            className="h-6 w-6 shrink-0"
                           >
-                            <Sparkle fill="currentColor" className="h-3 w-3" />
-                          </button>
+                            <Sparkle className="h-3 w-3 text-sidebar-primary" />
+                          </Button>
                         </TooltipTrigger>
                         <TooltipContent
                           side="top"
@@ -130,7 +132,7 @@ const AvailabilityOverview = React.forwardRef<HTMLDivElement, AvailabilityOvervi
                         >
                           <div className="flex flex-col gap-1">
                             <div className="flex items-center gap-1.5 font-medium text-sidebar-foreground">
-                              <Sparkle fill="currentColor" className="h-3 w-3" />
+                              <Sparkle className="h-3 w-3 text-sidebar-primary" />
                               Run agent
                             </div>
                             <p className="text-sidebar-foreground/70 font-normal">Find prospects and draft an outreach plan for this space</p>

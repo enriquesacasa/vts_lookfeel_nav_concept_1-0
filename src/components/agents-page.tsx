@@ -110,7 +110,7 @@ const AGENT_TYPES: AgentType[] = [
 
 const STATUS_CONFIG = {
   complete: { icon: CheckCircle2, color: "text-emerald-500", label: "Complete" },
-  running:  { icon: Loader2,      color: "text-violet-500",  label: "Running"  },
+  running:  { icon: Loader2,      color: "text-violet-500",           label: "Running"  },
   pending:  { icon: Clock,        color: "text-muted-foreground", label: "Queued" },
 }
 
@@ -151,20 +151,22 @@ export function AgentsPage({ className }: AgentsPageProps) {
           />
           <button className={cn(
             "shrink-0 flex items-center justify-center h-7 w-7 rounded-lg transition-all duration-150",
-            query ? "bg-primary text-white" : "bg-muted text-muted-foreground"
+            query ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
           )}>
             <ArrowRight className="h-3.5 w-3.5" />
           </button>
         </div>
         <div className="flex flex-wrap gap-2 mt-3">
           {SUGGESTED.map(s => (
-            <button
+            <Button
               key={s}
+              variant="outline"
+              size="sm"
               onClick={() => setQuery(s)}
-              className="text-xs text-primary border border-primary/30 bg-primary/5 rounded-full px-3 py-1 hover:bg-primary/10 hover:border-primary/50 transition-colors"
+              className="rounded-full text-xs h-7 px-3"
             >
               {s}
-            </button>
+            </Button>
           ))}
         </div>
       </div>
@@ -194,9 +196,9 @@ export function AgentsPage({ className }: AgentsPageProps) {
           <div className="flex items-start justify-between gap-4 mb-6">
             <div>
               <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">History</p>
-              <h2 className="text-xl font-semibold text-foreground">Recent agent runs</h2>
+              <h2 className="text-xl font-medium text-foreground">Recent agent runs</h2>
             </div>
-            <Button variant="outline" size="sm" className="shrink-0 text-primary border-primary bg-transparent hover:bg-primary/10 hover:text-primary dark:bg-white/8 dark:border-white/25 dark:text-white dark:hover:bg-white/15">
+            <Button variant="outline" size="sm" className="shrink-0">
               View all runs
             </Button>
           </div>
@@ -234,7 +236,7 @@ export function AgentsPage({ className }: AgentsPageProps) {
           <div className="flex items-start justify-between gap-4 mb-6">
             <div>
               <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">Capabilities</p>
-              <h2 className="text-xl font-semibold text-foreground">Agent types</h2>
+              <h2 className="text-xl font-medium text-foreground">Agent types</h2>
             </div>
           </div>
           <div className="flex flex-col gap-2">
@@ -247,14 +249,16 @@ export function AgentsPage({ className }: AgentsPageProps) {
                 <p className="text-xs text-muted-foreground mb-2.5 leading-relaxed">{type.description}</p>
                 <div className="flex flex-col gap-1.5">
                   {type.examplePrompts.map(p => (
-                    <button
+                    <Button
                       key={p}
+                      variant="outline"
+                      size="sm"
                       onClick={e => { e.stopPropagation(); setQuery(p) }}
-                      className="w-full text-left text-xs text-primary border border-primary/30 bg-primary/5 rounded-lg px-3 py-1.5 hover:bg-primary/10 hover:border-primary/50 transition-colors flex items-center justify-between gap-2"
+                      className="w-full justify-between text-xs h-auto py-1.5"
                     >
                       <span>{p}</span>
                       <ArrowRight className="h-3 w-3 shrink-0 opacity-60" />
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </div>

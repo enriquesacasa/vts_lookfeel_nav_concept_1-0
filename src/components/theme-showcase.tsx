@@ -37,7 +37,7 @@ function Swatch({ label, cssVar }: { label: string; cssVar: string }) {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>
-      <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-4">{title}</p>
+      <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-4">{title}</p>
       {children}
     </div>
   )
@@ -84,12 +84,12 @@ export function ThemeShowcase({ isDark, onToggleDark }: ThemeShowcaseProps) {
       {/* Typography */}
       <Section title="Typography">
         <div className="rounded-xl border border-border bg-card p-6 space-y-4">
-          <p className="text-4xl font-semibold text-foreground leading-tight">Display heading</p>
+          <p className="text-4xl font-medium text-foreground leading-tight">Display heading</p>
           <p className="text-2xl font-medium text-foreground leading-tight">Section heading</p>
           <p className="text-xl font-normal text-foreground leading-tight">Subheading</p>
           <p className="text-base text-foreground">Body text — The quick brown fox jumps over the lazy dog.</p>
           <p className="text-sm text-muted-foreground">Secondary / muted — Supporting information and labels.</p>
-          <p className="text-xs text-muted-foreground uppercase tracking-widest font-semibold">Eyebrow label</p>
+          <p className="text-xs text-muted-foreground uppercase tracking-widest font-medium">Eyebrow label</p>
           <p className="text-sm font-mono text-foreground">Monospace — var(--font-sans)</p>
         </div>
       </Section>
@@ -116,13 +116,13 @@ export function ThemeShowcase({ isDark, onToggleDark }: ThemeShowcaseProps) {
             <Badge variant="secondary">Secondary</Badge>
             <Badge variant="outline">Outline</Badge>
             <Badge variant="destructive">Destructive</Badge>
-            <span className="inline-flex items-center gap-1 rounded-full bg-success/15 text-success px-2.5 py-1 text-xs font-semibold">
+            <span className="inline-flex items-center gap-1 rounded-full bg-success/15 text-success px-2.5 py-1 text-xs font-medium">
               <Check className="h-3 w-3" /> Success
             </span>
-            <span className="inline-flex items-center rounded-full bg-warning/15 text-warning px-2.5 py-1 text-xs font-semibold">
+            <span className="inline-flex items-center rounded-full bg-warning/15 text-warning px-2.5 py-1 text-xs font-medium">
               Warning
             </span>
-            <span className="inline-flex items-center rounded-full bg-primary/10 text-primary px-2.5 py-1 text-xs font-semibold">
+            <span className="inline-flex items-center rounded-full bg-primary/10 text-primary px-2.5 py-1 text-xs font-medium">
               AI Powered
             </span>
           </div>
@@ -148,7 +148,7 @@ export function ThemeShowcase({ isDark, onToggleDark }: ThemeShowcaseProps) {
             { label: "Muted",      cls: "bg-muted border border-border" },
           ].map(s => (
             <div key={s.label} className={cn("rounded-xl p-5", s.cls)}>
-              <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-2">{s.label}</p>
+              <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground mb-2">{s.label}</p>
               <p className="text-sm text-foreground">Text on {s.label.toLowerCase()} surface.</p>
               <p className="text-xs text-muted-foreground mt-1">Muted supporting text.</p>
             </div>

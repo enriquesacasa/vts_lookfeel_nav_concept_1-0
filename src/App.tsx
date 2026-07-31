@@ -287,7 +287,7 @@ export default function App() {
       ? { ...headerProps, name: (
           <span>
             <span className="font-semibold">{headerProps.name}</span>{" "}
-            <span className="text-muted-foreground font-light"> | {pageLabel}</span>
+            <span className="text-muted-foreground font-light whitespace-nowrap"> | {pageLabel}</span>
           </span>
         )}
       : headerProps
@@ -443,8 +443,11 @@ export default function App() {
 
       <main
         className={cn(
-          "transition-all duration-300 ease-in-out pt-4 pr-4 pb-4 overflow-x-hidden",
-          navCollapsed ? "pl-[104px]" : "pl-[264px]"
+          "transition-all duration-300 ease-in-out pr-4 pb-4 overflow-x-hidden",
+          // Mobile: fixed top nav is h-14 (56px); add clearance + padding
+          "pt-[72px] pl-4",
+          // Desktop: sidebar is fixed on the left; push content right
+          navCollapsed ? "md:pt-4 md:pl-[104px]" : "md:pt-4 md:pl-[264px]"
         )}
       >
         {renderPage(currentPage)}

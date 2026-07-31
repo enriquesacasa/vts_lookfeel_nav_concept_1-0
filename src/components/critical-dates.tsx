@@ -39,7 +39,7 @@ function urgency(months: number): "urgent" | "soon" | "later" {
 const PILL: Record<ReturnType<typeof urgency>, string> = {
   urgent: "bg-destructive/10 text-destructive",
   soon:   "bg-warning/10 text-warning",
-  later:  "bg-primary/10 text-primary",
+  later:  "bg-primary/10 text-sidebar-primary",
 }
 
 function fmtMonths(n: number) {
@@ -62,12 +62,9 @@ function AIButton({ onClick }: AIButtonProps) {
   return (
     <Tooltip>
       <TooltipTrigger render={<span />}>
-        <button
-          onClick={onClick}
-          className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-primary/10 hover:bg-primary text-primary hover:text-primary-foreground transition-all duration-150 shrink-0"
-        >
-          <Sparkle fill="currentColor" className="h-3 w-3" />
-        </button>
+        <Button variant="secondary" size="icon" onClick={onClick} className="h-6 w-6 shrink-0">
+          <Sparkle className="h-3 w-3 text-sidebar-primary" />
+        </Button>
       </TooltipTrigger>
       <TooltipContent
         side="top"
@@ -76,7 +73,7 @@ function AIButton({ onClick }: AIButtonProps) {
       >
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-1.5 font-medium text-sidebar-foreground">
-            <Sparkle fill="currentColor" className="h-3 w-3" />
+            <Sparkle className="h-3 w-3 text-sidebar-primary" />
             Run agent
           </div>
           <p className="text-sidebar-foreground/70 font-normal">Research this date and surface next steps</p>
@@ -133,13 +130,9 @@ const CriticalDates = React.forwardRef<HTMLDivElement, CriticalDatesProps>(
         <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
           <div>
             <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">Upcoming 12 mo</p>
-            <h2 className="text-xl font-semibold text-foreground">Critical dates</h2>
+            <h2 className="text-xl font-medium text-foreground">Critical dates</h2>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            className="shrink-0 text-primary border-primary bg-transparent hover:bg-primary/10 hover:text-primary dark:bg-white/8 dark:border-white/25 dark:text-white dark:hover:bg-white/15"
-          >
+          <Button variant="outline" size="sm" className="shrink-0">
             View critical dates
           </Button>
         </div>
@@ -153,7 +146,7 @@ const CriticalDates = React.forwardRef<HTMLDivElement, CriticalDatesProps>(
               className={cn(
                 "flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-all",
                 active === tab.value
-                  ? "bg-primary text-white shadow-sm"
+                  ? "bg-primary text-primary-foreground shadow-sm"
                   : "text-muted-foreground hover:bg-background/70 dark:hover:bg-white/8 hover:text-foreground"
               )}
             >

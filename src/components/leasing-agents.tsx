@@ -23,16 +23,16 @@ const LeasingAgents = React.forwardRef<HTMLDivElement, LeasingAgentsProps>(
         <div className="flex items-start justify-between gap-2">
           <div>
             <p className="text-[10px] font-medium uppercase tracking-widest mb-1 text-sidebar-foreground/70">VTS Agents</p>
-            <h2 className="text-xl font-semibold text-sidebar-foreground">Leasing actions</h2>
+            <h2 className="text-xl font-medium text-sidebar-foreground">Leasing actions</h2>
           </div>
-          <Button variant="outline" size="sm" className="shrink-0 text-white/80 border-white/25 bg-transparent hover:bg-white/10 hover:text-white dark:bg-white/8 dark:border-white/25 dark:text-white dark:hover:bg-white/15">
+          <Button variant="outline" size="sm" className="shrink-0 text-white border-white/30 hover:bg-white/10 hover:text-white">
             View active agents
           </Button>
         </div>
 
         {/* Summary bar */}
         <div className="rounded-lg px-3 py-2 flex items-center gap-2 bg-sidebar-foreground/10">
-          <Sparkle fill="currentColor" className="h-4 w-4 shrink-0 text-sidebar-primary" />
+          <Sparkle className="h-4 w-4 shrink-0 text-sidebar-primary" />
           <p className="text-sm leading-snug text-sidebar-foreground/70">
             {atRisk.length} deal{atRisk.length !== 1 ? "s" : ""} need attention +{" "}
             <span className="text-sidebar-primary font-medium">{decisions.length} approval{decisions.length !== 1 ? "s" : ""} pending</span>
@@ -49,16 +49,16 @@ const LeasingAgents = React.forwardRef<HTMLDivElement, LeasingAgentsProps>(
               {atRisk.map((d, i) => (
                 <div key={i} className={cn(
                   "flex items-start gap-2.5 rounded-lg p-3 group/row",
-                  "bg-primary/15 border border-primary/25"
+                  "border border-primary/25 bg-primary/15"
                 )}>
                   <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0 text-sidebar-primary" />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
                       <p className="text-sm font-medium text-sidebar-foreground/90">{d.tenant}</p>
-                      <button className="inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-sm font-medium opacity-0 group-hover/row:opacity-100 transition-all bg-sidebar-foreground/10 hover:bg-sidebar-foreground/20 text-sidebar-foreground/80 shrink-0">
-                        <Sparkle fill="currentColor" className="h-3 w-3" />
+                      <Button variant="outline" size="sm" className="opacity-0 group-hover/row:opacity-100 gap-1 shrink-0 text-white border-white/30 hover:bg-white/10 hover:text-white">
+                        <Sparkle className="h-3 w-3" />
                         Run agent
-                      </button>
+                      </Button>
                     </div>
                     <p className="text-sm text-sidebar-foreground/55">{d.space} · {d.stage}</p>
                     {d.note && <p className="text-sm text-sidebar-foreground/45 mt-0.5">{d.note}</p>}
@@ -78,15 +78,15 @@ const LeasingAgents = React.forwardRef<HTMLDivElement, LeasingAgentsProps>(
           ) : (
             <div className="flex flex-col gap-2">
               {decisions.map((item, i) => (
-                <div key={i} className="flex items-start gap-2.5 rounded-lg bg-primary/15 border border-primary/25 p-3 group/row">
+                <div key={i} className="flex items-start gap-2.5 rounded-lg border border-primary/25 bg-primary/15 p-3 group/row">
                   <Clock className="h-4 w-4 mt-0.5 shrink-0 text-sidebar-primary" />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
                       <p className="text-sm font-medium text-sidebar-foreground/90">{item.tenant}</p>
-                      <button className="inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-sm font-medium opacity-0 group-hover/row:opacity-100 transition-all bg-sidebar-foreground/10 hover:bg-sidebar-foreground/20 text-sidebar-foreground/80 shrink-0">
-                        <Sparkle fill="currentColor" className="h-3 w-3" />
+                      <Button variant="outline" size="sm" className="opacity-0 group-hover/row:opacity-100 gap-1 shrink-0 text-white border-white/30 hover:bg-white/10 hover:text-white">
+                        <Sparkle className="h-3 w-3" />
                         Run agent
-                      </button>
+                      </Button>
                     </div>
                     <p className="text-sm text-sidebar-foreground/55">{item.action}</p>
                     <p className="text-sm font-medium text-sidebar-primary mt-0.5">In approval for {item.inApprovalFor}</p>

@@ -125,9 +125,9 @@ const LeasingActivity = React.forwardRef<HTMLDivElement, LeasingActivityProps>(
         <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2 mb-6">
           <div>
             <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">Pipeline</p>
-            <h2 className="text-xl font-semibold text-foreground">Leasing activity</h2>
+            <h2 className="text-xl font-medium text-foreground">Leasing activity</h2>
           </div>
-          <Button variant="outline" size="sm" className="shrink-0 text-primary border-primary bg-transparent hover:bg-primary/10 hover:text-primary dark:bg-white/8 dark:border-white/25 dark:text-white dark:hover:bg-white/15">
+          <Button variant="outline" size="sm" className="shrink-0">
             View all deals
           </Button>
         </div>
@@ -176,12 +176,9 @@ const LeasingActivity = React.forwardRef<HTMLDivElement, LeasingActivityProps>(
                 <td className="py-2.5 pl-2 text-right whitespace-nowrap">
                   <Tooltip>
                     <TooltipTrigger render={<span />}>
-                      <button
-                        onClick={e => e.stopPropagation()}
-                        className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-primary/10 hover:bg-primary text-primary hover:text-primary-foreground transition-all duration-150 shrink-0"
-                      >
-                        <Sparkle fill="currentColor" className="h-3 w-3" />
-                      </button>
+                      <Button variant="secondary" size="icon" onClick={e => e.stopPropagation()} className="h-6 w-6 shrink-0">
+                        <Sparkle className="h-3 w-3 text-sidebar-primary" />
+                      </Button>
                     </TooltipTrigger>
                     <TooltipContent
                       side="top"
@@ -190,7 +187,7 @@ const LeasingActivity = React.forwardRef<HTMLDivElement, LeasingActivityProps>(
                     >
                       <div className="flex flex-col gap-1">
                         <div className="flex items-center gap-1.5 font-medium text-sidebar-foreground">
-                          <Sparkle fill="currentColor" className="h-3 w-3" />
+                          <Sparkle className="h-3 w-3 text-sidebar-primary" />
                           Run agent
                         </div>
                         <p className="text-sidebar-foreground/70 font-normal">Analyze this deal and suggest next steps</p>

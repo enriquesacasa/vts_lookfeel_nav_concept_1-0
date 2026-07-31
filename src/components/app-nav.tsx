@@ -134,7 +134,7 @@ function NavRow({ label, icon: Icon, active, collapsed, sub = false, small = fal
   return (
     <Tooltip>
       <TooltipTrigger render={<div />}>{el}</TooltipTrigger>
-      <TooltipContent side="right" className="bg-[oklch(0.22_0.18_278)] text-white border-transparent text-xs font-medium" arrowClassName="fill-[oklch(0.22_0.18_278)]">
+      <TooltipContent side="right" className="bg-sidebar text-sidebar-foreground border-transparent text-xs font-medium" arrowClassName="fill-sidebar">
         {label}
       </TooltipContent>
     </Tooltip>
@@ -228,7 +228,7 @@ function DesktopNav({ className, onCollapsedChange, assets, portfolios, selected
       className={cn(
         "fixed left-4 top-4 bottom-4 z-50",
         "flex flex-col rounded-2xl",
-        "bg-sidebar backdrop-blur-md border border-sidebar-border",
+        "bg-sidebar backdrop-blur-md border border-sidebar-border dark:border-transparent",
         "shadow-xl shadow-black/30 nav-glow",
         "transition-all duration-300 ease-in-out",
         collapsed ? "w-[56px] py-4 px-2" : "w-[216px] py-4 px-3",
@@ -268,7 +268,7 @@ function DesktopNav({ className, onCollapsedChange, assets, portfolios, selected
             <ChevronRight className={cn("h-3 w-3 transition-transform duration-300", !collapsed && "rotate-180")} />
           </button>
         </TooltipTrigger>
-        <TooltipContent side="right" className="bg-[oklch(0.22_0.18_278)] text-white border-transparent text-xs font-medium" arrowClassName="fill-[oklch(0.22_0.18_278)]">
+        <TooltipContent side="right" className="bg-sidebar text-sidebar-foreground border-transparent text-xs font-medium" arrowClassName="fill-sidebar">
           {collapsed ? "Expand" : "Collapse"}
         </TooltipContent>
       </Tooltip>
@@ -294,7 +294,7 @@ function DesktopNav({ className, onCollapsedChange, assets, portfolios, selected
                   <Building2 className="h-[18px] w-[18px] shrink-0" />
                 </div>
               </TooltipTrigger>
-              <TooltipContent side="right" className="bg-[oklch(0.22_0.18_278)] text-white border-transparent text-xs font-medium" arrowClassName="fill-[oklch(0.22_0.18_278)]">
+              <TooltipContent side="right" className="bg-sidebar text-sidebar-foreground border-transparent text-xs font-medium" arrowClassName="fill-sidebar">
                 {selectorLabel}
               </TooltipContent>
             </Tooltip>
