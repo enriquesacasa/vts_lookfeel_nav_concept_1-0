@@ -187,11 +187,20 @@ export default function App() {
   const [currentPage, setCurrentPage] = React.useState("dashboard")
   const [selectedDeal, setSelectedDeal] = React.useState<DealsPageDeal | null>(null)
   const [isDark, setIsDark] = React.useState(false)
+  const [isSingleScale, setIsSingleScale] = React.useState(false)
 
   const toggleDark = () => {
     setIsDark(d => {
       const next = !d
       document.documentElement.classList.toggle("dark", next)
+      return next
+    })
+  }
+
+  const toggleSingleScale = () => {
+    setIsSingleScale(s => {
+      const next = !s
+      document.documentElement.classList.toggle("single-scale", next)
       return next
     })
   }
@@ -216,7 +225,7 @@ export default function App() {
 
   const renderPage = (page: string) => {
     if (page === "avatar") {
-      return <ThemeShowcase isDark={isDark} onToggleDark={toggleDark} />
+      return <ThemeShowcase isDark={isDark} onToggleDark={toggleDark} isSingleScale={isSingleScale} onToggleSingleScale={toggleSingleScale} />
     }
 
     if (page === "ai") {

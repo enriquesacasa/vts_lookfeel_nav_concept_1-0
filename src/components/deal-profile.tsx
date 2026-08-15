@@ -3,6 +3,13 @@ import { cn, cardBase } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuCheckboxItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
+import {
   ChevronRight, Check, X, Clock, CheckCircle2, Circle,
   AlertCircle, Eye, FileText, MessageSquare,
   ArrowDownLeft, ArrowUpRight, Sparkle, Plus,
@@ -27,7 +34,7 @@ export function TenantLogoImage({ name }: { name: string }) {
   const [failed, setFailed] = React.useState(false)
   const src = TENANT_LOGO[name]
   const initials = name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()
-  const hue = name.split("").reduce((a, c) => a + c.charCodeAt(0), 0) % 360
+
   if (src && !failed) {
     return (
       <div className="h-full w-full bg-background flex items-center justify-center p-2">
@@ -36,8 +43,7 @@ export function TenantLogoImage({ name }: { name: string }) {
     )
   }
   return (
-    <div className="h-full w-full flex items-center justify-center text-white font-semibold text-lg"
-      style={{ background: `hsl(${hue} 55% 42%)` }}>
+    <div className="h-full w-full flex items-center justify-center text-primary-foreground font-semibold text-lg bg-primary/80">
       {initials}
     </div>
   )
@@ -263,7 +269,7 @@ function CashFlowTable({ varianceMode, unitMode, extraCols }: { varianceMode: Va
   const activeCols = [...COLS, ...EXTRA_SOURCES.filter(s => extraCols.includes(String(s.key)))]
   return (
     <div className="overflow-x-auto">
-      <table className="w-full text-sm border-separate border-spacing-0" style={{ minWidth: showVariance ? 1100 : 700 }}>
+      <table className={cn("w-full text-sm border-separate border-spacing-0", showVariance ? "min-w-[1100px]" : "min-w-[700px]")}>
         <thead>
           <tr>
             <th className="w-[160px] pb-0 pr-3 align-bottom" />
@@ -440,7 +446,6 @@ export function DealProfile({ deal, onBack }: DealProfileProps) {
   const [unitMode, setUnitMode] = React.useState<UnitMode>("total")
   const [approval, setApproval]  = React.useState<null | "approved" | "declined">(null)
   const [extraCols, setExtraCols] = React.useState<string[]>([])
-  const [addSourceOpen, setAddSourceOpen] = React.useState(false)
 
   function toggleSource(key: string) {
     setExtraCols(prev => prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key])
@@ -451,7 +456,7 @@ export function DealProfile({ deal, onBack }: DealProfileProps) {
 
       {/* Breadcrumb */}
       <nav className="flex items-center gap-1 text-xs text-muted-foreground px-1">
-        <button onClick={onBack} className="hover:text-foreground transition-colors">Deals</button>
+        <Button variant="ghost" size="sm" onClick={onBack} className="h-auto p-0 text-xs font-normal text-muted-foreground hover:text-foreground hover:bg-transparent">Deals</Button>
         <ChevronRight className="h-3 w-3 shrink-0" />
         <span className="text-foreground font-medium">{deal.tenant}</span>
       </nav>
@@ -576,83 +581,60 @@ export function DealProfile({ deal, onBack }: DealProfileProps) {
             <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-0.5">Comparison</p>
             <h2 className="text-xl font-medium text-foreground leading-none">Proposals</h2>
           </div>
-          <div className="relative ml-auto">
-            <Button
-              variant="outline"
-              size="sm"
-              className="gap-1.5 text-xs"
-              onClick={() => setAddSourceOpen(o => !o)}
-            >
-              <Plus className="h-3.5 w-3.5" /> Add Source
-            </Button>
-            {addSourceOpen && (
-              <div className="absolute right-0 top-full mt-1 z-20 bg-popover border border-border rounded-lg shadow-lg p-1 min-w-[180px]">
-                {EXTRA_SOURCES.map(src => {
-                  const active = extraCols.includes(String(src.key))
-                  return (
-                    <button
-                      key={String(src.key)}
-                      onClick={() => { toggleSource(String(src.key)); setAddSourceOpen(false) }}
-                      className={cn(
-                        "w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm text-left transition-colors",
-                        active
-                          ? "bg-primary/10 text-primary font-medium"
-                          : "text-foreground hover:bg-muted"
-                      )}
-                    >
-                      {active && <Check className="h-3.5 w-3.5 shrink-0" />}
-                      {!active && <span className="h-3.5 w-3.5 shrink-0" />}
-                      <div>
-                        <p className="leading-none">{src.label}</p>
-                        <p className="text-[10px] text-muted-foreground mt-0.5">{src.sub}</p>
-                      </div>
-                    </button>
-                  )
-                })}
-              </div>
-            )}
-          </div>
-          <div className="flex gap-1 rounded-lg bg-muted/60 dark:bg-white/6 p-1 shrink-0">
-              {([
-                { key: "total",    label: "Total $"   },
-                { key: "perSfYr",  label: "$/SF/Yr"   },
-                { key: "perSfMo",  label: "$/SF/Mo"   },
-              ] as { key: UnitMode; label: string }[]).map(opt => (
-                <button
-                  key={opt.key}
-                  onClick={() => setUnitMode(opt.key)}
-                  className={cn(
-                    "rounded-md px-3 py-1.5 text-xs font-medium transition-all",
-                    unitMode === opt.key
-                      ? "bg-primary text-primary-foreground shadow-sm"
-                      : "text-muted-foreground hover:bg-background/70 dark:hover:bg-white/8 hover:text-foreground"
-                  )}
+          <DropdownMenu>
+            <DropdownMenuTrigger>
+              <Button variant="outline" size="sm" className="gap-1.5 text-xs ml-auto">
+                <Plus className="h-3.5 w-3.5" /> Add Source
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="min-w-[180px]">
+              {EXTRA_SOURCES.map(src => (
+                <DropdownMenuCheckboxItem
+                  key={String(src.key)}
+                  checked={extraCols.includes(String(src.key))}
+                  onCheckedChange={() => toggleSource(String(src.key))}
                 >
-                  {opt.label}
-                </button>
+                  <div>
+                    <p className="leading-none">{src.label}</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">{src.sub}</p>
+                  </div>
+                </DropdownMenuCheckboxItem>
               ))}
-          </div>
-          <div className="flex gap-1 rounded-lg bg-muted/60 dark:bg-white/6 p-1 shrink-0">
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <ToggleGroup
+            type="single"
+            value={unitMode}
+            onValueChange={v => v && setUnitMode(v as UnitMode)}
+            className="bg-muted/60 dark:bg-white/6 p-1 rounded-lg gap-0"
+          >
             {([
-              { key: null,           label: "Δ Off"              },
-              { key: "budget",       label: "Δ vs Budget"      },
-              { key: "prevLease",    label: "Δ vs Prior Lease" },
-              { key: "prevProposal", label: "Δ vs Prev Proposal" },
-            ] as { key: VarianceMode; label: string }[]).map(opt => (
-              <button
-                key={String(opt.key)}
-                onClick={() => setVarianceMode(opt.key)}
-                className={cn(
-                  "rounded-md px-3 py-1.5 text-xs font-medium transition-all",
-                  varianceMode === opt.key
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-muted-foreground hover:bg-background/70 dark:hover:bg-white/8 hover:text-foreground"
-                )}
-              >
+              { value: "total",   label: "Total $"  },
+              { value: "perSfYr", label: "$/SF/Yr"  },
+              { value: "perSfMo", label: "$/SF/Mo"  },
+            ] as { value: UnitMode; label: string }[]).map(opt => (
+              <ToggleGroupItem key={opt.value} value={opt.value} size="sm" className="text-xs px-3 rounded-md data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:shadow-sm">
                 {opt.label}
-              </button>
+              </ToggleGroupItem>
             ))}
-          </div>
+          </ToggleGroup>
+          <ToggleGroup
+            type="single"
+            value={String(varianceMode)}
+            onValueChange={v => setVarianceMode(v === "null" ? null : v as VarianceMode)}
+            className="bg-muted/60 dark:bg-white/6 p-1 rounded-lg gap-0"
+          >
+            {([
+              { value: "null",          label: "Δ Off"             },
+              { value: "budget",        label: "Δ vs Budget"       },
+              { value: "prevLease",     label: "Δ vs Prior Lease"  },
+              { value: "prevProposal",  label: "Δ vs Prev Proposal"},
+            ]).map(opt => (
+              <ToggleGroupItem key={opt.value} value={opt.value} size="sm" className="text-xs px-3 rounded-md data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:shadow-sm">
+                {opt.label}
+              </ToggleGroupItem>
+            ))}
+          </ToggleGroup>
         </div>
         <CashFlowTable varianceMode={varianceMode} unitMode={unitMode} extraCols={extraCols} />
       </div>
@@ -673,7 +655,7 @@ export function DealProfile({ deal, onBack }: DealProfileProps) {
                   <ActivityDot type={event.type} />
                 </div>
                 {i < ACTIVITY.length - 1 && (
-                  <div className="w-px bg-border/40 my-1" style={{ minHeight: 20 }} />
+                  <div className="w-px bg-border/40 my-1 min-h-5" />
                 )}
               </div>
               <div className="pb-4 flex-1 min-w-0 pt-0.5">

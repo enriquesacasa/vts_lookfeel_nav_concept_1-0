@@ -119,7 +119,7 @@ function ChartTooltip({ active, payload, label }: any) {
       <div className="space-y-1">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-1.5">
-            <span className="h-2 w-2 rounded-sm shrink-0" style={{ background: "var(--color-primary)" }} />
+            <span className="h-2 w-2 rounded-sm shrink-0 bg-primary" />
             <span className="text-muted-foreground">Revenue</span>
           </div>
           <span className="font-medium tabular-nums">{rev != null ? fmtM(rev) : "—"} <span className="text-muted-foreground">/ {fmtM(d.revBudget)}</span></span>
@@ -236,7 +236,7 @@ const FinancialPerformance = React.forwardRef<HTMLDivElement, FinancialPerforman
         {/* Chart legend */}
         <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 mt-3 mb-6">
           <div className="flex items-center gap-1.5">
-            <span className="h-2.5 w-2.5 rounded-sm shrink-0" style={{ background: "var(--color-primary)" }} />
+            <span className="h-2.5 w-2.5 rounded-sm shrink-0 bg-primary" />
             <span className="text-sm text-muted-foreground">Revenue actual</span>
           </div>
           <div className="flex items-center gap-1.5">
@@ -251,7 +251,7 @@ const FinancialPerformance = React.forwardRef<HTMLDivElement, FinancialPerforman
             <span className="text-sm text-muted-foreground">Revenue projected</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="h-2.5 w-2.5 rounded-sm shrink-0" style={{ background: "var(--color-primary)", opacity: 0.22 }} />
+            <span className="h-2.5 w-2.5 rounded-sm shrink-0 bg-primary/20" />
             <span className="text-sm text-muted-foreground">Revenue budget</span>
           </div>
           <div className="flex items-center gap-1.5">

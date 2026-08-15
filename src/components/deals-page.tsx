@@ -4,6 +4,7 @@ import { cn, cardBase } from "@/lib/utils"
 const CardCtx = React.createContext(cardBase)
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import {
   Sparkle, Search, ChevronUp, ChevronDown, ChevronsUpDown,
   ChevronLeft, ChevronRight, AlertTriangle, Clock,
@@ -71,7 +72,7 @@ function TenantAvatar({ name }: { name: string }) {
   const [failed, setFailed] = React.useState(false)
   const src = TENANT_LOGO[name]
   const initials = name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()
-  const hue = name.split("").reduce((a, c) => a + c.charCodeAt(0), 0) % 360
+
   if (src && !failed) {
     return (
       <img
@@ -84,8 +85,7 @@ function TenantAvatar({ name }: { name: string }) {
   }
   return (
     <div
-      className="h-7 w-7 rounded-full flex items-center justify-center text-[10px] font-medium text-white shrink-0 ring-1 ring-border/30"
-      style={{ background: `hsl(${hue} 55% 45%)` }}
+      className="h-7 w-7 rounded-full flex items-center justify-center text-[10px] font-medium text-primary-foreground shrink-0 ring-1 ring-border/30 bg-primary/80"
     >
       {initials}
     </div>
@@ -222,7 +222,7 @@ function PipelineViz({ deals, className }: { deals: Deal[]; className?: string }
                 <div className="text-xs font-medium text-muted-foreground tabular-nums">{count > 0 ? count : ""}</div>
                 <div className="w-full relative px-1.5" style={{ height: `${Math.max(count / maxCount * 100, count > 0 ? 4 : 1)}%` }}>
                   <div className="w-full h-full rounded-t-md overflow-hidden flex flex-col-reverse">
-                    {active  > 0 && <div className="w-full" style={{ height: `${(active / count) * 100}%`, background: isExecuted ? "var(--color-primary)" : "var(--color-success)" }} />}
+                    {active  > 0 && <div className={cn("w-full", isExecuted ? "bg-primary" : "bg-success")} style={{ height: `${(active / count) * 100}%` }} />}
                     {stalled > 0 && <div className="w-full bg-warning/70"  style={{ height: `${(stalled / count) * 100}%` }} />}
                     {atRisk  > 0 && <div className="w-full bg-destructive/70" style={{ height: `${(atRisk / count) * 100}%` }} />}
                     {count === 0 && <div className="w-full h-1 bg-border rounded" />}
@@ -333,7 +333,7 @@ function KpiSummary({ deals }: { deals: Deal[] }) {
       {kpis.map(k => (
         <div key={k.label} className={cn("flex-1 min-w-[120px]", isV2 ? "px-6 py-5" : "px-5 py-4")}>
           <p className={cn("font-medium uppercase tracking-widest text-muted-foreground mb-1", isV2 ? "text-[11px]" : "text-[10px]")}>{k.label}</p>
-          <p className={cn("font-medium text-foreground", isV2 ? "text-3xl tracking-tight mt-1" : "text-2xl font-medium")}>{k.value}</p>
+          <p className={cn("font-medium text-foreground", isV2 ? "text-3xl mt-1" : "text-2xl font-medium")}>{k.value}</p>
           {k.label === "Need Attention" ? (
             <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
               <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium", STATUS_CONFIG["at-risk"].cls)}>{atRisk} At Risk</span>
@@ -427,22 +427,18 @@ export function DealsPage({ onDealClick }: { onDealClick?: (deal: Deal) => void 
       <div className={cn(card)}>
         {/* Status tabs + search */}
         <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
-          <div className="flex gap-1 rounded-lg bg-muted/60 dark:bg-white/6 p-1 overflow-x-auto">
+          <ToggleGroup
+            type="single"
+            value={statusFilter}
+            onValueChange={v => { if (v) { setStatusFilter(v as "all" | Status); setPage(1) } }}
+            className="bg-muted/60 dark:bg-white/6 p-1 rounded-lg gap-0 overflow-x-auto"
+          >
             {STATUS_TABS.map(tab => (
-              <button
-                key={tab.value}
-                onClick={() => { setStatusFilter(tab.value); setPage(1) }}
-                className={cn(
-                  "rounded-md px-3 py-1.5 text-xs font-medium transition-all whitespace-nowrap",
-                  statusFilter === tab.value
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-muted-foreground hover:bg-background/70 dark:hover:bg-white/8 hover:text-foreground"
-                )}
-              >
+              <ToggleGroupItem key={tab.value} value={tab.value} size="sm" className="text-xs px-3 whitespace-nowrap rounded-md data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:shadow-sm">
                 {tab.label}
-              </button>
+              </ToggleGroupItem>
             ))}
-          </div>
+          </ToggleGroup>
           <div className="flex items-center gap-2 sm:ml-auto">
             <div className="relative">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
@@ -453,30 +449,17 @@ export function DealsPage({ onDealClick }: { onDealClick?: (deal: Deal) => void 
                 className="pl-8 h-8 text-sm w-48"
               />
             </div>
-            {/* Stage filter — styled to match V1 */}
-            <div className="flex gap-1 rounded-lg bg-muted/60 dark:bg-white/6 p-1">
-              <button
-                onClick={() => { setStageFilter("all"); setPage(1) }}
-                className={cn(
-                  "rounded-md px-3 py-1.5 text-xs font-medium transition-all whitespace-nowrap",
-                  stageFilter === "all"
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-muted-foreground hover:bg-background/70 dark:hover:bg-white/8 hover:text-foreground"
-                )}
-              >All stages</button>
+            <ToggleGroup
+              type="single"
+              value={stageFilter}
+              onValueChange={v => { if (v) { setStageFilter(v as "all" | Stage); setPage(1) } }}
+              className="bg-muted/60 dark:bg-white/6 p-1 rounded-lg gap-0"
+            >
+              <ToggleGroupItem value="all" size="sm" className="text-xs px-3 whitespace-nowrap rounded-md data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:shadow-sm">All stages</ToggleGroupItem>
               {STAGES.filter(s => DEALS.some(d => d.stage === s)).map(s => (
-                <button
-                  key={s}
-                  onClick={() => { setStageFilter(s); setPage(1) }}
-                  className={cn(
-                    "rounded-md px-2.5 py-1.5 text-xs font-medium transition-all whitespace-nowrap",
-                    stageFilter === s
-                      ? "bg-primary text-white shadow-sm"
-                      : "text-muted-foreground hover:bg-background/70 dark:hover:bg-white/8 hover:text-foreground"
-                  )}
-                >{s}</button>
+                <ToggleGroupItem key={s} value={s} size="sm" className="text-xs px-2.5 whitespace-nowrap rounded-md data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:shadow-sm">{s}</ToggleGroupItem>
               ))}
-            </div>
+            </ToggleGroup>
           </div>
         </div>
 
