@@ -220,7 +220,7 @@ html.single-scale {
     }
     .dark body {
         background:
-            radial-gradient(ellipse 160% 120% at 0% 0%, oklch(0.61 0.10 278 / 30%) 0%, transparent 75%),
+            radial-gradient(ellipse 160% 120% at 0% 0%, oklch(0.49 0.036 278 / 30%) 0%, transparent 75%),
             oklch(0.08 0.002 258);
     }
     html {
