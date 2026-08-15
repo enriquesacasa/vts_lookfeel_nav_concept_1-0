@@ -1,5 +1,6 @@
 import * as React from "react"
 import { cn, cardBase } from "@/lib/utils"
+import { Progress } from "@/components/ui/progress"
 import { TrendingUp, TrendingDown, Minus } from "lucide-react"
 
 export interface MoveEvent {
@@ -64,9 +65,7 @@ const OccupancyCard = React.forwardRef<HTMLDivElement, OccupancyCardProps>(
             </div>
           </div>
           {/* Bar */}
-          <div className="h-2 w-full rounded-full bg-muted/60 overflow-hidden">
-            <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${occupiedPct}%` }} />
-          </div>
+          <Progress value={occupiedPct} className="h-2" />
           <div className="flex justify-between mt-1.5 text-[10px] text-muted-foreground tabular-nums">
             <span>{fmt(occupiedSf)} sf occupied</span>
             <span>{fmt(vacantSf)} sf vacant</span>

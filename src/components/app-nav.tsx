@@ -1,5 +1,6 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { Separator } from "@/components/ui/separator"
 import { useIsMobile } from "@/hooks/use-mobile"
@@ -260,13 +261,14 @@ function DesktopNav({ className, onCollapsedChange, assets, portfolios, selected
       {/* Expand/collapse toggle */}
       <Tooltip>
         <TooltipTrigger render={<div className="absolute -right-3.5 top-4" />}>
-          <button
+          <Button
+            variant="ghost" size="icon"
             onClick={() => toggle(!collapsed)}
             aria-label={collapsed ? "Expand navigation" : "Collapse navigation"}
-            className="flex items-center justify-center rounded-full p-1 text-sidebar-foreground hover:bg-sidebar-accent/60 transition-colors bg-sidebar border border-white/30 shadow-md"
+            className="h-6 w-6 rounded-full text-sidebar-foreground hover:bg-sidebar-accent/60 bg-sidebar border border-sidebar-border shadow-md"
           >
             <ChevronRight className={cn("h-3 w-3 transition-transform duration-300", !collapsed && "rotate-180")} />
-          </button>
+          </Button>
         </TooltipTrigger>
         <TooltipContent side="right" className="bg-sidebar text-sidebar-foreground border-transparent text-xs font-medium" arrowClassName="fill-sidebar">
           {collapsed ? "Expand" : "Collapse"}
@@ -472,13 +474,13 @@ function DesktopNav({ className, onCollapsedChange, assets, portfolios, selected
                     {item.icon && <item.icon className="h-[18px] w-[18px] shrink-0" />}
                     <span className="truncate">{item.label}</span>
                   </div>
-                  <button
+                  <Button variant="ghost" size="icon"
                     onClick={() => toggleSection(item.id)}
-                    className="pr-2 text-sidebar-foreground/60 hover:text-sidebar-foreground transition-colors"
+                    className="h-6 w-6 mr-1 text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-transparent shrink-0"
                     aria-label={isOpen ? "Collapse section" : "Expand section"}
                   >
                     <ChevronRight className={cn("h-3 w-3 transition-transform duration-200", isOpen && "rotate-90")} />
-                  </button>
+                  </Button>
                 </div>
               ) : (
                 <NavRow
@@ -605,10 +607,10 @@ function MobileNav({ onLogoClick, onNavItemClick, activePage, assets, portfolios
     <>
       <header className="fixed top-0 inset-x-0 z-50 bg-sidebar border-b border-sidebar-border flex items-center justify-between px-4 h-14">
         <span onClick={onLogoClick} className="cursor-pointer"><VTSLogo /></span>
-        <button onClick={() => setSheetOpen(true)} aria-label="Open menu"
-          className="flex items-center justify-center h-9 w-9 rounded-xl text-sidebar-foreground/70 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground transition-colors">
+        <Button variant="ghost" size="icon" onClick={() => setSheetOpen(true)} aria-label="Open menu"
+          className="h-9 w-9 rounded-xl text-sidebar-foreground/70 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground">
           <Menu className="h-5 w-5" />
-        </button>
+        </Button>
       </header>
 
       {sheetOpen && <div className="fixed inset-0 z-50 bg-black/40" onClick={() => setSheetOpen(false)} />}
@@ -620,10 +622,10 @@ function MobileNav({ onLogoClick, onNavItemClick, activePage, assets, portfolios
         {/* Drawer header */}
         <div className="flex items-center justify-between px-4 h-14 border-b border-sidebar-border shrink-0">
           <VTSLogo />
-          <button onClick={() => setSheetOpen(false)}
-            className="flex items-center justify-center h-8 w-8 rounded-xl text-sidebar-foreground/50 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground transition-colors">
+          <Button variant="ghost" size="icon" onClick={() => setSheetOpen(false)}
+            className="h-8 w-8 rounded-xl text-sidebar-foreground/50 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground">
             <XIcon className="h-4 w-4" />
-          </button>
+          </Button>
         </div>
 
         <div className="flex flex-col flex-1 overflow-hidden px-3 py-3">
@@ -741,11 +743,12 @@ function MobileNav({ onLogoClick, onNavItemClick, activePage, assets, portfolios
                         {item.icon && <item.icon className="h-[18px] w-[18px] shrink-0" />}
                         <span className="truncate">{item.label}</span>
                       </div>
-                      <button onClick={() => toggleSection(item.id)}
-                        className="pr-2 text-sidebar-foreground/60 hover:text-sidebar-foreground transition-colors"
+                      <Button variant="ghost" size="icon"
+                        onClick={() => toggleSection(item.id)}
+                        className="h-6 w-6 mr-1 text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-transparent shrink-0"
                         aria-label={isOpen ? "Collapse" : "Expand"}>
                         <ChevronRight className={cn("h-3 w-3 transition-transform duration-200", isOpen && "rotate-90")} />
-                      </button>
+                      </Button>
                     </div>
                   ) : (
                     <NavRow {...item} active={active === item.id} collapsed={false} onClick={() => { handleSelect(item.id); setOpenSections(new Set()) }} />

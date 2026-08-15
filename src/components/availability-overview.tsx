@@ -68,12 +68,12 @@ const AvailabilityOverview = React.forwardRef<HTMLDivElement, AvailabilityOvervi
             <div>
               <div className="flex items-center justify-between mb-0.5">
                 <div className="flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full shrink-0" style={{ background: "var(--color-primary)" }} />
+                  <span className="h-2 w-2 rounded-full shrink-0 bg-primary" />
                   <span className="text-xs text-muted-foreground">Occupied</span>
                 </div>
                 <span className="text-sm font-medium text-muted-foreground">{occupiedPct}%</span>
               </div>
-              <p className="text-xl font-medium pl-4 whitespace-nowrap" style={{ color: "var(--color-primary)" }}>
+              <p className="text-xl font-medium pl-4 whitespace-nowrap text-primary">
                 {fmt(occupiedSf)}<span className="text-xs font-normal text-muted-foreground ml-1">sf</span>
               </p>
             </div>

@@ -1,6 +1,7 @@
 import * as React from "react"
 import { cn, cardBase } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { ChevronUp, ChevronDown, ChevronsUpDown, Sparkle } from "lucide-react"
 
@@ -138,22 +139,16 @@ const CriticalDates = React.forwardRef<HTMLDivElement, CriticalDatesProps>(
         </div>
 
         {/* Toggle bar */}
-        <div className="flex gap-1 rounded-lg bg-muted/60 dark:bg-white/6 p-1">
+        <ToggleGroup type="single" value={active}
+          onValueChange={v => { if (v) setActive(v as DateCategory) }}
+          className="bg-muted/60 dark:bg-white/6 p-1 rounded-lg gap-0 w-full">
           {TABS.map(tab => (
-            <button
-              key={tab.value}
-              onClick={() => setActive(tab.value)}
-              className={cn(
-                "flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-all",
-                active === tab.value
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "text-muted-foreground hover:bg-background/70 dark:hover:bg-white/8 hover:text-foreground"
-              )}
-            >
+            <ToggleGroupItem key={tab.value} value={tab.value} size="sm"
+              className="flex-1 text-xs px-3 rounded-md data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:shadow-sm">
               {tab.label}
-            </button>
+            </ToggleGroupItem>
           ))}
-        </div>
+        </ToggleGroup>
 
         {/* Table — scrolls within card, never causes page scroll */}
         <div className="overflow-x-auto">

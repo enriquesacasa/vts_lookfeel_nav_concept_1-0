@@ -109,8 +109,8 @@ const AGENT_TYPES: AgentType[] = [
 ]
 
 const STATUS_CONFIG = {
-  complete: { icon: CheckCircle2, color: "text-emerald-500", label: "Complete" },
-  running:  { icon: Loader2,      color: "text-violet-500",           label: "Running"  },
+  complete: { icon: CheckCircle2, color: "text-success",     label: "Complete" },
+  running:  { icon: Loader2,      color: "text-primary",              label: "Running"  },
   pending:  { icon: Clock,        color: "text-muted-foreground", label: "Queued" },
 }
 
@@ -149,12 +149,10 @@ export function AgentsPage({ className }: AgentsPageProps) {
             placeholder="Ask VTS Agents anything about your portfolio…"
             className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
           />
-          <button className={cn(
-            "shrink-0 flex items-center justify-center h-7 w-7 rounded-lg transition-all duration-150",
-            query ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
-          )}>
+          <Button size="icon" variant="ghost"
+            className={cn("shrink-0 h-7 w-7 rounded-lg", query ? "bg-primary text-primary-foreground hover:bg-primary/90" : "bg-muted text-muted-foreground")}>
             <ArrowRight className="h-3.5 w-3.5" />
-          </button>
+          </Button>
         </div>
         <div className="flex flex-wrap gap-2 mt-3">
           {SUGGESTED.map(s => (
@@ -172,17 +170,17 @@ export function AgentsPage({ className }: AgentsPageProps) {
       </div>
 
       {/* Running agent banner */}
-      <div className={cn(cardBase, "bg-[oklch(0.22_0.18_278)] border-transparent flex items-center gap-4")}>
+      <div className={cn(cardBase, "bg-sidebar border-transparent flex items-center gap-4")}>
         <Loader2 className="h-5 w-5 text-violet-400 animate-spin shrink-0" />
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-white">1 agent running</p>
-          <p className="text-sm text-white/60 truncate">Northeast Corridor Portfolio Q3 NOI improvement opportunities</p>
+          <p className="text-sm font-medium text-sidebar-foreground">1 agent running</p>
+          <p className="text-sm text-sidebar-foreground/60 truncate">Northeast Corridor Portfolio Q3 NOI improvement opportunities</p>
         </div>
-        <Button variant="outline" size="sm" className="shrink-0 text-white/80 border-white/25 bg-transparent hover:bg-white/10 hover:text-white">
+        <Button variant="outline" size="sm" className="shrink-0 text-sidebar-foreground/80 border-sidebar-border bg-transparent hover:bg-white/10 hover:text-white">
           <AlertTriangle className="h-3.5 w-3.5 mr-1.5" />
           View progress
         </Button>
-        <Button variant="outline" size="sm" className="shrink-0 text-white/80 border-white/25 bg-transparent hover:bg-white/10 hover:text-white">
+        <Button variant="outline" size="sm" className="shrink-0 text-sidebar-foreground/80 border-sidebar-border bg-transparent hover:bg-white/10 hover:text-white">
           <FileText className="h-3.5 w-3.5 mr-1.5" />
           All agents
         </Button>
