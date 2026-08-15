@@ -119,10 +119,10 @@
     --foreground: oklch(0.95 0.005 258);
 
     /* Cards barely elevated above background */
-    --card: oklch(0.18 0.005 258);
+    --card: oklch(0.10 0.002 258);
     --card-foreground: oklch(0.95 0.005 258);
 
-    --popover: oklch(0.18 0.005 258);
+    --popover: oklch(0.10 0.002 258);
     --popover-foreground: oklch(0.95 0.005 258);
 
     /* Dark gray for non-highlighted chart bars and secondary surfaces */
