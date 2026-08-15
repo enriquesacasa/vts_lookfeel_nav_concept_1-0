@@ -296,7 +296,7 @@ export default function App() {
       ? { ...headerProps, name: (
           <span>
             <span className="font-semibold">{headerProps.name}</span>{" "}
-            <span className="text-muted-foreground font-light whitespace-nowrap"> | {pageLabel}</span>
+            <span className="text-primary font-semibold whitespace-nowrap">| {pageLabel}</span>
           </span>
         )}
       : headerProps

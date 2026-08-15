@@ -41,7 +41,7 @@ const BuildingHeader = React.forwardRef<HTMLDivElement, BuildingHeaderProps>(
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-medium text-foreground leading-tight mb-1.5">
             {name}
           </h1>
-          <p className="text-sm text-foreground/60">{address}</p>
+          <p className="text-sm text-foreground">{address}</p>
           {badges && <div className="flex flex-wrap gap-1.5 mt-2">{badges}</div>}
         </div>
         <div className="flex items-center gap-2 shrink-0">
