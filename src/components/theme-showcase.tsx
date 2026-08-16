@@ -20,7 +20,7 @@ const COLOR_SECTIONS = [
     title: "Surfaces",
     tokens: [
       { name: "Background", role: "Page canvas",    var: "--background", description: "The base page surface. In light mode it carries a subtle indigo ambient gradient. In dark mode, a faint lavender radial bloom over near-black." },
-      { name: "Card",        role: "Raised surface", var: "--card",       description: "Cards and panels one step above the page. In the app these also use bg-white/70 dark:bg-white/8 with backdrop-blur-md for a glass layer." },
+      { name: "Card",        role: "Raised surface", var: "--card",       description: "Cards and panels one step above the page. Rendered as bg-card/70 with backdrop-blur-md in both light and dark modes." },
       { name: "Muted",       role: "Subtle fill",    var: "--muted",      description: "Table headers, input backgrounds, and any region that needs a quieter fill than card." },
       { name: "Secondary",   role: "Control surface",var: "--secondary",  description: "Secondary button backgrounds and non-primary interactive surfaces." },
     ],
@@ -159,7 +159,7 @@ function MiniPanel({ mode }: { mode: "light" | "dark" }) {
         {/* Main content */}
         <div className="flex-1 flex flex-col min-w-0 bg-background">
           {/* Building header */}
-          <div className="px-4 py-2.5 border-b border-border bg-white/70 dark:bg-white/8 backdrop-blur-md flex items-center justify-between">
+          <div className="px-4 py-2.5 border-b border-border bg-card/70 backdrop-blur-md flex items-center justify-between">
             <div>
               <p className="text-[9px] uppercase tracking-widest text-muted-foreground font-medium">Built 2017 · Office</p>
               <p className="font-bold text-[13px] text-foreground leading-tight">VTS Tower Headquarters</p>
@@ -372,7 +372,7 @@ export function ThemeShowcase({ isDark, onToggleDark, isSingleScale, onToggleSin
         <SectionHeader
           kicker="05 — Elevation"
           title="Flat by default. Floating on purpose."
-          description="Most of this system stays flat — surfaces separate using value contrast alone. Cards in the app use bg-white/70 dark:bg-white/8 with backdrop-blur-md for a real glass layer. Elevation exists for one job: telling you something above the page deserves attention."
+          description="Most of this system stays flat — surfaces separate using value contrast alone. Cards in the app use bg-card/70 with backdrop-blur-md for a glass layer in both modes. Elevation exists for one job: telling you something above the page deserves attention."
         />
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           <div>
@@ -382,9 +382,9 @@ export function ThemeShowcase({ isDark, onToggleDark, isSingleScale, onToggleSin
             <p className="text-xs text-muted-foreground leading-relaxed">The page canvas. Separation from cards comes from a one-step value difference, never a shadow.</p>
           </div>
           <div>
-            <div className="h-16 rounded-xl mb-4 bg-white/70 dark:bg-white/8 backdrop-blur-md border border-border shadow-sm" />
+            <div className="h-16 rounded-xl mb-4 bg-card/70 backdrop-blur-md border border-border shadow-sm" />
             <p className="text-sm font-semibold text-foreground mb-1">Raised — Glass</p>
-            <p className="font-mono text-[10px] text-muted-foreground mb-2">bg-white/70 dark:bg-white/8 backdrop-blur-md</p>
+            <p className="font-mono text-[10px] text-muted-foreground mb-2">bg-card/70 backdrop-blur-md</p>
             <p className="text-xs text-muted-foreground leading-relaxed">The actual card pattern used across the app — frosted glass, not a flat token. Consistent across stat tiles, building headers, and content cards.</p>
           </div>
           <div>
@@ -509,7 +509,7 @@ export function ThemeShowcase({ isDark, onToggleDark, isSingleScale, onToggleSin
             <div className="p-5 grid grid-cols-3 gap-3">
               {[
                 { label: "Background", cls: "bg-background border border-border" },
-                { label: "Card",       cls: "bg-white/70 dark:bg-white/8 backdrop-blur-md border border-border shadow-sm" },
+                { label: "Card",       cls: "bg-card/70 backdrop-blur-md border border-border shadow-sm" },
                 { label: "Muted",      cls: "bg-muted border border-border" },
               ].map(s => (
                 <div key={s.label} className={cn("rounded-xl p-3", s.cls)}>
@@ -520,7 +520,7 @@ export function ThemeShowcase({ isDark, onToggleDark, isSingleScale, onToggleSin
               ))}
             </div>
             <div className="px-5 pb-4 text-xs text-muted-foreground leading-relaxed border-t border-border pt-3">
-              The Card surface in this app uses the glass pattern (bg-white/70 dark:bg-white/8 backdrop-blur-md), not a flat --card token fill.
+              The Card surface in this app uses bg-card/70 backdrop-blur-md in both light and dark modes.
             </div>
           </div>
 

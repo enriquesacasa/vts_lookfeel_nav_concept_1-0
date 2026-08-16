@@ -56,7 +56,7 @@ const BuildingHeader = React.forwardRef<HTMLDivElement, BuildingHeaderProps>(
       </div>
 
       {/* Stats row */}
-      <div className="flex flex-wrap divide-x divide-border/60 bg-white/70 dark:bg-white/8 backdrop-blur-md">
+      <div className="flex flex-wrap divide-x divide-border/60 bg-card/70 backdrop-blur-md">
         {stats.map(({ label, value, accent }) => (
           <div key={label} className="flex-1 min-w-[110px] px-4 py-4">
             <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">
