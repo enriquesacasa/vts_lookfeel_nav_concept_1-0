@@ -143,9 +143,7 @@ const KPIS = [
   { label: "In-place NOI",           value: "$29.1M",    subtitle: "+9.4% vs budget",  trend: "up"   as const },
   { label: "Revenue at risk (12mo)", value: "$234K/mo",  subtitle: "-$18K vs budget",  trend: "down" as const },
   { label: "Pipeline upside",        value: "+$89K/mo",  subtitle: "+$12K vs budget",  trend: "up"   as const },
-  { label: "Managed by",             value: "CBRE" },
-  { label: "Leased by",              value: "JLL" },
-  { label: "Owned by",               value: "View The Space" },
+  { label: "WALT",                   value: "4.2 yrs",   subtitle: "Weighted avg lease" },
 ]
 
 const ACTIVE_DEALS: Deal[] = [
