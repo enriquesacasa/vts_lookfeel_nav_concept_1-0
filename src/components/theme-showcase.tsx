@@ -1,10 +1,10 @@
 import * as React from "react"
-import { Sun, Moon, Check, ArrowRight, ChevronRight, Palette } from "lucide-react"
+import { Sun, Moon, Check, ArrowRight, ChevronRight, Palette, CheckCircle2, Loader2, Clock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
-import { cn } from "@/lib/utils"
+import { cn, cardBase } from "@/lib/utils"
 
 // ── Data ─────────────────────────────────────────────────────────────────────
 
@@ -128,16 +128,16 @@ function MiniPanel({ mode }: { mode: "light" | "dark" }) {
     )}>
       <div className="flex min-h-[260px]">
         {/* Sidebar — always dark, matching the real nav */}
-        <div className="w-32 shrink-0 flex flex-col bg-sidebar border-r border-sidebar-border">
+        <div className="w-32 shrink-0 flex flex-col bg-sidebar border-r border-sidebar-foreground/80">
           {/* Logo */}
-          <div className="flex items-center gap-1.5 px-3 py-3 border-b border-sidebar-border">
+          <div className="flex items-center gap-1.5 px-3 py-3 border-b border-sidebar-foreground/80">
             <span className="w-4 h-4 rounded bg-sidebar-primary/20 flex items-center justify-center shrink-0">
               <span className="w-2 h-2 rounded-sm bg-sidebar-primary block" />
             </span>
             <span className="text-[11px] font-bold text-sidebar-foreground">VTS</span>
           </div>
           {/* Building switcher */}
-          <div className="px-2 py-2 border-b border-sidebar-border">
+          <div className="px-2 py-2 border-b border-sidebar-foreground/80">
             <div className="flex items-center gap-1.5 px-2 py-1.5 rounded-md bg-sidebar-accent">
               <span className="w-4 h-4 rounded bg-muted-foreground/20 shrink-0" />
               <span className="text-[9px] font-medium text-sidebar-foreground leading-tight truncate">VTS Tower HQ</span>
@@ -242,7 +242,7 @@ export function ThemeShowcase({ isDark, onToggleDark, isSingleScale, onToggleSin
               onClick={onToggleDark}
               className={cn(
                 "shrink-0 rounded-full gap-2",
-                isDark && "bg-sidebar text-sidebar-foreground border-sidebar-border hover:bg-sidebar-accent"
+                isDark && "bg-sidebar text-sidebar-foreground border-sidebar-foreground/80 hover:bg-sidebar-accent"
               )}
             >
               {isDark ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
@@ -253,7 +253,7 @@ export function ThemeShowcase({ isDark, onToggleDark, isSingleScale, onToggleSin
               onClick={onToggleSingleScale}
               className={cn(
                 "shrink-0 rounded-full gap-2",
-                isDark && "bg-sidebar text-sidebar-foreground border-sidebar-border hover:bg-sidebar-accent"
+                isDark && "bg-sidebar text-sidebar-foreground border-sidebar-foreground/80 hover:bg-sidebar-accent"
               )}
             >
               <Palette className="h-4 w-4" />
@@ -262,7 +262,7 @@ export function ThemeShowcase({ isDark, onToggleDark, isSingleScale, onToggleSin
           </div>
         </div>
         <h1 className="text-[60px] font-semibold tracking-[-0.02em] leading-[1.08] text-foreground mb-5 max-w-[780px]">
-          Designed for clarity.<br /><span className="text-primary">Built for action.</span>
+          Designed for clarity.<br /><span className="text-primary">Built for speed.</span><br />Powered by agents.
         </h1>
         <p className="text-[19px] text-muted-foreground leading-relaxed max-w-[640px]">
           A foundation for VTS Reimagined, combining a refined indigo palette, Geist throughout, and consistent UI patterns. Built to make information clearer, actions easier to find, and AI and agents feel native to how CRE work gets done.
@@ -368,7 +368,7 @@ export function ThemeShowcase({ isDark, onToggleDark, isSingleScale, onToggleSin
             onClick={() => setPanelDark(d => !d)}
             className={cn(
               "rounded-full gap-2",
-              panelDark && "bg-sidebar text-sidebar-foreground border-sidebar-border hover:bg-sidebar-accent"
+              panelDark && "bg-sidebar text-sidebar-foreground border-sidebar-foreground/80 hover:bg-sidebar-accent"
             )}
           >
             {panelDark ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
@@ -578,6 +578,55 @@ export function ThemeShowcase({ isDark, onToggleDark, isSingleScale, onToggleSin
             <p>The active item is marked by the sidebar-accent fill and sidebar-primary dot — a quiet signal, not a jarring highlight.</p>
             <p>VTS Agents gets the sidebar-primary text color at rest, distinguishing it from standard nav items without requiring a separate accent system.</p>
             <p className="text-xs font-mono text-muted-foreground/70">--sidebar-primary is brighter than --primary so it reads on the dark nav surface without a separate dark-mode override.</p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <SectionHeader
+          kicker="09 — AI + Agents"
+          title="Intelligence belongs in the workflow."
+          description="AI is part of the system, not a separate visual layer. Agents use the same components, surfaces, states, and interaction patterns as the rest of VTS."
+        />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div className="space-y-3">
+            {/* Running agent banner */}
+            <div className={cn(cardBase, "bg-sidebar border-transparent flex items-center gap-4")}>
+              <Loader2 className="h-5 w-5 text-violet-400 animate-spin shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-sidebar-foreground">1 agent running</p>
+                <p className="text-xs text-sidebar-foreground/60 truncate">Northeast Corridor Portfolio · Q3 NOI improvement</p>
+              </div>
+              <Button variant="outline" size="sm" className="shrink-0 text-sidebar-foreground border-current bg-transparent hover:bg-white/10 text-xs">
+                View
+              </Button>
+            </div>
+            {/* Recent runs */}
+            <div className={cn(cardBase, "space-y-1.5")}>
+              <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-3">Recent Runs</p>
+              {[
+                { icon: CheckCircle2, color: "text-success", title: "12-month lease expiry risk analysis", meta: "VTS Tower · Lease risk · 2 min ago", summary: "3 leases totaling $234K/mo expire before Oct 2026." },
+                { icon: CheckCircle2, color: "text-success", title: "Vacancy outreach plan for Suite 2100", meta: "VTS Tower · Leasing · 14 min ago", summary: "12 prospects identified. Draft outreach ready." },
+                { icon: Clock,        color: "text-muted-foreground", title: "KPMG Suite 3400 renewal strategy", meta: "VTS Tower · Lease strategy · Queued", summary: null },
+              ].map(({ icon: Icon, color, title, meta, summary }) => (
+                <div key={title} className="flex items-start gap-3 rounded-xl border border-border/60 px-4 py-3.5 hover:bg-muted/50 hover:border-border cursor-pointer transition-all group">
+                  <Icon className={cn("h-4 w-4 mt-0.5 shrink-0", color)} />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="text-sm font-medium text-foreground leading-snug group-hover:text-primary transition-colors">{title}</p>
+                      <ChevronRight className="h-3.5 w-3.5 text-muted-foreground shrink-0 mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-0.5">{meta}</p>
+                    {summary && <p className="text-xs text-muted-foreground mt-1 leading-snug">{summary}</p>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="text-sm text-muted-foreground leading-relaxed space-y-3 self-center">
+            <p>They can surface what needs attention, bring context together, recommend next steps, and take action — while keeping the user oriented and in control.</p>
+            <p>Agent output lives in cards, rows, and panels — not in modals or overlays that break the flow. The visual weight of an agent action matches the weight of a human one.</p>
+            <p className="text-xs font-mono text-muted-foreground/70">Same border-border/60 rows, same cardBase surface, same hover states as every other list in VTS.</p>
           </div>
         </div>
       </section>

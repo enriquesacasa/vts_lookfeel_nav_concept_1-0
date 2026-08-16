@@ -176,11 +176,11 @@ export function AgentsPage({ className }: AgentsPageProps) {
           <p className="text-sm font-medium text-sidebar-foreground">1 agent running</p>
           <p className="text-sm text-sidebar-foreground/60 truncate">Northeast Corridor Portfolio Q3 NOI improvement opportunities</p>
         </div>
-        <Button variant="outline" size="sm" className="shrink-0 text-sidebar-foreground/80 border-sidebar-border bg-transparent hover:bg-white/10 hover:text-white">
+        <Button variant="outline" size="sm" className="shrink-0 text-sidebar-foreground/85 border-current bg-transparent hover:bg-white/10">
           <AlertTriangle className="h-3.5 w-3.5 mr-1.5" />
           View progress
         </Button>
-        <Button variant="outline" size="sm" className="shrink-0 text-sidebar-foreground/80 border-sidebar-border bg-transparent hover:bg-white/10 hover:text-white">
+        <Button variant="outline" size="sm" className="shrink-0 text-sidebar-foreground/85 border-current bg-transparent hover:bg-white/10">
           <FileText className="h-3.5 w-3.5 mr-1.5" />
           All agents
         </Button>
