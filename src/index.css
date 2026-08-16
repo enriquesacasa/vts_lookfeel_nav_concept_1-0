@@ -60,7 +60,7 @@
 /* ─── VTS Light ─────────────────────────────────────────────────────────── */
 :root {
     /* Muted periwinkle — matches image's chart accent (#9090D4 lightened for light bg) */
-    --primary: oklch(0.50 0.14 278);
+    --primary: oklch(0.50 0.182 278);
     --primary-foreground: oklch(1 0 0);
 
     --background: oklch(0.965 0.005 258);
@@ -112,7 +112,7 @@
 /* Near-pure-black bg, muted periwinkle accent matching image (#9090D4)      */
 .dark {
     /* Muted periwinkle — the soft lavender used for highlighted bars/metrics */
-    --primary: oklch(0.67 0.13 278);
+    --primary: oklch(0.737 0.169 278);
     --primary-foreground: oklch(0.13 0.005 258);
 
     --background: oklch(0.13 0.005 258);

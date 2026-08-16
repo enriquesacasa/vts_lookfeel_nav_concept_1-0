@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Sun, Moon, Check, ArrowRight, ChevronRight } from "lucide-react"
+import { Sun, Moon, Check, ArrowRight, ChevronRight, Palette } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
@@ -224,29 +224,42 @@ export function ThemeShowcase({ isDark, onToggleDark, isSingleScale, onToggleSin
         "fixed inset-0 -z-10",
         isDark ? "bg-[oklch(0.08_0.002_258)]" : "bg-[oklch(0.99_0.01_275)]"
       )} />
-    <div className="max-w-6xl mx-auto py-[72px] px-1 space-y-[72px]">
+    <div className="max-w-6xl mx-auto pt-10 pb-[72px] px-1 space-y-[72px]">
 
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <div className="pb-[72px] border-b border-border">
-        <div className="flex items-center justify-between mb-6">
-          <button
-            onClick={onToggleSingleScale}
-            className="inline-flex items-center gap-2 font-mono text-[12px] font-medium text-primary border border-primary/30 bg-primary/8 rounded-full px-3 py-1.5 uppercase tracking-[0.06em] cursor-pointer hover:bg-primary/14 transition-colors"
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
-            {isSingleScale ? "Geist, Single Scale" : "Geist, Dual Scales"}
-          </button>
-          <Button
-            variant={isDark ? "outline" : "secondary"}
-            onClick={onToggleDark}
-            className={cn(
-              "shrink-0 rounded-full gap-2",
-              isDark && "bg-sidebar text-sidebar-foreground border-sidebar-border hover:bg-sidebar-accent"
-            )}
-          >
-            {isDark ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
-            {isDark ? "Dark Mode" : "Light Mode"}
-          </Button>
+        <div className="flex items-start justify-between mb-6">
+          <svg width="555" height="160" viewBox="0 0 555 160" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-10 w-auto text-foreground">
+            <path d="M262.948 37.923L282.271 99.5913L301.591 37.923H321.723L293.26 121.804H270.12L241.889 37.923H262.948Z" fill="currentColor"/>
+            <path d="M378.745 55.2793H351.903V37.923H425.601V55.2793H398.645V121.804H378.745V55.2793Z" fill="currentColor"/>
+            <path d="M491.06 52.3862C483.422 52.3862 477.756 55.2794 477.756 60.4835C477.756 64.6518 481.688 67.6581 487.475 68.9305L498.928 71.2439C512.464 74.021 529.588 78.1862 529.588 95.7721C529.588 113.358 511.885 123.31 494.416 123.31C472.895 123.31 458.78 112.549 455.771 94.4997H475.441C477.639 103.293 484.581 107.342 494.879 107.342C501.588 107.342 509.224 105.144 509.224 98.2023C509.224 92.7658 502.747 90.1023 493.604 88.1371L483.422 86.0533C469.77 83.1633 457.392 76.6841 457.392 61.6418C457.392 44.519 475.788 36.5351 492.217 36.5351C508.646 36.5351 524.265 43.7095 527.158 62.2215H507.604C505.636 55.9721 499.506 52.3862 491.06 52.3862Z" fill="currentColor"/>
+            <path d="M108.553 46.9088L136.165 65.2593L156.596 51.7396L108.553 19.812L108.485 19.8573L60.427 51.7926L80.8551 65.3125L108.485 46.953L108.553 46.9088Z" fill="currentColor"/>
+            <path d="M108.47 105.303L25.0786 53.0043V87.8887L108.47 140.187L108.485 140.179L191.889 87.8741V52.9871L108.485 105.293L108.47 105.303Z" fill="currentColor"/>
+          </svg>
+          <div className="flex flex-col items-end gap-2">
+            <Button
+              variant={isDark ? "outline" : "secondary"}
+              onClick={onToggleDark}
+              className={cn(
+                "shrink-0 rounded-full gap-2",
+                isDark && "bg-sidebar text-sidebar-foreground border-sidebar-border hover:bg-sidebar-accent"
+              )}
+            >
+              {isDark ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+              {isDark ? "Dark Mode" : "Light Mode"}
+            </Button>
+            <Button
+              variant={isDark ? "outline" : "secondary"}
+              onClick={onToggleSingleScale}
+              className={cn(
+                "shrink-0 rounded-full gap-2",
+                isDark && "bg-sidebar text-sidebar-foreground border-sidebar-border hover:bg-sidebar-accent"
+              )}
+            >
+              <Palette className="h-4 w-4" />
+              {isSingleScale ? "Single Scale" : "Dual Scales"}
+            </Button>
+          </div>
         </div>
         <h1 className="text-[60px] font-semibold tracking-[-0.02em] leading-[1.08] text-foreground mb-5 max-w-[780px]">
           Designed for clarity.<br /><span className="text-primary">Built for action.</span>
@@ -260,7 +273,7 @@ export function ThemeShowcase({ isDark, onToggleDark, isSingleScale, onToggleSin
       <section>
         <SectionHeader
           kicker="01 — Color"
-          title="One refined indigo, a working system around it"
+          title="One refined indigo, a working system around it."
           description="A single, considered refined indigo carries every primary action. Around it: a neutral secondary for lower-emphasis controls, four system colors for status and feedback, five chart colors within the same indigo family, and matched neutral scales for light and dark surfaces."
         />
         <div className="space-y-8">
@@ -283,7 +296,7 @@ export function ThemeShowcase({ isDark, onToggleDark, isSingleScale, onToggleSin
       <section>
         <SectionHeader
           kicker="02 — Gradients"
-          title="The page surface, in both modes"
+          title="The page surface, in both modes."
           description="Two gradients — one per mode — applied to the page body. Light mode runs a soft indigo wash from upper left to lower right, staying warm and barely-there. Dark mode deepens the same direction, fading from a muted violet into near-black. Both are defined as CSS utility classes in index.css, separate from the token system."
         />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -316,7 +329,7 @@ export function ThemeShowcase({ isDark, onToggleDark, isSingleScale, onToggleSin
       <section>
         <SectionHeader
           kicker="03 — Typography"
-          title="Geist, top to bottom"
+          title="Geist, top to bottom."
           description="One typeface across every role — both --font-heading and --font-sans are set to Geist Variable. Headings (h1–h6) use the heading token via @layer base; body and UI copy use font-sans. The same family, the same renderer, no switching cost."
         />
         <div className="rounded-2xl border border-border bg-card overflow-hidden">
@@ -402,7 +415,7 @@ export function ThemeShowcase({ isDark, onToggleDark, isSingleScale, onToggleSin
       <section>
         <SectionHeader
           kicker="06 — Curves & Shapes"
-          title="Radius, softness, and geometry"
+          title="Radius, softness, and geometry."
           description="Corner radius is computed from a single --radius base of 0.5rem (8px) with multipliers. The scale runs from tight chips to generous hero banners — all derived from one source of truth."
         />
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4">
@@ -425,7 +438,7 @@ export function ThemeShowcase({ isDark, onToggleDark, isSingleScale, onToggleSin
       <section>
         <SectionHeader
           kicker="07 — Components"
-          title="The ramp, applied to components"
+          title="Tokens, applied to Components."
           description="shadcn/ui components with VTS tokens wired in: one refined indigo for every primary action and focus state, slate for secondary emphasis, and Geist carrying every label."
         />
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
@@ -437,11 +450,11 @@ export function ThemeShowcase({ isDark, onToggleDark, isSingleScale, onToggleSin
               <p className="text-xs text-muted-foreground font-mono">primary · secondary · ghost</p>
             </div>
             <div className="p-5 flex flex-wrap gap-3 items-center">
-              <Button>Create workspace</Button>
-              <Button variant="secondary">Invite team</Button>
-              <Button variant="outline">Export</Button>
-              <Button variant="ghost">Learn more <ArrowRight className="h-3.5 w-3.5" /></Button>
-              <Button variant="destructive">Delete</Button>
+              <Button>Primary</Button>
+              <Button variant="secondary">Secondary</Button>
+              <Button variant="outline">Outline</Button>
+              <Button variant="ghost">Ghost <ArrowRight className="h-3.5 w-3.5" /></Button>
+              <Button variant="destructive">Destructive</Button>
               <Button disabled>Disabled</Button>
             </div>
             <div className="px-5 pb-4 text-xs text-muted-foreground leading-relaxed border-t border-border pt-3">
