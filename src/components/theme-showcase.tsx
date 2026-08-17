@@ -1,10 +1,11 @@
 import * as React from "react"
-import { Sun, Moon, Check, ArrowRight, ChevronRight, Palette, CheckCircle2, Loader2, Clock } from "lucide-react"
+import { Sun, Moon, Check, ArrowRight, ChevronRight, Palette, CheckCircle2, Loader2, Clock, Sparkle, LayoutGrid, FileText, Handshake, Calculator, UserCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { cn, cardBase } from "@/lib/utils"
+import { AgentBtn } from "@/components/agent-btn"
 
 // ── Data ─────────────────────────────────────────────────────────────────────
 
@@ -12,7 +13,7 @@ const COLOR_SECTIONS = [
   {
     title: "Primary",
     tokens: [
-      { name: "Primary",            role: "Action / Active",   var: "--primary",            description: "The single chromatic anchor. Every primary button, active nav state, and focus ring resolves here — one filled action per view." },
+      { name: "Primary",            role: "Action / Active",   var: "--primary",            description: "The single chromatic anchor. Every primary button, active nav state, and focus ring resolves here. One filled action per view." },
       { name: "Primary Foreground", role: "Text on Primary",   var: "--primary-foreground",  description: "Foreground text and icons placed directly on a primary-filled surface." },
     ],
   },
@@ -36,17 +37,17 @@ const COLOR_SECTIONS = [
   {
     title: "Border & Structure",
     tokens: [
-      { name: "Border",  role: "Divider",     var: "--border",  description: "Structural hairlines between regions — table rows, panel edges, input outlines." },
-      { name: "Ring",    role: "Focus",       var: "--ring",    description: "Focus rings on interactive elements — keyboard-navigable without distraction." },
+      { name: "Border",  role: "Divider",     var: "--border",  description: "Structural hairlines between regions: table rows, panel edges, and input outlines." },
+      { name: "Ring",    role: "Focus",       var: "--ring",    description: "Focus rings on interactive elements, keyboard-navigable without distraction." },
       { name: "Accent",  role: "Hover fill",  var: "--accent",  description: "Hover fills and subtle interactive backgrounds that don't compete with primary." },
     ],
   },
   {
     title: "Sidebar",
     tokens: [
-      { name: "Sidebar",               role: "Nav surface",       var: "--sidebar",               description: "Always dark regardless of page mode — wired to dark-mode values even in light. A fixed orientation anchor." },
+      { name: "Sidebar",               role: "Nav surface",       var: "--sidebar",               description: "Always dark regardless of page mode. Wired to dark-mode values even in light. A fixed orientation anchor." },
       { name: "Sidebar Foreground",    role: "Nav text",          var: "--sidebar-foreground",    description: "Default text and icons inside the sidebar." },
-      { name: "Sidebar Primary",       role: "Active accent",     var: "--sidebar-primary",       description: "Active nav item labels and the VTS Agents accent — brighter than --primary to read on the dark nav surface." },
+      { name: "Sidebar Primary",       role: "Active accent",     var: "--sidebar-primary",       description: "Active nav item labels and the VTS Agents accent. Brighter than --primary to read on the dark nav surface." },
       { name: "Sidebar Accent",        role: "Hover / selected",  var: "--sidebar-accent",        description: "Hover and selected state fills inside the navigation shell." },
     ],
   },
@@ -63,28 +64,30 @@ const COLOR_SECTIONS = [
     title: "Charts",
     tokens: [
       { name: "Chart 1", role: "Primary series",   var: "--chart-1", description: "Matches --primary. The highlighted bar, the active line, the first series." },
-      { name: "Chart 2", role: "Second series",    var: "--chart-2", description: "A cooler blue-violet for the second data series — within the indigo family." },
+      { name: "Chart 2", role: "Second series",    var: "--chart-2", description: "A cooler blue-violet for the second data series, within the indigo family." },
       { name: "Chart 3", role: "Third series",     var: "--chart-3", description: "A mauve-adjacent step, still in the 278–298 hue range." },
       { name: "Chart 4", role: "Fourth series",    var: "--chart-4", description: "Shifts slightly blue for the fourth series." },
-      { name: "Chart 5", role: "Fifth series",     var: "--chart-5", description: "The coolest step — a soft blue-grey for the least-emphasized series." },
+      { name: "Chart 5", role: "Fifth series",     var: "--chart-5", description: "A soft blue-grey for the least-emphasized series." },
     ],
   },
 ]
 
 const TYPE_SCALE = [
-  { role: "Display",  meta: "60px · 600 · −0.02em",  className: "text-[60px] font-semibold tracking-[-0.02em] leading-[1.08]",  sample: "Built for how modern teams work" },
-  { role: "H1",       meta: "38px · 600 · −0.018em", className: "text-[38px] font-semibold tracking-[-0.018em] leading-[1.2]",   sample: "One workspace, every team" },
-  { role: "H2",       meta: "33px · 600 · −0.015em", className: "text-[33px] font-semibold tracking-[-0.015em] leading-snug",    sample: "Automate the busywork" },
-  { role: "Body",     meta: "16px · 400 · 1.6 lh",   className: "text-base text-muted-foreground leading-relaxed max-w-lg",      sample: "Standard paragraph and component copy. Geist's open counters and even spacing keep long-form reading comfortable at any surface color, light or dark." },
-  { role: "Small",    meta: "14px · 400",             className: "text-sm text-muted-foreground",                                  sample: "Helper text, timestamps, and metadata labels." },
-  { role: "Caption",  meta: "12px · 500 · mono",      className: "font-mono text-xs font-medium text-muted-foreground",           sample: "Eyebrow labels, table headers, status chips." },
+  { role: "Display",  meta: "60px · 600 · −0.02em",        className: "text-[60px] font-semibold tracking-[-0.02em] leading-[1.08]",                               sample: "Built for how modern teams work" },
+  { role: "H1",       meta: "38px · 600 · −0.018em",       className: "text-[38px] font-semibold tracking-[-0.018em] leading-[1.2]",                               sample: "One workspace, every team" },
+  { role: "H2",       meta: "33px · 600 · −0.015em",       className: "text-[33px] font-semibold tracking-[-0.015em] leading-snug",                                sample: "Automate the busywork" },
+  { role: "H3",       meta: "20px · 600",                   className: "text-xl font-semibold",                                                                     sample: "Recent agent runs" },
+  { role: "Body",     meta: "16px · 400 · 1.6 lh",         className: "text-base text-muted-foreground leading-relaxed max-w-lg",                                  sample: "Standard paragraph and component copy. Geist's open counters and even spacing keep long-form reading comfortable at any surface color, light or dark." },
+  { role: "Small",    meta: "14px · 400",                   className: "text-sm text-muted-foreground",                                                             sample: "Helper text, timestamps, and metadata labels." },
+  { role: "Eyebrow",  meta: "10px · 500 · uppercase",       className: "text-[10px] font-medium uppercase tracking-widest text-muted-foreground",                   sample: "VTS Agents · Lease risk · 2 min ago" },
+  { role: "Mono",     meta: "11.5px · 600 · mono",          className: "font-mono text-[11.5px] font-semibold uppercase tracking-[0.07em] text-primary",            sample: "03 · Typography" },
 ]
 
 // --radius = 0.5rem (8px). Steps are computed multipliers of that base.
 const RADIUS_STEPS = [
   { label: "sm",   cls: "rounded-sm",   px: "~5px",  desc: "Chips, badges, tight labels" },
   { label: "md",   cls: "rounded-md",   px: "~6px",  desc: "Input fields, small rows" },
-  { label: "lg",   cls: "rounded-lg",   px: "8px",   desc: "Buttons, tags — the base radius" },
+  { label: "lg",   cls: "rounded-lg",   px: "8px",   desc: "Buttons and tags. The base radius." },
   { label: "xl",   cls: "rounded-xl",   px: "~11px", desc: "Building image thumbnails" },
   { label: "2xl",  cls: "rounded-2xl",  px: "~14px", desc: "Cards, panels, stat tiles" },
   { label: "3xl",  cls: "rounded-3xl",  px: "~18px", desc: "Modals, large overlays" },
@@ -272,7 +275,7 @@ export function ThemeShowcase({ isDark, onToggleDark, isSingleScale, onToggleSin
       {/* ── 01 Color ─────────────────────────────────────────────────────── */}
       <section>
         <SectionHeader
-          kicker="01 — Color"
+          kicker="01 · Color"
           title="One refined indigo, a working system around it."
           description="A single, considered refined indigo carries every primary action. Around it: a neutral secondary for lower-emphasis controls, four system colors for status and feedback, five chart colors within the same indigo family, and matched neutral scales for light and dark surfaces."
         />
@@ -295,26 +298,26 @@ export function ThemeShowcase({ isDark, onToggleDark, isSingleScale, onToggleSin
       {/* ── 02 Gradients ─────────────────────────────────────────────────── */}
       <section>
         <SectionHeader
-          kicker="02 — Gradients"
+          kicker="02 · Gradients"
           title="The page surface, in both modes."
-          description="Two gradients — one per mode — applied to the page body. Light mode runs a soft indigo wash from upper left to lower right, staying warm and barely-there. Dark mode deepens the same direction, fading from a muted violet into near-black. Both are defined as CSS utility classes in index.css, separate from the token system."
+          description="Two gradients applied to the page body, one per mode. Light mode runs a soft indigo wash from upper left to lower right, staying warm and barely-there. Dark mode deepens the same direction, fading from a muted violet into near-black. Both are defined as CSS utility classes in index.css, separate from the token system."
         />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {/* Light mode body — approximate representation */}
           <div className="rounded-xl overflow-hidden border border-border">
             <div className="h-28 bg-gradient-body-light" />
             <div className="p-3 space-y-1">
-              <p className="text-sm font-semibold text-foreground">Page Background — Light</p>
+              <p className="text-sm font-semibold text-foreground">Page Background: Light</p>
               <p className="text-[10px] font-medium uppercase tracking-wide text-primary">Ambient / Body</p>
               <p className="font-mono text-[10px] text-muted-foreground bg-muted rounded px-1.5 py-0.5 inline-block mb-1">body (light mode)</p>
-              <p className="text-xs text-muted-foreground leading-relaxed">Three layered radial gradients over a warm indigo base. Subtle warmth and a slight purple cast — never competes with content.</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">Three layered radial gradients over a warm indigo base. Subtle warmth and a slight purple cast that never competes with content.</p>
             </div>
           </div>
           {/* Dark mode body */}
           <div className="rounded-xl overflow-hidden border border-border">
             <div className="h-28 bg-gradient-body-dark" />
             <div className="p-3 space-y-1">
-              <p className="text-sm font-semibold text-foreground">Page Background — Dark</p>
+              <p className="text-sm font-semibold text-foreground">Page Background: Dark</p>
               <p className="text-[10px] font-medium uppercase tracking-wide text-primary">Ambient / Body</p>
               <p className="font-mono text-[10px] text-muted-foreground bg-muted rounded px-1.5 py-0.5 inline-block mb-1">body (dark mode)</p>
               <p className="text-xs text-muted-foreground leading-relaxed">A lavender radial bloom (#CAC7FC at 30% opacity) over near-black. Connects dark surfaces back to the indigo palette without adding noise.</p>
@@ -328,9 +331,9 @@ export function ThemeShowcase({ isDark, onToggleDark, isSingleScale, onToggleSin
       {/* ── 03 Typography ────────────────────────────────────────────────── */}
       <section>
         <SectionHeader
-          kicker="03 — Typography"
+          kicker="03 · Typography"
           title="Geist, top to bottom."
-          description="One typeface across every role — both --font-heading and --font-sans are set to Geist Variable. Headings (h1–h6) use the heading token via @layer base; body and UI copy use font-sans. The same family, the same renderer, no switching cost."
+          description="One typeface across every role. Both --font-heading and --font-sans are set to Geist Variable. Headings (h1–h6) use the heading token via @layer base; body and UI copy use font-sans. The same family, the same renderer, no switching cost."
         />
         <div className="rounded-2xl border border-border bg-card overflow-hidden">
           {TYPE_SCALE.map((row, i) => (
@@ -343,7 +346,7 @@ export function ThemeShowcase({ isDark, onToggleDark, isSingleScale, onToggleSin
             </div>
           ))}
           <div className="border-t border-border px-6 py-4 flex flex-wrap gap-2">
-            {[["400","body default",false],["500","interactive / labels",true],["600","heading default",true],["700","rare emphasis",false]].map(([weight, label, active]) => (
+            {[["400","body · paragraph",true],["500","labels · eyebrows",true],["600","headings · card titles",true]].map(([weight, label, active]) => (
               <span key={String(weight)} className={cn("font-mono text-xs px-3 py-1.5 rounded-full border",
                 active ? "border-primary/40 bg-primary/10 text-primary" : "border-border bg-muted text-muted-foreground"
               )}>{weight} · {label}</span>
@@ -358,9 +361,9 @@ export function ThemeShowcase({ isDark, onToggleDark, isSingleScale, onToggleSin
       {/* ── 04 Applied ───────────────────────────────────────────────────── */}
       <section>
         <SectionHeader
-          kicker="04 — Applied"
+          kicker="04 · Applied"
           title="One token set. Two neutral scales."
-          description="The same component, the same token classes, two modes. What changes: the neutral scale — background, card, muted, border, and text values all shift. What doesn't: the indigo primary, the sidebar, and every semantic status color stay locked to the same hue."
+          description="The same component, the same token classes, two modes. What changes is the neutral scale: background, card, muted, border, and text values all shift. What stays locked: the indigo primary, the sidebar, and every semantic status color."
         />
         <div className="flex items-center justify-end mb-4">
           <Button
@@ -383,9 +386,9 @@ export function ThemeShowcase({ isDark, onToggleDark, isSingleScale, onToggleSin
       {/* ── 05 Elevation ─────────────────────────────────────────────────── */}
       <section>
         <SectionHeader
-          kicker="05 — Elevation"
+          kicker="05 · Elevation"
           title="Flat by default. Floating on purpose."
-          description="Most of this system stays flat — surfaces separate using value contrast alone. Cards in the app use bg-card/70 with backdrop-blur-md for a glass layer in both modes. Elevation exists for one job: telling you something above the page deserves attention."
+          description="Most of this system stays flat. Surfaces separate using value contrast alone. Cards in the app use bg-card/70 with backdrop-blur-md for a glass layer in both modes. Elevation exists for one job: telling you something above the page deserves attention."
         />
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           <div>
@@ -396,15 +399,15 @@ export function ThemeShowcase({ isDark, onToggleDark, isSingleScale, onToggleSin
           </div>
           <div>
             <div className="h-16 rounded-xl mb-4 bg-card/70 backdrop-blur-md border border-border shadow-sm" />
-            <p className="text-sm font-semibold text-foreground mb-1">Raised — Glass</p>
+            <p className="text-sm font-semibold text-foreground mb-1">Raised Glass</p>
             <p className="font-mono text-[10px] text-muted-foreground mb-2">bg-card/70 backdrop-blur-md</p>
-            <p className="text-xs text-muted-foreground leading-relaxed">The actual card pattern used across the app — frosted glass, not a flat token. Consistent across stat tiles, building headers, and content cards.</p>
+            <p className="text-xs text-muted-foreground leading-relaxed">The actual card pattern used across the app. Frosted glass, not a flat token. Consistent across stat tiles, building headers, and content cards.</p>
           </div>
           <div>
             <div className="h-16 rounded-xl mb-4 bg-popover/80 backdrop-blur-xl border border-border shadow-xl" />
             <p className="text-sm font-semibold text-foreground mb-1">Floating</p>
             <p className="font-mono text-[10px] text-muted-foreground mb-2">bg-popover/80 backdrop-blur-xl shadow-xl</p>
-            <p className="text-xs text-muted-foreground leading-relaxed">Dropdowns, modals, tooltips — anything that overlays the page. Deep blur, a pronounced shadow, and a slightly brighter border.</p>
+            <p className="text-xs text-muted-foreground leading-relaxed">Dropdowns, modals, and tooltips. Deep blur, a pronounced shadow, and a slightly brighter border.</p>
           </div>
         </div>
       </section>
@@ -414,9 +417,9 @@ export function ThemeShowcase({ isDark, onToggleDark, isSingleScale, onToggleSin
       {/* ── 06 Curves & Shapes ───────────────────────────────────────────── */}
       <section>
         <SectionHeader
-          kicker="06 — Curves & Shapes"
+          kicker="06 · Curves & Shapes"
           title="Radius, softness, and geometry."
-          description="Corner radius is computed from a single --radius base of 0.5rem (8px) with multipliers. The scale runs from tight chips to generous hero banners — all derived from one source of truth."
+          description="Corner radius is computed from a single --radius base of 0.5rem (8px) with multipliers. The scale runs from tight chips to generous hero banners, all derived from one source of truth."
         />
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4">
           {RADIUS_STEPS.map(({ label, cls, px, desc }) => (
@@ -437,7 +440,7 @@ export function ThemeShowcase({ isDark, onToggleDark, isSingleScale, onToggleSin
       {/* ── 07 Components ────────────────────────────────────────────────── */}
       <section>
         <SectionHeader
-          kicker="07 — Components"
+          kicker="07 · Components"
           title="Tokens, applied to Components."
           description="shadcn/ui components with VTS tokens wired in: one refined indigo for every primary action and focus state, slate for secondary emphasis, and Geist carrying every label."
         />
@@ -458,7 +461,7 @@ export function ThemeShowcase({ isDark, onToggleDark, isSingleScale, onToggleSin
               <Button disabled>Disabled</Button>
             </div>
             <div className="px-5 pb-4 text-xs text-muted-foreground leading-relaxed border-t border-border pt-3">
-              Indigo fill is reserved for the single primary action per view. Secondary uses the slate surface token — never a lighter tint of the brand color.
+              Indigo fill is reserved for the single primary action per view. Secondary uses the slate surface token, never a lighter tint of the brand color.
             </div>
           </div>
 
@@ -487,7 +490,7 @@ export function ThemeShowcase({ isDark, onToggleDark, isSingleScale, onToggleSin
               </span>
             </div>
             <div className="px-5 pb-4 text-xs text-muted-foreground leading-relaxed border-t border-border pt-3">
-              Status uses dedicated semantic tokens — including --declined for lapsed deals — not a generic color system.
+              Status uses dedicated semantic tokens, including --declined for lapsed deals. Not a generic color system.
             </div>
           </div>
 
@@ -509,7 +512,7 @@ export function ThemeShowcase({ isDark, onToggleDark, isSingleScale, onToggleSin
               </div>
             </div>
             <div className="px-5 pb-4 text-xs text-muted-foreground leading-relaxed border-t border-border pt-3">
-              Focus rings use the --ring token (a soft indigo halo at reduced opacity) — visible, not jarring. Field borders use --input, one step up from --background.
+              Focus rings use the --ring token, a soft indigo halo at reduced opacity. Visible, not jarring. Field borders use --input, one step up from --background.
             </div>
           </div>
 
@@ -545,37 +548,42 @@ export function ThemeShowcase({ isDark, onToggleDark, isSingleScale, onToggleSin
       {/* ── 08 Navigation ────────────────────────────────────────────────── */}
       <section>
         <SectionHeader
-          kicker="08 — Navigation"
+          kicker="08 · Navigation"
           title="Always dark. Always oriented."
-          description="The sidebar stays dark regardless of page mode — sidebar tokens are wired to dark-mode values even in light. In dark mode, --sidebar and --card share the same oklch value (0.18 0.005 258), so the sidebar has zero value contrast from cards; separation comes from layout position alone."
+          description="The sidebar stays dark regardless of page mode. Sidebar tokens are wired to dark-mode values even in light. In dark mode, --sidebar and --card share the same oklch value (0.18 0.005 258), so the sidebar has zero value contrast from cards; separation comes from layout position alone."
         />
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div className="rounded-2xl overflow-hidden border border-border max-w-xs">
             <div className="bg-sidebar px-4 py-5 space-y-0.5">
               <p className="text-[10px] font-medium uppercase tracking-widest text-sidebar-foreground/40 px-3 mb-2">Navigation</p>
-              {["Overview", "Leases", "Deals", "Planning", "VTS Agents", "Profile"].map((item, i) => (
+              {[
+                { label: "Overview",   icon: LayoutGrid,  active: true,  accent: false },
+                { label: "Leases",     icon: FileText,    active: false, accent: false },
+                { label: "Deals",      icon: Handshake,   active: false, accent: false },
+                { label: "Planning",   icon: Calculator,  active: false, accent: false },
+                { label: "VTS Agents", icon: Sparkle,     active: false, accent: true  },
+                { label: "Profile",    icon: UserCircle,  active: false, accent: false },
+              ].map(({ label, icon: Icon, active, accent }) => (
                 <div
-                  key={item}
+                  key={label}
                   className={cn(
                     "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors",
-                    i === 0
+                    active
                       ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
-                      : i === 4
+                      : accent
                         ? "text-sidebar-primary hover:bg-sidebar-accent/60"
                         : "text-sidebar-foreground/60 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
                   )}
                 >
-                  <div className={cn("h-1.5 w-1.5 rounded-full shrink-0",
-                    i === 0 ? "bg-sidebar-primary" : i === 4 ? "bg-sidebar-primary" : "bg-sidebar-foreground/20"
-                  )} />
-                  {item}
-                  {i === 4 && <ChevronRight className="h-3 w-3 ml-auto opacity-60" />}
+                  <Icon className="h-[18px] w-[18px] shrink-0" />
+                  {label}
+                  {accent && <ChevronRight className="h-3 w-3 ml-auto opacity-60" />}
                 </div>
               ))}
             </div>
           </div>
           <div className="text-sm text-muted-foreground leading-relaxed space-y-3 self-center">
-            <p>The active item is marked by the sidebar-accent fill and sidebar-primary dot — a quiet signal, not a jarring highlight.</p>
+            <p>The active item is marked by the sidebar-accent fill and sidebar-primary dot. A quiet signal, not a jarring highlight.</p>
             <p>VTS Agents gets the sidebar-primary text color at rest, distinguishing it from standard nav items without requiring a separate accent system.</p>
             <p className="text-xs font-mono text-muted-foreground/70">--sidebar-primary is brighter than --primary so it reads on the dark nav surface without a separate dark-mode override.</p>
           </div>
@@ -584,24 +592,113 @@ export function ThemeShowcase({ isDark, onToggleDark, isSingleScale, onToggleSin
 
       <section>
         <SectionHeader
-          kicker="09 — AI + Agents"
+          kicker="09 · AI + Agents"
           title="Intelligence belongs in the workflow."
           description="AI is part of the system, not a separate visual layer. Agents use the same components, surfaces, states, and interaction patterns as the rest of VTS."
         />
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+
+        {/* System Principles — full width */}
+        <div className="rounded-2xl border border-border bg-card overflow-hidden mb-10">
+          <div className="flex items-center justify-between px-5 py-3 border-b border-border">
+            <p className="text-sm font-semibold text-foreground">How Agents Behave</p>
+            <p className="text-xs text-muted-foreground font-mono">context · output · control · auditability</p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-0 divide-y sm:divide-y-0 sm:divide-x divide-border">
+            {[
+              { icon: Sparkle,      title: "Context is pre-loaded.",      body: "Agents receive the full row, card, or asset context on dispatch. No re-prompting. No copy-paste. The user taps and the agent knows." },
+              { icon: ArrowRight,   title: "Output lives in the flow.",    body: "Findings render in cards, rows, and sidebar panels. Not modals. The visual weight of an agent result matches a human-authored one." },
+              { icon: CheckCircle2, title: "Actions are recommended, not automatic.", body: "Agents surface next steps and draft actions. The user approves. Control stays with the team, speed comes from the AI." },
+              { icon: Clock,        title: "Runs are tracked and auditable.", body: "Every agent run has a timestamp, an asset, a category, and a result. Nothing is a black box. History is always one click away." },
+            ].map(({ icon: Icon, title, body }) => (
+              <div key={title} className="flex flex-col gap-2 p-5">
+                <Icon className="h-4 w-4 shrink-0 text-primary" />
+                <p className="text-sm font-semibold text-foreground leading-snug">{title}</p>
+                <p className="text-xs text-muted-foreground leading-relaxed">{body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Row 1: Entry point + Deal Intelligence panel */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+          {/* Left: sparkle entry point */}
+          <div className="space-y-4">
+            <div>
+              <p className="text-sm font-semibold text-foreground mb-3">Entry Point: Every Row</p>
+              <p className="text-sm text-muted-foreground leading-relaxed mb-4">Every data row in VTS carries a contextual agent trigger. One tap dispatches an agent with full row context pre-loaded. No copy-paste, no prompt engineering.</p>
+              {/* Simulated table row with sparkle */}
+              <div className={cn(cardBase, "p-0 overflow-hidden")}>
+                <div className="px-4 py-2 border-b border-border/40 flex items-center gap-4 text-[10px] font-medium uppercase tracking-widest text-muted-foreground">
+                  <span className="flex-1">Tenant</span><span className="w-24 text-right">Space</span><span className="w-20 text-right">Time</span><span className="w-8" />
+                </div>
+                {[
+                  { tenant: "Pfizer", space: "Suite 1200", time: "2 mo", urgent: true },
+                  { tenant: "Morgan Stanley", space: "Floors 8–11", time: "4 mo", urgent: false },
+                  { tenant: "Deloitte", space: "Suite 3400", time: "6 mo", urgent: false },
+                  { tenant: "KPMG", space: "Floor 22", time: "1 mo", urgent: true },
+                  { tenant: "WeWork", space: "Floors 14–16", time: "3 mo", urgent: true },
+                ].map((row, i) => (
+                  <div key={i} className="flex items-center gap-4 px-4 py-3 hover:bg-muted/40 transition-colors border-b border-border/30 last:border-0">
+                    <span className="flex-1 text-sm font-medium text-foreground">{row.tenant}</span>
+                    <span className="w-24 text-right text-xs text-muted-foreground">{row.space}</span>
+                    <span className="w-20 flex justify-end">
+                      <span className={cn(
+                        "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium tabular-nums",
+                        row.urgent ? "bg-destructive/10 text-destructive" : "bg-warning/10 text-warning"
+                      )}>{row.time}</span>
+                    </span>
+                    <span className="w-8 flex justify-end">
+                      <AgentBtn label={`Analyze ${row.tenant} expiration and recommend next steps`} />
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Right: Deal Intelligence panel */}
+          <div className="space-y-4">
+            <p className="text-sm font-semibold text-foreground">Proactive Intelligence Panel</p>
+            <p className="text-sm text-muted-foreground leading-relaxed">Agents don't wait to be asked. They run continuously and surface findings in the sidebar, prioritized by revenue impact rather than recency.</p>
+            <div className={cn(cardBase, "bg-sidebar border-transparent space-y-2")}>
+              <div className="flex items-start justify-between gap-2 mb-4">
+                <div>
+                  <p className="text-[10px] font-medium uppercase tracking-widest text-sidebar-foreground/50 mb-1">VTS Agents</p>
+                  <h3 className="text-xl font-semibold text-sidebar-foreground">Deal Intelligence</h3>
+                </div>
+                <Button variant="outline" size="sm" className="shrink-0 text-sidebar-foreground border-current bg-transparent hover:bg-white/10 text-xs">View Active Agents</Button>
+              </div>
+              <div className="rounded-lg bg-primary/15 border border-primary/25 px-3 py-2.5 flex items-center gap-2.5">
+                <Sparkle className="h-4 w-4 shrink-0 text-sidebar-primary" />
+                <p className="text-sm text-sidebar-foreground">3 deal risks identified: <span className="text-sidebar-primary font-medium">$1.8M NOI at risk</span></p>
+              </div>
+              {[
+                { label: "4 deals stalling 20+ days", value: "276K sf" },
+                { label: "3 at-risk deals need review", value: "3 at-risk" },
+                { label: "LOI+ pipeline upside", value: "+$89K/mo" },
+              ].map(({ label, value }) => (
+                <div key={label} className="rounded-lg bg-primary/10 border border-primary/20 px-3 py-2.5 flex items-center gap-2.5">
+                  <Sparkle className="h-3.5 w-3.5 shrink-0 text-sidebar-primary" />
+                  <p className="flex-1 text-sm text-sidebar-foreground">{label}</p>
+                  <p className="text-sm font-medium text-sidebar-primary tabular-nums">{value}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Live Status + Recent Runs */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6 mt-10">
           <div className="space-y-3">
-            {/* Running agent banner */}
+            <p className="text-sm font-semibold text-foreground">Live Status</p>
             <div className={cn(cardBase, "bg-sidebar border-transparent flex items-center gap-4")}>
               <Loader2 className="h-5 w-5 text-violet-400 animate-spin shrink-0" />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-sidebar-foreground">1 agent running</p>
                 <p className="text-xs text-sidebar-foreground/60 truncate">Northeast Corridor Portfolio · Q3 NOI improvement</p>
               </div>
-              <Button variant="outline" size="sm" className="shrink-0 text-sidebar-foreground border-current bg-transparent hover:bg-white/10 text-xs">
-                View
-              </Button>
+              <Button variant="outline" size="sm" className="shrink-0 text-sidebar-foreground border-current bg-transparent hover:bg-white/10 text-xs">View</Button>
             </div>
-            {/* Recent runs */}
             <div className={cn(cardBase, "space-y-1.5")}>
               <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-3">Recent Runs</p>
               {[
@@ -623,17 +720,14 @@ export function ThemeShowcase({ isDark, onToggleDark, isSingleScale, onToggleSin
               ))}
             </div>
           </div>
-          <div className="text-sm text-muted-foreground leading-relaxed space-y-3 self-center">
-            <p>They can surface what needs attention, bring context together, recommend next steps, and take action — while keeping the user oriented and in control.</p>
-            <p>Agent output lives in cards, rows, and panels — not in modals or overlays that break the flow. The visual weight of an agent action matches the weight of a human one.</p>
-            <p className="text-xs font-mono text-muted-foreground/70">Same border-border/60 rows, same cardBase surface, same hover states as every other list in VTS.</p>
-          </div>
         </div>
+
+
       </section>
 
       {/* Footer */}
       <div className="pb-8 border-t border-border pt-8 text-xs text-muted-foreground">
-        VTS Design System — foundations reference. Built to be retokenized and extended as the product surface grows.
+        VTS Design System foundations reference. Built to be retokenized and extended as the product surface grows.
       </div>
 
     </div>

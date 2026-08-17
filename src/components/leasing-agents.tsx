@@ -1,5 +1,5 @@
 import * as React from "react"
-import { cn, cardBase } from "@/lib/utils"
+import { cn, cardBase, sidebarBtn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { AlertTriangle, Clock, Sparkle } from "lucide-react"
 import type { Deal, DecisionItem } from "@/components/leasing-activity"
@@ -25,7 +25,7 @@ const LeasingAgents = React.forwardRef<HTMLDivElement, LeasingAgentsProps>(
             <p className="text-[10px] font-medium uppercase tracking-widest mb-1 text-sidebar-foreground/70">VTS Agents</p>
             <h2 className="text-xl font-semibold text-sidebar-foreground">Leasing actions</h2>
           </div>
-          <Button variant="outline" size="sm" className="shrink-0 text-sidebar-foreground/85 border-current hover:bg-white/10">
+          <Button variant="outline" size="sm" className={cn("shrink-0", sidebarBtn)}>
             View active agents
           </Button>
         </div>
@@ -55,7 +55,7 @@ const LeasingAgents = React.forwardRef<HTMLDivElement, LeasingAgentsProps>(
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
                       <p className="text-sm font-medium text-sidebar-foreground/90">{d.tenant}</p>
-                      <Button variant="outline" size="sm" className="opacity-0 group-hover/row:opacity-100 gap-1 shrink-0 text-sidebar-foreground/85 border-current hover:bg-white/10">
+                      <Button variant="outline" size="sm" className={cn("opacity-0 group-hover/row:opacity-100 gap-1 shrink-0", sidebarBtn)}>
                         <Sparkle className="h-3 w-3" />
                         Run agent
                       </Button>
@@ -83,7 +83,7 @@ const LeasingAgents = React.forwardRef<HTMLDivElement, LeasingAgentsProps>(
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
                       <p className="text-sm font-medium text-sidebar-foreground/90">{item.tenant}</p>
-                      <Button variant="outline" size="sm" className="opacity-0 group-hover/row:opacity-100 gap-1 shrink-0 text-sidebar-foreground/85 border-current hover:bg-white/10">
+                      <Button variant="outline" size="sm" className={cn("opacity-0 group-hover/row:opacity-100 gap-1 shrink-0", sidebarBtn)}>
                         <Sparkle className="h-3 w-3" />
                         Run agent
                       </Button>

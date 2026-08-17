@@ -2,8 +2,7 @@ import * as React from "react"
 import { PieChart, Pie, Cell } from "recharts"
 import { cn, cardBase } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
-import { Sparkle } from "lucide-react"
+import { AgentBtn } from "@/components/agent-btn"
 
 export interface VacantSpace {
   space: string
@@ -114,31 +113,7 @@ const AvailabilityOverview = React.forwardRef<HTMLDivElement, AvailabilityOvervi
                             ? "bg-warning/10 text-warning"
                             : "bg-primary/10 text-primary"
                       )}>{v.daysVacant} d</span>
-                      <Tooltip>
-                        <TooltipTrigger render={<span />}>
-                          <Button
-                            variant="secondary"
-                            size="icon"
-                            onClick={e => e.stopPropagation()}
-                            className="h-6 w-6 shrink-0"
-                          >
-                            <Sparkle className="h-3 w-3 text-sidebar-primary" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent
-                          side="top"
-                          className="bg-sidebar text-sidebar-foreground border-transparent font-medium"
-                          arrowClassName="fill-sidebar"
-                        >
-                          <div className="flex flex-col gap-1">
-                            <div className="flex items-center gap-1.5 font-medium text-sidebar-foreground">
-                              <Sparkle className="h-3 w-3 text-sidebar-primary" />
-                              Run agent
-                            </div>
-                            <p className="text-sidebar-foreground/70 font-normal">Find prospects and draft an outreach plan for this space</p>
-                          </div>
-                        </TooltipContent>
-                      </Tooltip>
+                      <AgentBtn label="Find prospects and draft an outreach plan for this space" onClick={e => e.stopPropagation()} />
                     </div>
                   </div>
                 ))}

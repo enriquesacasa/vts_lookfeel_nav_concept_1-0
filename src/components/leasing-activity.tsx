@@ -1,8 +1,8 @@
 import * as React from "react"
 import { cn, cardBase } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
-import { Sparkle, ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react"
+import { AgentBtn } from "@/components/agent-btn"
+import { ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react"
 
 export interface Deal {
   tenant: string
@@ -174,26 +174,7 @@ const LeasingActivity = React.forwardRef<HTMLDivElement, LeasingActivityProps>(
                   <RentDelta base={d.baseRent} budget={d.budgetRent} />
                 </td>
                 <td className="py-2.5 pl-2 text-right whitespace-nowrap">
-                  <Tooltip>
-                    <TooltipTrigger render={<span />}>
-                      <Button variant="secondary" size="icon" onClick={e => e.stopPropagation()} className="h-6 w-6 shrink-0">
-                        <Sparkle className="h-3 w-3 text-sidebar-primary" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent
-                      side="top"
-                      className="bg-sidebar text-sidebar-foreground border-transparent font-medium"
-                      arrowClassName="fill-sidebar"
-                    >
-                      <div className="flex flex-col gap-1">
-                        <div className="flex items-center gap-1.5 font-medium text-sidebar-foreground">
-                          <Sparkle className="h-3 w-3 text-sidebar-primary" />
-                          Run agent
-                        </div>
-                        <p className="text-sidebar-foreground/70 font-normal">Analyze this deal and suggest next steps</p>
-                      </div>
-                    </TooltipContent>
-                  </Tooltip>
+                  <AgentBtn label="Analyze this deal and suggest next steps" onClick={e => e.stopPropagation()} />
                 </td>
               </tr>
             ))}

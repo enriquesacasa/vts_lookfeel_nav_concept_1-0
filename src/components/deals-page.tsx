@@ -1,5 +1,5 @@
 import * as React from "react"
-import { cn, cardBase } from "@/lib/utils"
+import { cn, cardBase, sidebarBtn } from "@/lib/utils"
 
 const CardCtx = React.createContext(cardBase)
 import { Button } from "@/components/ui/button"
@@ -10,28 +10,7 @@ import {
   ChevronLeft, ChevronRight, AlertTriangle, Clock,
   CheckCircle2, TrendingUp, TrendingDown,
 } from "lucide-react"
-import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
-
-function AgentBtn({ label }: { label: string }) {
-  return (
-    <Tooltip>
-      <TooltipTrigger render={<span />}>
-        <Button variant="secondary" size="icon" className="h-7 w-7 shrink-0">
-          <Sparkle className="h-3.5 w-3.5" />
-        </Button>
-      </TooltipTrigger>
-      <TooltipContent side="top" className="bg-sidebar text-sidebar-foreground border-transparent font-medium" arrowClassName="fill-sidebar">
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-1.5 font-medium text-sidebar-foreground">
-            <Sparkle className="h-3 w-3" />
-            Run agent
-          </div>
-          <p className="text-sidebar-foreground/70 font-normal">{label}</p>
-        </div>
-      </TooltipContent>
-    </Tooltip>
-  )
-}
+import { AgentBtn } from "@/components/agent-btn"
 
 // ── Tenant logos ─────────────────────────────────────────────────────────────
 
@@ -269,7 +248,7 @@ function AiInsightCard() {
           </p>
         </div>
         <Button variant="outline" size="sm" className={cn(
-          "shrink-0 text-white border-white/30 hover:bg-white/10 hover:text-white",
+          cn("shrink-0", sidebarBtn),
           isV2 && "rounded-none"
         )}>
           View Active Agents
@@ -297,7 +276,7 @@ function AiInsightCard() {
             <p className="text-sm text-sidebar-foreground/85 flex-1 min-w-0 truncate">{item.text}</p>
             <div className="relative shrink-0">
               <span className="text-sm font-medium tabular-nums text-sidebar-primary transition-opacity duration-150 group-hover/row:opacity-0">{item.value}</span>
-              <Button variant="outline" size="sm" className="absolute inset-y-0 right-0 gap-1.5 opacity-0 group-hover/row:opacity-100 transition-opacity duration-150 text-xs whitespace-nowrap my-auto h-auto py-1 text-white border-white/30 hover:bg-white/10 hover:text-white">
+              <Button variant="outline" size="sm" className={cn("absolute inset-y-0 right-0 gap-1.5 opacity-0 group-hover/row:opacity-100 transition-opacity duration-150 text-xs whitespace-nowrap my-auto h-auto py-1", sidebarBtn)}>
                 <Sparkle className="h-3 w-3" />Run agent
               </Button>
             </div>

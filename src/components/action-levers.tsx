@@ -1,5 +1,5 @@
 import * as React from "react"
-import { cn, cardBase } from "@/lib/utils"
+import { cn, cardBase, sidebarBtn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { AlertTriangle, Zap, ShieldAlert, Sparkle, TrendingUp } from "lucide-react"
 
@@ -61,7 +61,7 @@ function ActionRow({ item, onRun }: { item: ActionItem; onRun: () => void }) {
               variant="outline"
               size="sm"
               onClick={onRun}
-              className="opacity-0 group-hover/row:opacity-100 gap-1.5 text-sidebar-foreground/85 border-current hover:bg-white/10"
+              className={cn("opacity-0 group-hover/row:opacity-100 gap-1.5", sidebarBtn)}
             >
               <Sparkle className="h-3 w-3" />
               Run agent
@@ -93,7 +93,7 @@ const ActionLevers = React.forwardRef<HTMLDivElement, ActionLeversProps>(
             <p className="text-[10px] font-medium uppercase tracking-widest mb-1 text-sidebar-foreground/70">VTS Agents</p>
             <h2 className="text-xl font-semibold text-sidebar-foreground">Financial levers</h2>
           </div>
-          <Button variant="outline" size="sm" className="shrink-0 text-sidebar-foreground/85 border-current hover:bg-white/10">
+          <Button variant="outline" size="sm" className={cn("shrink-0", sidebarBtn)}>
             View active agents
           </Button>
         </div>

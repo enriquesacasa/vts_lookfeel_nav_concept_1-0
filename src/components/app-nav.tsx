@@ -99,8 +99,7 @@ interface NavRowProps {
   onClick: () => void
 }
 
-function NavRow({ label, icon: Icon, active, collapsed, sub = false, small = false, accent = false, onClick }: NavRowProps) {
-  const isSmall = sub || small
+function NavRow({ label, icon: Icon, active, collapsed, small = false, accent = false, onClick }: NavRowProps) {
   const el = (
     <div
       role="button"
@@ -113,7 +112,7 @@ function NavRow({ label, icon: Icon, active, collapsed, sub = false, small = fal
         "flex items-center gap-2.5 rounded-xl transition-colors cursor-pointer select-none outline-none",
         "focus-visible:ring-2 focus-visible:ring-ring",
         collapsed ? "justify-center p-3 w-full" : "px-3 w-full",
-        isSmall && !collapsed ? "py-2" : "py-2.5",
+        small && !collapsed ? "py-2" : "py-2.5",
         active
           ? "bg-sidebar-accent text-sidebar-accent-foreground"
           : accent
@@ -121,9 +120,9 @@ function NavRow({ label, icon: Icon, active, collapsed, sub = false, small = fal
             : "text-sidebar-foreground/60 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground",
       )}
     >
-      {Icon && <Icon className={cn("shrink-0", isSmall ? "h-3.5 w-3.5" : "h-[18px] w-[18px]")} />}
+      {Icon && <Icon className={cn("shrink-0", small ? "h-3.5 w-3.5" : "h-[18px] w-[18px]")} />}
       {!collapsed && (
-        <span className={cn("truncate", isSmall ? "text-xs font-normal" : "text-sm font-medium")}>
+        <span className={cn("truncate", small ? "text-xs font-normal" : "text-sm font-medium")}>
           {label}
         </span>
       )}

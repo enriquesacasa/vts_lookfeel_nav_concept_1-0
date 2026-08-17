@@ -2,6 +2,7 @@ import * as React from "react"
 import { cn, cardBase } from "@/lib/utils"
 import { Progress } from "@/components/ui/progress"
 import { TrendingUp, TrendingDown, Minus } from "lucide-react"
+import { AgentBtn } from "@/components/agent-btn"
 
 export interface MoveEvent {
   tenant: string
@@ -90,6 +91,7 @@ const OccupancyCard = React.forwardRef<HTMLDivElement, OccupancyCardProps>(
                 <div className="flex items-center gap-2 shrink-0 text-[11px] text-muted-foreground tabular-nums">
                   <span>{fmt(e.sf)} sf</span>
                   <span className="text-foreground/60">{e.date}</span>
+                  <AgentBtn label={`Research ${e.tenant} ${e.type === "move-in" ? "move-in" : "move-out"} and surface next steps`} onClick={e => e.stopPropagation()} />
                 </div>
               </div>
             ))}
@@ -111,6 +113,7 @@ const OccupancyCard = React.forwardRef<HTMLDivElement, OccupancyCardProps>(
                     "text-[10px] font-medium",
                     v.daysVacant > 180 ? "text-destructive" : v.daysVacant > 90 ? "text-warning" : "text-muted-foreground"
                   )}>{v.daysVacant} d</span>
+                  <AgentBtn label={`Find prospects and leasing strategy for ${v.space}`} onClick={e => e.stopPropagation()} />
                 </div>
               </div>
             ))}
@@ -129,9 +132,12 @@ const OccupancyCard = React.forwardRef<HTMLDivElement, OccupancyCardProps>(
                   <span className="text-xs font-medium text-foreground truncate block">{e.tenant}</span>
                   <span className="text-[10px] text-muted-foreground">{e.space}</span>
                 </div>
-                <div className="shrink-0 text-right">
-                  <span className="text-[11px] font-medium text-foreground block">{e.date}</span>
-                  <span className="text-[10px] text-muted-foreground tabular-nums">{fmt(e.sf)} sf</span>
+                <div className="flex items-center gap-2 shrink-0">
+                  <div className="text-right">
+                    <span className="text-[11px] font-medium text-foreground block">{e.date}</span>
+                    <span className="text-[10px] text-muted-foreground tabular-nums">{fmt(e.sf)} sf</span>
+                  </div>
+                  <AgentBtn label={`Analyze ${e.tenant} expiration and recommend renewal strategy`} onClick={e => e.stopPropagation()} />
                 </div>
               </div>
             ))}

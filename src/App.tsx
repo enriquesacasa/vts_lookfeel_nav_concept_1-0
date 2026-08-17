@@ -181,11 +181,36 @@ const VACANT_SPACES: VacantSpace[] = [
 
 export default function App() {
   const [navCollapsed, setNavCollapsed] = React.useState(false)
-  const [selectedAssetId, setSelectedAssetId] = React.useState("vts-tower")
-  const [currentPage, setCurrentPage] = React.useState("dashboard")
+  function parseHash() {
+    const parts = window.location.hash.replace(/^#\//, "").split("/")
+    const page = parts[0] || "dashboard"
+    const asset = parts[1] || "vts-tower"
+    return { page, asset }
+  }
+
+  const [selectedAssetId, setSelectedAssetId] = React.useState(() => parseHash().asset)
+  const [currentPage, setCurrentPage] = React.useState(() => parseHash().page)
   const [selectedDeal, setSelectedDeal] = React.useState<DealsPageDeal | null>(null)
   const [isDark, setIsDark] = React.useState(false)
   const [isSingleScale, setIsSingleScale] = React.useState(false)
+
+  React.useEffect(() => {
+    const globalPages = ["theme", "activity", "reminders"]
+    const hash = globalPages.includes(currentPage)
+      ? `/${currentPage}`
+      : `/${currentPage}/${selectedAssetId}`
+    if (window.location.hash !== `#${hash}`) window.location.hash = hash
+  }, [currentPage, selectedAssetId])
+
+  React.useEffect(() => {
+    const onHashChange = () => {
+      const { page, asset } = parseHash()
+      setCurrentPage(page)
+      setSelectedAssetId(asset)
+    }
+    window.addEventListener("hashchange", onHashChange)
+    return () => window.removeEventListener("hashchange", onHashChange)
+  }, [])
 
   const toggleDark = () => {
     setIsDark(d => {
@@ -222,7 +247,7 @@ export default function App() {
   const selectedAsset = ASSETS.find(a => a.id === selectedAssetId)
 
   const renderPage = (page: string) => {
-    if (page === "avatar") {
+    if (page === "avatar" || page === "theme") {
       return <ThemeShowcase isDark={isDark} onToggleDark={toggleDark} isSingleScale={isSingleScale} onToggleSingleScale={toggleSingleScale} />
     }
 

@@ -2,8 +2,8 @@ import * as React from "react"
 import { cn, cardBase } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
-import { ChevronUp, ChevronDown, ChevronsUpDown, Sparkle } from "lucide-react"
+import { AgentBtn } from "@/components/agent-btn"
+import { ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react"
 
 type DateCategory = "expiring" | "renewal" | "options" | "all"
 type SortKey = "tenant" | "type" | "space" | "date" | "monthsOut"
@@ -55,34 +55,6 @@ function SortIcon({ col, sortKey, sortDir }: { col: SortKey; sortKey: SortKey; s
     : <ChevronDown className="h-3 w-3" />
 }
 
-interface AIButtonProps {
-  onClick: (e: React.MouseEvent) => void
-}
-
-function AIButton({ onClick }: AIButtonProps) {
-  return (
-    <Tooltip>
-      <TooltipTrigger render={<span />}>
-        <Button variant="secondary" size="icon" onClick={onClick} className="h-6 w-6 shrink-0">
-          <Sparkle className="h-3 w-3 text-sidebar-primary" />
-        </Button>
-      </TooltipTrigger>
-      <TooltipContent
-        side="top"
-        className="bg-sidebar text-sidebar-foreground border-transparent font-medium"
-        arrowClassName="fill-sidebar"
-      >
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-1.5 font-medium text-sidebar-foreground">
-            <Sparkle className="h-3 w-3 text-sidebar-primary" />
-            Run agent
-          </div>
-          <p className="text-sidebar-foreground/70 font-normal">Research this date and surface next steps</p>
-        </div>
-      </TooltipContent>
-    </Tooltip>
-  )
-}
 
 const CriticalDates = React.forwardRef<HTMLDivElement, CriticalDatesProps>(
   ({ dates, className }, ref) => {
@@ -193,7 +165,7 @@ const CriticalDates = React.forwardRef<HTMLDivElement, CriticalDatesProps>(
                       </span>
                     </td>
                     <td className="py-2.5 pl-2 text-right whitespace-nowrap">
-                      <AIButton onClick={e => e.stopPropagation()} />
+                      <AgentBtn label="Research this date and surface next steps" onClick={e => e.stopPropagation()} />
                     </td>
                   </tr>
                 )
