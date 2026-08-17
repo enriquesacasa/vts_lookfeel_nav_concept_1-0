@@ -17,6 +17,7 @@ import { DealsPage } from "@/components/deals-page"
 import type { Deal as DealsPageDeal } from "@/components/deals-page"
 import { DealProfile, TenantLogoImage } from "@/components/deal-profile"
 import { ThemeShowcase } from "@/components/theme-showcase"
+import { StackingPlan } from "@/components/stacking-plan"
 import { cn } from "@/lib/utils"
 import buildingImg from "@/assets/building.jpg"
 
@@ -420,6 +421,15 @@ export default function App() {
         </div>
       )
     }
+    if (page === "stacking") {
+      return (
+        <div className="flex flex-col" style={{ minHeight: "calc(100vh - 2rem)" }}>
+          <BuildingHeader {...pagedHeaderProps} />
+          <StackingPlan />
+        </div>
+      )
+    }
+
     if (PAGE_LABELS[page] && page !== "dashboard") {
       return (
         <div className="flex flex-col" style={{minHeight: 'calc(100vh - 2rem)'}}>
