@@ -604,7 +604,7 @@ export const StackingPlan = forwardRef<StackingPlanHandle>(function StackingPlan
   const visibleFilters = showAllFilters ? FILTER_DEFS : FILTER_DEFS.slice(0, 4)
 
   return (
-    <div className="flex flex-col flex-1 bg-background rounded-xl overflow-hidden border border-border mb-6">
+    <div className="flex flex-col flex-1 bg-background rounded-xl overflow-hidden border border-border mt-4 mb-6">
 
       {/* Filter bar */}
       <div className="flex items-center gap-1.5 px-3 py-2 border-b border-border flex-wrap bg-background">
