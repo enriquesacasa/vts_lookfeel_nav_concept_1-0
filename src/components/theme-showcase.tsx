@@ -277,7 +277,7 @@ export function ThemeShowcase({ isDark, onToggleDark, isSingleScale, onToggleSin
         <SectionHeader
           kicker="01 · Color"
           title="One refined indigo, a working system around it."
-          description="A single, considered refined indigo carries every primary action. Around it: a neutral secondary for lower-emphasis controls, four system colors for status and feedback, five chart colors within the same indigo family, and matched neutral scales for light and dark surfaces."
+          description="A single oklch indigo carries every primary action. Around it: a neutral secondary for lower-emphasis controls, four semantic status colors, five chart colors within the same hue family, and two neutral ramps sharing the same chroma and hue axis: one for light surfaces, one for dark."
         />
         <div className="space-y-8">
           {COLOR_SECTIONS.map(section => (
@@ -300,7 +300,7 @@ export function ThemeShowcase({ isDark, onToggleDark, isSingleScale, onToggleSin
         <SectionHeader
           kicker="02 · Gradients"
           title="The page surface, in both modes."
-          description="Two gradients applied to the page body, one per mode. Light mode runs a soft indigo wash from upper left to lower right, staying warm and barely-there. Dark mode deepens the same direction, fading from a muted violet into near-black. Both are defined as CSS utility classes in index.css, separate from the token system."
+          description="Two gradients applied to the base surface, one per mode. Light mode layers soft radial washes in the same oklch hue family as the primary ramp, staying warm and barely-there. Dark mode fades from a muted violet bloom into near-black. Both are CSS utility classes in index.css, separate from the token ramps."
         />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {/* Light mode body — approximate representation */}
@@ -362,8 +362,8 @@ export function ThemeShowcase({ isDark, onToggleDark, isSingleScale, onToggleSin
       <section>
         <SectionHeader
           kicker="04 · Applied"
-          title="One token set. Two neutral scales."
-          description="The same component, the same token classes, two modes. What changes is the neutral scale: background, card, muted, border, and text values all shift. What stays locked: the indigo primary, the sidebar, and every semantic status color."
+          title="One token set. Two neutral ramps."
+          description="The same component, the same token classes, two modes. What changes is the neutral ramp: background, card, muted, border, and foreground surfaces all shift together. What stays locked: the indigo primary, the sidebar surface, and every semantic status color."
         />
         <div className="flex items-center justify-end mb-4">
           <Button
@@ -388,7 +388,7 @@ export function ThemeShowcase({ isDark, onToggleDark, isSingleScale, onToggleSin
         <SectionHeader
           kicker="05 · Elevation"
           title="Flat by default. Floating on purpose."
-          description="Most of this system stays flat. Surfaces separate using value contrast alone. Cards in the app use bg-card/70 with backdrop-blur-md for a glass layer in both modes. Elevation exists for one job: telling you something above the page deserves attention."
+          description="Three surface levels: base, raised glass, and floating. Base is the page canvas. Raised glass sits one ramp step above it using bg-card/70 with backdrop-blur-md, the pattern used across stat tiles, building headers, and content cards. Floating surfaces step further again with deeper blur and shadow, reserved for popovers and modals."
         />
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           <div>
@@ -550,7 +550,7 @@ export function ThemeShowcase({ isDark, onToggleDark, isSingleScale, onToggleSin
         <SectionHeader
           kicker="08 · Navigation"
           title="Always dark. Always oriented."
-          description="The sidebar stays dark regardless of page mode. Sidebar tokens are wired to dark-mode values even in light. In dark mode, --sidebar and --card share the same oklch value (0.18 0.005 258), so the sidebar has zero value contrast from cards; separation comes from layout position alone."
+          description="The sidebar surface uses its own token ramp, wired to dark values in both modes. In light mode it sits as a dark island against the light base surface. In dark mode, the sidebar and card surfaces share the same oklch lightness (0.18), so separation comes from layout position alone, not value contrast."
         />
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div className="rounded-2xl overflow-hidden border border-border max-w-xs">
@@ -594,7 +594,7 @@ export function ThemeShowcase({ isDark, onToggleDark, isSingleScale, onToggleSin
         <SectionHeader
           kicker="09 · AI + Agents"
           title="Intelligence belongs in the workflow."
-          description="AI is part of the system, not a separate visual layer. Agents use the same components, surfaces, states, and interaction patterns as the rest of VTS."
+          description="AI is part of the system, not a separate visual layer. Agents use the same components, surface ramps, states, and interaction patterns as everything else in VTS."
         />
 
         {/* System Principles — full width */}
@@ -724,6 +724,7 @@ export function ThemeShowcase({ isDark, onToggleDark, isSingleScale, onToggleSin
 
 
       </section>
+
 
       {/* Footer */}
       <div className="pb-8 border-t border-border pt-8 text-xs text-muted-foreground">
