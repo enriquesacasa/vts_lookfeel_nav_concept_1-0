@@ -10,16 +10,14 @@ import { cn } from "@/lib/utils"
 // Expiration bucket colors — semantic, intentionally not theme tokens
 // vacant/available use theme-aware values; year buckets are fixed semantic colors
 export const COLORS: Record<string, { bg: string; text: string; dashed?: boolean; darkBg?: string }> = {
-  vacant:    { bg: "oklch(0.26 0.006 258)", darkBg: "oklch(0.22 0.006 261)", text: "oklch(0.72 0.018 278)" },
+  vacant:    { bg: "transparent", text: "oklch(0.60 0.02 258)", dashed: true },
   m2m:       { bg: "#c2410c", text: "#fff" },
   "2026":    { bg: "#b91c1c", text: "#fff" },
   "2027":    { bg: "#a16207", text: "#fff" },
   "2028":    { bg: "#15803d", text: "#fff" },
   "2029":    { bg: "#1d4ed8", text: "#fff" },
-  "2030":    { bg: "#4f46e5", text: "#fff" },
-  "2031":    { bg: "#7c3aed", text: "#fff" },
-  "2032+":   { bg: "oklch(0.30 0.01 258)", darkBg: "oklch(0.26 0.006 261)", text: "oklch(0.78 0.015 278)" },
-  available: { bg: "transparent", text: "oklch(0.60 0.02 258)", dashed: true },
+  "2030":    { bg: "#0f766e", text: "#fff" },
+  available: { bg: "oklch(0.26 0.006 258)", text: "oklch(0.72 0.018 278)" },
 }
 
 type ExpBucket = keyof typeof COLORS
@@ -129,7 +127,7 @@ export type Floor = { number: number; totalSf: number; spaces: Space[] }
 export const floors: Floor[] = [
   {
     number: 15, totalSf: 18000,
-    spaces: [{ suite: "1500", sf: 18000, expBucket: "available", listed: true, daysListed: 47, daysVacant: 62,
+    spaces: [{ suite: "1500", sf: 18000, expBucket: "vacant", listed: true, daysListed: 47, daysVacant: 62,
       encumbrances: [
         { tenant: "Blackstone Group", suite: "1300", optionType: "Expansion Option", priority: 1,
           details: [{ label: "Trigger", value: "Landlord offers space to market" }, { label: "Response Period", value: "60 days written notice" }, { label: "Priority", value: "1st right" }, { label: "Rent Basis", value: "Prevailing market rent" }] },
@@ -139,21 +137,21 @@ export const floors: Floor[] = [
   {
     number: 14, totalSf: 18000,
     spaces: [
-      { suite: "1400", sf: 10000, tenant: "Blackstone Group", dba: "BX Real Estate", standardizedTenant: "Blackstone Inc.", baseRent: 102.50, grossRent: 118.75, inPlaceRent: 102.50, lcd: "07/01/24", lxd: "06/30/34", expBucket: "2032+", industry: "Financial Services", leaseOptions: ["Renewal Option", "ROFO"] },
-      { suite: "1410", sf: 8000, expBucket: "vacant", deals: 1, listed: true, daysListed: 112, daysVacant: 145, internalNote: "Under offer — do not market" },
+      { suite: "1400", sf: 10000, tenant: "Blackstone Group", dba: "BX Real Estate", standardizedTenant: "Blackstone Inc.", baseRent: 102.50, grossRent: 118.75, inPlaceRent: 102.50, lcd: "07/01/20", lxd: "06/30/30", expBucket: "2030", industry: "Financial Services", leaseOptions: ["Renewal Option", "ROFO"] },
+      { suite: "1410", sf: 8000, expBucket: "available", deals: 1, listed: true, daysListed: 112, daysVacant: 145, internalNote: "Under offer — do not market" },
     ],
   },
   {
     number: 13, totalSf: 18000,
-    spaces: [{ suite: "1300", sf: 18000, tenant: "Blackstone Group", dba: "BX Real Estate", standardizedTenant: "Blackstone Inc.", baseRent: 102.50, grossRent: 118.75, inPlaceRent: 102.50, lcd: "07/01/24", lxd: "06/30/34", expBucket: "2032+", industry: "Financial Services", leaseOptions: ["Renewal Option", "Expansion Option", "ROFO"] }],
+    spaces: [{ suite: "1300", sf: 18000, tenant: "Blackstone Group", dba: "BX Real Estate", standardizedTenant: "Blackstone Inc.", baseRent: 102.50, grossRent: 118.75, inPlaceRent: 102.50, lcd: "07/01/20", lxd: "06/30/30", expBucket: "2030", industry: "Financial Services", leaseOptions: ["Renewal Option", "Expansion Option", "ROFO"] }],
   },
   {
     number: 12, totalSf: 18000,
-    spaces: [{ suite: "1200", sf: 18000, tenant: "Vantage Point Capital", standardizedTenant: "Vantage Point Capital LP", baseRent: 98.35, grossRent: 113.20, inPlaceRent: 98.35, lcd: "01/01/23", lxd: "12/31/32", expBucket: "2032+", industry: "Financial Services", leaseOptions: ["Renewal Option"], executedDeal: true }],
+    spaces: [{ suite: "1200", sf: 18000, tenant: "Vantage Point Capital", standardizedTenant: "Vantage Point Capital LP", baseRent: 98.35, grossRent: 113.20, inPlaceRent: 98.35, lcd: "01/01/23", lxd: "12/31/29", expBucket: "2029", industry: "Financial Services", leaseOptions: ["Renewal Option"], executedDeal: true }],
   },
   {
     number: 11, totalSf: 18000,
-    spaces: [{ suite: "1100", sf: 18000, tenant: "Amazon MGM Studios", dba: "Amazon Studios", standardizedTenant: "Amazon.com Inc.", baseRent: 89.12, grossRent: 103.40, inPlaceRent: 89.12, lcd: "10/01/23", lxd: "09/30/33", expBucket: "2032+", industry: "Media & Entertainment", leaseOptions: ["Renewal Option", "Expansion Option"],
+    spaces: [{ suite: "1100", sf: 18000, tenant: "Amazon MGM Studios", dba: "Amazon Studios", standardizedTenant: "Amazon.com Inc.", baseRent: 89.12, grossRent: 103.40, inPlaceRent: 89.12, lcd: "10/01/22", lxd: "09/30/29", expBucket: "2029", industry: "Media & Entertainment", leaseOptions: ["Renewal Option", "Expansion Option"],
       encumbrances: [
         { tenant: "Blackstone Group", suite: "1300", optionType: "Expansion Option", priority: 1,
           details: [{ label: "Trigger", value: "Space becomes available" }, { label: "Response Period", value: "60 days written notice" }, { label: "Priority", value: "1st right — senior claim" }, { label: "Rent Basis", value: "Prevailing market rent" }] },
@@ -162,22 +160,24 @@ export const floors: Floor[] = [
   },
   {
     number: 10, totalSf: 18000,
-    spaces: [{ suite: "1000", sf: 18000, tenant: "Amazon MGM Studios", dba: "Amazon Studios", standardizedTenant: "Amazon.com Inc.", baseRent: 89.12, grossRent: 103.40, inPlaceRent: 89.12, lcd: "10/01/23", lxd: "09/30/33", expBucket: "2032+", industry: "Media & Entertainment" }],
+    spaces: [{ suite: "1000", sf: 18000, tenant: "Amazon MGM Studios", dba: "Amazon Studios", standardizedTenant: "Amazon.com Inc.", baseRent: 89.12, grossRent: 103.40, inPlaceRent: 89.12, lcd: "10/01/20", lxd: "09/30/30", expBucket: "2030", industry: "Media & Entertainment" }],
   },
   {
     number: 9, totalSf: 20000,
-    spaces: [{ suite: "0900", sf: 20000, expBucket: "vacant", deals: 1, dealNote: "Amazon MGM Studios | LCD 01/01/27", committedLease: true, committedTenant: "Amazon MGM Studios", committedLcd: "01/01/27", committedLxd: "12/31/36", committedExpBucket: "2032+", listed: true, daysListed: 28, daysVacant: 90, internalNote: "Preferred deal in LOI stage",
+    spaces: [{ suite: "0900", sf: 20000, expBucket: "vacant", deals: 1, dealNote: "Amazon MGM Studios | LCD 01/01/27", committedLease: true, committedTenant: "Amazon MGM Studios", committedLcd: "01/01/27", committedLxd: "12/31/30", committedExpBucket: "2030", listed: true, daysListed: 28, daysVacant: 90, internalNote: "Preferred deal in LOI stage",
       encumbrances: [
-        { tenant: "Sullivan & Cromwell", suite: "0800", optionType: "ROFR", priority: 1,
+        { tenant: "Sullivan & Cromwell", suite: "0700", optionType: "ROFR", priority: 1,
           details: [{ label: "Trigger", value: "Bona fide third-party offer received" }, { label: "Response Period", value: "5 business days" }, { label: "Priority", value: "1st right" }, { label: "Match Terms", value: "Same as third-party offer" }, { label: "Notice Date", value: "Must notify by Dec 1, 2026" }] },
         { tenant: "Arthur & Brennan LLP", suite: "0400", optionType: "ROFO", priority: 2,
           details: [{ label: "Trigger", value: "Prior to marketing to market" }, { label: "Response Period", value: "10 business days" }, { label: "Priority", value: "2nd right — subordinate to Sullivan ROFR" }, { label: "Rent Basis", value: "As specified in ROFO Notice" }] },
+        { tenant: "Amazon MGM Studios", suite: "1100", optionType: "Expansion Option", priority: 3,
+          details: [{ label: "Trigger", value: "Space becomes available for lease" }, { label: "Response Period", value: "15 business days" }, { label: "Priority", value: "3rd right — subordinate to Sullivan ROFR and Arthur ROFO" }, { label: "Rent Basis", value: "Prevailing market rent" }, { label: "Notice Deadline", value: "Sep 30, 2029" }] },
       ],
     }],
   },
   {
     number: 8, totalSf: 20000,
-    spaces: [{ suite: "0800", sf: 20000, tenant: "Sullivan & Cromwell", standardizedTenant: "Sullivan & Cromwell LLP", baseRent: 93.14, grossRent: 107.60, inPlaceRent: 93.14, lcd: "05/01/20", lxd: "04/30/30", expBucket: "2030", industry: "Legal", leaseOptions: ["Renewal Option", "Termination Option"],
+    spaces: [{ suite: "0800", sf: 20000, tenant: "Sullivan & Cromwell", standardizedTenant: "Sullivan & Cromwell LLP", baseRent: 93.14, grossRent: 107.60, inPlaceRent: 93.14, lcd: "05/01/19", lxd: "04/30/29", expBucket: "2029", industry: "Legal", leaseOptions: ["Renewal Option", "Termination Option"],
       encumbrances: [
         { tenant: "Pacific Wealth Mngt.", suite: "0500", optionType: "ROFO", priority: 1,
           details: [{ label: "Trigger", value: "Sullivan & Cromwell vacates or markets" }, { label: "Response Period", value: "10 business days" }, { label: "Priority", value: "1st right" }, { label: "Rent Basis", value: "As specified in ROFO Notice" }, { label: "Notice Deadline", value: "Apr 30, 2029" }] },
@@ -186,22 +186,22 @@ export const floors: Floor[] = [
   },
   {
     number: 7, totalSf: 20000,
-    spaces: [{ suite: "0700", sf: 20000, tenant: "Sullivan & Cromwell", standardizedTenant: "Sullivan & Cromwell LLP", baseRent: 93.14, grossRent: 107.60, inPlaceRent: 93.14, lcd: "05/01/20", lxd: "04/30/30", expBucket: "2030", industry: "Legal", deals: 1, leaseOptions: ["Renewal Option", "ROFR"], executedDeal: true }],
+    spaces: [{ suite: "0700", sf: 20000, tenant: "Sullivan & Cromwell", standardizedTenant: "Sullivan & Cromwell LLP", baseRent: 93.14, grossRent: 107.60, inPlaceRent: 93.14, lcd: "05/01/19", lxd: "04/30/29", expBucket: "2029", industry: "Legal", deals: 1, leaseOptions: ["Renewal Option", "ROFR"], executedDeal: true }],
   },
   {
     number: 6, totalSf: 20000,
     spaces: [
-      { suite: "0600", sf: 6500, expBucket: "vacant", deals: 1, listed: true, daysListed: 210, daysVacant: 210 },
-      { suite: "0620", sf: 5500, expBucket: "vacant", deals: 2, listed: true, sublease: true, daysListed: 180, daysVacant: 195, internalNote: "Sublease — Tenant marketing directly" },
-      { suite: "0640", sf: 8000, expBucket: "vacant", deals: 1, listed: false, daysVacant: 310 },
+      { suite: "0600", sf: 6500, expBucket: "available", deals: 1, listed: true, daysListed: 210, daysVacant: 210 },
+      { suite: "0620", sf: 5500, expBucket: "available", deals: 2, listed: true, sublease: true, daysListed: 180, daysVacant: 195, internalNote: "Sublease — Tenant marketing directly" },
+      { suite: "0640", sf: 8000, expBucket: "available", deals: 1, listed: false, daysVacant: 310 },
     ],
   },
   {
     number: 5, totalSf: 20000,
-    spaces: [{ suite: "0500", sf: 20000, tenant: "Pacific Wealth Mngt.", standardizedTenant: "Pacific Wealth Management LLC", baseRent: 89.60, grossRent: 104.10, inPlaceRent: 89.60, lcd: "12/01/22", lxd: "11/30/32", expBucket: "2032+", industry: "Financial Services", leaseOptions: ["Renewal Option"],
+    spaces: [{ suite: "0500", sf: 20000, tenant: "Pacific Wealth Mngt.", standardizedTenant: "Pacific Wealth Management LLC", baseRent: 89.60, grossRent: 104.10, inPlaceRent: 89.60, lcd: "12/01/21", lxd: "11/30/28", expBucket: "2028", industry: "Financial Services", leaseOptions: ["Renewal Option", "ROFO"],
       encumbrances: [
         { tenant: "Meridian Health Partners", suite: "0300", optionType: "Expansion Option", priority: 1,
-          details: [{ label: "Trigger", value: "Pacific Wealth vacates or gives back space" }, { label: "Response Period", value: "60 days written notice" }, { label: "Priority", value: "1st right" }, { label: "Rent Basis", value: "Prevailing market rent" }, { label: "Deadline", value: "Nov 30, 2031" }] },
+          details: [{ label: "Trigger", value: "Pacific Wealth vacates or gives back space" }, { label: "Response Period", value: "60 days written notice" }, { label: "Priority", value: "1st right" }, { label: "Rent Basis", value: "Prevailing market rent" }, { label: "Deadline", value: "Nov 30, 2027" }] },
         { tenant: "Carlyle & Associates", suite: "0200", optionType: "ROFR", priority: 2,
           details: [{ label: "Trigger", value: "Bona fide third-party offer on this space" }, { label: "Response Period", value: "5 business days" }, { label: "Priority", value: "2nd right — subordinate to Meridian" }, { label: "Match Terms", value: "Same as third-party offer" }] },
       ],
@@ -218,14 +218,14 @@ export const floors: Floor[] = [
       { suite: "0320", sf: 8000, expBucket: "vacant", listed: true, daysListed: 55, daysVacant: 55,
         encumbrances: [
           { tenant: "Meridian Health Partners", suite: "0300", optionType: "Expansion Option", priority: 1,
-            details: [{ label: "Trigger", value: "Space becomes available" }, { label: "Response Period", value: "60 days written notice" }, { label: "Priority", value: "1st right" }, { label: "Rent Basis", value: "Prevailing market rent" }, { label: "Deadline", value: "Mar 31, 2026" }] },
+            details: [{ label: "Trigger", value: "Space becomes available" }, { label: "Response Period", value: "60 days written notice" }, { label: "Priority", value: "1st right" }, { label: "Rent Basis", value: "Prevailing market rent" }, { label: "Deadline", value: "Mar 31, 2027" }] },
         ],
       },
     ],
   },
   {
     number: 2, totalSf: 20000,
-    spaces: [{ suite: "0200", sf: 20000, tenant: "Carlyle & Associates", dba: "Carlyle Advisory", standardizedTenant: "The Carlyle Group Inc.", baseRent: 91.00, grossRent: 105.25, inPlaceRent: 91.00, lcd: "07/01/20", lxd: "06/30/30", expBucket: "2030", industry: "Financial Services", leaseOptions: ["Renewal Option", "Termination Option"], sublease: true }],
+    spaces: [{ suite: "0200", sf: 20000, tenant: "Carlyle & Associates", dba: "Carlyle Advisory", standardizedTenant: "The Carlyle Group Inc.", baseRent: 91.00, grossRent: 105.25, inPlaceRent: 91.00, lcd: "07/01/18", lxd: "06/30/28", expBucket: "2028", industry: "Financial Services", leaseOptions: ["Renewal Option", "Termination Option", "ROFR"], sublease: true }],
   },
   {
     number: 1, totalSf: 5000,
@@ -241,8 +241,6 @@ const LEGEND_KEYS: { label: string; key: ExpBucket }[] = [
   { label: "2028",      key: "2028" },
   { label: "2029",      key: "2029" },
   { label: "2030",      key: "2030" },
-  { label: "2031",      key: "2031" },
-  { label: "2032+",     key: "2032+" },
   { label: "Available", key: "available" },
 ]
 
@@ -255,7 +253,7 @@ export const FILTER_DEFS: FilterDef[] = [
   { key: "tenant",         label: "Tenant",         options: allTenants.map((t) => ({ label: t, value: t })) },
   { key: "space",          label: "Space",           options: allSpaces.map((s) => ({ label: `${s.suite} — ${(s.sf / 1000).toFixed(0)}K sf`, value: s.suite })) },
   { key: "size",           label: "Size",            options: [{ label: "Under 5,000 sf", value: "xs" }, { label: "5,000–10,000 sf", value: "sm" }, { label: "10,000–20,000 sf", value: "md" }, { label: "Over 20,000 sf", value: "lg" }] },
-  { key: "expBucket",      label: "LXD",             options: LEGEND_KEYS.map(({ label, key }) => ({ label, value: key })) },
+  { key: "expBucket", label: "LXD", options: LEGEND_KEYS.map(({ label, key }) => ({ label, value: key })) },
   { key: "industry",       label: "Industry",        options: ["Financial Services", "Legal", "Technology", "Healthcare", "Retail", "Media & Entertainment"].map((i) => ({ label: i, value: i })) },
   { key: "options",        label: "Options",         options: ["Renewal Option", "Expansion Option", "Termination Option", "ROFO", "ROFR"].map((o) => ({ label: o, value: o })) },
   { key: "encumbrances",   label: "Encumbrances",    options: ["Expansion Option", "ROFO", "ROFR"].map((o) => ({ label: o, value: o })) },
@@ -297,12 +295,12 @@ export function matchesFilters(space: Space, active: Record<string, string[]>): 
   if (f("options").length && !space.leaseOptions?.some((o) => f("options").includes(o))) return false
   if (f("encumbrances").length && !space.encumbrances?.some((e) => f("encumbrances").includes(e.optionType))) return false
   if (f("availability").length) {
-    const isAvailOrVacant = space.expBucket === "available" || space.expBucket === "vacant"
-    if (!f("availability").some((v) => (v === "available" ? isAvailOrVacant : !isAvailOrVacant))) return false
+    const isUnoccupied = space.expBucket === "available" || space.expBucket === "vacant"
+    if (!f("availability").some((v) => (v === "available" ? isUnoccupied : !isUnoccupied))) return false
   }
   if (f("occupancy").length) {
-    const isVacant = space.expBucket === "vacant"
-    const isOccupied = !!space.tenant && !isVacant && space.expBucket !== "available"
+    const isVacant = space.expBucket === "vacant" || space.expBucket === "available"
+    const isOccupied = !!space.tenant && !isVacant
     if (!f("occupancy").some((v) => (v === "vacant" ? isVacant : isOccupied))) return false
   }
   if (f("listingStatus").length) {
@@ -333,9 +331,7 @@ function getExpBucketForYear(y: number): ExpBucket {
   if (y === 2027) return "2027"
   if (y === 2028) return "2028"
   if (y === 2029) return "2029"
-  if (y === 2030) return "2030"
-  if (y === 2031) return "2031"
-  return "2032+"
+  return "2030"
 }
 
 type Encumbrance = NonNullable<Space["encumbrances"]>[0]
@@ -575,7 +571,7 @@ export const StackingPlan = forwardRef<StackingPlanHandle>(function StackingPlan
   const resolvedFloors = floors.map((floor) => {
     const spaces = floor.spaces.map((space) => {
       if (expirationMode === "in-place-committed" && space.committedLease && space.committedTenant) {
-        return { ...space, expBucket: space.committedExpBucket ?? "2032+", tenant: space.committedTenant, lcd: space.committedLcd, lxd: space.committedLxd } as Space
+        return { ...space, expBucket: space.committedExpBucket ?? "2030", tenant: space.committedTenant, lcd: space.committedLcd, lxd: space.committedLxd } as Space
       }
       if (expirationMode === "moving-forward") return getSpaceAtDate(space, sliderDate)
       if (expirationMode === "lease-abstract") { if (!space.tenant) return null; return space }
@@ -604,10 +600,10 @@ export const StackingPlan = forwardRef<StackingPlanHandle>(function StackingPlan
   const visibleFilters = showAllFilters ? FILTER_DEFS : FILTER_DEFS.slice(0, 4)
 
   return (
-    <div className="flex flex-col flex-1 bg-background rounded-xl overflow-hidden border border-border mt-4 mb-6">
+    <div className="flex flex-col flex-1 bg-white/70 dark:bg-white/8 backdrop-blur-md rounded-xl overflow-hidden mt-4 mb-6">
 
       {/* Filter bar */}
-      <div className="flex items-center gap-1.5 px-3 py-2 border-b border-border flex-wrap bg-background">
+      <div className="flex items-center gap-1.5 px-3 py-3 border-b border-border flex-wrap">
         {visibleFilters.map((filter) => (
           <FilterChip key={filter.key} filter={filter} selected={activeFilters[filter.key] ?? []} onToggle={(v) => toggleFilter(filter.key, v)} onClear={() => clearFilter(filter.key)} />
         ))}
@@ -629,37 +625,63 @@ export const StackingPlan = forwardRef<StackingPlanHandle>(function StackingPlan
       </div>
 
       {/* Legend + controls bar */}
-      <div className="flex flex-col border-b border-border bg-background">
-        <div className="flex items-center px-3 py-2 gap-0 overflow-x-auto">
-          <ExpirationModePopover mode={expirationMode} onSelect={setExpirationMode} />
-          <div className="flex items-center overflow-x-auto flex-1 min-w-0">
+      <div className="flex flex-col border-b border-border">
+        {/* Top row: expiration mode + controls (always single line) */}
+        <div className="flex items-stretch border-b border-border sm:border-b-0">
+          <div className="shrink-0 flex items-center px-3 py-2.5 sm:border-r border-border">
+            <ExpirationModePopover mode={expirationMode} onSelect={setExpirationMode} />
+          </div>
+          {/* Legend — inline on sm+, hidden here on mobile */}
+          <div className="hidden sm:flex items-center overflow-x-auto flex-1 min-w-0">
             {bucketStats.map(({ label, key, sf, pct }) => {
               const c = COLORS[key]
               const isActive = (activeFilters.expBucket ?? []).includes(key)
               return (
                 <Button key={key} variant="ghost" onClick={() => toggleFilter("expBucket", key)}
-                  className={cn("flex items-center gap-1.5 px-2 py-1.5 rounded-none border-0 border-r border-border last:border-r-0 shrink-0 h-auto font-normal", isActive && "bg-primary/10")}>
-                  <div className="size-2.5 rounded-sm shrink-0" style={{
+                  className={cn("flex items-center gap-2 px-3 py-2 rounded-none border-0 border-r border-border last:border-r-0 shrink-0 h-full font-normal", isActive && "bg-primary/10")}>
+                  <div className="size-3 rounded-sm shrink-0" style={{
                     background: c.dashed ? "transparent" : c.bg,
                     border: c.dashed ? "1.5px dashed var(--color-border)" : "none",
                     outline: isActive ? "2px solid var(--color-primary)" : "none",
                     outlineOffset: "1px",
                   }} />
-                  <div className="flex flex-col leading-none gap-0.5 text-left">
-                    <span className={cn("text-[11px] font-medium whitespace-nowrap", isActive ? "text-primary" : "text-foreground")}>{label}</span>
-                    <span className="text-[9px] text-muted-foreground whitespace-nowrap hidden sm:block">{pct}% · {sf > 0 ? `${Math.round(sf / 1000)}K sf` : "—"}</span>
+                  <div className="flex flex-col leading-none gap-1 text-left">
+                    <span className={cn("text-xs font-medium whitespace-nowrap", isActive ? "text-primary" : "text-foreground")}>{label}</span>
+                    <span className="text-[10px] text-muted-foreground whitespace-nowrap">{pct}% · {sf > 0 ? `${Math.round(sf / 1000)}K sf` : "—"}</span>
                   </div>
                 </Button>
               )
             })}
           </div>
-          <div className="flex items-center gap-1.5 pl-3 shrink-0">
+          <div className="ml-auto shrink-0 flex items-center gap-1.5 px-3 border-l border-border">
             <ViewSettingsPopover viewType={viewType} onViewTypeChange={setViewType} enabledOptions={enabledOptions} onToggleOption={toggleOption} />
-            <Button size="sm" variant="outline">
-              <DownloadIcon data-icon="inline-start" />
+            <Button size="sm" variant="outline" className="gap-1.5">
+              <DownloadIcon className="size-4 shrink-0" />
               <span className="hidden sm:inline">Export</span>
             </Button>
           </div>
+        </div>
+        {/* Legend row — mobile only, second row */}
+        <div className="flex sm:hidden items-center overflow-x-auto border-b-0">
+          {bucketStats.map(({ label, key, sf, pct }) => {
+            const c = COLORS[key]
+            const isActive = (activeFilters.expBucket ?? []).includes(key)
+            return (
+              <Button key={key} variant="ghost" onClick={() => toggleFilter("expBucket", key)}
+                className={cn("flex items-center gap-2 px-3 py-2 rounded-none border-0 border-r border-border last:border-r-0 shrink-0 h-auto font-normal", isActive && "bg-primary/10")}>
+                <div className="size-3 rounded-sm shrink-0" style={{
+                  background: c.dashed ? "transparent" : c.bg,
+                  border: c.dashed ? "1.5px dashed var(--color-border)" : "none",
+                  outline: isActive ? "2px solid var(--color-primary)" : "none",
+                  outlineOffset: "1px",
+                }} />
+                <div className="flex flex-col leading-none gap-1 text-left">
+                  <span className={cn("text-xs font-medium whitespace-nowrap", isActive ? "text-primary" : "text-foreground")}>{label}</span>
+                  <span className="text-[10px] text-muted-foreground whitespace-nowrap">{pct}% · {sf > 0 ? `${Math.round(sf / 1000)}K sf` : "—"}</span>
+                </div>
+              </Button>
+            )
+          })}
         </div>
 
         {expirationMode === "moving-forward" && (
