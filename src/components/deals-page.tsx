@@ -270,15 +270,13 @@ function AiInsightCard() {
             "group/row",
             isV2
               ? "flex items-center gap-3 px-4 py-3 border-b border-sidebar-border/50 last:border-0 hover:bg-sidebar-accent/40 transition-colors"
-              : "flex items-center gap-3 rounded-lg border border-primary/25 bg-primary/15 px-3 py-2.5"
+              : "flex items-center gap-3 rounded-lg border border-primary/25 bg-primary/15 px-3 py-2.5 agent-row"
           )}>
             <Sparkle className="h-3.5 w-3.5 shrink-0 text-sidebar-primary" />
             <p className="text-sm text-sidebar-foreground/85 flex-1 min-w-0 truncate">{item.text}</p>
             <div className="relative shrink-0">
               <span className="text-sm font-medium tabular-nums text-sidebar-primary transition-opacity duration-150 group-hover/row:opacity-0">{item.value}</span>
-              <Button variant="outline" size="sm" className={cn("absolute inset-y-0 right-0 gap-1.5 opacity-0 group-hover/row:opacity-100 transition-opacity duration-150 text-xs whitespace-nowrap my-auto h-auto py-1", sidebarBtn)}>
-                <Sparkle className="h-3 w-3" />Run agent
-              </Button>
+              <AgentBtn variant="run" label="Run agent" className="absolute inset-y-0 right-0 opacity-0 group-hover/row:opacity-100 transition-opacity duration-150 my-auto h-auto py-1" />
             </div>
           </div>
         ))}

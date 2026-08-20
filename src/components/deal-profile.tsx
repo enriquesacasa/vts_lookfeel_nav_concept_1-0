@@ -14,6 +14,7 @@ import {
   AlertCircle, Eye, FileText, MessageSquare,
   ArrowDownLeft, ArrowUpRight, Sparkle, Plus,
 } from "lucide-react"
+import { AgentBtn } from "@/components/agent-btn"
 import type { Deal } from "@/components/deals-page"
 
 // ─── Tenant logo ──────────────────────────────────────────────────────────────
@@ -560,10 +561,7 @@ export function DealProfile({ deal, onBack }: DealProfileProps) {
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between gap-2">
                   <p className="text-sm font-medium text-sidebar-foreground/90">{title}</p>
-                  <Button variant="outline" size="sm" className="opacity-0 group-hover/row:opacity-100 gap-1 shrink-0 text-white border-white/30 hover:bg-white/10 hover:text-white">
-                    <Sparkle className="h-3 w-3" />
-                    Run Agent
-                  </Button>
+                  <AgentBtn variant="run" label="Run Agent" className="opacity-0 group-hover/row:opacity-100 text-white border-white/30 hover:bg-white/10 hover:text-white" />
                 </div>
                 <p className="text-sm text-sidebar-foreground/55">{detail}</p>
               </div>

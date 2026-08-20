@@ -2,6 +2,7 @@ import * as React from "react"
 import { cn, cardBase, sidebarBtn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { AlertTriangle, Zap, ShieldAlert, Sparkle, TrendingUp } from "lucide-react"
+import { AgentBtn } from "@/components/agent-btn"
 
 interface ActionItem {
   type: "risk" | "upside" | "ops"
@@ -44,7 +45,7 @@ const CONFIG = {
 function ActionRow({ item, onRun }: { item: ActionItem; onRun: () => void }) {
   const cfg = CONFIG[item.type]
   return (
-    <div className="rounded-lg border border-primary/25 bg-primary/15 p-3 group/row">
+    <div className="rounded-lg border border-primary/25 bg-primary/15 p-3 group/row agent-row">
       <div className="flex items-start gap-2.5">
         <cfg.icon className="h-4 w-4 mt-0.5 shrink-0 text-sidebar-primary" />
         <div className="flex-1 min-w-0">
@@ -57,15 +58,7 @@ function ActionRow({ item, onRun }: { item: ActionItem; onRun: () => void }) {
               <TrendingUp className="h-3 w-3 shrink-0 text-sidebar-foreground/50" />
               <span className="text-sm text-sidebar-foreground/60">{item.impact}</span>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onRun}
-              className={cn("opacity-0 group-hover/row:opacity-100 gap-1.5", sidebarBtn)}
-            >
-              <Sparkle className="h-3 w-3" />
-              Run agent
-            </Button>
+            <AgentBtn variant="run" label={item.text} onClick={onRun} className="opacity-0 group-hover/row:opacity-100" />
           </div>
           {item.detail && (
             <p className="text-sm mt-0.5 text-sidebar-foreground/50">{item.detail}</p>

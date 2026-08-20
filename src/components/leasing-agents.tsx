@@ -2,6 +2,7 @@ import * as React from "react"
 import { cn, cardBase, sidebarBtn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { AlertTriangle, Clock, Sparkle } from "lucide-react"
+import { AgentBtn } from "@/components/agent-btn"
 import type { Deal, DecisionItem } from "@/components/leasing-activity"
 
 interface LeasingAgentsProps {
@@ -48,17 +49,14 @@ const LeasingAgents = React.forwardRef<HTMLDivElement, LeasingAgentsProps>(
             <div className="flex flex-col gap-2">
               {atRisk.map((d, i) => (
                 <div key={i} className={cn(
-                  "flex items-start gap-2.5 rounded-lg p-3 group/row",
+                  "flex items-start gap-2.5 rounded-lg p-3 group/row agent-row",
                   "border border-primary/25 bg-primary/15"
                 )}>
                   <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0 text-sidebar-primary" />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
                       <p className="text-sm font-medium text-sidebar-foreground/90">{d.tenant}</p>
-                      <Button variant="outline" size="sm" className={cn("opacity-0 group-hover/row:opacity-100 gap-1 shrink-0", sidebarBtn)}>
-                        <Sparkle className="h-3 w-3" />
-                        Run agent
-                      </Button>
+                      <AgentBtn variant="run" label="Run agent" className="opacity-0 group-hover/row:opacity-100" />
                     </div>
                     <p className="text-sm text-sidebar-foreground/55">{d.space} · {d.stage}</p>
                     {d.note && <p className="text-sm text-sidebar-foreground/45 mt-0.5">{d.note}</p>}
@@ -78,15 +76,12 @@ const LeasingAgents = React.forwardRef<HTMLDivElement, LeasingAgentsProps>(
           ) : (
             <div className="flex flex-col gap-2">
               {decisions.map((item, i) => (
-                <div key={i} className="flex items-start gap-2.5 rounded-lg border border-primary/25 bg-primary/15 p-3 group/row">
+                <div key={i} className="flex items-start gap-2.5 rounded-lg border border-primary/25 bg-primary/15 p-3 group/row agent-row">
                   <Clock className="h-4 w-4 mt-0.5 shrink-0 text-sidebar-primary" />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
                       <p className="text-sm font-medium text-sidebar-foreground/90">{item.tenant}</p>
-                      <Button variant="outline" size="sm" className={cn("opacity-0 group-hover/row:opacity-100 gap-1 shrink-0", sidebarBtn)}>
-                        <Sparkle className="h-3 w-3" />
-                        Run agent
-                      </Button>
+                      <AgentBtn variant="run" label="Run agent" className="opacity-0 group-hover/row:opacity-100" />
                     </div>
                     <p className="text-sm text-sidebar-foreground/55">{item.action}</p>
                     <p className="text-sm font-medium text-sidebar-primary mt-0.5">In approval for {item.inApprovalFor}</p>

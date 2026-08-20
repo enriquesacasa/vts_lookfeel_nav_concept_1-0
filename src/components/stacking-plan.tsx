@@ -11,12 +11,12 @@ import { cn } from "@/lib/utils"
 // vacant/available use theme-aware values; year buckets are fixed semantic colors
 export const COLORS: Record<string, { bg: string; text: string; dashed?: boolean; darkBg?: string }> = {
   vacant:    { bg: "transparent", text: "oklch(0.60 0.02 258)", dashed: true },
-  m2m:       { bg: "#c2410c", text: "#fff" },
-  "2026":    { bg: "#b91c1c", text: "#fff" },
-  "2027":    { bg: "#a16207", text: "#fff" },
-  "2028":    { bg: "#15803d", text: "#fff" },
-  "2029":    { bg: "#1d4ed8", text: "#fff" },
-  "2030":    { bg: "#0f766e", text: "#fff" },
+  m2m:       { bg: "var(--color-destructive)", text: "#fff" },
+  "2026":    { bg: "var(--color-chart-1)",     text: "#fff" },
+  "2027":    { bg: "var(--color-chart-2)",     text: "#fff" },
+  "2028":    { bg: "var(--color-chart-3)",     text: "#fff" },
+  "2029":    { bg: "var(--color-chart-4)",     text: "#fff" },
+  "2030":    { bg: "var(--color-chart-5)",     text: "#fff" },
   available: { bg: "oklch(0.26 0.006 258)", text: "oklch(0.72 0.018 278)" },
 }
 
