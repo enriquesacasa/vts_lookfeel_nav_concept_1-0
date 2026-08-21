@@ -193,7 +193,6 @@ export default function App() {
   const [currentPage, setCurrentPage] = React.useState(() => parseHash().page)
   const [selectedDeal, setSelectedDeal] = React.useState<DealsPageDeal | null>(null)
   const [isDark, setIsDark] = React.useState(false)
-  const [isSingleScale, setIsSingleScale] = React.useState(false)
 
   React.useEffect(() => {
     const globalPages = ["theme", "activity", "reminders"]
@@ -221,14 +220,6 @@ export default function App() {
     })
   }
 
-  const toggleSingleScale = () => {
-    setIsSingleScale(s => {
-      const next = !s
-      document.documentElement.classList.toggle("single-scale", next)
-      return next
-    })
-  }
-
   const PAGE_LABELS: Record<string, string> = {
     "dashboard": "Overview",
     "stacking": "Stacking plan", "spaces": "Spaces",
@@ -249,7 +240,7 @@ export default function App() {
 
   const renderPage = (page: string) => {
     if (page === "avatar" || page === "theme") {
-      return <ThemeShowcase isDark={isDark} onToggleDark={toggleDark} isSingleScale={isSingleScale} onToggleSingleScale={toggleSingleScale} />
+      return <ThemeShowcase isDark={isDark} onToggleDark={toggleDark} />
     }
 
     if (page === "ai") {

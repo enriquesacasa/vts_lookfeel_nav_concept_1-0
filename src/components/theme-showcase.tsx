@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Sun, Moon, Check, ArrowRight, ChevronRight, Palette, CheckCircle2, Loader2, Clock, Sparkle, LayoutGrid, FileText, Handshake, Calculator, UserCircle } from "lucide-react"
+import { Sun, Moon, Check, ArrowRight, ChevronRight, CheckCircle2, Loader2, Clock, Sparkle, LayoutGrid, FileText, Handshake, Calculator, UserCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
@@ -215,11 +215,9 @@ function MiniPanel({ mode }: { mode: "light" | "dark" }) {
 interface ThemeShowcaseProps {
   isDark: boolean
   onToggleDark: () => void
-  isSingleScale: boolean
-  onToggleSingleScale: () => void
 }
 
-export function ThemeShowcase({ isDark, onToggleDark, isSingleScale, onToggleSingleScale }: ThemeShowcaseProps) {
+export function ThemeShowcase({ isDark, onToggleDark }: ThemeShowcaseProps) {
   const [panelDark, setPanelDark] = React.useState(false)
   return (
     <>
@@ -251,17 +249,7 @@ export function ThemeShowcase({ isDark, onToggleDark, isSingleScale, onToggleSin
               {isDark ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
               {isDark ? "Dark Mode" : "Light Mode"}
             </Button>
-            <Button
-              variant={isDark ? "outline" : "secondary"}
-              onClick={onToggleSingleScale}
-              className={cn(
-                "shrink-0 rounded-full gap-2",
-                isDark && "bg-sidebar text-sidebar-foreground border-sidebar-foreground/80 hover:bg-sidebar-accent"
-              )}
-            >
-              <Palette className="h-4 w-4" />
-              {isSingleScale ? "Single Scale" : "Dual Scales"}
-            </Button>
+
           </div>
         </div>
         <h1 className="text-[60px] font-semibold tracking-[-0.02em] leading-[1.08] text-foreground mb-5 max-w-[780px]">

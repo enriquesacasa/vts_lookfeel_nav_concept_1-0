@@ -186,12 +186,6 @@
     color-scheme: light;
 }
 
-/* Single scale — same primary in both light and dark modes */
-html.single-scale {
-    --primary: #684DFF;
-    --primary-foreground: oklch(1 0 0);
-    --ring: #684DFF;
-}
 
 .dark .nav-glow {
     box-shadow: none;
