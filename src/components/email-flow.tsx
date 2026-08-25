@@ -317,7 +317,7 @@ function ConfirmDetail({ onBack }: { onBack?: () => void }) {
                   </svg>
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-primary mb-1">Deal Capture Agent</p>
+                  <p className="text-lg font-semibold text-primary mb-1">Deal Capture Agent</p>
                   <p className="text-sm text-foreground/80 leading-relaxed">Parsed your forwarded email and extracted the deal details below.</p>
                 </div>
               </div>
