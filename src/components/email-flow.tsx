@@ -3,7 +3,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import { ArrowLeft, Menu, X } from "lucide-react"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { ArrowLeft, ChevronRight, Menu, X } from "lucide-react"
 
 interface EmailFlowProps {
   step: "inbox" | "forward" | "confirm"
@@ -60,8 +61,8 @@ const FOLDERS = [
 const VTS_CONFIRM_EMAIL = {
   from: "VTS",
   email: "noreply@vts.com",
-  subject: "Deal Created: Amazon | VTS Tower – Floor 8",
-  preview: "A new deal has been created: Amazon | VTS Tower – Floor 8...",
+  subject: "New Deal Ready: Amazon | VTS Tower – Floor 8",
+  preview: "We picked up an inquiry from your forwarded email — review and add it to your pipeline.",
   time: "Just now",
   unread: true,
 }
@@ -165,6 +166,31 @@ function InboxDetail({ onForward, onBack }: { onForward: () => void; onBack?: ()
 }
 
 function ForwardCompose({ onSend }: { onSend: () => void }) {
+  const [sent, setSent] = React.useState(false)
+
+  if (sent) {
+    return (
+      <div className="flex flex-col h-full items-center justify-center gap-4 p-8 text-center">
+        <div className="w-12 h-12 rounded-full bg-green-50 border border-green-200 flex items-center justify-center">
+          <svg className="w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+        <div>
+          <p className="text-base font-semibold text-gray-900 mb-1">Email Sent</p>
+          <p className="text-sm text-gray-500">Forwarded to <span className="font-medium text-gray-700">deal-capture@vts.com</span>.<br />VTS will process it and confirm shortly.</p>
+        </div>
+        <Button
+          size="sm"
+          className="bg-blue-600 hover:bg-blue-700 text-white mt-2"
+          onClick={onSend}
+        >
+          Back to Inbox
+        </Button>
+      </div>
+    )
+  }
+
   return (
     <div className="flex flex-col h-full">
       <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 shrink-0">
@@ -174,7 +200,7 @@ function ForwardCompose({ onSend }: { onSend: () => void }) {
         <div className="space-y-3">
           <div className="flex items-center gap-3">
             <span className="text-sm text-gray-500 w-14 shrink-0">To</span>
-            <Input defaultValue="deals@vts.com" className="text-sm border-gray-300 bg-white" readOnly />
+            <Input defaultValue="deal-capture@vts.com" className="text-sm border-gray-300 bg-white" readOnly />
           </div>
           <div className="flex items-center gap-3">
             <span className="text-sm text-gray-500 w-14 shrink-0">Subject</span>
@@ -196,7 +222,7 @@ function ForwardCompose({ onSend }: { onSend: () => void }) {
           </div>
         </div>
         <div className="flex gap-2 pt-2 shrink-0">
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white" onClick={onSend}>Send</Button>
+          <Button className="bg-blue-600 hover:bg-blue-700 text-white" onClick={() => setSent(true)}>Send</Button>
           <Button variant="outline" className="border-gray-300 text-gray-600" onClick={() => { window.location.hash = "#/email" }}>Discard</Button>
         </div>
       </div>
@@ -204,25 +230,40 @@ function ForwardCompose({ onSend }: { onSend: () => void }) {
   )
 }
 
-// VTS primary periwinkle
 const VTS_PRIMARY = "oklch(0.51 0.175 277)"
-const VTS_PRIMARY_LIGHT = "oklch(0.92 0.04 278)"
 
-function VtsLogoMark({ className }: { className?: string }) {
+const VTS_LOGO_PATHS = (
+  <>
+    <path d="M262.948 37.923L282.271 99.5913L301.591 37.923H321.723L293.26 121.804H270.12L241.889 37.923H262.948Z" fill="currentColor"/>
+    <path d="M378.745 55.2793H351.903V37.923H425.601V55.2793H398.645V121.804H378.745V55.2793Z" fill="currentColor"/>
+    <path d="M491.06 52.3862C483.422 52.3862 477.756 55.2794 477.756 60.4835C477.756 64.6518 481.688 67.6581 487.475 68.9305L498.928 71.2439C512.464 74.021 529.588 78.1862 529.588 95.7721C529.588 113.358 511.885 123.31 494.416 123.31C472.895 123.31 458.78 112.549 455.771 94.4997H475.441C477.639 103.293 484.581 107.342 494.879 107.342C501.588 107.342 509.224 105.144 509.224 98.2023C509.224 92.7658 502.747 90.1023 493.604 88.1371L483.422 86.0533C469.77 83.1633 457.392 76.6841 457.392 61.6418C457.392 44.519 475.788 36.5351 492.217 36.5351C508.646 36.5351 524.265 43.7095 527.158 62.2215H507.604C505.636 55.9721 499.506 52.3862 491.06 52.3862Z" fill="currentColor"/>
+    <path d="M108.553 46.9088L136.165 65.2593L156.596 51.7396L108.553 19.812L108.485 19.8573L60.427 51.7926L80.8551 65.3125L108.485 46.953L108.553 46.9088Z" fill="currentColor"/>
+    <path d="M108.47 105.303L25.0786 53.0043V87.8887L108.47 140.187L108.485 140.179L191.889 87.8741V52.9871L108.485 105.293L108.47 105.303Z" fill="currentColor"/>
+  </>
+)
+
+function VtsLogo({ height, color }: { height: number; color: string }) {
   return (
-    <svg viewBox="0 0 555 160" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-      <path d="M262.948 37.923L282.271 99.5913L301.591 37.923H321.723L293.26 121.804H270.12L241.889 37.923H262.948Z" fill="currentColor"/>
-      <path d="M378.745 55.2793H351.903V37.923H425.601V55.2793H398.645V121.804H378.745V55.2793Z" fill="currentColor"/>
-      <path d="M491.06 52.3862C483.422 52.3862 477.756 55.2794 477.756 60.4835C477.756 64.6518 481.688 67.6581 487.475 68.9305L498.928 71.2439C512.464 74.021 529.588 78.1862 529.588 95.7721C529.588 113.358 511.885 123.31 494.416 123.31C472.895 123.31 458.78 112.549 455.771 94.4997H475.441C477.639 103.293 484.581 107.342 494.879 107.342C501.588 107.342 509.224 105.144 509.224 98.2023C509.224 92.7658 502.747 90.1023 493.604 88.1371L483.422 86.0533C469.77 83.1633 457.392 76.6841 457.392 61.6418C457.392 44.519 475.788 36.5351 492.217 36.5351C508.646 36.5351 524.265 43.7095 527.158 62.2215H507.604C505.636 55.9721 499.506 52.3862 491.06 52.3862Z" fill="currentColor"/>
-      <path d="M108.553 46.9088L136.165 65.2593L156.596 51.7396L108.553 19.812L108.485 19.8573L60.427 51.7926L80.8551 65.3125L108.485 46.953L108.553 46.9088Z" fill="currentColor"/>
-      <path d="M108.47 105.303L25.0786 53.0043V87.8887L108.47 140.187L108.485 140.179L191.889 87.8741V52.9871L108.485 105.293L108.47 105.303Z" fill="currentColor"/>
+    <svg viewBox="0 0 555 160" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ height, width: "auto", color }}>
+      {VTS_LOGO_PATHS}
     </svg>
   )
 }
 
+const DEAL_ROWS: [string, string][] = [
+  ["Stage", "Inquiry"],
+  ["Tenant", "Amazon"],
+  ["Asset", "VTS Tower"],
+  ["Space", "Suite 0800 – Floor 8"],
+  ["Size", "18,000 sf"],
+  ["Tenant Rep", "Sarah Okonkwo · CBRE"],
+  ["Source", "Forwarded email"],
+]
+
 function ConfirmDetail({ onBack }: { onBack?: () => void }) {
   return (
     <div className="flex flex-col h-full">
+      {/* Email toolbar */}
       <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 shrink-0">
         <div className="flex items-start gap-3">
           {onBack && (
@@ -231,7 +272,9 @@ function ConfirmDetail({ onBack }: { onBack?: () => void }) {
             </button>
           )}
           <div className="flex-1 min-w-0">
-            <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-1 leading-tight">Deal Created: Amazon | VTS Tower – Floor 8</h2>
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-1 leading-tight">
+              New Deal Ready: Amazon | VTS Tower – Floor 8
+            </h2>
             <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs sm:text-sm text-gray-500">
               <span className="font-medium text-gray-700">VTS</span>
               <span className="hidden sm:inline">&lt;noreply@vts.com&gt;</span>
@@ -241,67 +284,70 @@ function ConfirmDetail({ onBack }: { onBack?: () => void }) {
           <Button variant="outline" size="sm" className="text-gray-600 border-gray-300 shrink-0">Archive</Button>
         </div>
       </div>
-      <div className="flex-1 overflow-auto px-4 sm:px-6 py-4 sm:py-5">
-        <div className="max-w-xl mx-auto">
-          <div className="rounded-xl overflow-hidden bg-white" style={{ border: `1px solid ${VTS_PRIMARY}33` }}>
-            {/* VTS branded header */}
-            <div className="px-6 py-5 flex items-center gap-4" style={{ background: VTS_PRIMARY }}>
-              <VtsLogoMark className="h-7 w-auto text-white" />
-              <div className="w-px h-6 bg-white/30" />
-              <span className="text-white/90 text-sm font-medium tracking-wide">Deal Notification</span>
+
+      {/* Email body */}
+      <div className="flex-1 overflow-auto bg-muted/40 px-4 sm:px-8 py-6">
+        <div className="max-w-lg mx-auto">
+          <div className="rounded-2xl overflow-hidden shadow-sm border border-border">
+
+            {/* Header */}
+            <div className="px-8 py-7 flex items-center justify-between bg-sidebar">
+              <VtsLogo height={28} color="white" />
+              <span className="text-xs font-medium uppercase tracking-widest text-white">
+                Action Required
+              </span>
             </div>
 
-            {/* Accent strip */}
-            <div className="h-1" style={{ background: `linear-gradient(90deg, ${VTS_PRIMARY}, oklch(0.60 0.15 300))` }} />
-
-            <div className="px-5 sm:px-6 py-6 space-y-5">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: VTS_PRIMARY }}>New Deal Created</p>
-                <h3 className="text-xl font-semibold text-gray-900 mb-1">Amazon · VTS Tower</h3>
-                <p className="text-sm text-gray-500">VTS automatically created a deal from the email you forwarded to <span className="font-medium text-gray-700">deals@vts.com</span>.</p>
+            {/* Body */}
+            <div className="bg-card px-8 py-8 space-y-6">
+              <div className="space-y-1.5">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-primary">
+                  New Deal Ready
+                </p>
+                <h3 className="text-2xl font-semibold tracking-tight text-foreground">
+                  Amazon · VTS Tower
+                </h3>
               </div>
 
-              <div className="rounded-lg overflow-hidden" style={{ border: `1px solid ${VTS_PRIMARY}22`, background: VTS_PRIMARY_LIGHT }}>
-                <table className="w-full text-sm">
-                  <tbody>
-                    {[
-                      ["Tenant", "Amazon"],
-                      ["Asset", "VTS Tower"],
-                      ["Space", "Suite 0800 – Floor 8"],
-                      ["Size", "18,000 sf"],
-                      ["Stage", "Prospect"],
-                      ["Created from", "Forwarded email"],
-                    ].map(([label, value]) => (
-                      <tr key={label} className="border-b last:border-0" style={{ borderColor: `${VTS_PRIMARY}18` }}>
-                        <td className="px-4 py-2.5 text-gray-500 font-medium w-32">{label}</td>
-                        <td className="px-4 py-2.5 text-gray-900 font-medium">{value}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              {/* Deal Capture agent callout */}
+              <div className="flex items-start gap-4 rounded-xl bg-primary/5 border border-primary/15 px-5 py-5">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 border border-primary/20 mt-0.5">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-primary">
+                    <ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.657 4.03 3 9 3s9-1.343 9-3V5"/><path d="M3 12c0 1.657 4.03 3 9 3s9-1.343 9-3"/>
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-primary mb-1">Deal Capture Agent</p>
+                  <p className="text-sm text-foreground/80 leading-relaxed">Parsed your forwarded email and extracted the deal details below.</p>
+                </div>
               </div>
 
-              <button
-                className="w-full py-3 rounded-lg text-white text-sm font-semibold transition-opacity hover:opacity-90"
-                style={{ background: VTS_PRIMARY }}
-                onClick={() => { window.location.hash = "#/deals" }}
-              >
-                View Deal in VTS →
-              </button>
+              {/* Deal details */}
+              <div className="rounded-xl overflow-hidden border border-border">
+                {DEAL_ROWS.map(([label, value], i) => (
+                  <div key={label} className={`flex items-center px-5 py-3 ${i < DEAL_ROWS.length - 1 ? "border-b border-border" : ""} ${i % 2 === 0 ? "bg-card" : "bg-muted/40"}`}>
+                    <span className="w-28 text-sm shrink-0 text-muted-foreground">{label}</span>
+                    <span className="text-sm font-medium text-foreground">{value}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Actions */}
+              <div className="flex flex-col gap-2">
+                <Button className="w-full" size="lg" onClick={() => { window.location.hash = "#/deals?deal=d00" }}>
+                  Add to Deal Pipeline
+                </Button>
+                <Button variant="outline" className="w-full" size="lg" onClick={onBack}>
+                  This doesn't look right
+                </Button>
+              </div>
             </div>
 
-            <div className="px-5 py-4 border-t" style={{ borderColor: `${VTS_PRIMARY}20`, background: `${VTS_PRIMARY}08` }}>
-              <div className="flex items-center justify-center gap-2 mb-1">
-                <svg viewBox="0 0 555 160" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-3 w-auto" style={{ color: VTS_PRIMARY }}>
-                  <path d="M262.948 37.923L282.271 99.5913L301.591 37.923H321.723L293.26 121.804H270.12L241.889 37.923H262.948Z" fill="currentColor"/>
-                  <path d="M378.745 55.2793H351.903V37.923H425.601V55.2793H398.645V121.804H378.745V55.2793Z" fill="currentColor"/>
-                  <path d="M491.06 52.3862C483.422 52.3862 477.756 55.2794 477.756 60.4835C477.756 64.6518 481.688 67.6581 487.475 68.9305L498.928 71.2439C512.464 74.021 529.588 78.1862 529.588 95.7721C529.588 113.358 511.885 123.31 494.416 123.31C472.895 123.31 458.78 112.549 455.771 94.4997H475.441C477.639 103.293 484.581 107.342 494.879 107.342C501.588 107.342 509.224 105.144 509.224 98.2023C509.224 92.7658 502.747 90.1023 493.604 88.1371L483.422 86.0533C469.77 83.1633 457.392 76.6841 457.392 61.6418C457.392 44.519 475.788 36.5351 492.217 36.5351C508.646 36.5351 524.265 43.7095 527.158 62.2215H507.604C505.636 55.9721 499.506 52.3862 491.06 52.3862Z" fill="currentColor"/>
-                  <path d="M108.553 46.9088L136.165 65.2593L156.596 51.7396L108.553 19.812L108.485 19.8573L60.427 51.7926L80.8551 65.3125L108.485 46.953L108.553 46.9088Z" fill="currentColor"/>
-                  <path d="M108.47 105.303L25.0786 53.0043V87.8887L108.47 140.187L108.485 140.179L191.889 87.8741V52.9871L108.485 105.293L108.47 105.303Z" fill="currentColor"/>
-                </svg>
-              </div>
-              <p className="text-xs text-center" style={{ color: VTS_PRIMARY }}>
-                This deal was automatically created from the email you forwarded to deals@vts.com
+            {/* Footer */}
+            <div className="px-8 py-6 flex flex-col items-center gap-3 bg-muted/60 border-t border-border">
+              <VtsLogo height={20} color={VTS_PRIMARY} />
+              <p className="text-xs text-center leading-relaxed text-muted-foreground">
+                Forwarded to <span className="font-medium">deal-capture@vts.com</span> · Only you can approve this deal
               </p>
             </div>
           </div>
@@ -312,17 +358,17 @@ function ConfirmDetail({ onBack }: { onBack?: () => void }) {
 }
 
 export function EmailFlow({ step }: EmailFlowProps) {
-  const [selectedEmail, setSelectedEmail] = React.useState("amazon")
+  const [selectedEmail, setSelectedEmail] = React.useState<string | null>(step === "confirm" ? null : "amazon")
   const [sidebarOpen, setSidebarOpen] = React.useState(false)
-  // On mobile: show list or detail
   const [mobileView, setMobileView] = React.useState<"list" | "detail">("list")
+  const [gmailLogoOpen, setGmailLogoOpen] = React.useState(false)
 
   const confirmEmails = step === "confirm"
     ? [{ id: "vts-confirm", from: VTS_CONFIRM_EMAIL.from, email: VTS_CONFIRM_EMAIL.email, subject: VTS_CONFIRM_EMAIL.subject, preview: VTS_CONFIRM_EMAIL.preview, time: VTS_CONFIRM_EMAIL.time, unread: true }, ...EMAILS]
     : EMAILS
 
   React.useEffect(() => {
-    if (step === "confirm") { setSelectedEmail("vts-confirm"); setMobileView("detail") }
+    if (step === "confirm") { setSelectedEmail(null); setMobileView("list") }
     if (step === "forward") setMobileView("detail")
   }, [step])
 
@@ -332,13 +378,67 @@ export function EmailFlow({ step }: EmailFlowProps) {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-white overflow-hidden">
+    <div className="force-light h-screen flex flex-col bg-white overflow-hidden">
       {/* Top bar */}
       <div className="flex items-center gap-3 px-3 sm:px-4 py-2 border-b border-gray-200 bg-white shrink-0">
         <button className="p-1.5 rounded-full hover:bg-gray-100 text-gray-600 md:hidden" onClick={() => setSidebarOpen(o => !o)}>
           <Menu className="w-5 h-5" />
         </button>
-        <GmailLogo className="w-8 h-8 shrink-0" />
+        <Popover open={gmailLogoOpen} onOpenChange={setGmailLogoOpen}>
+          <PopoverTrigger render={<div className="shrink-0 cursor-pointer" />}>
+            <GmailLogo className="w-8 h-8" />
+          </PopoverTrigger>
+          <PopoverContent className="w-64 p-0 overflow-hidden" align="start">
+            {/* Experience */}
+            <div className="px-3 py-2.5 border-b border-border">
+              <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-2">Experience</p>
+              <div className="flex flex-col gap-1">
+                {["Asset Manager", "Broker"].map(exp => (
+                  <div key={exp} className="flex items-center justify-between px-2.5 py-2 rounded-lg bg-muted/40 opacity-60 cursor-not-allowed">
+                    <span className="text-sm text-foreground">{exp}</span>
+                    <Badge variant="secondary" className="text-[10px] h-4 px-1.5">Coming Soon</Badge>
+                  </div>
+                ))}
+              </div>
+            </div>
+            {/* Prototype */}
+            <div className="px-3 py-2.5 border-b border-border">
+              <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-2">Prototype</p>
+              <div className="flex flex-col gap-0.5">
+                {[
+                  { label: "Main View",                hash: "#/dashboard" },
+                  { label: "Inquiry Email",           hash: "#/inquiry-email" },
+                  { label: "Inquiry Email Forward",   hash: "#/inquiry-email-forward" },
+                  { label: "Inquiry Email Confirm",   hash: "#/inquiry-email-confirm" },
+                ].map(link => (
+                  <button key={link.hash}
+                    onClick={() => { window.location.hash = link.hash; setGmailLogoOpen(false) }}
+                    className="flex items-center justify-between w-full px-2.5 py-1.5 rounded-lg text-sm text-foreground hover:bg-muted/60 transition-colors text-left">
+                    {link.label}
+                    <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/50" />
+                  </button>
+                ))}
+              </div>
+            </div>
+            {/* Documentation */}
+            <div className="px-3 py-2.5">
+              <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-2">Documentation</p>
+              <div className="flex flex-col gap-0.5">
+                {[
+                  { label: "Theme Showcase",   hash: "#/theme" },
+                  { label: "Agent Principles", hash: "#/principles" },
+                ].map(link => (
+                  <button key={link.hash}
+                    onClick={() => { window.location.hash = link.hash; setGmailLogoOpen(false) }}
+                    className="flex items-center justify-between w-full px-2.5 py-1.5 rounded-lg text-sm text-foreground hover:bg-muted/60 transition-colors text-left">
+                    {link.label}
+                    <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/50" />
+                  </button>
+                ))}
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
         <div className="flex-1 max-w-xl">
           <input
             className="w-full bg-gray-100 rounded-full px-4 py-2 text-sm text-gray-700 outline-none focus:bg-white focus:shadow-sm border border-transparent focus:border-gray-300 transition-all"
@@ -389,14 +489,18 @@ export function EmailFlow({ step }: EmailFlowProps) {
           ${mobileView === "list" ? "hidden md:flex" : "flex"}
         `}>
           {step === "forward" ? (
-            <ForwardCompose onSend={() => { window.location.hash = "#/email-confirm" }} />
-          ) : step === "confirm" && selectedEmail === "vts-confirm" ? (
-            <ConfirmDetail onBack={() => setMobileView("list")} />
-          ) : (
+            <ForwardCompose onSend={() => { window.location.hash = "#/inquiry-email-confirm" }} />
+          ) : selectedEmail === "vts-confirm" ? (
+            <ConfirmDetail onBack={() => { setSelectedEmail(null); setMobileView("list") }} />
+          ) : selectedEmail === "amazon" ? (
             <InboxDetail
-              onForward={() => { window.location.hash = "#/email-forward" }}
+              onForward={() => { window.location.hash = "#/inquiry-email-forward" }}
               onBack={() => setMobileView("list")}
             />
+          ) : (
+            <div className="flex-1 flex items-center justify-center text-sm text-gray-400">
+              Select an email to read
+            </div>
           )}
         </div>
       </div>
