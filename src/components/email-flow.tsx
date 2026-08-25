@@ -204,6 +204,22 @@ function ForwardCompose({ onSend }: { onSend: () => void }) {
   )
 }
 
+// VTS primary periwinkle
+const VTS_PRIMARY = "oklch(0.51 0.175 277)"
+const VTS_PRIMARY_LIGHT = "oklch(0.92 0.04 278)"
+
+function VtsLogoMark({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 555 160" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+      <path d="M262.948 37.923L282.271 99.5913L301.591 37.923H321.723L293.26 121.804H270.12L241.889 37.923H262.948Z" fill="currentColor"/>
+      <path d="M378.745 55.2793H351.903V37.923H425.601V55.2793H398.645V121.804H378.745V55.2793Z" fill="currentColor"/>
+      <path d="M491.06 52.3862C483.422 52.3862 477.756 55.2794 477.756 60.4835C477.756 64.6518 481.688 67.6581 487.475 68.9305L498.928 71.2439C512.464 74.021 529.588 78.1862 529.588 95.7721C529.588 113.358 511.885 123.31 494.416 123.31C472.895 123.31 458.78 112.549 455.771 94.4997H475.441C477.639 103.293 484.581 107.342 494.879 107.342C501.588 107.342 509.224 105.144 509.224 98.2023C509.224 92.7658 502.747 90.1023 493.604 88.1371L483.422 86.0533C469.77 83.1633 457.392 76.6841 457.392 61.6418C457.392 44.519 475.788 36.5351 492.217 36.5351C508.646 36.5351 524.265 43.7095 527.158 62.2215H507.604C505.636 55.9721 499.506 52.3862 491.06 52.3862Z" fill="currentColor"/>
+      <path d="M108.553 46.9088L136.165 65.2593L156.596 51.7396L108.553 19.812L108.485 19.8573L60.427 51.7926L80.8551 65.3125L108.485 46.953L108.553 46.9088Z" fill="currentColor"/>
+      <path d="M108.47 105.303L25.0786 53.0043V87.8887L108.47 140.187L108.485 140.179L191.889 87.8741V52.9871L108.485 105.293L108.47 105.303Z" fill="currentColor"/>
+    </svg>
+  )
+}
+
 function ConfirmDetail({ onBack }: { onBack?: () => void }) {
   return (
     <div className="flex flex-col h-full">
@@ -227,17 +243,25 @@ function ConfirmDetail({ onBack }: { onBack?: () => void }) {
       </div>
       <div className="flex-1 overflow-auto px-4 sm:px-6 py-4 sm:py-5">
         <div className="max-w-xl mx-auto">
-          <div className="border border-gray-200 rounded-xl overflow-hidden bg-white">
-            <div className="bg-gray-900 px-5 py-4 flex items-center gap-3">
-              <span className="inline-flex items-center rounded-md bg-blue-600 px-2.5 py-1 text-sm font-bold text-white">VTS</span>
-              <span className="text-white text-sm font-medium">Automated Deal Notification</span>
+          <div className="rounded-xl overflow-hidden bg-white" style={{ border: `1px solid ${VTS_PRIMARY}33` }}>
+            {/* VTS branded header */}
+            <div className="px-6 py-5 flex items-center gap-4" style={{ background: VTS_PRIMARY }}>
+              <VtsLogoMark className="h-7 w-auto text-white" />
+              <div className="w-px h-6 bg-white/30" />
+              <span className="text-white/90 text-sm font-medium tracking-wide">Deal Notification</span>
             </div>
-            <div className="px-5 sm:px-6 py-5 sm:py-6 space-y-5">
+
+            {/* Accent strip */}
+            <div className="h-1" style={{ background: `linear-gradient(90deg, ${VTS_PRIMARY}, oklch(0.60 0.15 300))` }} />
+
+            <div className="px-5 sm:px-6 py-6 space-y-5">
               <div>
-                <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-1">A new deal has been created</h3>
-                <p className="text-sm text-gray-500">VTS automatically created a deal from the email you forwarded to deals@vts.com.</p>
+                <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: VTS_PRIMARY }}>New Deal Created</p>
+                <h3 className="text-xl font-semibold text-gray-900 mb-1">Amazon · VTS Tower</h3>
+                <p className="text-sm text-gray-500">VTS automatically created a deal from the email you forwarded to <span className="font-medium text-gray-700">deals@vts.com</span>.</p>
               </div>
-              <div className="rounded-lg border border-gray-200 overflow-hidden">
+
+              <div className="rounded-lg overflow-hidden" style={{ border: `1px solid ${VTS_PRIMARY}22`, background: VTS_PRIMARY_LIGHT }}>
                 <table className="w-full text-sm">
                   <tbody>
                     {[
@@ -247,21 +271,38 @@ function ConfirmDetail({ onBack }: { onBack?: () => void }) {
                       ["Size", "18,000 sf"],
                       ["Stage", "Prospect"],
                       ["Created from", "Forwarded email"],
-                    ].map(([label, value], i) => (
-                      <tr key={label} className={i % 2 === 0 ? "bg-gray-50" : "bg-white"}>
+                    ].map(([label, value]) => (
+                      <tr key={label} className="border-b last:border-0" style={{ borderColor: `${VTS_PRIMARY}18` }}>
                         <td className="px-4 py-2.5 text-gray-500 font-medium w-32">{label}</td>
-                        <td className="px-4 py-2.5 text-gray-900">{value}</td>
+                        <td className="px-4 py-2.5 text-gray-900 font-medium">{value}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
-              <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white" onClick={() => { window.location.hash = "#/deals" }}>
-                View Deal in VTS
-              </Button>
+
+              <button
+                className="w-full py-3 rounded-lg text-white text-sm font-semibold transition-opacity hover:opacity-90"
+                style={{ background: VTS_PRIMARY }}
+                onClick={() => { window.location.hash = "#/deals" }}
+              >
+                View Deal in VTS →
+              </button>
             </div>
-            <div className="px-5 py-3 bg-gray-50 border-t border-gray-200">
-              <p className="text-xs text-gray-400 text-center">This deal was automatically created from the email you forwarded to deals@vts.com</p>
+
+            <div className="px-5 py-4 border-t" style={{ borderColor: `${VTS_PRIMARY}20`, background: `${VTS_PRIMARY}08` }}>
+              <div className="flex items-center justify-center gap-2 mb-1">
+                <svg viewBox="0 0 555 160" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-3 w-auto" style={{ color: VTS_PRIMARY }}>
+                  <path d="M262.948 37.923L282.271 99.5913L301.591 37.923H321.723L293.26 121.804H270.12L241.889 37.923H262.948Z" fill="currentColor"/>
+                  <path d="M378.745 55.2793H351.903V37.923H425.601V55.2793H398.645V121.804H378.745V55.2793Z" fill="currentColor"/>
+                  <path d="M491.06 52.3862C483.422 52.3862 477.756 55.2794 477.756 60.4835C477.756 64.6518 481.688 67.6581 487.475 68.9305L498.928 71.2439C512.464 74.021 529.588 78.1862 529.588 95.7721C529.588 113.358 511.885 123.31 494.416 123.31C472.895 123.31 458.78 112.549 455.771 94.4997H475.441C477.639 103.293 484.581 107.342 494.879 107.342C501.588 107.342 509.224 105.144 509.224 98.2023C509.224 92.7658 502.747 90.1023 493.604 88.1371L483.422 86.0533C469.77 83.1633 457.392 76.6841 457.392 61.6418C457.392 44.519 475.788 36.5351 492.217 36.5351C508.646 36.5351 524.265 43.7095 527.158 62.2215H507.604C505.636 55.9721 499.506 52.3862 491.06 52.3862Z" fill="currentColor"/>
+                  <path d="M108.553 46.9088L136.165 65.2593L156.596 51.7396L108.553 19.812L108.485 19.8573L60.427 51.7926L80.8551 65.3125L108.485 46.953L108.553 46.9088Z" fill="currentColor"/>
+                  <path d="M108.47 105.303L25.0786 53.0043V87.8887L108.47 140.187L108.485 140.179L191.889 87.8741V52.9871L108.485 105.293L108.47 105.303Z" fill="currentColor"/>
+                </svg>
+              </div>
+              <p className="text-xs text-center" style={{ color: VTS_PRIMARY }}>
+                This deal was automatically created from the email you forwarded to deals@vts.com
+              </p>
             </div>
           </div>
         </div>
