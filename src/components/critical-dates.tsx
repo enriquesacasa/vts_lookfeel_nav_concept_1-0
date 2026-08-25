@@ -3,6 +3,7 @@ import { cn, cardBase } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { AgentBtn } from "@/components/agent-btn"
+import { FILTER_TAB_GROUP_CLS, FILTER_TAB_ITEM_CLS } from "@/components/filter-chip"
 import { ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react"
 
 type DateCategory = "expiring" | "renewal" | "options" | "all"
@@ -113,10 +114,10 @@ const CriticalDates = React.forwardRef<HTMLDivElement, CriticalDatesProps>(
         {/* Toggle bar */}
         <ToggleGroup type="single" value={active}
           onValueChange={v => { if (v) setActive(v as DateCategory) }}
-          className="bg-muted/60 dark:bg-white/6 p-1 rounded-lg gap-0 w-full">
+          className={cn(FILTER_TAB_GROUP_CLS, "w-full")}>
           {TABS.map(tab => (
             <ToggleGroupItem key={tab.value} value={tab.value} size="sm"
-              className="flex-1 text-xs px-3 rounded-md data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:shadow-sm">
+              className={cn(FILTER_TAB_ITEM_CLS, "flex-1")}>
               {tab.label}
             </ToggleGroupItem>
           ))}

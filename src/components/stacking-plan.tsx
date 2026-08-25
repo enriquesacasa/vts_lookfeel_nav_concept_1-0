@@ -1,11 +1,11 @@
 import { useState, forwardRef, useImperativeHandle } from "react"
-import { Settings2Icon, DownloadIcon, ChevronDownIcon, XIcon, ConstructionIcon, ScrollTextIcon, HandshakeIcon, FileCheckIcon, ClockIcon } from "lucide-react"
+import { Settings2Icon, DownloadIcon, ChevronDownIcon, ConstructionIcon, ScrollTextIcon, HandshakeIcon, FileCheckIcon, ClockIcon } from "lucide-react"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { cn } from "@/lib/utils"
+import { FilterBar, toggleFilterValue, clearFilterKey, type FilterDef } from "@/components/filter-chip"
 
 // Expiration bucket colors — semantic, intentionally not theme tokens
 // vacant/available use theme-aware values; year buckets are fixed semantic colors
@@ -244,8 +244,6 @@ const LEGEND_KEYS: { label: string; key: ExpBucket }[] = [
   { label: "Available", key: "available" },
 ]
 
-export type FilterDef = { key: string; label: string; options: { label: string; value: string }[] }
-
 const allSpaces = floors.flatMap((f) => f.spaces)
 const allTenants = [...new Set(allSpaces.filter((s) => s.tenant).map((s) => s.tenant!))]
 
@@ -461,39 +459,6 @@ function ViewSettingsPopover({ viewType, onViewTypeChange, enabledOptions, onTog
   )
 }
 
-// --- Filter Chip ---
-function FilterChip({ filter, selected, onToggle, onClear }: {
-  filter: FilterDef; selected: string[]; onToggle: (v: string) => void; onClear: () => void
-}) {
-  const isActive = selected.length > 0
-  return (
-    <Popover>
-      <PopoverTrigger render={<Button variant="outline" size="sm" className={cn("gap-1 font-normal whitespace-nowrap", isActive && "border-primary bg-primary/10 text-primary font-medium")} />}>
-        {filter.label}
-        {isActive && <Badge className="size-4 rounded-full p-0 flex items-center justify-center text-[10px]">{selected.length}</Badge>}
-        <ChevronDownIcon data-icon="inline-end" />
-      </PopoverTrigger>
-      <PopoverContent align="start" className="w-52 p-2">
-        <div className="flex items-center justify-between mb-1.5 px-1">
-          <span className="text-xs font-semibold text-foreground">{filter.label}</span>
-          {isActive && (
-            <Button variant="ghost" size="sm" onClick={onClear} className="h-auto px-1.5 py-0.5 text-xs text-muted-foreground">
-              <XIcon data-icon="inline-start" /> Clear
-            </Button>
-          )}
-        </div>
-        <div className="flex flex-col gap-0.5">
-          {filter.options.map((opt) => (
-            <label key={opt.value} className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-muted cursor-pointer text-sm">
-              <Checkbox checked={selected.includes(opt.value)} onCheckedChange={() => onToggle(opt.value)} className="size-3.5" />
-              {opt.label}
-            </label>
-          ))}
-        </div>
-      </PopoverContent>
-    </Popover>
-  )
-}
 
 export type StackingPlanCommand =
   | { type: "setFilters"; filters: Record<string, string[]> }
@@ -511,7 +476,6 @@ export const StackingPlan = forwardRef<StackingPlanHandle>(function StackingPlan
   const [enabledOptions, setEnabledOptions] = useState<Set<string>>(new Set(DEFAULT_VIEW_OPTIONS))
   const [expirationMode, setExpirationMode] = useState<ExpirationMode>("in-place")
   const [sliderMonths, setSliderMonths] = useState(0)
-  const [showAllFilters, setShowAllFilters] = useState(false)
 
   type CircleInfo = { color: "blue" | "orange"; n: number }
   type HighlightState = { active: string; type: "options" | "encumbrances"; circles: Record<string, CircleInfo[]> }
@@ -552,16 +516,13 @@ export const StackingPlan = forwardRef<StackingPlanHandle>(function StackingPlan
     },
   }))
 
-  const hasActiveFilters = Object.values(activeFilters).some((v) => v.length > 0)
   const cfg = VIEW_CONFIG[viewType]
   const show = (opt: string) => enabledOptions.has(opt)
 
   const toggleFilter = (key: string, value: string) =>
-    setActiveFilters((prev) => {
-      const cur = prev[key] ?? []
-      return { ...prev, [key]: cur.includes(value) ? cur.filter((v) => v !== value) : [...cur, value] }
-    })
-  const clearFilter = (key: string) => setActiveFilters((prev) => ({ ...prev, [key]: [] }))
+    setActiveFilters((prev) => toggleFilterValue(prev, key, value))
+  const clearFilter = (key: string) =>
+    setActiveFilters((prev) => clearFilterKey(prev, key))
   const clearAll = () => setActiveFilters({})
   const toggleOption = (opt: string) =>
     setEnabledOptions((prev) => { const n = new Set(prev); n.has(opt) ? n.delete(opt) : n.add(opt); return n })
@@ -596,32 +557,19 @@ export const StackingPlan = forwardRef<StackingPlanHandle>(function StackingPlan
     return { label, key, sf, pct }
   })
 
-  // On mobile show first 4 filters by default
-  const visibleFilters = showAllFilters ? FILTER_DEFS : FILTER_DEFS.slice(0, 4)
-
   return (
     <div className="flex flex-col flex-1 bg-white/70 dark:bg-white/8 backdrop-blur-md rounded-xl overflow-hidden mt-4 mb-6">
 
       {/* Filter bar */}
-      <div className="flex items-center gap-1.5 px-3 py-3 border-b border-border flex-wrap">
-        {visibleFilters.map((filter) => (
-          <FilterChip key={filter.key} filter={filter} selected={activeFilters[filter.key] ?? []} onToggle={(v) => toggleFilter(filter.key, v)} onClear={() => clearFilter(filter.key)} />
-        ))}
-        {!showAllFilters && FILTER_DEFS.length > 4 && (
-          <Button variant="ghost" size="sm" onClick={() => setShowAllFilters(true)} className="font-normal text-muted-foreground">
-            +{FILTER_DEFS.length - 4} more
-          </Button>
-        )}
-        {showAllFilters && (
-          <Button variant="ghost" size="sm" onClick={() => setShowAllFilters(false)} className="font-normal text-muted-foreground">
-            Show less
-          </Button>
-        )}
-        {hasActiveFilters && (
-          <Button variant="link" size="sm" onClick={clearAll} className="ml-auto px-0 text-primary">
-            Clear all
-          </Button>
-        )}
+      <div className="px-3 py-3 border-b border-border">
+        <FilterBar
+          filters={FILTER_DEFS}
+          active={activeFilters}
+          onToggle={toggleFilter}
+          onClear={clearFilter}
+          onClearAll={clearAll}
+          visibleCount={4}
+        />
       </div>
 
       {/* Legend + controls bar */}

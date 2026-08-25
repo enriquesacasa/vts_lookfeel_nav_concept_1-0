@@ -18,6 +18,8 @@ import type { Deal as DealsPageDeal } from "@/components/deals-page"
 import { DealProfile, TenantLogoImage } from "@/components/deal-profile"
 import { ThemeShowcase } from "@/components/theme-showcase"
 import { StackingPlan } from "@/components/stacking-plan"
+import { EmailFlow } from "@/components/email-flow"
+import { TenantPortal } from "@/components/tenant-portal"
 import { cn } from "@/lib/utils"
 import buildingImg from "@/assets/building.jpg"
 
@@ -195,7 +197,7 @@ export default function App() {
   const [isDark, setIsDark] = React.useState(false)
 
   React.useEffect(() => {
-    const globalPages = ["theme", "activity", "reminders"]
+    const globalPages = ["theme", "activity", "reminders", "email", "email-forward", "email-confirm", "tenant-portal"]
     const hash = globalPages.includes(currentPage)
       ? `/${currentPage}`
       : `/${currentPage}/${selectedAssetId}`
@@ -242,6 +244,11 @@ export default function App() {
     if (page === "avatar" || page === "theme") {
       return <ThemeShowcase isDark={isDark} onToggleDark={toggleDark} />
     }
+
+    if (page === "email") return <EmailFlow step="inbox" />
+    if (page === "email-forward") return <EmailFlow step="forward" />
+    if (page === "email-confirm") return <EmailFlow step="confirm" />
+    if (page === "tenant-portal") return <TenantPortal />
 
     if (page === "ai") {
       const aiImage = (
@@ -453,6 +460,11 @@ export default function App() {
         </div>
       </div>
     )
+  }
+
+  const standalonePages = ["theme", "email", "email-forward", "email-confirm", "tenant-portal"]
+  if (standalonePages.includes(currentPage)) {
+    return <div className="min-h-screen">{renderPage(currentPage)}</div>
   }
 
   return (

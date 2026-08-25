@@ -5,6 +5,7 @@ const CardCtx = React.createContext(cardBase)
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
+import { FILTER_TAB_GROUP_CLS, FILTER_TAB_ITEM_CLS } from "@/components/filter-chip"
 import {
   Sparkle, Search, ChevronUp, ChevronDown, ChevronsUpDown,
   ChevronLeft, ChevronRight, AlertTriangle, Clock,
@@ -408,10 +409,10 @@ export function DealsPage({ onDealClick }: { onDealClick?: (deal: Deal) => void 
             type="single"
             value={statusFilter}
             onValueChange={v => { if (v) { setStatusFilter(v as "all" | Status); setPage(1) } }}
-            className="bg-muted/60 dark:bg-white/6 p-1 rounded-lg gap-0 overflow-x-auto"
+            className={FILTER_TAB_GROUP_CLS}
           >
             {STATUS_TABS.map(tab => (
-              <ToggleGroupItem key={tab.value} value={tab.value} size="sm" className="text-xs px-3 whitespace-nowrap rounded-md data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:shadow-sm">
+              <ToggleGroupItem key={tab.value} value={tab.value} size="sm" className={FILTER_TAB_ITEM_CLS}>
                 {tab.label}
               </ToggleGroupItem>
             ))}
@@ -430,11 +431,11 @@ export function DealsPage({ onDealClick }: { onDealClick?: (deal: Deal) => void 
               type="single"
               value={stageFilter}
               onValueChange={v => { if (v) { setStageFilter(v as "all" | Stage); setPage(1) } }}
-              className="bg-muted/60 dark:bg-white/6 p-1 rounded-lg gap-0"
+              className={FILTER_TAB_GROUP_CLS}
             >
-              <ToggleGroupItem value="all" size="sm" className="text-xs px-3 whitespace-nowrap rounded-md data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:shadow-sm">All stages</ToggleGroupItem>
+              <ToggleGroupItem value="all" size="sm" className={FILTER_TAB_ITEM_CLS}>All stages</ToggleGroupItem>
               {STAGES.filter(s => DEALS.some(d => d.stage === s)).map(s => (
-                <ToggleGroupItem key={s} value={s} size="sm" className="text-xs px-2.5 whitespace-nowrap rounded-md data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:shadow-sm">{s}</ToggleGroupItem>
+                <ToggleGroupItem key={s} value={s} size="sm" className={cn(FILTER_TAB_ITEM_CLS, "px-2.5")}>{s}</ToggleGroupItem>
               ))}
             </ToggleGroup>
           </div>

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { cn, cardBase } from "@/lib/utils"
 import { AgentBtn } from "@/components/agent-btn"
 
@@ -230,27 +231,56 @@ export function ThemeShowcase({ isDark, onToggleDark }: ThemeShowcaseProps) {
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <div className="pb-[72px] border-b border-border">
         <div className="flex items-start justify-between mb-6">
-          <svg width="555" height="160" viewBox="0 0 555 160" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-10 w-auto text-foreground">
-            <path d="M262.948 37.923L282.271 99.5913L301.591 37.923H321.723L293.26 121.804H270.12L241.889 37.923H262.948Z" fill="currentColor"/>
-            <path d="M378.745 55.2793H351.903V37.923H425.601V55.2793H398.645V121.804H378.745V55.2793Z" fill="currentColor"/>
-            <path d="M491.06 52.3862C483.422 52.3862 477.756 55.2794 477.756 60.4835C477.756 64.6518 481.688 67.6581 487.475 68.9305L498.928 71.2439C512.464 74.021 529.588 78.1862 529.588 95.7721C529.588 113.358 511.885 123.31 494.416 123.31C472.895 123.31 458.78 112.549 455.771 94.4997H475.441C477.639 103.293 484.581 107.342 494.879 107.342C501.588 107.342 509.224 105.144 509.224 98.2023C509.224 92.7658 502.747 90.1023 493.604 88.1371L483.422 86.0533C469.77 83.1633 457.392 76.6841 457.392 61.6418C457.392 44.519 475.788 36.5351 492.217 36.5351C508.646 36.5351 524.265 43.7095 527.158 62.2215H507.604C505.636 55.9721 499.506 52.3862 491.06 52.3862Z" fill="currentColor"/>
-            <path d="M108.553 46.9088L136.165 65.2593L156.596 51.7396L108.553 19.812L108.485 19.8573L60.427 51.7926L80.8551 65.3125L108.485 46.953L108.553 46.9088Z" fill="currentColor"/>
-            <path d="M108.47 105.303L25.0786 53.0043V87.8887L108.47 140.187L108.485 140.179L191.889 87.8741V52.9871L108.485 105.293L108.47 105.303Z" fill="currentColor"/>
-          </svg>
-          <div className="flex flex-col items-end gap-2">
-            <Button
-              variant={isDark ? "outline" : "secondary"}
-              onClick={onToggleDark}
-              className={cn(
-                "shrink-0 rounded-full gap-2",
-                isDark && "bg-sidebar text-sidebar-foreground border-sidebar-foreground/80 hover:bg-sidebar-accent"
-              )}
-            >
-              {isDark ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
-              {isDark ? "Dark Mode" : "Light Mode"}
-            </Button>
-
-          </div>
+          <Popover>
+            <PopoverTrigger>
+              <button className="cursor-pointer focus:outline-none" aria-label="Open appearance settings">
+                <svg width="555" height="160" viewBox="0 0 555 160" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-10 w-auto text-foreground hover:opacity-80 transition-opacity">
+                  <path d="M262.948 37.923L282.271 99.5913L301.591 37.923H321.723L293.26 121.804H270.12L241.889 37.923H262.948Z" fill="currentColor"/>
+                  <path d="M378.745 55.2793H351.903V37.923H425.601V55.2793H398.645V121.804H378.745V55.2793Z" fill="currentColor"/>
+                  <path d="M491.06 52.3862C483.422 52.3862 477.756 55.2794 477.756 60.4835C477.756 64.6518 481.688 67.6581 487.475 68.9305L498.928 71.2439C512.464 74.021 529.588 78.1862 529.588 95.7721C529.588 113.358 511.885 123.31 494.416 123.31C472.895 123.31 458.78 112.549 455.771 94.4997H475.441C477.639 103.293 484.581 107.342 494.879 107.342C501.588 107.342 509.224 105.144 509.224 98.2023C509.224 92.7658 502.747 90.1023 493.604 88.1371L483.422 86.0533C469.77 83.1633 457.392 76.6841 457.392 61.6418C457.392 44.519 475.788 36.5351 492.217 36.5351C508.646 36.5351 524.265 43.7095 527.158 62.2215H507.604C505.636 55.9721 499.506 52.3862 491.06 52.3862Z" fill="currentColor"/>
+                  <path d="M108.553 46.9088L136.165 65.2593L156.596 51.7396L108.553 19.812L108.485 19.8573L60.427 51.7926L80.8551 65.3125L108.485 46.953L108.553 46.9088Z" fill="currentColor"/>
+                  <path d="M108.47 105.303L25.0786 53.0043V87.8887L108.47 140.187L108.485 140.179L191.889 87.8741V52.9871L108.485 105.293L108.47 105.303Z" fill="currentColor"/>
+                </svg>
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="w-64 p-4 space-y-4" align="start">
+              <div>
+                <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-2">Appearance</p>
+                <div className="flex gap-2">
+                  <Button
+                    variant={isDark ? "ghost" : "default"}
+                    size="sm"
+                    onClick={() => { if (isDark) onToggleDark() }}
+                    className="flex-1 gap-1.5"
+                  >
+                    <Sun className="h-3.5 w-3.5" /> Light
+                  </Button>
+                  <Button
+                    variant={isDark ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => { if (!isDark) onToggleDark() }}
+                    className="flex-1 gap-1.5"
+                  >
+                    <Moon className="h-3.5 w-3.5" /> Dark
+                  </Button>
+                </div>
+              </div>
+              <div>
+                <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-2">Experience</p>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between py-1">
+                    <span className="text-sm text-foreground">Asset Manager</span>
+                    <Badge variant="secondary">Active</Badge>
+                  </div>
+                  <div className="flex items-center justify-between py-1">
+                    <span className="text-sm text-muted-foreground">Broker</span>
+                    <Badge variant="outline" className="text-muted-foreground">Coming Soon</Badge>
+                  </div>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
+          <div />
         </div>
         <h1 className="text-[60px] font-semibold tracking-[-0.02em] leading-[1.08] text-foreground mb-5 max-w-[780px]">
           Designed for clarity.<br /><span className="text-primary">Built for speed.</span><br />Powered by agents.
