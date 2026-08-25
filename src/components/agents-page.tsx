@@ -1374,7 +1374,7 @@ export function AgentsPage({ className }: { className?: string }) {
           </Button>
         )}
         <ToggleGroup type="single" value={tab} onValueChange={v => v && setTab(v as string)}
-          className={FILTER_TAB_GROUP_CLS}>
+          className={cn(FILTER_TAB_GROUP_CLS, mobileShowDetail && "hidden md:flex")}>
           <ToggleGroupItem value="catalog"  size="sm" className={cn(FILTER_TAB_ITEM_CLS, "text-sm")}>Agents</ToggleGroupItem>
           <ToggleGroupItem value="activity" size="sm" className={cn(FILTER_TAB_ITEM_CLS, "text-sm")}>Activity</ToggleGroupItem>
         </ToggleGroup>
