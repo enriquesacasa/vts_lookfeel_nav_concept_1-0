@@ -178,7 +178,7 @@ function ForwardCompose({ onSend }: { onSend: () => void }) {
         </div>
         <div>
           <p className="text-base font-semibold text-gray-900 mb-1">Email Sent</p>
-          <p className="text-sm text-gray-500">Forwarded to <span className="font-medium text-gray-700">deal-capture@vts.com</span>.<br />VTS will process it and confirm shortly.</p>
+          <p className="text-sm text-gray-500">Forwarded to <span className="font-medium text-gray-700">deal.capture@vts.com</span>.<br />VTS will process it and confirm shortly.</p>
         </div>
         <Button
           size="sm"
@@ -200,7 +200,7 @@ function ForwardCompose({ onSend }: { onSend: () => void }) {
         <div className="space-y-3">
           <div className="flex items-center gap-3">
             <span className="text-sm text-gray-500 w-14 shrink-0">To</span>
-            <Input defaultValue="deal-capture@vts.com" className="text-sm border-gray-300 bg-white" readOnly />
+            <Input defaultValue="deal.capture@vts.com" className="text-sm border-gray-300 bg-white" readOnly />
           </div>
           <div className="flex items-center gap-3">
             <span className="text-sm text-gray-500 w-14 shrink-0">Subject</span>
@@ -347,7 +347,7 @@ function ConfirmDetail({ onBack }: { onBack?: () => void }) {
             <div className="px-8 py-6 flex flex-col items-center gap-3 bg-muted/60 border-t border-border">
               <VtsLogo height={20} color={VTS_PRIMARY} />
               <p className="text-xs text-center leading-relaxed text-muted-foreground">
-                Forwarded to <span className="font-medium">deal-capture@vts.com</span> · Only you can approve this deal
+                Forwarded to <span className="font-medium">deal.capture@vts.com</span> · Only you can approve this deal
               </p>
             </div>
           </div>
