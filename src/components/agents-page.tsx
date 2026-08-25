@@ -1367,19 +1367,17 @@ export function AgentsPage({ className }: { className?: string }) {
       <div className="flex items-center gap-3">
         {/* Mobile back button */}
         {mobileShowDetail && tab === "catalog" && (
-          <Button variant="ghost" size="sm" className="md:hidden gap-1.5 -ml-1"
+          <Button variant="ghost" size="sm" className="md:hidden gap-1.5 -ml-1 shrink-0"
             onClick={() => setMobileShowDetail(false)}>
             <ArrowLeft className="h-4 w-4" />
             Agents
           </Button>
         )}
-        {!mobileShowDetail && (
-          <ToggleGroup type="single" value={tab} onValueChange={v => v && setTab(v as string)}
-            className={FILTER_TAB_GROUP_CLS}>
-            <ToggleGroupItem value="catalog"  size="sm" className={cn(FILTER_TAB_ITEM_CLS, "text-sm")}>Agents</ToggleGroupItem>
-            <ToggleGroupItem value="activity" size="sm" className={cn(FILTER_TAB_ITEM_CLS, "text-sm")}>Activity</ToggleGroupItem>
-          </ToggleGroup>
-        )}
+        <ToggleGroup type="single" value={tab} onValueChange={v => v && setTab(v as string)}
+          className={FILTER_TAB_GROUP_CLS}>
+          <ToggleGroupItem value="catalog"  size="sm" className={cn(FILTER_TAB_ITEM_CLS, "text-sm")}>Agents</ToggleGroupItem>
+          <ToggleGroupItem value="activity" size="sm" className={cn(FILTER_TAB_ITEM_CLS, "text-sm")}>Activity</ToggleGroupItem>
+        </ToggleGroup>
       </div>
 
       {tab === "activity" && <FullActivityTab />}
