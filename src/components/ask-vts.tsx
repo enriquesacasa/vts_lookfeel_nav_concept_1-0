@@ -184,7 +184,7 @@ function MessageRow({ message }: { message: Message }) {
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 
-export function AskVTSPage({ className }: { className?: string }) {
+export function AskVTSPage({ className, newChatKey }: { className?: string; newChatKey?: number }) {
   const [activeId, setActiveId]             = React.useState(CONVERSATIONS[0].id)
   const [convs, setConvs]                   = React.useState<Conversation[]>(CONVERSATIONS)
   const [input, setInput]                   = React.useState("")
@@ -225,6 +225,10 @@ export function AskVTSPage({ className }: { className?: string }) {
     setActiveId(id)
     setMobileShowChat(true)
   }
+
+  React.useEffect(() => {
+    if (newChatKey && newChatKey > 0) newConversation()
+  }, [newChatKey])
 
   React.useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" })

@@ -219,6 +219,7 @@ export default function App() {
     return dealId ? (DEALS.find(d => d.id === dealId) ?? null) : null
   })
   const [pipelineToast, setPipelineToast] = React.useState(() => parseHash().dealId === "d00")
+  const [askVtsKey, setAskVtsKey] = React.useState(0)
   const [isDark, setIsDark] = React.useState(() => document.documentElement.classList.contains("dark"))
 
   React.useEffect(() => {
@@ -290,7 +291,7 @@ export default function App() {
     if (page === "reminders") return <GlobalPlaceholderPage icon={BellRing}    title="Reminders" />
     if (page === "activity")  return <GlobalPlaceholderPage icon={Activity}    title="Activity Feed" />
 
-    if (page === "ask-vts") return <AskVTSPage className="h-[calc(100vh-2rem)] flex-1" />
+    if (page === "ask-vts") return <AskVTSPage className="h-[calc(100vh-2rem)] flex-1" newChatKey={askVtsKey} />
     if (page === "inquiry-email") return <EmailFlow step="inbox" />
     if (page === "inquiry-email-forward") return <EmailFlow step="forward" />
     if (page === "inquiry-email-confirm") return <EmailFlow step="confirm" />
@@ -357,7 +358,7 @@ export default function App() {
       }
     })()
 
-    const goAskVts = () => setCurrentPage("ask-vts")
+    const goAskVts = () => { setCurrentPage("ask-vts"); setAskVtsKey(k => k + 1) }
 
     // Show "AssetName PageLabel" with page label in mid-grey (includes "Overview" on dashboard)
     const pageLabel = PAGE_LABELS[page]
@@ -535,7 +536,7 @@ export default function App() {
         }}
         isDark={isDark}
         onLogoClick={toggleDark}
-        onNavItemClick={id => { setCurrentPage(id); setSelectedDeal(null) }}
+        onNavItemClick={id => { setCurrentPage(id); setSelectedDeal(null); if (id === "ask-vts") setAskVtsKey(k => k + 1) }}
         activePage={currentPage}
       />
 
