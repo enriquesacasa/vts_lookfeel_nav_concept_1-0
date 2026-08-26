@@ -305,7 +305,7 @@ export function AskVTSPage({ className }: { className?: string }) {
 
               {/* New chat */}
               <Separator className="mb-3" />
-              <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1.5">Recents</p>
+              <p className="text-sm font-semibold text-foreground mb-1.5">Recents</p>
 
               {/* List */}
               <div className="flex flex-col gap-0.5 flex-1 overflow-y-auto min-h-0">
