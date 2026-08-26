@@ -99,7 +99,8 @@ export interface Deal {
 
 // ── Mock data ─────────────────────────────────────────────────────────────────
 
-const DEALS: Deal[] = [
+export const DEALS: Deal[] = [
+  { id:"d00", tenant:"Amazon.com", dealType:"New Deal", asset:"VTS Tower", space:"Suite 0800 – Floor 8", sf:18000, stage:"Inquiry", status:"active", ner:0, budgetNer:98.00, noi:0, budgetNoi:1764000, lastUpdated:"2026-08-25", contact:"Sarah Okonkwo · CBRE" },
   { id:"d01", tenant:"Starbucks Corporation", dealType:"New Deal",  asset:"VTS Tower HQ",         space:"Suite 800",    sf:28500,  stage:"Legal",    status:"active",   ner:52.00, budgetNer:50.00, noi:1482000,  budgetNoi:1425000,  lastUpdated:"2026-07-14", term:84,  contact:"Sarah Chen" },
   { id:"d02", tenant:"Apex Capital",          dealType:"Renewal",   asset:"Empire State Bldg",    space:"Floor 12",     sf:45000,  stage:"Proposal", status:"active",   ner:48.00, budgetNer:52.00, noi:2160000,  budgetNoi:2340000,  lastUpdated:"2026-07-10", term:60,  contact:"Mark Torres",    note:"Counter awaiting response" },
   { id:"d03", tenant:"Meridian Health",       dealType:"New Deal",  asset:"VTS Tower HQ",         space:"Suite 1800",   sf:33000,  stage:"Lease Out",status:"stalled",  ner:55.00, budgetNer:55.00, noi:1815000,  budgetNoi:1815000,  lastUpdated:"2026-06-26", term:120, contact:"Priya Nair",     stalledDays:18 },

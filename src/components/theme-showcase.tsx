@@ -168,7 +168,7 @@ function MiniPanel({ mode }: { mode: "light" | "dark" }) {
               <p className="text-[9px] uppercase tracking-widest text-muted-foreground font-medium">Built 2017 · Office</p>
               <p className="font-bold text-[13px] text-foreground leading-tight">VTS Tower Headquarters</p>
             </div>
-            <span className="text-[9px] px-2 py-1 rounded-full font-semibold bg-primary text-primary-foreground">Ask VTS AI</span>
+            <span className="text-[9px] px-2 py-1 rounded-full font-semibold bg-primary text-primary-foreground">Ask VTS</span>
           </div>
           {/* Stats row */}
           <div className="grid grid-cols-3 gap-px border-b border-border bg-border">
@@ -220,6 +220,7 @@ interface ThemeShowcaseProps {
 
 export function ThemeShowcase({ isDark, onToggleDark }: ThemeShowcaseProps) {
   const [panelDark, setPanelDark] = React.useState(false)
+  const [themeLogoOpen, setThemeLogoOpen] = React.useState(false)
   return (
     <>
       <div className={cn(
@@ -231,7 +232,7 @@ export function ThemeShowcase({ isDark, onToggleDark }: ThemeShowcaseProps) {
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <div className="pb-[72px] border-b border-border">
         <div className="flex items-start justify-between mb-6">
-          <Popover>
+          <Popover open={themeLogoOpen} onOpenChange={setThemeLogoOpen}>
             <PopoverTrigger>
               <button className="cursor-pointer focus:outline-none" aria-label="Open appearance settings">
                 <svg width="555" height="160" viewBox="0 0 555 160" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-10 w-auto text-foreground hover:opacity-80 transition-opacity">
@@ -243,39 +244,67 @@ export function ThemeShowcase({ isDark, onToggleDark }: ThemeShowcaseProps) {
                 </svg>
               </button>
             </PopoverTrigger>
-            <PopoverContent className="w-64 p-4 space-y-4" align="start">
-              <div>
+            <PopoverContent className="w-64 p-0 overflow-hidden" align="start">
+              {/* Appearance */}
+              <div className="px-3 py-2.5 border-b border-border">
                 <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-2">Appearance</p>
                 <div className="flex gap-2">
-                  <Button
-                    variant={isDark ? "ghost" : "default"}
-                    size="sm"
-                    onClick={() => { if (isDark) onToggleDark() }}
-                    className="flex-1 gap-1.5"
-                  >
+                  <Button variant={isDark ? "ghost" : "default"} size="sm" className="flex-1 gap-1.5"
+                    onClick={() => { if (isDark) { onToggleDark(); setThemeLogoOpen(false) } }}>
                     <Sun className="h-3.5 w-3.5" /> Light
                   </Button>
-                  <Button
-                    variant={isDark ? "default" : "ghost"}
-                    size="sm"
-                    onClick={() => { if (!isDark) onToggleDark() }}
-                    className="flex-1 gap-1.5"
-                  >
+                  <Button variant={isDark ? "default" : "ghost"} size="sm" className="flex-1 gap-1.5"
+                    onClick={() => { if (!isDark) { onToggleDark(); setThemeLogoOpen(false) } }}>
                     <Moon className="h-3.5 w-3.5" /> Dark
                   </Button>
                 </div>
               </div>
-              <div>
+              {/* Experience */}
+              <div className="px-3 py-2.5 border-b border-border">
                 <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-2">Experience</p>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between py-1">
-                    <span className="text-sm text-foreground">Asset Manager</span>
-                    <Badge variant="secondary">Active</Badge>
-                  </div>
-                  <div className="flex items-center justify-between py-1">
-                    <span className="text-sm text-muted-foreground">Broker</span>
-                    <Badge variant="outline" className="text-muted-foreground">Coming Soon</Badge>
-                  </div>
+                <div className="flex flex-col gap-1">
+                  {["Asset Manager", "Broker"].map(exp => (
+                    <div key={exp} className="flex items-center justify-between px-2.5 py-2 rounded-lg bg-muted/40 opacity-60 cursor-not-allowed">
+                      <span className="text-sm text-foreground">{exp}</span>
+                      <Badge variant="secondary" className="text-[10px] h-4 px-1.5">Coming Soon</Badge>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              {/* Prototype */}
+              <div className="px-3 py-2.5 border-b border-border">
+                <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-2">Prototype</p>
+                <div className="flex flex-col gap-0.5">
+                  {[
+                    { label: "Main View",                hash: "#/dashboard" },
+                    { label: "Inquiry Email",           hash: "#/inquiry-email" },
+                    { label: "Inquiry Email Forward",   hash: "#/inquiry-email-forward" },
+                    { label: "Inquiry Email Confirm",   hash: "#/inquiry-email-confirm" },
+                  ].map(link => (
+                    <button key={link.hash}
+                      onClick={() => { window.location.hash = link.hash; setThemeLogoOpen(false) }}
+                      className="flex items-center justify-between w-full px-2.5 py-1.5 rounded-lg text-sm text-foreground hover:bg-muted/60 transition-colors text-left">
+                      {link.label}
+                      <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/50" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {/* Documentation */}
+              <div className="px-3 py-2.5">
+                <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-2">Documentation</p>
+                <div className="flex flex-col gap-0.5">
+                  {[
+                    { label: "Theme Showcase",   hash: "#/theme" },
+                    { label: "Agent Principles", hash: "#/principles" },
+                  ].map(link => (
+                    <button key={link.hash}
+                      onClick={() => { window.location.hash = link.hash; setThemeLogoOpen(false) }}
+                      className="flex items-center justify-between w-full px-2.5 py-1.5 rounded-lg text-sm text-foreground hover:bg-muted/60 transition-colors text-left">
+                      {link.label}
+                      <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/50" />
+                    </button>
+                  ))}
                 </div>
               </div>
             </PopoverContent>

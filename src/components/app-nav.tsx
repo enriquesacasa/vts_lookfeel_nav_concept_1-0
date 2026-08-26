@@ -3,6 +3,8 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { Separator } from "@/components/ui/separator"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Badge } from "@/components/ui/badge"
 import { useIsMobile } from "@/hooks/use-mobile"
 import {
   LayoutGrid,
@@ -27,7 +29,7 @@ import {
   UserCircle,
   ChevronRight,
   ChevronDown,
-  Menu,
+  Menu, Moon, Sun,
   X as XIcon,
   Search,
   Archive,
@@ -156,14 +158,16 @@ interface DesktopNavProps {
   portfolios?: Portfolio[]
   selectedAssetId?: string
   onAssetChange?: (id: string) => void
+  isDark?: boolean
   onLogoClick?: () => void
   onNavItemClick?: (id: string) => void
   activePage?: string
 }
 
-function DesktopNav({ className, onCollapsedChange, assets, portfolios, selectedAssetId, onAssetChange, onLogoClick, onNavItemClick, activePage }: DesktopNavProps) {
+function DesktopNav({ className, onCollapsedChange, assets, portfolios, selectedAssetId, onAssetChange, isDark, onLogoClick, onNavItemClick, activePage }: DesktopNavProps) {
   const [collapsed, setCollapsed] = React.useState(false)
   const [active, setActive] = React.useState(activePage ?? "dashboard")
+  const [logoOpen, setLogoOpen] = React.useState(false)
 
   React.useEffect(() => {
     if (activePage) setActive(activePage)
@@ -235,27 +239,101 @@ function DesktopNav({ className, onCollapsedChange, assets, portfolios, selected
         className
       )}
     >
-      {/* Logo */}
-      <div
-        className="relative flex items-center justify-center mb-4 px-1 overflow-hidden cursor-pointer"
-        onClick={onLogoClick}
-        title="Toggle dark mode"
-      >
-        {collapsed ? (
-          <svg viewBox="0 0 167 121" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-[1.12rem] w-auto shrink-0 opacity-90">
-            <path d="M83.474 27.0968L111.087 45.4473L131.517 31.9276L83.474 -5.4248e-06L83.4063 0.0453396L35.3484 31.9807L55.7765 45.5005L83.4063 27.1411L83.474 27.0968Z" fill="white"/>
-            <path d="M83.3916 85.4912L0 33.1923V68.0767L83.3916 120.375L83.4063 120.367L166.811 68.0622V33.1751L83.4063 85.4814L83.3916 85.4912Z" fill="white"/>
-          </svg>
-        ) : (
-          <svg width="555" height="160" viewBox="0 0 555 160" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-[1.4rem] w-auto shrink-0 opacity-90">
-            <path d="M262.948 37.923L282.271 99.5913L301.591 37.923H321.723L293.26 121.804H270.12L241.889 37.923H262.948Z" fill="white"/>
-            <path d="M378.745 55.2793H351.903V37.923H425.601V55.2793H398.645V121.804H378.745V55.2793Z" fill="white"/>
-            <path d="M491.06 52.3862C483.422 52.3862 477.756 55.2794 477.756 60.4835C477.756 64.6518 481.688 67.6581 487.475 68.9305L498.928 71.2439C512.464 74.021 529.588 78.1862 529.588 95.7721C529.588 113.358 511.885 123.31 494.416 123.31C472.895 123.31 458.78 112.549 455.771 94.4997H475.441C477.639 103.293 484.581 107.342 494.879 107.342C501.588 107.342 509.224 105.144 509.224 98.2023C509.224 92.7658 502.747 90.1023 493.604 88.1371L483.422 86.0533C469.77 83.1633 457.392 76.6841 457.392 61.6418C457.392 44.519 475.788 36.5351 492.217 36.5351C508.646 36.5351 524.265 43.7095 527.158 62.2215H507.604C505.636 55.9721 499.506 52.3862 491.06 52.3862Z" fill="white"/>
-            <path d="M108.553 46.9088L136.165 65.2593L156.596 51.7396L108.553 19.812L108.485 19.8573L60.427 51.7926L80.8551 65.3125L108.485 46.953L108.553 46.9088Z" fill="white"/>
-            <path d="M108.47 105.303L25.0786 53.0043V87.8887L108.47 140.187L108.485 140.179L191.889 87.8741V52.9871L108.485 105.293L108.47 105.303Z" fill="white"/>
-          </svg>
-        )}
-      </div>
+      {/* Logo — click opens settings popover */}
+      <Popover open={logoOpen} onOpenChange={setLogoOpen}>
+        <PopoverTrigger render={<div />}
+          className="relative flex items-center justify-center mb-4 px-1 overflow-hidden cursor-pointer"
+        >
+          {collapsed ? (
+            <svg viewBox="0 0 167 121" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-[1.12rem] w-auto shrink-0 opacity-90">
+              <path d="M83.474 27.0968L111.087 45.4473L131.517 31.9276L83.474 -5.4248e-06L83.4063 0.0453396L35.3484 31.9807L55.7765 45.5005L83.4063 27.1411L83.474 27.0968Z" fill="white"/>
+              <path d="M83.3916 85.4912L0 33.1923V68.0767L83.3916 120.375L83.4063 120.367L166.811 68.0622V33.1751L83.4063 85.4814L83.3916 85.4912Z" fill="white"/>
+            </svg>
+          ) : (
+            <svg width="555" height="160" viewBox="0 0 555 160" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-[1.4rem] w-auto shrink-0 opacity-90">
+              <path d="M262.948 37.923L282.271 99.5913L301.591 37.923H321.723L293.26 121.804H270.12L241.889 37.923H262.948Z" fill="white"/>
+              <path d="M378.745 55.2793H351.903V37.923H425.601V55.2793H398.645V121.804H378.745V55.2793Z" fill="white"/>
+              <path d="M491.06 52.3862C483.422 52.3862 477.756 55.2794 477.756 60.4835C477.756 64.6518 481.688 67.6581 487.475 68.9305L498.928 71.2439C512.464 74.021 529.588 78.1862 529.588 95.7721C529.588 113.358 511.885 123.31 494.416 123.31C472.895 123.31 458.78 112.549 455.771 94.4997H475.441C477.639 103.293 484.581 107.342 494.879 107.342C501.588 107.342 509.224 105.144 509.224 98.2023C509.224 92.7658 502.747 90.1023 493.604 88.1371L483.422 86.0533C469.77 83.1633 457.392 76.6841 457.392 61.6418C457.392 44.519 475.788 36.5351 492.217 36.5351C508.646 36.5351 524.265 43.7095 527.158 62.2215H507.604C505.636 55.9721 499.506 52.3862 491.06 52.3862Z" fill="white"/>
+              <path d="M108.553 46.9088L136.165 65.2593L156.596 51.7396L108.553 19.812L108.485 19.8573L60.427 51.7926L80.8551 65.3125L108.485 46.953L108.553 46.9088Z" fill="white"/>
+              <path d="M108.47 105.303L25.0786 53.0043V87.8887L108.47 140.187L108.485 140.179L191.889 87.8741V52.9871L108.485 105.293L108.47 105.303Z" fill="white"/>
+            </svg>
+          )}
+        </PopoverTrigger>
+        <PopoverContent side="right" align="start" className="w-64 p-0 overflow-hidden">
+          {/* Appearance */}
+          <div className="px-3 py-2.5 border-b border-border">
+            <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-2">Appearance</p>
+            <div className="flex gap-2">
+              <Button
+                variant={isDark ? "ghost" : "default"}
+                size="sm"
+                className="flex-1 gap-1.5"
+                onClick={() => { if (isDark) { onLogoClick?.(); setLogoOpen(false) } }}
+              >
+                <Sun className="h-3.5 w-3.5" /> Light
+              </Button>
+              <Button
+                variant={isDark ? "default" : "ghost"}
+                size="sm"
+                className="flex-1 gap-1.5"
+                onClick={() => { if (!isDark) { onLogoClick?.(); setLogoOpen(false) } }}
+              >
+                <Moon className="h-3.5 w-3.5" /> Dark
+              </Button>
+            </div>
+          </div>
+          {/* Experience */}
+          <div className="px-3 py-2.5 border-b border-border">
+            <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-2">Experience</p>
+            <div className="flex flex-col gap-1">
+              {["Asset Manager", "Broker"].map(exp => (
+                <div key={exp} className="flex items-center justify-between px-2.5 py-2 rounded-lg bg-muted/40 opacity-60 cursor-not-allowed">
+                  <span className="text-sm text-foreground">{exp}</span>
+                  <Badge variant="secondary" className="text-[10px] h-4 px-1.5">Coming Soon</Badge>
+                </div>
+              ))}
+            </div>
+          </div>
+          {/* Prototype links */}
+          <div className="px-3 py-2.5 border-b border-border">
+            <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-2">Prototype</p>
+            <div className="flex flex-col gap-0.5">
+              {[
+                { label: "Main View",                id: "dashboard" },
+                { label: "Inquiry Email",           id: "inquiry-email" },
+              ].map(link => (
+                <button
+                  key={link.id}
+                  onClick={() => { onNavItemClick?.(link.id); setLogoOpen(false) }}
+                  className="flex items-center justify-between w-full px-2.5 py-1.5 rounded-lg text-sm text-foreground hover:bg-muted/60 transition-colors text-left"
+                >
+                  {link.label}
+                  <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/50" />
+                </button>
+              ))}
+            </div>
+          </div>
+          {/* Documentation */}
+          <div className="px-3 py-2.5">
+            <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-2">Documentation</p>
+            <div className="flex flex-col gap-0.5">
+              {[
+                { label: "Theme Showcase",    id: "theme" },
+                { label: "Agent Principles",  id: "principles" },
+              ].map(link => (
+                <button
+                  key={link.id}
+                  onClick={() => { onNavItemClick?.(link.id); setLogoOpen(false) }}
+                  className="flex items-center justify-between w-full px-2.5 py-1.5 rounded-lg text-sm text-foreground hover:bg-muted/60 transition-colors text-left"
+                >
+                  {link.label}
+                  <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/50" />
+                </button>
+              ))}
+            </div>
+          </div>
+        </PopoverContent>
+      </Popover>
 
       {/* Expand/collapse toggle */}
       <Tooltip>
@@ -510,6 +588,18 @@ function DesktopNav({ className, onCollapsedChange, assets, portfolios, selected
             </React.Fragment>
           )
         })}
+
+        {/* Ask VTS */}
+        <NavRow
+          key="ask-vts"
+          id="ask-vts"
+          label="Ask VTS"
+          icon={Sparkle}
+          accent={true}
+          active={active === "ask-vts"}
+          collapsed={collapsed}
+          onClick={() => { setActive("ask-vts"); onNavItemClick?.("ask-vts") }}
+        />
 
         {/* VTS Agents */}
         <NavRow
@@ -787,13 +877,14 @@ interface AppNavProps {
   portfolios?: Portfolio[]
   selectedAssetId?: string
   onAssetChange?: (id: string) => void
+  isDark?: boolean
   onLogoClick?: () => void
   onNavItemClick?: (id: string) => void
   activePage?: string
 }
 
-export function AppNav({ className, onCollapsedChange, assets, portfolios, selectedAssetId, onAssetChange, onLogoClick, onNavItemClick, activePage }: AppNavProps) {
+export function AppNav({ className, onCollapsedChange, assets, portfolios, selectedAssetId, onAssetChange, isDark, onLogoClick, onNavItemClick, activePage }: AppNavProps) {
   const isMobile = useIsMobile()
   if (isMobile) return <MobileNav onLogoClick={onLogoClick} onNavItemClick={onNavItemClick} activePage={activePage} assets={assets} portfolios={portfolios} selectedAssetId={selectedAssetId} onAssetChange={onAssetChange} />
-  return <DesktopNav className={className} onCollapsedChange={onCollapsedChange} assets={assets} portfolios={portfolios} selectedAssetId={selectedAssetId} onAssetChange={onAssetChange} onLogoClick={onLogoClick} onNavItemClick={onNavItemClick} activePage={activePage} />
+  return <DesktopNav className={className} onCollapsedChange={onCollapsedChange} assets={assets} portfolios={portfolios} selectedAssetId={selectedAssetId} onAssetChange={onAssetChange} isDark={isDark} onLogoClick={onLogoClick} onNavItemClick={onNavItemClick} activePage={activePage} />
 }

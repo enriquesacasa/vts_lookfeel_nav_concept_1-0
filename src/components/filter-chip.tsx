@@ -4,7 +4,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
+import { cn, TOGGLE_INACTIVE, TOGGLE_HOVER } from "@/lib/utils"
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -184,4 +184,4 @@ export const FILTER_TAB_GROUP_CLS =
   "bg-muted/60 dark:bg-white/6 p-1 rounded-lg gap-0 overflow-x-auto"
 
 export const FILTER_TAB_ITEM_CLS =
-  "text-xs px-3 whitespace-nowrap rounded-md data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:shadow-sm"
+  `text-xs px-3 whitespace-nowrap rounded-md ${TOGGLE_INACTIVE} ${TOGGLE_HOVER}`

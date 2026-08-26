@@ -96,7 +96,7 @@ const AvailabilityOverview = React.forwardRef<HTMLDivElement, AvailabilityOvervi
           <>
             <div className="h-px bg-border/60 mt-5" />
             <div className="mt-4">
-              <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-3">Vacant spaces</p>
+              <p className="text-sm font-semibold text-foreground mb-3">Vacant Spaces</p>
               <div className="flex flex-col gap-2">
                 {vacantSpaces.map((v, i) => (
                   <div key={i} className="flex items-center justify-between gap-2 rounded-md px-2 py-1 -mx-2 cursor-pointer hover:bg-muted/40 dark:hover:bg-white/4 transition-colors group/space">

@@ -17,10 +17,11 @@ interface BuildingHeaderProps {
   stats: BuildingStat[]
   badges?: React.ReactNode
   className?: string
+  onAskVts?: () => void
 }
 
 const BuildingHeader = React.forwardRef<HTMLDivElement, BuildingHeaderProps>(
-  ({ image, name, address, city, stats, badges, className }, ref) => (
+  ({ image, name, address, city, stats, badges, className, onAskVts }, ref) => (
     <div ref={ref} className={cn(className)}>
       {/* Hero section */}
       <div className="flex items-center gap-4 py-3">
@@ -45,9 +46,9 @@ const BuildingHeader = React.forwardRef<HTMLDivElement, BuildingHeaderProps>(
           {badges && <div className="flex flex-wrap gap-1.5 mt-2">{badges}</div>}
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          <Button className="hidden sm:inline-flex gap-1.5">
+          <Button className="hidden sm:inline-flex gap-1.5" onClick={onAskVts}>
             <Sparkle className="h-3.5 w-3.5" />
-            Ask VTS AI
+            Ask VTS
           </Button>
           <Button variant="outline" size="icon" aria-label="Search">
             <Search className="h-3.5 w-3.5" />

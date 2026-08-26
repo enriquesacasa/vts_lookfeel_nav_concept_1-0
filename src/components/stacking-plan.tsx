@@ -5,7 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { cn } from "@/lib/utils"
-import { FilterBar, toggleFilterValue, clearFilterKey, type FilterDef } from "@/components/filter-chip"
+import { FilterBar, toggleFilterValue, clearFilterKey, type FilterDef, FILTER_TAB_GROUP_CLS, FILTER_TAB_ITEM_CLS } from "@/components/filter-chip"
 
 // Expiration bucket colors — semantic, intentionally not theme tokens
 // vacant/available use theme-aware values; year buckets are fixed semantic colors
@@ -435,11 +435,11 @@ function ViewSettingsPopover({ viewType, onViewTypeChange, enabledOptions, onTog
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">View Type</p>
         </div>
         <div className="p-2 border-b border-border">
-          <ToggleGroup spacing={0} variant="outline" size="sm" value={[viewType]}
+          <ToggleGroup type="single" value={viewType}
             onValueChange={(v) => { if (v && v !== viewType) onViewTypeChange(v as ViewType) }}
-            className="w-full">
+            className={cn(FILTER_TAB_GROUP_CLS, "w-full")}>
             {(["Condensed", "Standard", "Expanded"] as ViewType[]).map((vt) => (
-              <ToggleGroupItem key={vt} value={vt} className="flex-1 text-xs">{vt}</ToggleGroupItem>
+              <ToggleGroupItem key={vt} value={vt} size="sm" className={cn(FILTER_TAB_ITEM_CLS, "flex-1")}>{vt}</ToggleGroupItem>
             ))}
           </ToggleGroup>
         </div>

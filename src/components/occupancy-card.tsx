@@ -54,7 +54,7 @@ const OccupancyCard = React.forwardRef<HTMLDivElement, OccupancyCardProps>(
 
         {/* Section 1: Current Occupancy */}
         <div>
-          <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-2">Occupancy</p>
+          <p className="text-sm font-semibold text-foreground mb-2">Occupancy</p>
           <div className="flex items-end justify-between mb-2">
             <div>
               <span className="text-3xl font-medium text-foreground">{occupiedPct}%</span>
@@ -77,7 +77,7 @@ const OccupancyCard = React.forwardRef<HTMLDivElement, OccupancyCardProps>(
 
         {/* Section 2: Upcoming move-ins & move-outs */}
         <div>
-          <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-2">Upcoming move-ins & move-outs</p>
+          <p className="text-sm font-semibold text-foreground mb-2">Upcoming Move-Ins & Move-Outs</p>
           <div className="flex flex-col gap-1.5">
             {moveEvents.map((e, i) => (
               <div key={i} className="flex items-center justify-between gap-2">
@@ -102,7 +102,7 @@ const OccupancyCard = React.forwardRef<HTMLDivElement, OccupancyCardProps>(
 
         {/* Section 3: Vacant spaces */}
         <div>
-          <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-2">Vacant spaces</p>
+          <p className="text-sm font-semibold text-foreground mb-2">Vacant Spaces</p>
           <div className="flex flex-col gap-1.5">
             {vacantSpaces.map((v, i) => (
               <div key={i} className="flex items-center justify-between gap-2">
@@ -124,7 +124,7 @@ const OccupancyCard = React.forwardRef<HTMLDivElement, OccupancyCardProps>(
 
         {/* Section 4: Near-Term Lease Expirations */}
         <div>
-          <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-2">Near-Term Expirations</p>
+          <p className="text-sm font-semibold text-foreground mb-2">Near-Term Expirations</p>
           <div className="flex flex-col gap-1.5">
             {expirations.map((e, i) => (
               <div key={i} className="flex items-center justify-between gap-2">

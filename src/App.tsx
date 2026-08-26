@@ -13,15 +13,33 @@ import { ActionLevers } from "@/components/action-levers"
 import { KpiBar } from "@/components/kpi-bar"
 import { LeasingAgents } from "@/components/leasing-agents"
 import { AgentsPage } from "@/components/agents-page"
-import { DealsPage } from "@/components/deals-page"
+import { DealsPage, DEALS } from "@/components/deals-page"
 import type { Deal as DealsPageDeal } from "@/components/deals-page"
 import { DealProfile, TenantLogoImage } from "@/components/deal-profile"
 import { ThemeShowcase } from "@/components/theme-showcase"
+import { AgentPrinciples } from "@/components/agent-principles"
 import { StackingPlan } from "@/components/stacking-plan"
 import { EmailFlow } from "@/components/email-flow"
-import { TenantPortal } from "@/components/tenant-portal"
+import { AskVTSPage } from "@/components/ask-vts"
 import { cn } from "@/lib/utils"
+import { type LucideIcon, UserCircle, BellRing, Activity } from "lucide-react"
 import buildingImg from "@/assets/building.jpg"
+
+function GlobalPlaceholderPage({ icon: Icon, title, description }: {
+  icon: LucideIcon
+  title: string
+  description?: string
+}) {
+  return (
+    <div className="flex flex-col items-center justify-center text-center px-4 rounded-2xl bg-card/70 backdrop-blur-md min-h-[calc(100vh-1rem)]">
+      <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-5">
+        <Icon className="h-7 w-7 text-primary" strokeWidth={1.5} />
+      </div>
+      <h1 className="text-2xl font-medium text-foreground mb-2">{title}</h1>
+      <p className="text-sm text-muted-foreground max-w-xs">{description ?? "This page is a placeholder. Content coming soon."}</p>
+    </div>
+  )
+}
 
 const ASSET_MARKET: Record<string, string> = {
   "vts-tower":     "New York",
@@ -185,19 +203,26 @@ const VACANT_SPACES: VacantSpace[] = [
 export default function App() {
   const [navCollapsed, setNavCollapsed] = React.useState(false)
   function parseHash() {
-    const parts = window.location.hash.replace(/^#\//, "").split("/")
+    const raw = window.location.hash.replace(/^#\//, "")
+    const [pathPart, queryPart] = raw.split("?")
+    const parts = pathPart.split("/")
     const page = parts[0] || "dashboard"
     const asset = parts[1] || "vts-tower"
-    return { page, asset }
+    const params = new URLSearchParams(queryPart ?? "")
+    return { page, asset, dealId: params.get("deal") }
   }
 
   const [selectedAssetId, setSelectedAssetId] = React.useState(() => parseHash().asset)
   const [currentPage, setCurrentPage] = React.useState(() => parseHash().page)
-  const [selectedDeal, setSelectedDeal] = React.useState<DealsPageDeal | null>(null)
-  const [isDark, setIsDark] = React.useState(false)
+  const [selectedDeal, setSelectedDeal] = React.useState<DealsPageDeal | null>(() => {
+    const { dealId } = parseHash()
+    return dealId ? (DEALS.find(d => d.id === dealId) ?? null) : null
+  })
+  const [pipelineToast, setPipelineToast] = React.useState(() => parseHash().dealId === "d00")
+  const [isDark, setIsDark] = React.useState(() => document.documentElement.classList.contains("dark"))
 
   React.useEffect(() => {
-    const globalPages = ["theme", "activity", "reminders", "email", "email-forward", "email-confirm", "tenant-portal"]
+    const globalPages = ["theme", "principles", "activity", "reminders", "avatar", "inquiry-email", "inquiry-email-forward", "inquiry-email-confirm", "ask-vts"]
     const hash = globalPages.includes(currentPage)
       ? `/${currentPage}`
       : `/${currentPage}/${selectedAssetId}`
@@ -205,10 +230,22 @@ export default function App() {
   }, [currentPage, selectedAssetId])
 
   React.useEffect(() => {
+    if (pipelineToast) {
+      const t = setTimeout(() => setPipelineToast(false), 3000)
+      return () => clearTimeout(t)
+    }
+  }, [pipelineToast])
+
+  React.useEffect(() => {
     const onHashChange = () => {
-      const { page, asset } = parseHash()
+      const { page, asset, dealId } = parseHash()
       setCurrentPage(page)
       setSelectedAssetId(asset)
+      if (dealId) {
+        const deal = DEALS.find(d => d.id === dealId) ?? null
+        setSelectedDeal(deal)
+        if (dealId === "d00") setPipelineToast(true)
+      }
     }
     window.addEventListener("hashchange", onHashChange)
     return () => window.removeEventListener("hashchange", onHashChange)
@@ -241,14 +278,22 @@ export default function App() {
   const selectedAsset = ASSETS.find(a => a.id === selectedAssetId)
 
   const renderPage = (page: string) => {
-    if (page === "avatar" || page === "theme") {
+    if (page === "theme") {
       return <ThemeShowcase isDark={isDark} onToggleDark={toggleDark} />
     }
 
-    if (page === "email") return <EmailFlow step="inbox" />
-    if (page === "email-forward") return <EmailFlow step="forward" />
-    if (page === "email-confirm") return <EmailFlow step="confirm" />
-    if (page === "tenant-portal") return <TenantPortal />
+    if (page === "principles") {
+      return <AgentPrinciples isDark={isDark} onToggleDark={toggleDark} />
+    }
+
+    if (page === "avatar")    return <GlobalPlaceholderPage icon={UserCircle} title="Profile" />
+    if (page === "reminders") return <GlobalPlaceholderPage icon={BellRing}    title="Reminders" />
+    if (page === "activity")  return <GlobalPlaceholderPage icon={Activity}    title="Activity Feed" />
+
+    if (page === "ask-vts") return <div className="h-[calc(100vh-5rem)] flex overflow-hidden rounded-xl border border-border"><AskVTSPage /></div>
+    if (page === "inquiry-email") return <EmailFlow step="inbox" />
+    if (page === "inquiry-email-forward") return <EmailFlow step="forward" />
+    if (page === "inquiry-email-confirm") return <EmailFlow step="confirm" />
 
     if (page === "ai") {
       const aiImage = (
@@ -257,15 +302,15 @@ export default function App() {
         </div>
       )
       return (
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4 h-[calc(100vh-2rem)]">
           <BuildingHeader
             image={aiImage}
-            city="AI · Automation"
+            city="Assist · Automate · Accelerate"
             name={<span><span className="font-semibold">VTS Agents</span></span>}
-            address="Ask anything about your portfolio. Agents research, analyze, and act on your behalf."
+            address="Improve decisions, remove manual work, and move everything forward faster."
             stats={[]}
           />
-          <AgentsPage />
+          <AgentsPage className="flex-1 min-h-0" />
         </div>
       )
     }
@@ -312,6 +357,8 @@ export default function App() {
       }
     })()
 
+    const goAskVts = () => setCurrentPage("ask-vts")
+
     // Show "AssetName PageLabel" with page label in mid-grey (includes "Overview" on dashboard)
     const pageLabel = PAGE_LABELS[page]
     const pagedHeaderProps = pageLabel
@@ -333,7 +380,12 @@ export default function App() {
       } : pagedHeaderProps
       return (
         <div className="space-y-4">
-          <BuildingHeader {...dealHeaderProps} />
+          {pipelineToast && (
+            <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-lg bg-foreground text-background text-sm font-medium shadow-lg pointer-events-none animate-in fade-in slide-in-from-bottom-2">
+              Amazon deal added to your pipeline.
+            </div>
+          )}
+          <BuildingHeader {...dealHeaderProps} onAskVts={goAskVts} />
           {selectedDeal
             ? <DealProfile deal={selectedDeal} onBack={() => setSelectedDeal(null)} />
             : <DealsPage onDealClick={deal => setSelectedDeal(deal)} />
@@ -348,7 +400,7 @@ export default function App() {
         : ASSETS
       return (
         <div className="space-y-4">
-          <BuildingHeader {...pagedHeaderProps} />
+          <BuildingHeader {...pagedHeaderProps} onAskVts={goAskVts} />
           <KpiBar kpis={[
             { label: "Total portfolio NOI", value: "$312M",   subtitle: "+4.2% vs budget",  trend: "up"   as const },
             { label: "Occupancy",           value: "91.4%",  subtitle: "+0.8% vs budget",  trend: "up"   as const },
@@ -422,7 +474,7 @@ export default function App() {
     if (page === "stacking") {
       return (
         <div className="flex flex-col" style={{ minHeight: "calc(100vh - 2rem)" }}>
-          <BuildingHeader {...pagedHeaderProps} />
+          <BuildingHeader {...pagedHeaderProps} onAskVts={goAskVts} />
           <StackingPlan />
         </div>
       )
@@ -431,7 +483,7 @@ export default function App() {
     if (PAGE_LABELS[page] && page !== "dashboard") {
       return (
         <div className="flex flex-col" style={{minHeight: 'calc(100vh - 2rem)'}}>
-          <BuildingHeader {...pagedHeaderProps} />
+          <BuildingHeader {...pagedHeaderProps} onAskVts={goAskVts} />
           <div className="flex flex-col items-center justify-center flex-1 text-center px-4 rounded-2xl bg-white/70 dark:bg-white/8 backdrop-blur-md mt-4">
             <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center mb-5">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-primary opacity-60"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 21V9"/></svg>
@@ -444,7 +496,7 @@ export default function App() {
     }
     return (
       <div className="space-y-4">
-        <BuildingHeader {...pagedHeaderProps} />
+        <BuildingHeader {...pagedHeaderProps} onAskVts={goAskVts} />
         <KpiBar kpis={KPIS} />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <AvailabilityOverview occupiedSf={957638} vacantSf={410416} vacantSpaces={VACANT_SPACES} />
@@ -462,7 +514,7 @@ export default function App() {
     )
   }
 
-  const standalonePages = ["theme", "email", "email-forward", "email-confirm", "tenant-portal"]
+  const standalonePages = ["theme", "principles", "inquiry-email", "inquiry-email-forward", "inquiry-email-confirm"]
   if (standalonePages.includes(currentPage)) {
     return <div className="min-h-screen">{renderPage(currentPage)}</div>
   }
@@ -481,6 +533,7 @@ export default function App() {
           }
           setSelectedAssetId(id)
         }}
+        isDark={isDark}
         onLogoClick={toggleDark}
         onNavItemClick={id => { setCurrentPage(id); setSelectedDeal(null) }}
         activePage={currentPage}

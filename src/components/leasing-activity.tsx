@@ -132,7 +132,7 @@ const LeasingActivity = React.forwardRef<HTMLDivElement, LeasingActivityProps>(
           </Button>
         </div>
 
-        <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-3">Active deals</p>
+        <p className="text-sm font-semibold text-foreground mb-3">Active Deals</p>
         <table className="w-full text-sm border-collapse">
           <thead>
             <tr className="border-b-2 border-border/60">
