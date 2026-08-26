@@ -405,9 +405,16 @@ export function AskVTSPage({ className, newChatKey }: { className?: string; newC
                 <Button variant="ghost" size="icon" className="text-muted-foreground">
                   <Mic className="h-4 w-4" />
                 </Button>
-                <Button size="icon" disabled={!input.trim()} onClick={send}>
-                  <ArrowUp className="h-4 w-4" />
-                </Button>
+                {input.trim() ? (
+                  <Button size="icon" onClick={send}>
+                    <ArrowUp className="h-4 w-4" />
+                  </Button>
+                ) : (
+                  <Button size="sm" className="gap-1.5" onClick={() => {}}>
+                    <Sparkle className="h-3.5 w-3.5" />
+                    Ask VTS
+                  </Button>
+                )}
               </div>
             </div>
           </div>
