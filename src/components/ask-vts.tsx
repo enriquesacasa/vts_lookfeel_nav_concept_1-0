@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
-  Send, Sparkle, Plus, ArrowLeft, PanelLeft,
+  Send, Sparkle, Plus, ArrowLeft, PanelLeft, Search,
   MoreHorizontal, Share2, Pencil, Pin, Archive, Trash2,
 } from "lucide-react"
 
@@ -281,9 +281,14 @@ export function AskVTSPage({ className }: { className?: string }) {
               {/* Header */}
               <div className="flex items-center justify-between gap-2 mb-3">
                 <h2 className="text-xl font-semibold text-foreground">Ask VTS</h2>
-                <Button variant="ghost" size="icon" className="shrink-0" onClick={() => setRailCollapsed(true)}>
-                  <PanelLeft className="h-4 w-4" />
-                </Button>
+                <div className="flex items-center">
+                  <Button variant="ghost" size="icon">
+                    <Search className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="icon" className="shrink-0" onClick={() => setRailCollapsed(true)}>
+                    <PanelLeft className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
 
               {/* New chat — ghost, left-aligned */}
