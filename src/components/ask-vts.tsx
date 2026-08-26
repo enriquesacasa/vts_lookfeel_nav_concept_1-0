@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
-  Send, Sparkle, Plus, ArrowLeft, ChevronLeft,
+  Send, Sparkle, Plus, ArrowLeft, PanelLeftClose, PanelLeftOpen,
   MoreHorizontal, Share2, Pencil, Pin, Archive, Trash2,
 } from "lucide-react"
 
@@ -115,45 +115,45 @@ function ConvListItem({ conv, selected, onSelect }: {
         {conv.title}
       </p>
 
-      {/* Timestamp → more button on hover */}
-      {hovered ? (
-        <DropdownMenu>
-          <DropdownMenuTrigger
-            onClick={e => e.stopPropagation()}
-            className={cn(
-              "shrink-0 h-6 w-6 flex items-center justify-center rounded-md transition-colors",
-              selected ? "text-primary hover:bg-primary/20" : "text-muted-foreground hover:bg-muted"
-            )}
-          >
-            <MoreHorizontal className="h-3.5 w-3.5" />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-44">
-            <DropdownMenuItem className="gap-2">
-              <Share2 className="h-3.5 w-3.5" />
-              Share
-            </DropdownMenuItem>
-            <DropdownMenuItem className="gap-2">
-              <Pencil className="h-3.5 w-3.5" />
-              Rename
-            </DropdownMenuItem>
-            <DropdownMenuItem className="gap-2">
-              <Pin className="h-3.5 w-3.5" />
-              Pin chat
-            </DropdownMenuItem>
-            <DropdownMenuItem className="gap-2">
-              <Archive className="h-3.5 w-3.5" />
-              Archive
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="gap-2 text-destructive focus:text-destructive">
-              <Trash2 className="h-3.5 w-3.5" />
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      ) : (
+      {/* Right slot — always same height; timestamp hides on hover, more button appears */}
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          onClick={e => e.stopPropagation()}
+          className={cn(
+            "shrink-0 h-6 w-6 items-center justify-center rounded-md transition-colors",
+            hovered ? "flex" : "hidden",
+            selected ? "text-primary hover:bg-primary/20" : "text-muted-foreground hover:bg-muted"
+          )}
+        >
+          <MoreHorizontal className="h-3.5 w-3.5" />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-44">
+          <DropdownMenuItem className="gap-2">
+            <Share2 className="h-3.5 w-3.5" />
+            Share
+          </DropdownMenuItem>
+          <DropdownMenuItem className="gap-2">
+            <Pencil className="h-3.5 w-3.5" />
+            Rename
+          </DropdownMenuItem>
+          <DropdownMenuItem className="gap-2">
+            <Pin className="h-3.5 w-3.5" />
+            Pin chat
+          </DropdownMenuItem>
+          <DropdownMenuItem className="gap-2">
+            <Archive className="h-3.5 w-3.5" />
+            Archive
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem className="gap-2 text-destructive focus:text-destructive">
+            <Trash2 className="h-3.5 w-3.5" />
+            Delete
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      {!hovered && (
         <span className={cn(
-          "shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-medium",
+          "shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-medium whitespace-nowrap",
           selected ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground"
         )}>
           {conv.time}
@@ -275,28 +275,25 @@ export function AskVTSPage({ className }: { className?: string }) {
                 onClick={() => setRailCollapsed(false)}
                 className="h-8 w-8 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
               >
-                <ChevronLeft className="h-4 w-4 rotate-180" />
+                <PanelLeftOpen className="h-4 w-4" />
               </button>
             </div>
           ) : (
             /* Expanded state */
             <div className="flex flex-col flex-1 min-h-0 p-4">
               {/* Header */}
-              <div className="flex items-start justify-between gap-2 mb-1">
-                <div>
-                  <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">Conversations</p>
-                  <h2 className="text-xl font-semibold text-foreground">Recents</h2>
-                </div>
+              <div className="flex items-center justify-between gap-2 mb-3">
+                <h2 className="text-xl font-semibold text-foreground">Recents</h2>
                 <button
                   onClick={() => setRailCollapsed(true)}
-                  className="h-7 w-7 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors mt-0.5 shrink-0"
+                  className="h-7 w-7 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors shrink-0"
                 >
-                  <ChevronLeft className="h-4 w-4" />
+                  <PanelLeftClose className="h-4 w-4" />
                 </button>
               </div>
 
-              {/* New chat button — below headline */}
-              <Button variant="outline" size="sm" className="gap-1.5 w-full mb-3 mt-2" onClick={newConversation}>
+              {/* New chat — ghost, left-aligned */}
+              <Button variant="ghost" size="sm" className="gap-1.5 justify-start mb-2 -mx-1 px-2" onClick={newConversation}>
                 <Plus className="h-3.5 w-3.5" />
                 New chat
               </Button>
