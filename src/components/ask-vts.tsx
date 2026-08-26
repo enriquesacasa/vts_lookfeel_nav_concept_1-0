@@ -301,7 +301,7 @@ export function AskVTSPage({ className }: { className?: string }) {
                 </div>
               </div>
 
-              <Button variant="outline" size="sm" className="justify-start gap-1.5 w-full mb-2" onClick={newConversation}>
+              <Button variant="outline" size="sm" className="gap-1.5 w-full mb-2" onClick={newConversation}>
                 <SquarePen className="h-3.5 w-3.5" />
                 New chat
               </Button>
