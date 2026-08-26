@@ -292,9 +292,6 @@ export function AskVTSPage({ className }: { className?: string }) {
                   <h2 className="text-xl font-semibold text-foreground">Ask VTS</h2>
                 </div>
                 <div className="flex items-center">
-                  <Button variant="ghost" size="icon" onClick={newConversation}>
-                    <SquarePen className="h-4 w-4" />
-                  </Button>
                   <Button variant="ghost" size="icon">
                     <Search className="h-4 w-4" />
                   </Button>
@@ -304,7 +301,11 @@ export function AskVTSPage({ className }: { className?: string }) {
                 </div>
               </div>
 
-              {/* New chat */}
+              <Button variant="ghost" size="sm" className="justify-start gap-1.5 w-full mb-2" onClick={newConversation}>
+                <SquarePen className="h-3.5 w-3.5" />
+                New chat
+              </Button>
+
               <Collapsible open={recentsOpen} onOpenChange={setRecentsOpen} className="flex flex-col flex-1 min-h-0">
                 <CollapsibleTrigger className="flex items-center justify-between w-full mb-2">
                   <span className="text-sm font-medium text-foreground">Recents</span>
