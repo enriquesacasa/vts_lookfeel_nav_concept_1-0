@@ -1,6 +1,6 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import {
   DropdownMenu,
@@ -265,7 +265,7 @@ export function AskVTSPage({ className }: { className?: string }) {
                 <Search className="h-4 w-4" />
               </Button>
               <DropdownMenu>
-                <DropdownMenuTrigger className="flex h-9 w-9 items-center justify-center rounded-md hover:bg-accent hover:text-accent-foreground transition-colors">
+                <DropdownMenuTrigger className={buttonVariants({ variant: "ghost", size: "icon" })}>
                   <Clock className="h-4 w-4" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent side="right" align="start" className="w-56">
