@@ -2,6 +2,7 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { Textarea } from "@/components/ui/textarea"
 import {
   DropdownMenu,
@@ -11,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
-  Send, Sparkle, SquarePen, ArrowLeft, PanelLeft, Search, Clock,
+  Send, Sparkle, SquarePen, ArrowLeft, PanelLeft, Search, Clock, ChevronDown,
   MoreHorizontal, Share2, Pencil, Pin, Archive, Trash2,
 } from "lucide-react"
 
@@ -190,6 +191,7 @@ export function AskVTSPage({ className }: { className?: string }) {
   const [input, setInput]                   = React.useState("")
   const [mobileShowChat, setMobileShowChat] = React.useState(false)
   const [railCollapsed, setRailCollapsed]   = React.useState(false)
+  const [recentsOpen, setRecentsOpen]       = React.useState(true)
   const bottomRef = React.useRef<HTMLDivElement>(null)
 
   const active = convs.find(c => c.id === activeId) ?? convs[0]
@@ -305,19 +307,22 @@ export function AskVTSPage({ className }: { className?: string }) {
 
               {/* New chat */}
               <Separator className="mb-3" />
-              <p className="text-sm font-semibold text-foreground mb-1.5">Recents</p>
-
-              {/* List */}
-              <div className="flex flex-col gap-0.5 flex-1 overflow-y-auto min-h-0">
-                {convs.map(conv => (
-                  <ConvListItem
-                    key={conv.id}
-                    conv={conv}
-                    selected={conv.id === activeId}
-                    onSelect={() => { setActiveId(conv.id); setMobileShowChat(true) }}
-                  />
-                ))}
-              </div>
+              <Collapsible open={recentsOpen} onOpenChange={setRecentsOpen} className="flex flex-col flex-1 min-h-0">
+                <CollapsibleTrigger className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "justify-between w-full mb-1.5 px-0 rounded-none")}>
+                  <span className="text-sm font-semibold text-foreground">Recents</span>
+                  <ChevronDown className={cn("h-3.5 w-3.5 text-muted-foreground transition-transform", !recentsOpen && "-rotate-90")} />
+                </CollapsibleTrigger>
+                <CollapsibleContent className="flex flex-col gap-0.5 flex-1 overflow-y-auto min-h-0">
+                  {convs.map(conv => (
+                    <ConvListItem
+                      key={conv.id}
+                      conv={conv}
+                      selected={conv.id === activeId}
+                      onSelect={() => { setActiveId(conv.id); setMobileShowChat(true) }}
+                    />
+                  ))}
+                </CollapsibleContent>
+              </Collapsible>
             </div>
           )}
         </div>
