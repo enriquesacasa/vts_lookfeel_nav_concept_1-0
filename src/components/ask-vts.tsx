@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
-  Send, Sparkle, Plus, ArrowLeft, PanelLeftClose, PanelLeftOpen,
+  Send, Sparkle, Plus, ArrowLeft, PanelLeft,
   MoreHorizontal, Share2, Pencil, Pin, Archive, Trash2,
 } from "lucide-react"
 
@@ -275,7 +275,7 @@ export function AskVTSPage({ className }: { className?: string }) {
                 onClick={() => setRailCollapsed(false)}
                 className="h-8 w-8 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
               >
-                <PanelLeftOpen className="h-4 w-4" />
+                <PanelLeft className="h-4 w-4" />
               </button>
             </div>
           ) : (
@@ -288,7 +288,7 @@ export function AskVTSPage({ className }: { className?: string }) {
                   onClick={() => setRailCollapsed(true)}
                   className="h-7 w-7 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors shrink-0"
                 >
-                  <PanelLeftClose className="h-4 w-4" />
+                  <PanelLeft className="h-4 w-4" />
                 </button>
               </div>
 
