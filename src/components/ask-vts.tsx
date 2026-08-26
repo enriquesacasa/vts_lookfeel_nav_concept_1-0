@@ -271,12 +271,9 @@ export function AskVTSPage({ className }: { className?: string }) {
           {railCollapsed ? (
             /* Collapsed state — just collapse toggle */
             <div className="flex flex-col items-center py-4 gap-3 flex-1">
-              <button
-                onClick={() => setRailCollapsed(false)}
-                className="h-8 w-8 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
-              >
+              <Button variant="ghost" size="icon" onClick={() => setRailCollapsed(false)}>
                 <PanelLeft className="h-4 w-4" />
-              </button>
+              </Button>
             </div>
           ) : (
             /* Expanded state */
@@ -284,12 +281,9 @@ export function AskVTSPage({ className }: { className?: string }) {
               {/* Header */}
               <div className="flex items-center justify-between gap-2 mb-3">
                 <h2 className="text-xl font-semibold text-foreground">Ask VTS</h2>
-                <button
-                  onClick={() => setRailCollapsed(true)}
-                  className="h-7 w-7 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors shrink-0"
-                >
+                <Button variant="ghost" size="icon" className="shrink-0" onClick={() => setRailCollapsed(true)}>
                   <PanelLeft className="h-4 w-4" />
-                </button>
+                </Button>
               </div>
 
               {/* New chat — ghost, left-aligned */}
