@@ -1,6 +1,7 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 import { Button, buttonVariants } from "@/components/ui/button"
+import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 import {
   DropdownMenu,
@@ -303,6 +304,7 @@ export function AskVTSPage({ className }: { className?: string }) {
               </div>
 
               {/* New chat */}
+              <Separator className="mb-3" />
               <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1.5">Recents</p>
 
               {/* List */}
