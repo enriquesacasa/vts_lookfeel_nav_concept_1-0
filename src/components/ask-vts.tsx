@@ -224,7 +224,6 @@ export function AskVTSPage({ className }: { className?: string }) {
     setConvs(prev => [{ id, title: "New conversation", preview: "Start asking…", time: "Just now", messages: [] }, ...prev])
     setActiveId(id)
     setMobileShowChat(true)
-    setRailCollapsed(false)
   }
 
   React.useEffect(() => {
