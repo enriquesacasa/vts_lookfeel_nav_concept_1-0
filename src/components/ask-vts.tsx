@@ -101,26 +101,21 @@ function ConvListItem({ conv, selected, onSelect }: {
   return (
     <div
       className={cn(
-        "group flex items-center gap-2 px-3 py-2.5 rounded-xl transition-all cursor-pointer",
-        selected ? "bg-primary/10" : "hover:bg-muted/60"
+        "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all cursor-pointer",
+        selected ? "bg-primary/10 text-primary" : "hover:bg-muted/60 text-foreground"
       )}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onClick={onSelect}
     >
-      <p className={cn(
-        "text-sm font-semibold truncate flex-1",
-        selected ? "text-primary" : "text-foreground"
-      )}>
-        {conv.title}
-      </p>
+      <p className="text-sm font-semibold truncate flex-1">{conv.title}</p>
 
-      {/* Right slot — always same height; timestamp hides on hover, more button appears */}
+      {/* Fixed-width slot: timestamp or more menu — no layout shift */}
       <DropdownMenu>
         <DropdownMenuTrigger
           onClick={e => e.stopPropagation()}
           className={cn(
-            "shrink-0 h-6 w-6 items-center justify-center rounded-md transition-colors",
+            "shrink-0 h-6 w-6 items-center justify-center rounded-md",
             hovered ? "flex" : "hidden",
             selected ? "text-primary hover:bg-primary/20" : "text-muted-foreground hover:bg-muted"
           )}
@@ -128,32 +123,28 @@ function ConvListItem({ conv, selected, onSelect }: {
           <MoreHorizontal className="h-3.5 w-3.5" />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-44">
-          <DropdownMenuItem className="gap-2">
-            <Share2 className="h-3.5 w-3.5" />
-            Share
+          <DropdownMenuItem className="gap-2 text-sm">
+            <Share2 className="h-3.5 w-3.5" />Share
           </DropdownMenuItem>
-          <DropdownMenuItem className="gap-2">
-            <Pencil className="h-3.5 w-3.5" />
-            Rename
+          <DropdownMenuItem className="gap-2 text-sm">
+            <Pencil className="h-3.5 w-3.5" />Rename
           </DropdownMenuItem>
-          <DropdownMenuItem className="gap-2">
-            <Pin className="h-3.5 w-3.5" />
-            Pin chat
+          <DropdownMenuItem className="gap-2 text-sm">
+            <Pin className="h-3.5 w-3.5" />Pin chat
           </DropdownMenuItem>
-          <DropdownMenuItem className="gap-2">
-            <Archive className="h-3.5 w-3.5" />
-            Archive
+          <DropdownMenuItem className="gap-2 text-sm">
+            <Archive className="h-3.5 w-3.5" />Archive
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem className="gap-2 text-destructive focus:text-destructive">
-            <Trash2 className="h-3.5 w-3.5" />
-            Delete
+          <DropdownMenuItem className="gap-2 text-sm text-destructive focus:text-destructive">
+            <Trash2 className="h-3.5 w-3.5" />Delete
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+
       {!hovered && (
         <span className={cn(
-          "shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-medium whitespace-nowrap",
+          "shrink-0 text-[10px] font-medium rounded-md px-1.5 py-0.5 whitespace-nowrap",
           selected ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground"
         )}>
           {conv.time}
@@ -175,7 +166,7 @@ function MessageRow({ message }: { message: Message }) {
       )}>
         <Sparkle className={cn("h-4 w-4", isUser ? "text-muted-foreground" : "text-primary")} />
       </div>
-      <div className={cn("flex flex-col gap-1 max-w-[76%]", isUser && "items-end")}>
+      <div className={cn("flex flex-col gap-1 max-w-lg", isUser && "items-end")}>
         <div className={cn(
           "rounded-xl border px-4 py-3 text-sm text-foreground leading-relaxed",
           isUser ? "bg-primary/10 border-primary/20" : "bg-muted/20 border-border/60"
@@ -193,9 +184,9 @@ function MessageRow({ message }: { message: Message }) {
 // ─── Main page ────────────────────────────────────────────────────────────────
 
 export function AskVTSPage({ className }: { className?: string }) {
-  const [activeId, setActiveId]         = React.useState(CONVERSATIONS[0].id)
-  const [convs, setConvs]               = React.useState<Conversation[]>(CONVERSATIONS)
-  const [input, setInput]               = React.useState("")
+  const [activeId, setActiveId]             = React.useState(CONVERSATIONS[0].id)
+  const [convs, setConvs]                   = React.useState<Conversation[]>(CONVERSATIONS)
+  const [input, setInput]                   = React.useState("")
   const [mobileShowChat, setMobileShowChat] = React.useState(false)
   const [railCollapsed, setRailCollapsed]   = React.useState(false)
   const bottomRef = React.useRef<HTMLDivElement>(null)
@@ -210,7 +201,6 @@ export function AskVTSPage({ className }: { className?: string }) {
     const userMsg: Message = { id: `u${Date.now()}`, role: "user", content: text, timestamp: now }
     const thinkId = `t${Date.now()}`
     const thinkMsg: Message = { id: thinkId, role: "assistant", content: "Thinking…", timestamp: now }
-
     setConvs(prev => prev.map(c =>
       c.id !== activeId ? c : { ...c, messages: [...c.messages, userMsg, thinkMsg], preview: text, time: "Just now" }
     ))
@@ -229,9 +219,7 @@ export function AskVTSPage({ className }: { className?: string }) {
 
   const newConversation = () => {
     const id = `c${Date.now()}`
-    setConvs(prev => [{
-      id, title: "New conversation", preview: "Start asking…", time: "Just now", messages: [],
-    }, ...prev])
+    setConvs(prev => [{ id, title: "New conversation", preview: "Start asking…", time: "Just now", messages: [] }, ...prev])
     setActiveId(id)
     setMobileShowChat(true)
     setRailCollapsed(false)
@@ -246,11 +234,10 @@ export function AskVTSPage({ className }: { className?: string }) {
 
       {/* Mobile back button */}
       {mobileShowChat && (
-        <div className="flex items-center gap-3 md:hidden shrink-0">
-          <Button variant="ghost" size="sm" className="gap-1.5 -ml-1"
-            onClick={() => setMobileShowChat(false)}>
+        <div className="flex items-center md:hidden shrink-0">
+          <Button variant="ghost" size="sm" className="gap-1.5 -ml-1" onClick={() => setMobileShowChat(false)}>
             <ArrowLeft className="h-4 w-4" />
-            Recents
+            Back
           </Button>
         </div>
       )}
@@ -258,25 +245,21 @@ export function AskVTSPage({ className }: { className?: string }) {
       {/* Two-panel grid */}
       <div className={cn(
         "grid grid-rows-[1fr] gap-4 flex-1 min-h-0 transition-all duration-300",
-        railCollapsed
-          ? "grid-cols-1 md:grid-cols-[40px_1fr]"
-          : "grid-cols-1 md:grid-cols-[300px_1fr]"
+        railCollapsed ? "grid-cols-1 md:grid-cols-[48px_1fr]" : "grid-cols-1 md:grid-cols-[300px_1fr]"
       )}>
 
-        {/* Left: recents rail */}
+        {/* Left: rail */}
         <div className={cn(
           "rounded-2xl bg-card/70 backdrop-blur-md flex flex-col min-h-0 overflow-hidden",
           mobileShowChat ? "hidden md:flex" : "flex"
         )}>
           {railCollapsed ? (
-            /* Collapsed state — just collapse toggle */
-            <div className="flex flex-col items-center py-4 gap-3 flex-1">
+            <div className="flex flex-col items-center py-4 gap-2 flex-1">
               <Button variant="ghost" size="icon" onClick={() => setRailCollapsed(false)}>
                 <PanelLeft className="h-4 w-4" />
               </Button>
             </div>
           ) : (
-            /* Expanded state */
             <div className="flex flex-col flex-1 min-h-0 p-4">
               {/* Header */}
               <div className="flex items-center justify-between gap-2 mb-3">
@@ -288,14 +271,14 @@ export function AskVTSPage({ className }: { className?: string }) {
                   <Button variant="ghost" size="icon">
                     <Search className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="icon" className="shrink-0" onClick={() => setRailCollapsed(true)}>
+                  <Button variant="ghost" size="icon" onClick={() => setRailCollapsed(true)}>
                     <PanelLeft className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
 
-              {/* New chat — ghost, left-aligned */}
-              <Button variant="ghost" size="sm" className="gap-1.5 justify-start mb-2 -mx-1 px-2" onClick={newConversation}>
+              {/* New chat */}
+              <Button variant="ghost" size="sm" className="justify-start gap-1.5 mb-2" onClick={newConversation}>
                 <Plus className="h-3.5 w-3.5" />
                 New chat
               </Button>
@@ -359,13 +342,15 @@ export function AskVTSPage({ className }: { className?: string }) {
           {active.messages.length > 0 && (
             <div className="flex gap-2 overflow-x-auto pt-4 pb-1 shrink-0">
               {SUGGESTED.slice(0, 4).map(s => (
-                <button
+                <Button
                   key={s.label}
+                  variant="outline"
+                  size="sm"
+                  className="shrink-0 whitespace-nowrap"
                   onClick={() => setInput(s.prompt)}
-                  className="shrink-0 rounded-xl border border-border/60 bg-muted/20 px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors whitespace-nowrap"
                 >
                   {s.label}
-                </button>
+                </Button>
               ))}
             </div>
           )}
@@ -377,10 +362,10 @@ export function AskVTSPage({ className }: { className?: string }) {
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send() } }}
               placeholder="Ask about deals, portfolio, agents, or market data…"
-              className="flex-1 resize-none text-sm min-h-[40px] max-h-[120px]"
+              className="flex-1 resize-none text-sm"
               rows={1}
             />
-            <Button size="sm" className="gap-1.5 shrink-0 h-9" disabled={!input.trim()} onClick={send}>
+            <Button size="sm" className="gap-1.5 shrink-0" disabled={!input.trim()} onClick={send}>
               <Send className="h-3.5 w-3.5" />
               Send
             </Button>
