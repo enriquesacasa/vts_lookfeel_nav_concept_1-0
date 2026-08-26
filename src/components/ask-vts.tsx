@@ -281,7 +281,7 @@ export function AskVTSPage({ className }: { className?: string }) {
               {/* Header */}
               <div className="flex items-center justify-between gap-2 mb-3">
                 <div className="flex items-center gap-2">
-                  <Sparkle className="h-5 w-5 text-primary shrink-0" />
+                  <Sparkle className="h-5 w-5 text-foreground shrink-0" />
                   <h2 className="text-xl font-semibold text-foreground">Ask VTS</h2>
                 </div>
                 <div className="flex items-center">
