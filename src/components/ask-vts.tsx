@@ -271,6 +271,9 @@ export function AskVTSPage({ className }: { className?: string }) {
                   <Button variant="ghost" size="icon">
                     <Search className="h-4 w-4" />
                   </Button>
+                  <Button variant="ghost" size="icon" onClick={newConversation}>
+                    <SquarePen className="h-4 w-4" />
+                  </Button>
                   <Button variant="ghost" size="icon" onClick={() => setRailCollapsed(true)}>
                     <PanelLeft className="h-4 w-4" />
                   </Button>
@@ -278,11 +281,6 @@ export function AskVTSPage({ className }: { className?: string }) {
               </div>
 
               {/* New chat */}
-              <Button variant="ghost" size="sm" className="gap-1.5 mb-4 w-fit" onClick={newConversation}>
-                <SquarePen className="h-3.5 w-3.5" />
-                New chat
-              </Button>
-
               <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1.5">Recents</p>
 
               {/* List */}
