@@ -305,8 +305,8 @@ export function AskVTSPage({ className }: { className?: string }) {
               </div>
 
               {/* New chat */}
-              <Collapsible open={recentsOpen} onOpenChange={setRecentsOpen} className="flex flex-col flex-1 min-h-0 mt-6">
-                <CollapsibleTrigger className="flex items-center justify-between w-full mb-6">
+              <Collapsible open={recentsOpen} onOpenChange={setRecentsOpen} className="flex flex-col flex-1 min-h-0">
+                <CollapsibleTrigger className="flex items-center justify-between w-full mb-2">
                   <span className="text-sm font-medium text-foreground">Recents</span>
                   <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform", !recentsOpen && "-rotate-90")} />
                 </CollapsibleTrigger>
