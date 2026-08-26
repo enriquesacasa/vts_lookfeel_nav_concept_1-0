@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
-  Send, Sparkle, PenLine, ArrowLeft, PanelLeft, Search,
+  Send, Sparkle, SquarePen, ArrowLeft, PanelLeft, Search,
   MoreHorizontal, Share2, Pencil, Pin, Archive, Trash2,
 } from "lucide-react"
 
@@ -278,8 +278,8 @@ export function AskVTSPage({ className }: { className?: string }) {
               </div>
 
               {/* New chat */}
-              <Button variant="outline" size="sm" className="gap-1 mb-2 w-fit h-7 text-xs px-2" onClick={newConversation}>
-                <PenLine className="h-3 w-3" />
+              <Button variant="outline" size="sm" className="gap-1.5 mb-2 w-fit" onClick={newConversation}>
+                <SquarePen className="h-3.5 w-3.5" />
                 New chat
               </Button>
 
