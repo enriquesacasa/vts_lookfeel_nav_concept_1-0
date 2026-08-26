@@ -308,7 +308,7 @@ export function AskVTSPage({ className }: { className?: string }) {
               {/* New chat */}
               <Separator className="mb-3" />
               <Collapsible open={recentsOpen} onOpenChange={setRecentsOpen} className="flex flex-col flex-1 min-h-0">
-                <CollapsibleTrigger className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "justify-between w-full mb-1.5 px-0 rounded-none")}>
+                <CollapsibleTrigger className="flex items-center justify-between w-full mb-1.5 group/recents">
                   <span className="text-sm font-semibold text-foreground">Recents</span>
                   <ChevronDown className={cn("h-3.5 w-3.5 text-muted-foreground transition-transform", !recentsOpen && "-rotate-90")} />
                 </CollapsibleTrigger>
