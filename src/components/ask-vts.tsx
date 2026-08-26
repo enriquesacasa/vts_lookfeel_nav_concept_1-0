@@ -118,13 +118,14 @@ function ConvListItem({ conv, selected, onSelect }: {
       {/* Timestamp → more button on hover */}
       {hovered ? (
         <DropdownMenu>
-          <DropdownMenuTrigger asChild onClick={e => e.stopPropagation()}>
-            <button className={cn(
+          <DropdownMenuTrigger
+            onClick={e => e.stopPropagation()}
+            className={cn(
               "shrink-0 h-6 w-6 flex items-center justify-center rounded-md transition-colors",
               selected ? "text-primary hover:bg-primary/20" : "text-muted-foreground hover:bg-muted"
-            )}>
-              <MoreHorizontal className="h-3.5 w-3.5" />
-            </button>
+            )}
+          >
+            <MoreHorizontal className="h-3.5 w-3.5" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-44">
             <DropdownMenuItem className="gap-2">
