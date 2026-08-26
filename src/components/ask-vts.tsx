@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
-  Send, Sparkle, SquarePen, ArrowLeft, PanelLeft, Search, Clock, ChevronDown,
+  ArrowUp, Sparkle, SquarePen, ArrowLeft, PanelLeft, Search, Clock, ChevronDown, Mic, Plus,
   MoreHorizontal, Share2, Pencil, Pin, Archive, Trash2,
 } from "lucide-react"
 
@@ -387,19 +387,29 @@ export function AskVTSPage({ className, newChatKey }: { className?: string; newC
           )}
 
           {/* Input */}
-          <div className="flex gap-2 items-end pt-4 shrink-0 border-t border-border/60 mt-4">
+          <div className="shrink-0 mt-4 rounded-2xl border border-border bg-card px-4 pt-3 pb-2">
             <Textarea
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send() } }}
-              placeholder="Ask about deals, portfolio, agents, or market data…"
-              className="flex-1 resize-none text-sm"
+              placeholder="Ask anything about your portfolio, or resume something below…"
+              className="w-full resize-none text-sm border-none shadow-none bg-transparent focus-visible:ring-0 p-0 min-h-10"
               rows={1}
             />
-            <Button size="sm" className="gap-1.5 shrink-0" disabled={!input.trim()} onClick={send}>
-              <Send className="h-3.5 w-3.5" />
-              Send
-            </Button>
+            <div className="flex items-center justify-between mt-2">
+              <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground">
+                <Plus className="h-3.5 w-3.5" />
+                Add
+              </Button>
+              <div className="flex items-center gap-1">
+                <Button variant="ghost" size="icon" className="text-muted-foreground">
+                  <Mic className="h-4 w-4" />
+                </Button>
+                <Button size="icon" disabled={!input.trim()} onClick={send}>
+                  <ArrowUp className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
           </div>
 
         </div>
