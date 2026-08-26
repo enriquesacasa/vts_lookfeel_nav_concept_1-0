@@ -2,7 +2,17 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { Send, Sparkle, Plus, ArrowLeft } from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import {
+  Send, Sparkle, Plus, ArrowLeft, ChevronLeft,
+  MoreHorizontal, Share2, Pencil, Pin, Archive, Trash2,
+} from "lucide-react"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -79,29 +89,76 @@ const SUGGESTED = [
   { label: "Agent activity",       prompt: "What have VTS Agents done in the last 24 hours?" },
 ]
 
-// ─── Conversation list item — same structure as AgentListItem ────────────────
+// ─── Conversation list item ───────────────────────────────────────────────────
 
 function ConvListItem({ conv, selected, onSelect }: {
   conv: Conversation
   selected: boolean
   onSelect: () => void
 }) {
+  const [hovered, setHovered] = React.useState(false)
+
   return (
-    <button
-      onClick={onSelect}
+    <div
       className={cn(
-        "w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-left transition-all",
-        selected ? "bg-primary/10 text-primary" : "hover:bg-muted/60 text-foreground"
+        "group flex items-center gap-2 px-3 py-2.5 rounded-xl transition-all cursor-pointer",
+        selected ? "bg-primary/10" : "hover:bg-muted/60"
       )}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onClick={onSelect}
     >
-      <p className="text-sm font-semibold truncate flex-1">{conv.title}</p>
-      <span className={cn(
-        "shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-medium",
-        selected ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground"
+      <p className={cn(
+        "text-sm font-semibold truncate flex-1",
+        selected ? "text-primary" : "text-foreground"
       )}>
-        {conv.time}
-      </span>
-    </button>
+        {conv.title}
+      </p>
+
+      {/* Timestamp → more button on hover */}
+      {hovered ? (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild onClick={e => e.stopPropagation()}>
+            <button className={cn(
+              "shrink-0 h-6 w-6 flex items-center justify-center rounded-md transition-colors",
+              selected ? "text-primary hover:bg-primary/20" : "text-muted-foreground hover:bg-muted"
+            )}>
+              <MoreHorizontal className="h-3.5 w-3.5" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-44">
+            <DropdownMenuItem className="gap-2">
+              <Share2 className="h-3.5 w-3.5" />
+              Share
+            </DropdownMenuItem>
+            <DropdownMenuItem className="gap-2">
+              <Pencil className="h-3.5 w-3.5" />
+              Rename
+            </DropdownMenuItem>
+            <DropdownMenuItem className="gap-2">
+              <Pin className="h-3.5 w-3.5" />
+              Pin chat
+            </DropdownMenuItem>
+            <DropdownMenuItem className="gap-2">
+              <Archive className="h-3.5 w-3.5" />
+              Archive
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem className="gap-2 text-destructive focus:text-destructive">
+              <Trash2 className="h-3.5 w-3.5" />
+              Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ) : (
+        <span className={cn(
+          "shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-medium",
+          selected ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground"
+        )}>
+          {conv.time}
+        </span>
+      )}
+    </div>
   )
 }
 
@@ -135,10 +192,11 @@ function MessageRow({ message }: { message: Message }) {
 // ─── Main page ────────────────────────────────────────────────────────────────
 
 export function AskVTSPage({ className }: { className?: string }) {
-  const [activeId, setActiveId] = React.useState(CONVERSATIONS[0].id)
-  const [convs, setConvs]       = React.useState<Conversation[]>(CONVERSATIONS)
-  const [input, setInput]       = React.useState("")
+  const [activeId, setActiveId]         = React.useState(CONVERSATIONS[0].id)
+  const [convs, setConvs]               = React.useState<Conversation[]>(CONVERSATIONS)
+  const [input, setInput]               = React.useState("")
   const [mobileShowChat, setMobileShowChat] = React.useState(false)
+  const [railCollapsed, setRailCollapsed]   = React.useState(false)
   const bottomRef = React.useRef<HTMLDivElement>(null)
 
   const active = convs.find(c => c.id === activeId) ?? convs[0]
@@ -175,6 +233,7 @@ export function AskVTSPage({ className }: { className?: string }) {
     }, ...prev])
     setActiveId(id)
     setMobileShowChat(true)
+    setRailCollapsed(false)
   }
 
   React.useEffect(() => {
@@ -184,47 +243,76 @@ export function AskVTSPage({ className }: { className?: string }) {
   return (
     <div className={cn("flex flex-col gap-4", className)}>
 
-      {/* Mobile back button — only when in chat view */}
+      {/* Mobile back button */}
       {mobileShowChat && (
         <div className="flex items-center gap-3 md:hidden shrink-0">
           <Button variant="ghost" size="sm" className="gap-1.5 -ml-1"
             onClick={() => setMobileShowChat(false)}>
             <ArrowLeft className="h-4 w-4" />
-            History
+            Recents
           </Button>
         </div>
       )}
 
-      {/* Two-panel grid — matches agents page */}
-      <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] grid-rows-[1fr] gap-4 flex-1 min-h-0">
+      {/* Two-panel grid */}
+      <div className={cn(
+        "grid grid-rows-[1fr] gap-4 flex-1 min-h-0 transition-all duration-300",
+        railCollapsed
+          ? "grid-cols-1 md:grid-cols-[40px_1fr]"
+          : "grid-cols-1 md:grid-cols-[300px_1fr]"
+      )}>
 
-        {/* Left: recents list */}
+        {/* Left: recents rail */}
         <div className={cn(
-          "rounded-2xl bg-card/70 backdrop-blur-md p-4 flex flex-col min-h-0",
+          "rounded-2xl bg-card/70 backdrop-blur-md flex flex-col min-h-0 overflow-hidden",
           mobileShowChat ? "hidden md:flex" : "flex"
         )}>
-          {/* Header — Critical Dates pattern */}
-          <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2 mb-3">
-            <div>
-              <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">Conversations</p>
-              <h2 className="text-xl font-semibold text-foreground">Recents</h2>
+          {railCollapsed ? (
+            /* Collapsed state — just collapse toggle */
+            <div className="flex flex-col items-center py-4 gap-3 flex-1">
+              <button
+                onClick={() => setRailCollapsed(false)}
+                className="h-8 w-8 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
+              >
+                <ChevronLeft className="h-4 w-4 rotate-180" />
+              </button>
             </div>
-            <Button variant="outline" size="sm" className="shrink-0 gap-1.5" onClick={newConversation}>
-              <Plus className="h-3.5 w-3.5" />
-              New chat
-            </Button>
-          </div>
-          {/* List */}
-          <div className="flex flex-col gap-0.5 flex-1 overflow-y-auto min-h-0">
-            {convs.map(conv => (
-              <ConvListItem
-                key={conv.id}
-                conv={conv}
-                selected={conv.id === activeId}
-                onSelect={() => { setActiveId(conv.id); setMobileShowChat(true) }}
-              />
-            ))}
-          </div>
+          ) : (
+            /* Expanded state */
+            <div className="flex flex-col flex-1 min-h-0 p-4">
+              {/* Header */}
+              <div className="flex items-start justify-between gap-2 mb-1">
+                <div>
+                  <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">Conversations</p>
+                  <h2 className="text-xl font-semibold text-foreground">Recents</h2>
+                </div>
+                <button
+                  onClick={() => setRailCollapsed(true)}
+                  className="h-7 w-7 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors mt-0.5 shrink-0"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+              </div>
+
+              {/* New chat button — below headline */}
+              <Button variant="outline" size="sm" className="gap-1.5 w-full mb-3 mt-2" onClick={newConversation}>
+                <Plus className="h-3.5 w-3.5" />
+                New chat
+              </Button>
+
+              {/* List */}
+              <div className="flex flex-col gap-0.5 flex-1 overflow-y-auto min-h-0">
+                {convs.map(conv => (
+                  <ConvListItem
+                    key={conv.id}
+                    conv={conv}
+                    selected={conv.id === activeId}
+                    onSelect={() => { setActiveId(conv.id); setMobileShowChat(true) }}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Right: chat panel */}
