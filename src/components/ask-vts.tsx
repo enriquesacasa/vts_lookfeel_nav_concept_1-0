@@ -2,7 +2,7 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { Send, Sparkle, Plus, ArrowLeft, MessageSquare } from "lucide-react"
+import { Send, Sparkle, Plus, ArrowLeft } from "lucide-react"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -94,12 +94,6 @@ function ConvListItem({ conv, selected, onSelect }: {
         selected ? "bg-primary/10 text-primary" : "hover:bg-muted/60 text-foreground"
       )}
     >
-      <div className={cn(
-        "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border",
-        selected ? "bg-primary/10 border-primary/20" : "bg-muted/60 border-border/50"
-      )}>
-        <MessageSquare className={cn("h-4 w-4", selected ? "text-primary" : "text-muted-foreground")} />
-      </div>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-semibold truncate">{conv.title}</p>
         <p className="text-[11px] text-muted-foreground truncate">{conv.preview}</p>
