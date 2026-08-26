@@ -256,15 +256,15 @@ export function AskVTSPage({ className }: { className?: string }) {
           mobileShowChat ? "hidden md:flex" : "flex"
         )}>
           {railCollapsed ? (
-            <div className="flex flex-col items-center py-4 gap-1 flex-1">
+            <div className="flex flex-col items-center py-3 gap-3 flex-1">
               <Button variant="ghost" size="icon" onClick={() => setRailCollapsed(false)}>
                 <PanelLeft className="h-4 w-4" />
               </Button>
-              <Button variant="ghost" size="icon" onClick={newConversation}>
-                <SquarePen className="h-4 w-4" />
-              </Button>
               <Button variant="ghost" size="icon">
                 <Search className="h-4 w-4" />
+              </Button>
+              <Button variant="ghost" size="icon" onClick={newConversation}>
+                <SquarePen className="h-4 w-4" />
               </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger className={buttonVariants({ variant: "ghost", size: "icon" })}>
@@ -286,7 +286,7 @@ export function AskVTSPage({ className }: { className?: string }) {
           ) : (
             <div className="flex flex-col flex-1 min-h-0 p-4">
               {/* Header */}
-              <div className="flex items-center justify-between gap-2 mb-3">
+              <div className="flex items-center justify-between gap-2 mb-2">
                 <div className="flex items-center gap-2">
                   <Sparkle className="h-5 w-5 text-foreground shrink-0" />
                   <h2 className="text-xl font-semibold text-foreground">Ask VTS</h2>
