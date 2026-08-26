@@ -265,7 +265,7 @@ export function AskVTSPage({ className }: { className?: string }) {
                 <Search className="h-4 w-4" />
               </Button>
               <DropdownMenu>
-                <DropdownMenuTrigger className="flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+                <DropdownMenuTrigger className="flex h-9 w-9 items-center justify-center rounded-md hover:bg-accent hover:text-accent-foreground transition-colors">
                   <Clock className="h-4 w-4" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent side="right" align="start" className="w-56">
