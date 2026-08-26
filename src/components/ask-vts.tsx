@@ -280,7 +280,10 @@ export function AskVTSPage({ className }: { className?: string }) {
             <div className="flex flex-col flex-1 min-h-0 p-4">
               {/* Header */}
               <div className="flex items-center justify-between gap-2 mb-3">
-                <h2 className="text-xl font-semibold text-foreground">Ask VTS</h2>
+                <div className="flex items-center gap-2">
+                  <Sparkle className="h-5 w-5 text-primary shrink-0" />
+                  <h2 className="text-xl font-semibold text-foreground">Ask VTS</h2>
+                </div>
                 <div className="flex items-center">
                   <Button variant="ghost" size="icon">
                     <Search className="h-4 w-4" />
