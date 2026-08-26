@@ -290,7 +290,7 @@ export default function App() {
     if (page === "reminders") return <GlobalPlaceholderPage icon={BellRing}    title="Reminders" />
     if (page === "activity")  return <GlobalPlaceholderPage icon={Activity}    title="Activity Feed" />
 
-    if (page === "ask-vts") return <AskVTSPage className="h-[calc(100vh-5rem)] flex-1" />
+    if (page === "ask-vts") return <AskVTSPage className="h-[calc(100vh-2rem)] flex-1" />
     if (page === "inquiry-email") return <EmailFlow step="inbox" />
     if (page === "inquiry-email-forward") return <EmailFlow step="forward" />
     if (page === "inquiry-email-confirm") return <EmailFlow step="confirm" />

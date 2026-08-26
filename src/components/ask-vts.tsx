@@ -188,16 +188,16 @@ export function AskVTSPage({ className }: { className?: string }) {
   return (
     <div className={cn("flex flex-col gap-4", className)}>
 
-      {/* Top bar */}
-      <div className="flex items-center gap-3">
-        {mobileShowChat && (
-          <Button variant="ghost" size="sm" className="md:hidden gap-1.5 -ml-1 shrink-0"
+      {/* Mobile back button — only when in chat view */}
+      {mobileShowChat && (
+        <div className="flex items-center gap-3 md:hidden shrink-0">
+          <Button variant="ghost" size="sm" className="gap-1.5 -ml-1"
             onClick={() => setMobileShowChat(false)}>
             <ArrowLeft className="h-4 w-4" />
             History
           </Button>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Two-panel grid — matches agents page */}
       <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] grid-rows-[1fr] gap-4 flex-1 min-h-0">
