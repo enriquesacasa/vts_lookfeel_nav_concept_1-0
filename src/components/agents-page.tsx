@@ -31,6 +31,7 @@ interface AgentRun {
   id: string
   title: string
   asset: string
+  dealId?: string
   status: "complete" | "running" | "pending"
   agentId: string
   category: string
@@ -305,6 +306,7 @@ const ALL_RUNS: AgentRun[] = [
     id: "dc-1",
     title: "Amazon inquiry captured from forwarded email",
     asset: "VTS Tower – Floor 8",
+    dealId: "d00",
     status: "complete",
     agentId: "deal-capture",
     category: "Deal Capture",
@@ -355,6 +357,7 @@ const ALL_RUNS: AgentRun[] = [
     id: "sm-1",
     title: "Amazon space ranking complete",
     asset: "VTS Tower",
+    dealId: "d08",
     status: "complete",
     agentId: "space-match",
     category: "Space Match",
@@ -641,6 +644,7 @@ const ALL_RUNS: AgentRun[] = [
     id: "ch-1",
     title: "CBRE LOI handoff package ready",
     asset: "VTS Tower – Floor 8",
+    dealId: "d09",
     status: "complete",
     agentId: "counsel-handoff",
     category: "Counsel Handoff",
@@ -709,6 +713,7 @@ const ALL_RUNS: AgentRun[] = [
     id: "dm-1",
     title: "3 stalled deals escalated",
     asset: "VTS Tower",
+    dealId: "d10",
     status: "complete",
     agentId: "deal-momentum",
     category: "Deal Momentum",
@@ -743,6 +748,7 @@ const ALL_RUNS: AgentRun[] = [
     id: "em-1",
     title: "Amazon lease execution package ready",
     asset: "VTS Tower – Floor 8",
+    dealId: "d20",
     status: "complete",
     agentId: "execution-management",
     category: "Execution Management",
@@ -811,6 +817,7 @@ const ALL_RUNS: AgentRun[] = [
     id: "dw-1",
     title: "Amazon final terms written back",
     asset: "VTS Tower – Floor 8",
+    dealId: "d22",
     status: "complete",
     agentId: "data-writeback",
     category: "Data Writeback",
@@ -1133,7 +1140,15 @@ function RunRow({ run, defaultOpen = false }: { run: AgentRun; defaultOpen?: boo
         <StatusIcon className={cn("h-4 w-4 mt-0.5 shrink-0", cfg.color, run.status === "running" && "animate-spin")} />
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-foreground leading-snug">{run.title}</p>
-          <p className="text-[11px] text-muted-foreground mt-0.5">{run.asset} · {run.time}</p>
+          <p className="text-[11px] text-muted-foreground mt-0.5">
+            {run.dealId ? (
+              <button
+                className="hover:text-primary hover:underline transition-colors"
+                onClick={e => { e.stopPropagation(); window.location.hash = `#/deals?deal=${run.dealId}` }}
+              >{run.asset}</button>
+            ) : run.asset}
+            {" · "}{run.time}
+          </p>
           {!open && run.summary && <p className="text-xs text-muted-foreground mt-1 leading-snug">{run.summary}</p>}
         </div>
         <ChevronRight className={cn("h-3.5 w-3.5 text-muted-foreground shrink-0 mt-0.5 transition-transform", open && "rotate-90")} />
@@ -1154,8 +1169,12 @@ function RunRow({ run, defaultOpen = false }: { run: AgentRun; defaultOpen?: boo
               <p className="text-xs text-foreground leading-relaxed whitespace-pre-line">{run.output}</p>
               {run.actionLabel && (
                 <div className="flex gap-2">
-                  <Button size="sm" className={cn("gap-1.5 text-xs h-7 px-3", run.actionKind === "confirm" && "bg-primary")}>{run.actionLabel}</Button>
-                  <Button size="sm" variant="outline" className="text-xs h-7 px-3">Dismiss</Button>
+                  <Button
+                    size="sm"
+                    className={cn("gap-1.5 text-xs h-7 px-3", run.actionKind === "confirm" && "bg-primary")}
+                    onClick={() => { if (run.dealId) window.location.hash = `#/deals?deal=${run.dealId}` }}
+                  >{run.actionLabel}</Button>
+                  {run.actionKind !== "review" && <Button size="sm" variant="outline" className="text-xs h-7 px-3">Dismiss</Button>}
                 </div>
               )}
             </div>
