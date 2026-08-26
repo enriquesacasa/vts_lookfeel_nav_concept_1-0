@@ -2,7 +2,6 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { Badge } from "@/components/ui/badge"
 import { Send, Sparkle, Plus, ArrowLeft, MessageSquare } from "lucide-react"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -198,9 +197,6 @@ export function AskVTSPage({ className }: { className?: string }) {
             History
           </Button>
         )}
-        <Badge variant="outline" className="text-[10px] text-primary border-primary/30 bg-primary/5 ml-auto">
-          Connected to live deal data
-        </Badge>
       </div>
 
       {/* Two-panel grid — matches agents page */}
