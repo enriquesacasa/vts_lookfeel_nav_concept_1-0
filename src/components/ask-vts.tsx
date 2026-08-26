@@ -278,10 +278,12 @@ export function AskVTSPage({ className }: { className?: string }) {
               </div>
 
               {/* New chat */}
-              <Button variant="outline" size="sm" className="gap-1.5 mb-2 w-fit" onClick={newConversation}>
+              <Button variant="ghost" size="sm" className="gap-1.5 mb-4 w-fit" onClick={newConversation}>
                 <SquarePen className="h-3.5 w-3.5" />
                 New chat
               </Button>
+
+              <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1.5">Recents</p>
 
               {/* List */}
               <div className="flex flex-col gap-0.5 flex-1 overflow-y-auto min-h-0">
