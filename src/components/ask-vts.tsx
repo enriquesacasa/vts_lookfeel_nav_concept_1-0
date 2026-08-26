@@ -230,22 +230,6 @@ export function AskVTSPage({ className }: { className?: string }) {
           mobileShowChat ? "flex" : "hidden md:flex"
         )}>
 
-          {/* Chat header — matches agent detail header */}
-          <div className="flex items-center gap-3 mb-5">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 border border-primary/20 shrink-0">
-              <Sparkle className="h-5 w-5 text-primary" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-xl font-semibold text-foreground">{active.title}</p>
-              <p className="text-sm text-muted-foreground mt-0.5">
-                {active.messages.length === 0
-                  ? "Ask anything about your portfolio"
-                  : `${active.messages.length} messages`
-                }
-              </p>
-            </div>
-          </div>
-
           {/* Messages / empty state */}
           <div className="flex-1 overflow-y-auto flex flex-col gap-4 min-h-0">
             {active.messages.length === 0 ? (
