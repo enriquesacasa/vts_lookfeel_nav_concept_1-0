@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
-  ArrowUp, Sparkle, SquarePen, ArrowLeft, PanelLeft, Search, Clock, ChevronDown, Mic, Plus,
+  ArrowUp, Sparkle, SquarePen, ArrowLeft, PanelLeft, Search, Clock, ChevronDown, Mic, AudioLines, Plus,
   MoreHorizontal, Share2, Pencil, Pin, Archive, Trash2,
 } from "lucide-react"
 
@@ -82,12 +82,12 @@ const CONVERSATIONS: Conversation[] = [
 ]
 
 const SUGGESTED = [
-  { label: "Pipeline health",      prompt: "Which deals need attention today?" },
-  { label: "Stalled deals",        prompt: "Show me all stalled deals and their cost of delay." },
-  { label: "NOI vs budget",        prompt: "Which active deals are above budget NOI?" },
-  { label: "Stage summary",        prompt: "How many deals are in each stage right now?" },
-  { label: "Upcoming expirations", prompt: "What leases expire in the next 90 days?" },
-  { label: "Agent activity",       prompt: "What have VTS Agents done in the last 24 hours?" },
+  { label: "Review pipeline health",   prompt: "Which deals need attention today?" },
+  { label: "Surface stalled deals",    prompt: "Show me all stalled deals and their cost of delay." },
+  { label: "Check NOI vs budget",      prompt: "Which active deals are above budget NOI?" },
+  { label: "Summarize deal stages",    prompt: "How many deals are in each stage right now?" },
+  { label: "Flag expiring leases",     prompt: "What leases expire in the next 90 days?" },
+  { label: "Show agent activity",      prompt: "What have VTS Agents done in the last 24 hours?" },
 ]
 
 // ─── Conversation list item ───────────────────────────────────────────────────
@@ -331,93 +331,108 @@ export function AskVTSPage({ className, newChatKey }: { className?: string; newC
 
         {/* Right: chat panel */}
         <div className={cn(
-          "rounded-2xl bg-card/70 backdrop-blur-md p-5 min-h-0 flex flex-col",
+          "rounded-2xl backdrop-blur-md p-5 min-h-0 flex flex-col",
+          "bg-card/70",
           mobileShowChat ? "flex" : "hidden md:flex"
         )}>
 
-          {/* Messages / empty state */}
-          <div className="flex-1 overflow-y-auto flex flex-col gap-4 min-h-0">
-            {active.messages.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full min-h-64 text-center px-6">
-                <div className="h-12 w-12 rounded-2xl bg-muted/60 border border-border/50 flex items-center justify-center mb-4">
-                  <Sparkle className="h-6 w-6 text-muted-foreground/50" />
+          {active.messages.length === 0 ? (
+            /* Empty state: centered greeting + input */
+            <div className="flex-1 flex flex-col items-center justify-center gap-10 px-4">
+              <p className="text-4xl font-semibold text-foreground text-center">What do you want to tackle, Enrique?</p>
+              <div className="w-full max-w-2xl">
+                <div className="rounded-2xl border border-border bg-card px-4 pt-3 pb-2">
+                  <Textarea
+                    value={input}
+                    onChange={e => setInput(e.target.value)}
+                    onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send() } }}
+                    placeholder="Ask anything about your portfolio…"
+                    className="w-full resize-none text-sm border-none shadow-none bg-transparent focus-visible:ring-0 p-0 min-h-10"
+                    rows={1}
+                  />
+                  <div className="flex items-center justify-between mt-2">
+                    <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground">
+                      <Plus className="h-3.5 w-3.5" />
+                      Add
+                    </Button>
+                    <div className="flex items-center gap-1">
+                      <Button variant="ghost" size="icon" className="text-muted-foreground">
+                        <Mic className="h-4 w-4" />
+                      </Button>
+                      {input.trim() ? (
+                        <Button size="icon" onClick={send}>
+                          <ArrowUp className="h-4 w-4" />
+                        </Button>
+                      ) : (
+                        <Button size="icon" onClick={() => {}}>
+                          <AudioLines className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
                 </div>
-                <p className="text-base font-medium text-foreground mb-1">Ask VTS</p>
-                <p className="text-sm text-muted-foreground mb-5 max-w-xs leading-relaxed">
-                  Ask about deals, portfolio performance, leasing activity, or agent outputs.
-                </p>
-                <div className="grid grid-cols-2 gap-2 w-full max-w-sm text-left">
+                <div className="flex flex-wrap gap-2 mt-12 justify-center">
                   {SUGGESTED.map(s => (
-                    <button
+                    <Button
                       key={s.label}
+                      variant="outline"
                       onClick={() => setInput(s.prompt)}
-                      className="rounded-xl border border-border/60 px-3 py-3 bg-muted/20 text-left hover:bg-muted/40 hover:border-border transition-colors"
+                      className="rounded-full whitespace-nowrap"
                     >
-                      <p className="text-sm font-medium text-foreground leading-snug">{s.label}</p>
-                      <p className="text-[11px] text-muted-foreground mt-0.5 leading-snug">{s.prompt}</p>
-                    </button>
+                      {s.label}
+                    </Button>
                   ))}
                 </div>
               </div>
-            ) : (
-              <>
+            </div>
+          ) : (
+            /* Chat layout: messages + input pinned to bottom */
+            <>
+              <div className="flex-1 overflow-y-auto flex flex-col gap-4 min-h-0">
                 {active.messages.map(msg => (
                   <MessageRow key={msg.id} message={msg} />
                 ))}
                 <div ref={bottomRef} />
-              </>
-            )}
-          </div>
-
-          {/* Suggestion chips */}
-          {active.messages.length > 0 && (
-            <div className="flex gap-2 overflow-x-auto pt-4 pb-1 shrink-0">
-              {SUGGESTED.slice(0, 4).map(s => (
-                <Button
-                  key={s.label}
-                  variant="outline"
-                  size="sm"
-                  className="shrink-0 whitespace-nowrap"
-                  onClick={() => setInput(s.prompt)}
-                >
-                  {s.label}
-                </Button>
-              ))}
-            </div>
-          )}
-
-          {/* Input */}
-          <div className="shrink-0 mt-4 rounded-2xl border border-border bg-card px-4 pt-3 pb-2">
-            <Textarea
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send() } }}
-              placeholder="Ask anything about your portfolio, or resume something below…"
-              className="w-full resize-none text-sm border-none shadow-none bg-transparent focus-visible:ring-0 p-0 min-h-10"
-              rows={1}
-            />
-            <div className="flex items-center justify-between mt-2">
-              <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground">
-                <Plus className="h-3.5 w-3.5" />
-                Add
-              </Button>
-              <div className="flex items-center gap-1">
-                <Button variant="ghost" size="icon" className="text-muted-foreground">
-                  <Mic className="h-4 w-4" />
-                </Button>
-                {input.trim() ? (
-                  <Button size="icon" onClick={send}>
-                    <ArrowUp className="h-4 w-4" />
-                  </Button>
-                ) : (
-                  <Button size="sm" className="gap-1.5" onClick={() => {}}>
-                    <Sparkle className="h-3.5 w-3.5" />
-                    Ask VTS
-                  </Button>
-                )}
               </div>
-            </div>
-          </div>
+              <div className="flex gap-2 overflow-x-auto pt-4 pb-1 shrink-0">
+                {SUGGESTED.slice(0, 4).map(s => (
+                  <Button key={s.label} variant="outline" size="sm" className="shrink-0 whitespace-nowrap" onClick={() => setInput(s.prompt)}>
+                    {s.label}
+                  </Button>
+                ))}
+              </div>
+              <div className="shrink-0 mt-2 rounded-2xl border border-border bg-card px-4 pt-3 pb-2">
+                <Textarea
+                  value={input}
+                  onChange={e => setInput(e.target.value)}
+                  onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send() } }}
+                  placeholder="Ask anything about your portfolio, or resume something below…"
+                  className="w-full resize-none text-sm border-none shadow-none bg-transparent focus-visible:ring-0 p-0 min-h-10"
+                  rows={1}
+                />
+                <div className="flex items-center justify-between mt-2">
+                  <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground">
+                    <Plus className="h-3.5 w-3.5" />
+                    Add
+                  </Button>
+                  <div className="flex items-center gap-1">
+                    <Button variant="ghost" size="icon" className="text-muted-foreground">
+                      <Mic className="h-4 w-4" />
+                    </Button>
+                    {input.trim() ? (
+                      <Button size="icon" onClick={send}>
+                        <ArrowUp className="h-4 w-4" />
+                      </Button>
+                    ) : (
+                      <Button size="icon" onClick={() => {}}>
+                        <AudioLines className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
 
         </div>
       </div>
