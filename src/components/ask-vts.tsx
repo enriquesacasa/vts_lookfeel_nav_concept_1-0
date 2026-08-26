@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
-  Send, Sparkle, SquarePen, ArrowLeft, PanelLeft, Search,
+  Send, Sparkle, SquarePen, ArrowLeft, PanelLeft, Search, Clock,
   MoreHorizontal, Share2, Pencil, Pin, Archive, Trash2,
 } from "lucide-react"
 
@@ -254,10 +254,32 @@ export function AskVTSPage({ className }: { className?: string }) {
           mobileShowChat ? "hidden md:flex" : "flex"
         )}>
           {railCollapsed ? (
-            <div className="flex flex-col items-center py-4 gap-2 flex-1">
+            <div className="flex flex-col items-center py-4 gap-1 flex-1">
               <Button variant="ghost" size="icon" onClick={() => setRailCollapsed(false)}>
                 <PanelLeft className="h-4 w-4" />
               </Button>
+              <Button variant="ghost" size="icon" onClick={newConversation}>
+                <SquarePen className="h-4 w-4" />
+              </Button>
+              <Button variant="ghost" size="icon">
+                <Search className="h-4 w-4" />
+              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger className="flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+                  <Clock className="h-4 w-4" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent side="right" align="start" className="w-56">
+                  {convs.map(conv => (
+                    <DropdownMenuItem
+                      key={conv.id}
+                      className="gap-2 text-sm"
+                      onClick={() => { setActiveId(conv.id); setMobileShowChat(true) }}
+                    >
+                      <span className="truncate">{conv.title}</span>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           ) : (
             <div className="flex flex-col flex-1 min-h-0 p-4">
@@ -268,11 +290,11 @@ export function AskVTSPage({ className }: { className?: string }) {
                   <h2 className="text-xl font-semibold text-foreground">Ask VTS</h2>
                 </div>
                 <div className="flex items-center">
-                  <Button variant="ghost" size="icon">
-                    <Search className="h-4 w-4" />
-                  </Button>
                   <Button variant="ghost" size="icon" onClick={newConversation}>
                     <SquarePen className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="icon">
+                    <Search className="h-4 w-4" />
                   </Button>
                   <Button variant="ghost" size="icon" onClick={() => setRailCollapsed(true)}>
                     <PanelLeft className="h-4 w-4" />
