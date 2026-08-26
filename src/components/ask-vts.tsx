@@ -1,7 +1,6 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 import { Button, buttonVariants } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { Textarea } from "@/components/ui/textarea"
 import {
@@ -306,11 +305,10 @@ export function AskVTSPage({ className }: { className?: string }) {
               </div>
 
               {/* New chat */}
-              <Separator className="mb-3" />
               <Collapsible open={recentsOpen} onOpenChange={setRecentsOpen} className="flex flex-col flex-1 min-h-0">
-                <CollapsibleTrigger className="flex items-center justify-between w-full mb-1.5 group/recents">
-                  <span className="text-sm font-semibold text-foreground">Recents</span>
-                  <ChevronDown className={cn("h-3.5 w-3.5 text-muted-foreground transition-transform", !recentsOpen && "-rotate-90")} />
+                <CollapsibleTrigger className="flex items-center justify-between w-full mb-1">
+                  <span className="text-sm font-medium text-foreground">Recents</span>
+                  <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform", !recentsOpen && "-rotate-90")} />
                 </CollapsibleTrigger>
                 <CollapsibleContent className="flex flex-col gap-0.5 flex-1 overflow-y-auto min-h-0">
                   {convs.map(conv => (
