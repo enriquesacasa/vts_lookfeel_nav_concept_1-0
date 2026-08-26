@@ -558,7 +558,7 @@ export const StackingPlan = forwardRef<StackingPlanHandle>(function StackingPlan
   })
 
   return (
-    <div className="flex flex-col flex-1 bg-white/70 dark:bg-white/8 backdrop-blur-md rounded-xl overflow-hidden mt-4 mb-6">
+    <div className="flex flex-col flex-1 bg-card/70 dark:bg-white/8 backdrop-blur-md rounded-xl overflow-hidden mt-4 mb-6">
 
       {/* Filter bar */}
       <div className="px-3 py-3 border-b border-border">
@@ -688,9 +688,9 @@ export const StackingPlan = forwardRef<StackingPlanHandle>(function StackingPlan
                         border: c.dashed ? "2px dashed var(--color-border)" : undefined,
                         padding: cfg.padding,
                         boxShadow: isActive
-                          ? `inset 0 0 0 2.5px ${activeHighlight?.type === "options" ? "#2563eb" : "#ea580c"}`
+                          ? `inset 0 0 0 2.5px ${activeHighlight?.type === "options" ? "var(--color-primary)" : "var(--color-chart-1)"}`
                           : isRelated
-                            ? `inset 0 0 0 2px ${activeHighlight?.type === "options" ? "rgb(37 99 235 / 0.4)" : "rgb(234 88 12 / 0.4)"}`
+                            ? `inset 0 0 0 2px ${activeHighlight?.type === "options" ? "color-mix(in oklch, var(--color-primary) 40%, transparent)" : "color-mix(in oklch, var(--color-chart-1) 40%, transparent)"}`
                             : undefined,
                         filter: isDimmed ? "brightness(0.75) saturate(0.5)" : undefined,
                         transition: "filter 0.15s ease, box-shadow 0.15s ease",
@@ -705,7 +705,7 @@ export const StackingPlan = forwardRef<StackingPlanHandle>(function StackingPlan
                                 <div className="flex items-center gap-1 min-w-0">
                                   <p className={cn("font-semibold truncate", cfg.nameCls)}>{space.suite}</p>
                                   {spaceCircles.map((ci, i) => (
-                                    <span key={i} className="size-4 rounded-full flex items-center justify-center text-[9px] font-bold shrink-0 text-white" style={{ background: ci.color === "blue" ? "#2563eb" : "#ea580c" }}>{ci.n}</span>
+                                    <span key={i} className={cn("size-4 rounded-full flex items-center justify-center text-[9px] font-bold shrink-0 text-primary-foreground", ci.color === "blue" ? "bg-primary" : "bg-chart-1")}>{ci.n}</span>
                                   ))}
                                 </div>
                               )}
@@ -721,7 +721,7 @@ export const StackingPlan = forwardRef<StackingPlanHandle>(function StackingPlan
                                 <div className="flex items-center gap-1 min-w-0">
                                   <p className={cn("font-semibold leading-tight truncate", cfg.nameCls)}>{space.tenant}</p>
                                   {spaceCircles.map((ci, i) => (
-                                    <span key={i} className="size-4 rounded-full flex items-center justify-center text-[9px] font-bold shrink-0 text-white" style={{ background: ci.color === "blue" ? "#2563eb" : "#ea580c" }}>{ci.n}</span>
+                                    <span key={i} className={cn("size-4 rounded-full flex items-center justify-center text-[9px] font-bold shrink-0 text-primary-foreground", ci.color === "blue" ? "bg-primary" : "bg-chart-1")}>{ci.n}</span>
                                   ))}
                                 </div>
                               )}
@@ -756,20 +756,17 @@ export const StackingPlan = forwardRef<StackingPlanHandle>(function StackingPlan
                         {/* Badges column */}
                         <div className="flex flex-col items-end gap-1 shrink-0">
                           {show("Deals") && space.deals != null && (
-                            <span className={cn("font-medium px-1.5 py-0.5 rounded whitespace-nowrap", cfg.metaCls)}
-                              style={{ background: "rgba(255,255,255,0.18)", border: "1px solid rgba(255,255,255,0.25)", color: c.text }}>
+                            <span className={cn("font-medium px-1.5 py-0.5 rounded whitespace-nowrap bg-white/18 border border-white/25", cfg.metaCls)} style={{ color: c.text }}>
                               {space.deals} {space.deals === 1 ? "Deal" : "Deals"}
                             </span>
                           )}
                           {show("Executed Deal") && space.executedDeal && (
-                            <span className={cn("font-medium px-1.5 py-0.5 rounded flex items-center gap-1 whitespace-nowrap", cfg.metaCls)}
-                              style={{ background: "rgba(255,255,255,0.18)", border: "1px solid rgba(255,255,255,0.25)", color: c.text }}>
+                            <span className={cn("font-medium px-1.5 py-0.5 rounded flex items-center gap-1 whitespace-nowrap bg-white/18 border border-white/25", cfg.metaCls)} style={{ color: c.text }}>
                               <FileCheckIcon className="size-3 shrink-0" /> Executed
                             </span>
                           )}
                           {show("Committed Lease") && space.committedLease && (
-                            <span className={cn("font-medium px-1.5 py-0.5 rounded flex items-center gap-1 whitespace-nowrap", cfg.metaCls)}
-                              style={{ background: "rgba(255,255,255,0.18)", border: "1px solid rgba(255,255,255,0.25)", color: c.text }}>
+                            <span className={cn("font-medium px-1.5 py-0.5 rounded flex items-center gap-1 whitespace-nowrap bg-white/18 border border-white/25", cfg.metaCls)} style={{ color: c.text }}>
                               <HandshakeIcon className="size-3 shrink-0" /> {space.dealNote ?? "Committed"}
                             </span>
                           )}
@@ -777,8 +774,7 @@ export const StackingPlan = forwardRef<StackingPlanHandle>(function StackingPlan
                           {/* Options badge */}
                           {show("Options") && space.leaseOptions && space.leaseOptions.length > 0 && (
                             <Popover onOpenChange={(open) => setActiveHighlight(open ? buildHighlight(space, "options") : null)}>
-                              <PopoverTrigger className={cn("cursor-pointer flex items-center gap-1 font-medium px-1.5 py-0.5 rounded whitespace-nowrap hover:brightness-110 transition-all", cfg.metaCls)}
-                                style={{ background: "rgba(37,99,235,0.15)", border: "1px solid rgba(37,99,235,0.35)", color: c.text }}>
+                              <PopoverTrigger className={cn("cursor-pointer flex items-center gap-1 font-medium px-1.5 py-0.5 rounded whitespace-nowrap hover:brightness-110 transition-all bg-primary/15 border border-primary/35", cfg.metaCls)} style={{ color: c.text }}>
                                 <ScrollTextIcon className="size-3 text-blue-400 shrink-0" />
                                 <span className="hidden sm:inline">{space.leaseOptions.length} {space.leaseOptions.length === 1 ? "Option" : "Options"}</span>
                                 <span className="sm:hidden">{space.leaseOptions.length}</span>
@@ -795,7 +791,7 @@ export const StackingPlan = forwardRef<StackingPlanHandle>(function StackingPlan
                                     return (
                                       <div key={opt} className={cn("px-3 py-3", i > 0 && "border-t border-border")}>
                                         <div className="flex items-start gap-2 mb-2">
-                                          <span className="mt-0.5 size-4 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 text-white bg-blue-600">{i + 1}</span>
+                                          <span className="mt-0.5 size-4 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 text-primary-foreground bg-primary">{i + 1}</span>
                                           <p className="text-sm font-semibold leading-tight text-foreground">{opt}</p>
                                         </div>
                                         {details && (
@@ -828,8 +824,7 @@ export const StackingPlan = forwardRef<StackingPlanHandle>(function StackingPlan
                           {/* Encumbrances badge */}
                           {show("Encumbrances") && space.encumbrances && space.encumbrances.length > 0 && (
                             <Popover onOpenChange={(open) => setActiveHighlight(open ? buildHighlight(space, "encumbrances") : null)}>
-                              <PopoverTrigger className={cn("cursor-pointer flex items-center gap-1 font-medium px-1.5 py-0.5 rounded whitespace-nowrap hover:brightness-110 transition-all", cfg.metaCls)}
-                                style={{ background: "rgba(234,88,12,0.15)", border: "1px solid rgba(234,88,12,0.35)", color: c.text }}>
+                              <PopoverTrigger className={cn("cursor-pointer flex items-center gap-1 font-medium px-1.5 py-0.5 rounded whitespace-nowrap hover:brightness-110 transition-all bg-chart-1/15 border border-chart-1/35", cfg.metaCls)} style={{ color: c.text }}>
                                 <ConstructionIcon className="size-3 text-orange-400 shrink-0" />
                                 <span className="hidden sm:inline">{space.encumbrances.length} {space.encumbrances.length === 1 ? "Encumbrance" : "Encumbrances"}</span>
                                 <span className="sm:hidden">{space.encumbrances.length}</span>
@@ -846,7 +841,7 @@ export const StackingPlan = forwardRef<StackingPlanHandle>(function StackingPlan
                                     return (
                                       <div key={i} className={cn("px-3 py-3", i > 0 && "border-t border-border")}>
                                         <div className="flex items-start gap-2 mb-2">
-                                          <span className="mt-0.5 size-4 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 text-white bg-orange-500">{enc.priority}</span>
+                                          <span className="mt-0.5 size-4 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 text-primary-foreground bg-chart-1">{enc.priority}</span>
                                           <div className="flex-1 min-w-0">
                                             <p className="text-sm font-semibold leading-tight text-foreground">{enc.optionType}</p>
                                             <p className="text-xs text-muted-foreground mt-0.5 leading-tight">{enc.tenant} · Suite {enc.suite}</p>

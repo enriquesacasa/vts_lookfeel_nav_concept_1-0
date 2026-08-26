@@ -59,7 +59,7 @@ function TenantAvatar({ name }: { name: string }) {
         src={src}
         alt={name}
         onError={() => setFailed(true)}
-        className="h-7 w-7 rounded-full object-contain bg-white ring-1 ring-border/30 shrink-0"
+        className="h-7 w-7 rounded-full object-contain bg-background ring-1 ring-border/30 shrink-0"
       />
     )
   }
