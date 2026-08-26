@@ -310,14 +310,14 @@ function ConfirmDetail({ onBack }: { onBack?: () => void }) {
               </div>
 
               {/* Deal Capture agent callout */}
-              <div className="flex items-start gap-4 rounded-xl bg-primary/5 border border-primary/15 px-5 py-5">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 border border-primary/20 mt-0.5">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-primary">
+              <div className="flex items-start gap-3 rounded-xl bg-primary/5 border border-primary/15 px-4 py-3">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 border border-primary/20 mt-0.5">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 text-primary">
                     <ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.657 4.03 3 9 3s9-1.343 9-3V5"/><path d="M3 12c0 1.657 4.03 3 9 3s9-1.343 9-3"/>
                   </svg>
                 </div>
                 <div>
-                  <p className="text-lg font-semibold text-primary mb-1">Deal Capture Agent</p>
+                  <p className="text-lg font-semibold text-primary mb-0.5">Deal Capture Agent</p>
                   <p className="text-sm text-foreground/80 leading-relaxed">Parsed your forwarded email and extracted the deal details below.</p>
                 </div>
               </div>
