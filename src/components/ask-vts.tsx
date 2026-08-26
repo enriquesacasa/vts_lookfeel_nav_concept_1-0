@@ -283,7 +283,7 @@ export function AskVTSPage({ className }: { className?: string }) {
             <div className="flex flex-col flex-1 min-h-0 p-4">
               {/* Header */}
               <div className="flex items-center justify-between gap-2 mb-3">
-                <h2 className="text-xl font-semibold text-foreground">Recents</h2>
+                <h2 className="text-xl font-semibold text-foreground">Ask VTS</h2>
                 <button
                   onClick={() => setRailCollapsed(true)}
                   className="h-7 w-7 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors shrink-0"
