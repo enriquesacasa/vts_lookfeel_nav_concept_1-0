@@ -5,7 +5,7 @@ import {
   Lock, Zap, Activity, ArrowLeft,
   Database, SlidersHorizontal, ChevronRight, HeartPulse, CalendarCheck,
   FileText, BarChart2, ClipboardCheck,
-  BrainCircuit, Scale, GitMerge, TrendingUp, FileCheck2, Building2, DatabaseZap,
+  BrainCircuit, Scale, GitMerge, TrendingUp, FileCheck2, Building2, DatabaseZap, PenLine,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -81,6 +81,25 @@ export const AGENTS: AgentDef[] = [
     ],
     icon: HeartPulse,
     available: true,
+  },
+  {
+    id: "doc-drafting",
+    name: "Doc Drafting",
+    tagline: "Draft, revise, and finalize leasing documents from deal context",
+    description:
+      "Generate LOIs, lease amendments, options notices, and first draft leases directly from proposal terms and VTS deal records. Export to Word, Google Docs, or send as email attachments.",
+    impact:
+      "Faster document turnaround, fewer drafting errors, and leasing documents that stay in sync with deal terms throughout negotiation.",
+    category: "Cross-Cutting",
+    capabilities: [
+      "Draft LOIs from proposal terms with policy flags pre-annotated",
+      "Generate lease amendments that carry forward defined terms from the executed lease",
+      "Create options and rights notices with correct delivery requirements",
+      "Export to Word, PDF, Google Docs, or Word Online",
+    ],
+    icon: PenLine,
+    available: true,
+    active: true,
   },
   {
     id: "space-match",
@@ -473,6 +492,57 @@ const ALL_RUNS: AgentRun[] = [
     category: "Deal Health",
     time: "Queued",
     summary: "Checking for duplicate or related deals across portfolio.",
+  },
+  // Doc Drafting
+  {
+    id: "dd-1",
+    title: "Amazon LOI drafted",
+    asset: "VTS Tower – Floor 8",
+    dealId: "d00",
+    status: "complete",
+    agentId: "doc-drafting",
+    category: "Doc Drafting",
+    time: "9:41 AM",
+    summary: "LOI drafted from current proposal terms. TI allowance flagged — $85 PSF exceeds $75 PSF policy threshold.",
+    output: "Pulled proposal terms for Amazon.com (Suite 0800, Floor 8, 18,000 sf). Drafted LOI with all economic terms pre-filled. One flag: TI allowance of $85 PSF exceeds standard policy ($75 PSF). VP sign-off recommended before sending. Document ready for review.",
+    actionLabel: "Review LOI",
+    actionKind: "review",
+  },
+  {
+    id: "dd-2",
+    title: "KPMG Lease Amendment No. 3 drafted",
+    asset: "VTS Tower – Floor 34",
+    status: "complete",
+    agentId: "doc-drafting",
+    category: "Doc Drafting",
+    time: "Yesterday",
+    summary: "Amendment drafted to add Floor 22 expansion space. Rent for expansion premises left as TBD pending landlord input.",
+    output: "Pulled executed KPMG lease (Amendment No. 2). Drafted Amendment No. 3 adding Suite 2200, Floor 22 (~12,000 sf) as expansion premises. Existing defined terms carried forward. Expansion rent left as [TBD]. Document ready for economics to be inserted.",
+    actionLabel: "Open in Doc Drafting",
+    actionKind: "review",
+  },
+  {
+    id: "dd-3",
+    title: "Deloitte expansion option notice drafted",
+    asset: "VTS Tower – Floor 20",
+    status: "complete",
+    agentId: "doc-drafting",
+    category: "Doc Drafting",
+    time: "Aug 20",
+    summary: "Options notice drafted for Deloitte expansion right on Floor 20. Delivery deadline is Sep 15 per lease.",
+    output: "Reviewed Deloitte lease (Article 42 — Expansion Option). Drafted exercise notice for Floor 20 expansion (approx. 10,000 sf). Certified mail delivery required by Sep 15. Cover letter draft included.",
+    actionLabel: "Review notice",
+    actionKind: "review",
+  },
+  {
+    id: "dd-4",
+    title: "Monitoring executed leases for upcoming option deadlines",
+    asset: "VTS Tower Headquarters",
+    status: "running",
+    agentId: "doc-drafting",
+    category: "Doc Drafting",
+    time: "Running now",
+    summary: "Scanning active leases for renewal, expansion, and termination option windows opening in the next 90 days.",
   },
   // Proposal Builder
   {
@@ -886,6 +956,13 @@ const WORKFLOW_STEPS: Record<string, string[]> = {
     "Identify duplicate or related deals and suggest consolidation",
     "Surface a prioritized list of deals that need attention today",
   ],
+  "doc-drafting": [
+    "Pull proposal terms and deal context from the VTS record",
+    "Draft the document using the appropriate VTS template",
+    "Flag any terms outside policy thresholds before the document is sent",
+    "Revise specific sections based on deal changes or user edits",
+    "Export or email the finalized document in the requested format",
+  ],
   "proposal-builder": [
     "Pull deal terms, space details, and leasing context from VTS",
     "Reference executed leases and market data to support proposed economics",
@@ -1027,6 +1104,11 @@ const AGENT_STATS: Record<string, { label: string; value: string }[]> = {
     { label: "Deals scored", value: "29" },
     { label: "At risk",      value: "2"  },
     { label: "Stalled",      value: "3"  },
+  ],
+  "doc-drafting": [
+    { label: "Docs drafted",  value: "14" },
+    { label: "Policy flags",  value: "3"  },
+    { label: "Exported",      value: "9"  },
   ],
   "proposal-builder": [
     { label: "Proposals built", value: "7"  },

@@ -1,6 +1,7 @@
 import * as React from "react"
 
 export type ChatPattern = "full-screen" | "popover" | "side-over" | "side-push"
+export type AgentsView = "ask-vts" | "vts-agents"
 
 export interface TransferMessage {
   id: string
@@ -24,6 +25,8 @@ interface ChatPatternContextValue {
   closeSideOver: () => void
   sidePushOpen: boolean
   closeSidePush: () => void
+  agentsView: AgentsView
+  setAgentsView: (v: AgentsView) => void
 }
 
 const ChatPatternContext = React.createContext<ChatPatternContextValue>({
@@ -36,6 +39,8 @@ const ChatPatternContext = React.createContext<ChatPatternContextValue>({
   closeSideOver: () => {},
   sidePushOpen: false,
   closeSidePush: () => {},
+  agentsView: "ask-vts",
+  setAgentsView: () => {},
 })
 
 export function useChatPattern() {
@@ -52,6 +57,7 @@ export function ChatPatternProvider({ children, onOpenChat }: ChatPatternProvide
   const [pending, setPending] = React.useState<ChatContext | null>(null)
   const [sideOverOpen, setSideOverOpen] = React.useState(false)
   const [sidePushOpen, setSidePushOpen] = React.useState(false)
+  const [agentsView, setAgentsView] = React.useState<AgentsView>("ask-vts")
 
   const openChat = React.useCallback((ctx: ChatContext) => {
     if (ctx.transferMessages) {
@@ -74,7 +80,7 @@ export function ChatPatternProvider({ children, onOpenChat }: ChatPatternProvide
   const closeSidePush = React.useCallback(() => { setSidePushOpen(false); setPending(null) }, [])
 
   return (
-    <ChatPatternContext.Provider value={{ pattern, setPattern, pending, openChat, clearPending, sideOverOpen, closeSideOver, sidePushOpen, closeSidePush }}>
+    <ChatPatternContext.Provider value={{ pattern, setPattern, pending, openChat, clearPending, sideOverOpen, closeSideOver, sidePushOpen, closeSidePush, agentsView, setAgentsView }}>
       {children}
     </ChatPatternContext.Provider>
   )

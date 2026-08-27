@@ -24,6 +24,7 @@ import {
   BarChart2,
   Calculator,
   Sparkle,
+  Wand,
   Activity,
   BellRing,
   UserCircle,
@@ -78,7 +79,7 @@ const navStructure: NavItem[] = [
   ]},
 ]
 
-const aiItem = { id: "ai", label: "VTS Agents", icon: Sparkle, accent: true, small: false }
+const aiItem = { id: "ai", label: "VTS Agents", icon: Wand, accent: true, small: false }
 
 const bottomItems = [
   { id: "activity",   label: "Activity feed",            icon: Activity,    accent: false, small: true },
@@ -162,9 +163,10 @@ interface DesktopNavProps {
   onLogoClick?: () => void
   onNavItemClick?: (id: string) => void
   activePage?: string
+  hideAgentsPage?: boolean
 }
 
-function DesktopNav({ className, onCollapsedChange, assets, portfolios, selectedAssetId, onAssetChange, isDark, onLogoClick, onNavItemClick, activePage }: DesktopNavProps) {
+function DesktopNav({ className, onCollapsedChange, assets, portfolios, selectedAssetId, onAssetChange, isDark, onLogoClick, onNavItemClick, activePage, hideAgentsPage }: DesktopNavProps) {
   const [collapsed, setCollapsed] = React.useState(false)
   const [active, setActive] = React.useState(activePage ?? "dashboard")
   const [logoOpen, setLogoOpen] = React.useState(false)
@@ -536,13 +538,15 @@ function DesktopNav({ className, onCollapsedChange, assets, portfolios, selected
         />
 
         {/* VTS Agents */}
-        <NavRow
-          key={aiItem.id}
-          {...aiItem}
-          active={active === aiItem.id}
-          collapsed={collapsed}
-          onClick={() => { setActive(aiItem.id); onNavItemClick?.(aiItem.id) }}
-        />
+        {!hideAgentsPage && (
+          <NavRow
+            key={aiItem.id}
+            {...aiItem}
+            active={active === aiItem.id}
+            collapsed={collapsed}
+            onClick={() => { setActive(aiItem.id); onNavItemClick?.(aiItem.id) }}
+          />
+        )}
       </div>
 
       <Separator className="my-3 bg-sidebar-border" />
@@ -574,9 +578,10 @@ interface MobileNavProps {
   portfolios?: Portfolio[]
   selectedAssetId?: string
   onAssetChange?: (id: string) => void
+  hideAgentsPage?: boolean
 }
 
-function MobileNav({ onLogoClick, onNavItemClick, activePage, assets, portfolios, selectedAssetId, onAssetChange }: MobileNavProps) {
+function MobileNav({ onLogoClick, onNavItemClick, activePage, assets, portfolios, selectedAssetId, onAssetChange, hideAgentsPage }: MobileNavProps) {
   const [active, setActive] = React.useState(activePage ?? "dashboard")
   const [sheetOpen, setSheetOpen] = React.useState(false)
   const [openSections, setOpenSections] = React.useState<Set<string>>(new Set())
@@ -785,7 +790,7 @@ function MobileNav({ onLogoClick, onNavItemClick, activePage, assets, portfolios
               )
             })}
 
-            <NavRow {...aiItem} active={active === aiItem.id} collapsed={false} onClick={() => handleSelect(aiItem.id)} />
+            {!hideAgentsPage && <NavRow {...aiItem} active={active === aiItem.id} collapsed={false} onClick={() => handleSelect(aiItem.id)} />}
           </div>
 
           <Separator className="my-2 bg-sidebar-border" />
@@ -815,10 +820,11 @@ interface AppNavProps {
   onLogoClick?: () => void
   onNavItemClick?: (id: string) => void
   activePage?: string
+  hideAgentsPage?: boolean
 }
 
-export function AppNav({ className, onCollapsedChange, assets, portfolios, selectedAssetId, onAssetChange, isDark, onLogoClick, onNavItemClick, activePage }: AppNavProps) {
+export function AppNav({ className, onCollapsedChange, assets, portfolios, selectedAssetId, onAssetChange, isDark, onLogoClick, onNavItemClick, activePage, hideAgentsPage }: AppNavProps) {
   const isMobile = useIsMobile()
-  if (isMobile) return <MobileNav onLogoClick={onLogoClick} onNavItemClick={onNavItemClick} activePage={activePage} assets={assets} portfolios={portfolios} selectedAssetId={selectedAssetId} onAssetChange={onAssetChange} />
-  return <DesktopNav className={className} onCollapsedChange={onCollapsedChange} assets={assets} portfolios={portfolios} selectedAssetId={selectedAssetId} onAssetChange={onAssetChange} isDark={isDark} onLogoClick={onLogoClick} onNavItemClick={onNavItemClick} activePage={activePage} />
+  if (isMobile) return <MobileNav onLogoClick={onLogoClick} onNavItemClick={onNavItemClick} activePage={activePage} assets={assets} portfolios={portfolios} selectedAssetId={selectedAssetId} onAssetChange={onAssetChange} hideAgentsPage={hideAgentsPage} />
+  return <DesktopNav className={className} onCollapsedChange={onCollapsedChange} assets={assets} portfolios={portfolios} selectedAssetId={selectedAssetId} onAssetChange={onAssetChange} isDark={isDark} onLogoClick={onLogoClick} onNavItemClick={onNavItemClick} activePage={activePage} hideAgentsPage={hideAgentsPage} />
 }

@@ -255,27 +255,24 @@ function ConvListItem({ conv, selected, onSelect }: {
   selected: boolean
   onSelect: () => void
 }) {
-  const [hovered, setHovered] = React.useState(false)
-
   return (
     <div
       className={cn(
-        "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all cursor-pointer",
+        "group w-full flex items-center gap-2 px-3 py-1.5 rounded-xl text-left transition-all cursor-pointer",
         selected ? "bg-primary/10 text-primary" : "hover:bg-muted/60 text-foreground"
       )}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
       onClick={onSelect}
     >
-      <p className="text-sm font-semibold truncate flex-1">{conv.title}</p>
+      <div className="min-w-0 flex-1">
+        <p className="text-sm truncate">{conv.title}</p>
+        <p className={cn("text-[11px] mt-0.5", selected ? "text-primary/70" : "text-muted-foreground")}>{conv.time}</p>
+      </div>
 
-      {/* Fixed-width slot: timestamp or more menu — no layout shift */}
       <DropdownMenu>
         <DropdownMenuTrigger
           onClick={e => e.stopPropagation()}
           className={cn(
-            "shrink-0 h-6 w-6 flex items-center justify-center rounded-md",
-            hovered ? "visible" : "invisible",
+            "shrink-0 h-6 w-6 flex items-center justify-center rounded-md opacity-0 group-hover:opacity-100 transition-opacity",
             selected ? "text-primary hover:bg-primary/20" : "text-muted-foreground hover:bg-muted"
           )}
         >
@@ -381,7 +378,7 @@ export function AskVTSPage({ className, newChatKey }: { className?: string; newC
   const bottomRef = React.useRef<HTMLDivElement>(null)
   const pendingAutoRef = React.useRef<string | null>(null)
 
-  const { pending, clearPending } = useChatPattern()
+  const { pending, clearPending, agentsView } = useChatPattern()
 
   const active = convs.find(c => c.id === activeId) ?? convs[0]
 
@@ -552,10 +549,13 @@ export function AskVTSPage({ className, newChatKey }: { className?: string; newC
                         onSelect={() => { setActiveId(conv.id); setSelectedAgentId(null); setMobileShowChat(true) }}
                       />
                     ))}
+                    <Button variant="ghost" size="sm" className="w-full justify-start px-3 text-muted-foreground text-xs h-8 mt-0.5">
+                      More
+                    </Button>
                   </CollapsibleContent>
                 </Collapsible>
 
-                <Collapsible open={agentsOpen} onOpenChange={setAgentsOpen}>
+                {agentsView === "ask-vts" && <Collapsible open={agentsOpen} onOpenChange={setAgentsOpen}>
                   <CollapsibleTrigger className="flex items-center justify-between w-full mb-2">
                     <span className="text-sm font-medium text-foreground">Agents</span>
                     <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform", !agentsOpen && "-rotate-90")} />
@@ -577,7 +577,7 @@ export function AskVTSPage({ className, newChatKey }: { className?: string; newC
                       </button>
                     ))}
                   </CollapsibleContent>
-                </Collapsible>
+                </Collapsible>}
               </div>
             </div>
           )}

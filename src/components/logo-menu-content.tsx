@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Sun, Moon, ChevronRight } from "lucide-react"
 
-import { useChatPattern, type ChatPattern } from "@/contexts/chat-pattern"
+import { useChatPattern, type ChatPattern, type AgentsView } from "@/contexts/chat-pattern"
 
 interface LogoMenuContentProps {
   isDark?: boolean
@@ -12,13 +12,19 @@ interface LogoMenuContentProps {
 }
 
 const PROTOTYPE_LINKS = [
-  { label: "Main view",      hash: "#/dashboard" },
-  { label: "Inquiry email",  hash: "#/inquiry-email" },
+  { label: "Main view",       hash: "#/dashboard" },
+  { label: "Inquiry email",   hash: "#/inquiry-email" },
+  { label: "Doc Drafting",    hash: "#/document-agent" },
 ]
 
 const DOC_LINKS = [
   { label: "Theme showcase",   hash: "#/theme" },
   { label: "Agent principles", hash: "#/principles" },
+]
+
+const AGENTS_VIEWS: { id: AgentsView; label: string; description: string }[] = [
+  { id: "ask-vts",    label: "Ask VTS",    description: "Agents in Ask VTS sidebar" },
+  { id: "vts-agents", label: "VTS Agents", description: "Dedicated agents page" },
 ]
 
 const CHAT_PATTERNS: { id: ChatPattern; label: string; active: boolean }[] = [
@@ -29,7 +35,7 @@ const CHAT_PATTERNS: { id: ChatPattern; label: string; active: boolean }[] = [
 ]
 
 export function LogoMenuContent({ isDark = false, onToggleDark, onNavigate, onClose }: LogoMenuContentProps) {
-  const { pattern, setPattern } = useChatPattern()
+  const { pattern, setPattern, agentsView, setAgentsView } = useChatPattern()
 
   const navigate = (hash: string) => {
     if (onNavigate) { onNavigate(hash) } else { window.location.hash = hash }
@@ -50,6 +56,21 @@ export function LogoMenuContent({ isDark = false, onToggleDark, onNavigate, onCl
             onClick={() => { if (!isDark) { onToggleDark?.(); onClose?.() } }}>
             <Moon className="h-3.5 w-3.5" /> Dark
           </Button>
+        </div>
+      </div>
+      {/* Agents */}
+      <div className="px-3 py-2.5 border-b border-border">
+        <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-2">Agents</p>
+        <div className="flex flex-col gap-1">
+          {AGENTS_VIEWS.map(({ id, label }) => (
+            <div key={id}
+              onClick={() => setAgentsView(id)}
+              className={`flex items-center justify-between px-2.5 py-2 rounded-lg cursor-pointer transition-colors hover:bg-muted/60 ${agentsView === id ? "bg-primary/10" : ""}`}
+            >
+              <span className={`text-sm ${agentsView === id ? "text-primary font-medium" : "text-foreground"}`}>{label}</span>
+              <span className={`h-2 w-2 rounded-full transition-colors ${agentsView === id ? "bg-primary" : "bg-muted-foreground/25"}`} />
+            </div>
+          ))}
         </div>
       </div>
       {/* AI chat pattern */}

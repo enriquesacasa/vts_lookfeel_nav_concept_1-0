@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Sparkle } from "lucide-react"
+import { Sparkle, Wand } from "lucide-react"
 import { AppNav } from "@/components/app-nav"
 import { BuildingHeader } from "@/components/building-header"
 import { AvailabilityOverview } from "@/components/availability-overview"
@@ -21,10 +21,16 @@ import { AgentPrinciples } from "@/components/agent-principles"
 import { StackingPlan } from "@/components/stacking-plan"
 import { EmailFlow } from "@/components/email-flow"
 import { AskVTSPage } from "@/components/ask-vts"
+import { DocumentAgentPage } from "@/components/document-agent-page"
 import { ChatPatternProvider } from "@/contexts/chat-pattern"
 import { ChatSideOver } from "@/components/chat-side-over"
 import { ChatSidePush, SIDE_PUSH_WIDTH } from "@/components/chat-side-push"
 import { useChatPattern } from "@/contexts/chat-pattern"
+
+function AgentsViewAwareNav(props: React.ComponentProps<typeof AppNav>) {
+  const { agentsView } = useChatPattern()
+  return <AppNav {...props} hideAgentsPage={agentsView === "ask-vts"} />
+}
 
 function SidePushMain({ children, navCollapsed }: { children: React.ReactNode; navCollapsed: boolean }) {
   const { sidePushOpen } = useChatPattern()
@@ -244,7 +250,7 @@ export default function App() {
   const [isDark, setIsDark] = React.useState(() => document.documentElement.classList.contains("dark"))
 
   React.useEffect(() => {
-    const globalPages = ["theme", "principles", "activity", "reminders", "avatar", "inquiry-email", "inquiry-email-forward", "inquiry-email-confirm", "ask-vts"]
+    const globalPages = ["theme", "principles", "activity", "reminders", "avatar", "inquiry-email", "inquiry-email-forward", "inquiry-email-confirm", "ask-vts", "document-agent"]
     const hash = globalPages.includes(currentPage)
       ? `/${currentPage}`
       : `/${currentPage}/${selectedAssetId}`
@@ -326,7 +332,7 @@ export default function App() {
     if (page === "ai") {
       const aiImage = (
         <div className="shrink-0 w-16 h-16 sm:w-24 sm:h-24 rounded-xl overflow-hidden bg-primary/10 flex items-center justify-center">
-          <Sparkle fill="currentColor" className="h-7 w-7 sm:h-10 sm:w-10 text-primary" />
+          <Wand className="h-7 w-7 sm:h-10 sm:w-10 text-primary" />
         </div>
       )
       return (
@@ -540,6 +546,14 @@ export default function App() {
     )
   }
 
+  if (currentPage === "document-agent") {
+    return (
+      <ChatPatternProvider onOpenChat={goAskVts}>
+        <DocumentAgentPage isDark={isDark} onToggleDark={toggleDark} />
+      </ChatPatternProvider>
+    )
+  }
+
   const standalonePages = ["theme", "principles", "inquiry-email", "inquiry-email-forward", "inquiry-email-confirm"]
   if (standalonePages.includes(currentPage)) {
     return (
@@ -553,7 +567,7 @@ export default function App() {
   return (
     <ChatPatternProvider onOpenChat={goAskVts}>
       <div className="min-h-screen">
-        <AppNav
+        <AgentsViewAwareNav
           onCollapsedChange={setNavCollapsed}
           assets={ASSETS}
           portfolios={PORTFOLIOS}
