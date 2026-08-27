@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import {
   ArrowUp, Sparkle, SquarePen, ArrowLeft, PanelLeft, Search, Clock, ChevronDown, Mic, AudioLines, Plus,
-  MoreHorizontal, Share2, Pencil, Pin, Archive, Trash2,
+  MoreHorizontal, Share2, Pencil, Pin, Archive, Trash2, ThumbsUp, ThumbsDown, Copy, RefreshCw,
 } from "lucide-react"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -162,7 +162,16 @@ function MessageRow({ message }: { message: Message }) {
             <p key={i} className={i > 0 && line ? "mt-1.5" : i > 0 ? "mt-1" : ""}>{line}</p>
           ))}
         </div>
-        <p className="text-[10px] text-muted-foreground px-1">{message.timestamp}</p>
+        {!isUser && (
+          <div className="flex items-center gap-0.5 px-1">
+            <Button variant="ghost" size="icon-sm" className="text-muted-foreground"><ThumbsUp className="h-3.5 w-3.5" /></Button>
+            <Button variant="ghost" size="icon-sm" className="text-muted-foreground"><ThumbsDown className="h-3.5 w-3.5" /></Button>
+            <Button variant="ghost" size="icon-sm" className="text-muted-foreground"><Copy className="h-3.5 w-3.5" /></Button>
+            <Button variant="ghost" size="icon-sm" className="text-muted-foreground"><Share2 className="h-3.5 w-3.5" /></Button>
+            <Button variant="ghost" size="icon-sm" className="text-muted-foreground"><RefreshCw className="h-3.5 w-3.5" /></Button>
+            <Button variant="ghost" size="icon-sm" className="text-muted-foreground"><MoreHorizontal className="h-3.5 w-3.5" /></Button>
+          </div>
+        )}
       </div>
     </div>
   )
