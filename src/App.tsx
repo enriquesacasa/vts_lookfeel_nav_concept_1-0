@@ -21,6 +21,26 @@ import { AgentPrinciples } from "@/components/agent-principles"
 import { StackingPlan } from "@/components/stacking-plan"
 import { EmailFlow } from "@/components/email-flow"
 import { AskVTSPage } from "@/components/ask-vts"
+import { ChatPatternProvider } from "@/contexts/chat-pattern"
+import { ChatSideOver } from "@/components/chat-side-over"
+import { ChatSidePush, SIDE_PUSH_WIDTH } from "@/components/chat-side-push"
+import { useChatPattern } from "@/contexts/chat-pattern"
+
+function SidePushMain({ children, navCollapsed }: { children: React.ReactNode; navCollapsed: boolean }) {
+  const { sidePushOpen } = useChatPattern()
+  return (
+    <main
+      className={cn(
+        "transition-all duration-300 ease-in-out pr-4 pb-4 overflow-x-hidden",
+        "pt-[72px] pl-4",
+        navCollapsed ? "md:pt-4 md:pl-[104px]" : "md:pt-4 md:pl-[264px]"
+      )}
+      style={sidePushOpen ? { paddingRight: SIDE_PUSH_WIDTH + 16 } : undefined}
+    >
+      {children}
+    </main>
+  )
+}
 import { cn } from "@/lib/utils"
 import { type LucideIcon, UserCircle, BellRing, Activity } from "lucide-react"
 import buildingImg from "@/assets/building.jpg"
@@ -209,11 +229,12 @@ export default function App() {
     const page = parts[0] || "dashboard"
     const asset = parts[1] || "vts-tower"
     const params = new URLSearchParams(queryPart ?? "")
-    return { page, asset, dealId: params.get("deal") }
+    return { page, asset, dealId: params.get("deal"), agentId: params.get("agent") }
   }
 
   const [selectedAssetId, setSelectedAssetId] = React.useState(() => parseHash().asset)
   const [currentPage, setCurrentPage] = React.useState(() => parseHash().page)
+  const [defaultAgentId, setDefaultAgentId] = React.useState(() => parseHash().agentId ?? undefined)
   const [selectedDeal, setSelectedDeal] = React.useState<DealsPageDeal | null>(() => {
     const { dealId } = parseHash()
     return dealId ? (DEALS.find(d => d.id === dealId) ?? null) : null
@@ -239,9 +260,10 @@ export default function App() {
 
   React.useEffect(() => {
     const onHashChange = () => {
-      const { page, asset, dealId } = parseHash()
+      const { page, asset, dealId, agentId } = parseHash()
       setCurrentPage(page)
       setSelectedAssetId(asset)
+      setDefaultAgentId(agentId ?? undefined)
       if (dealId) {
         const deal = DEALS.find(d => d.id === dealId) ?? null
         setSelectedDeal(deal)
@@ -250,6 +272,11 @@ export default function App() {
     }
     window.addEventListener("hashchange", onHashChange)
     return () => window.removeEventListener("hashchange", onHashChange)
+  }, [])
+
+  const goAskVts = React.useCallback(() => {
+    setCurrentPage("ask-vts")
+    setAskVtsKey(k => k + 1)
   }, [])
 
   const toggleDark = () => {
@@ -311,7 +338,7 @@ export default function App() {
             address="Improve decisions, remove manual work, and move everything forward faster."
             stats={[]}
           />
-          <AgentsPage className="flex-1 min-h-0" />
+          <AgentsPage className="flex-1 min-h-0" defaultAgentId={defaultAgentId} />
         </div>
       )
     }
@@ -357,8 +384,6 @@ export default function App() {
         stats: [] as { label: string; value: string; accent?: boolean }[],
       }
     })()
-
-    const goAskVts = () => { setCurrentPage("ask-vts"); setAskVtsKey(k => k + 1) }
 
     // Show "AssetName PageLabel" with page label in mid-grey (includes "Overview" on dashboard)
     const pageLabel = PAGE_LABELS[page]
@@ -517,40 +542,40 @@ export default function App() {
 
   const standalonePages = ["theme", "principles", "inquiry-email", "inquiry-email-forward", "inquiry-email-confirm"]
   if (standalonePages.includes(currentPage)) {
-    return <div className="min-h-screen">{renderPage(currentPage)}</div>
+    return (
+      <ChatPatternProvider onOpenChat={goAskVts}>
+        <div className="min-h-screen">{renderPage(currentPage)}</div>
+        <ChatSideOver />
+      </ChatPatternProvider>
+    )
   }
 
   return (
-    <div className="min-h-screen">
-      <AppNav
-        onCollapsedChange={setNavCollapsed}
-        assets={ASSETS}
-        portfolios={PORTFOLIOS}
-        selectedAssetId={selectedAssetId}
-        onAssetChange={id => {
-          const newIsPortfolioOrAll = id === "all" || PORTFOLIOS.some(p => p.id === id)
-          if (newIsPortfolioOrAll && (currentPage === "stacking" || currentPage === "spaces")) {
-            setCurrentPage("dashboard")
-          }
-          setSelectedAssetId(id)
-        }}
-        isDark={isDark}
-        onLogoClick={toggleDark}
-        onNavItemClick={id => { setCurrentPage(id); setSelectedDeal(null); if (id === "ask-vts") setAskVtsKey(k => k + 1) }}
-        activePage={currentPage}
-      />
-
-      <main
-        className={cn(
-          "transition-all duration-300 ease-in-out pr-4 pb-4 overflow-x-hidden",
-          // Mobile: fixed top nav is h-14 (56px); add clearance + padding
-          "pt-[72px] pl-4",
-          // Desktop: sidebar is fixed on the left; push content right
-          navCollapsed ? "md:pt-4 md:pl-[104px]" : "md:pt-4 md:pl-[264px]"
-        )}
-      >
-        {renderPage(currentPage)}
-      </main>
-    </div>
+    <ChatPatternProvider onOpenChat={goAskVts}>
+      <div className="min-h-screen">
+        <AppNav
+          onCollapsedChange={setNavCollapsed}
+          assets={ASSETS}
+          portfolios={PORTFOLIOS}
+          selectedAssetId={selectedAssetId}
+          onAssetChange={id => {
+            const newIsPortfolioOrAll = id === "all" || PORTFOLIOS.some(p => p.id === id)
+            if (newIsPortfolioOrAll && (currentPage === "stacking" || currentPage === "spaces")) {
+              setCurrentPage("dashboard")
+            }
+            setSelectedAssetId(id)
+          }}
+          isDark={isDark}
+          onLogoClick={toggleDark}
+          onNavItemClick={id => { setCurrentPage(id); setSelectedDeal(null); if (id === "ask-vts") setAskVtsKey(k => k + 1) }}
+          activePage={currentPage}
+        />
+        <SidePushMain navCollapsed={navCollapsed}>
+          {renderPage(currentPage)}
+        </SidePushMain>
+        <ChatSideOver />
+        <ChatSidePush />
+      </div>
+    </ChatPatternProvider>
   )
 }

@@ -14,7 +14,7 @@ import { FilterBar, toggleFilterValue, clearFilterKey, type FilterDef, FILTER_TA
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface AgentDef {
+export interface AgentDef {
   id: string
   name: string
   tagline: string
@@ -44,7 +44,7 @@ interface AgentRun {
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
-const AGENTS: AgentDef[] = [
+export const AGENTS: AgentDef[] = [
   {
     id: "deal-capture",
     name: "Deal Capture",
@@ -1367,9 +1367,9 @@ function FullActivityTab() {
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
-export function AgentsPage({ className }: { className?: string }) {
+export function AgentsPage({ className, defaultAgentId }: { className?: string; defaultAgentId?: string }) {
   const [tab, setTab] = React.useState("catalog")
-  const [selectedId, setSelectedId] = React.useState<string | null>(null)
+  const [selectedId, setSelectedId] = React.useState<string | null>(defaultAgentId ?? null)
   const [mobileShowDetail, setMobileShowDetail] = React.useState(false)
 
   const selectedAgent = AGENTS.find(a => a.id === selectedId) ?? AGENTS[0]

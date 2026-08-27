@@ -166,7 +166,7 @@ const CriticalDates = React.forwardRef<HTMLDivElement, CriticalDatesProps>(
                       </span>
                     </td>
                     <td className="py-2.5 pl-2 text-right whitespace-nowrap">
-                      <AgentBtn label="Research this date and surface next steps" onClick={e => e.stopPropagation()} />
+                      <AgentBtn label={`${d.tenant} — ${d.type} · ${d.space}, ${d.sf.toLocaleString()} sf · ${d.date} (${fmtMonths(d.monthsOut)} out)`} onClick={e => e.stopPropagation()} />
                     </td>
                   </tr>
                 )

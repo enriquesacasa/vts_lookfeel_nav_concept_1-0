@@ -556,7 +556,7 @@ export function DealsPage({ onDealClick }: { onDealClick?: (deal: Deal) => void 
                     </span>
                   </td>
                   <td className="py-3 pl-2">
-                    <AgentBtn label="Analyze deal" />
+                    <AgentBtn label={`${deal.tenant} — ${deal.dealType} · ${deal.sf.toLocaleString()} sf, ${deal.space} at ${deal.asset} · stage: ${deal.stage}${deal.note ? ` · ${deal.note}` : ""}`} />
                   </td>
                 </tr>
               )

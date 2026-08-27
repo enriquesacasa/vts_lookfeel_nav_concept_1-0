@@ -4,7 +4,8 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { ArrowLeft, ChevronRight, Menu, X } from "lucide-react"
+import { ArrowLeft, Menu, X } from "lucide-react"
+import { LogoMenuContent } from "@/components/logo-menu-content"
 
 interface EmailFlowProps {
   step: "inbox" | "forward" | "confirm"
@@ -389,54 +390,7 @@ export function EmailFlow({ step }: EmailFlowProps) {
             <GmailLogo className="w-8 h-8" />
           </PopoverTrigger>
           <PopoverContent className="w-64 p-0 overflow-hidden" align="start">
-            {/* Experience */}
-            <div className="px-3 py-2.5 border-b border-border">
-              <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-2">Experience</p>
-              <div className="flex flex-col gap-1">
-                {["Asset Manager", "Broker"].map(exp => (
-                  <div key={exp} className="flex items-center justify-between px-2.5 py-2 rounded-lg bg-muted/40 opacity-60 cursor-not-allowed">
-                    <span className="text-sm text-foreground">{exp}</span>
-                    <Badge variant="secondary" className="text-[10px] h-4 px-1.5">Coming Soon</Badge>
-                  </div>
-                ))}
-              </div>
-            </div>
-            {/* Prototype */}
-            <div className="px-3 py-2.5 border-b border-border">
-              <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-2">Prototype</p>
-              <div className="flex flex-col gap-0.5">
-                {[
-                  { label: "Main View",                hash: "#/dashboard" },
-                  { label: "Inquiry Email",           hash: "#/inquiry-email" },
-                  { label: "Inquiry Email Forward",   hash: "#/inquiry-email-forward" },
-                  { label: "Inquiry Email Confirm",   hash: "#/inquiry-email-confirm" },
-                ].map(link => (
-                  <button key={link.hash}
-                    onClick={() => { window.location.hash = link.hash; setGmailLogoOpen(false) }}
-                    className="flex items-center justify-between w-full px-2.5 py-1.5 rounded-lg text-sm text-foreground hover:bg-muted/60 transition-colors text-left">
-                    {link.label}
-                    <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/50" />
-                  </button>
-                ))}
-              </div>
-            </div>
-            {/* Documentation */}
-            <div className="px-3 py-2.5">
-              <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-2">Documentation</p>
-              <div className="flex flex-col gap-0.5">
-                {[
-                  { label: "Theme Showcase",   hash: "#/theme" },
-                  { label: "Agent Principles", hash: "#/principles" },
-                ].map(link => (
-                  <button key={link.hash}
-                    onClick={() => { window.location.hash = link.hash; setGmailLogoOpen(false) }}
-                    className="flex items-center justify-between w-full px-2.5 py-1.5 rounded-lg text-sm text-foreground hover:bg-muted/60 transition-colors text-left">
-                    {link.label}
-                    <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/50" />
-                  </button>
-                ))}
-              </div>
-            </div>
+            <LogoMenuContent onClose={() => setGmailLogoOpen(false)} />
           </PopoverContent>
         </Popover>
         <div className="flex-1 max-w-xl">

@@ -4,8 +4,8 @@ import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { Separator } from "@/components/ui/separator"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Badge } from "@/components/ui/badge"
 import { useIsMobile } from "@/hooks/use-mobile"
+import { LogoMenuContent } from "@/components/logo-menu-content"
 import {
   LayoutGrid,
   Layers,
@@ -29,7 +29,7 @@ import {
   UserCircle,
   ChevronRight,
   ChevronDown,
-  Menu, Moon, Sun,
+  Menu,
   X as XIcon,
   Search,
   Archive,
@@ -260,78 +260,12 @@ function DesktopNav({ className, onCollapsedChange, assets, portfolios, selected
           )}
         </PopoverTrigger>
         <PopoverContent side="right" align="start" className="w-64 p-0 overflow-hidden">
-          {/* Appearance */}
-          <div className="px-3 py-2.5 border-b border-border">
-            <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-2">Appearance</p>
-            <div className="flex gap-2">
-              <Button
-                variant={isDark ? "ghost" : "default"}
-                size="sm"
-                className="flex-1 gap-1.5"
-                onClick={() => { if (isDark) { onLogoClick?.(); setLogoOpen(false) } }}
-              >
-                <Sun className="h-3.5 w-3.5" /> Light
-              </Button>
-              <Button
-                variant={isDark ? "default" : "ghost"}
-                size="sm"
-                className="flex-1 gap-1.5"
-                onClick={() => { if (!isDark) { onLogoClick?.(); setLogoOpen(false) } }}
-              >
-                <Moon className="h-3.5 w-3.5" /> Dark
-              </Button>
-            </div>
-          </div>
-          {/* Experience */}
-          <div className="px-3 py-2.5 border-b border-border">
-            <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-2">Experience</p>
-            <div className="flex flex-col gap-1">
-              {["Asset Manager", "Broker"].map(exp => (
-                <div key={exp} className="flex items-center justify-between px-2.5 py-2 rounded-lg bg-muted/40 opacity-60 cursor-not-allowed">
-                  <span className="text-sm text-foreground">{exp}</span>
-                  <Badge variant="secondary" className="text-[10px] h-4 px-1.5">Coming Soon</Badge>
-                </div>
-              ))}
-            </div>
-          </div>
-          {/* Prototype links */}
-          <div className="px-3 py-2.5 border-b border-border">
-            <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-2">Prototype</p>
-            <div className="flex flex-col gap-0.5">
-              {[
-                { label: "Main View",                id: "dashboard" },
-                { label: "Inquiry Email",           id: "inquiry-email" },
-              ].map(link => (
-                <button
-                  key={link.id}
-                  onClick={() => { onNavItemClick?.(link.id); setLogoOpen(false) }}
-                  className="flex items-center justify-between w-full px-2.5 py-1.5 rounded-lg text-sm text-foreground hover:bg-muted/60 transition-colors text-left"
-                >
-                  {link.label}
-                  <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/50" />
-                </button>
-              ))}
-            </div>
-          </div>
-          {/* Documentation */}
-          <div className="px-3 py-2.5">
-            <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-2">Documentation</p>
-            <div className="flex flex-col gap-0.5">
-              {[
-                { label: "Theme Showcase",    id: "theme" },
-                { label: "Agent Principles",  id: "principles" },
-              ].map(link => (
-                <button
-                  key={link.id}
-                  onClick={() => { onNavItemClick?.(link.id); setLogoOpen(false) }}
-                  className="flex items-center justify-between w-full px-2.5 py-1.5 rounded-lg text-sm text-foreground hover:bg-muted/60 transition-colors text-left"
-                >
-                  {link.label}
-                  <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/50" />
-                </button>
-              ))}
-            </div>
-          </div>
+          <LogoMenuContent
+            isDark={isDark}
+            onToggleDark={() => { onLogoClick?.(); setLogoOpen(false) }}
+            onNavigate={(hash) => { onNavItemClick?.(hash.replace("#/", "")); setLogoOpen(false) }}
+            onClose={() => setLogoOpen(false)}
+          />
         </PopoverContent>
       </Popover>
 
