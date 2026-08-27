@@ -210,10 +210,10 @@ export function ProposalBuilderPage({ className, isDark = false, onToggleDark }:
 
   return (
     <div className={cn("flex flex-col h-screen overflow-hidden gap-4 p-4", className)}>
-      <div className="flex flex-1 min-h-0 gap-4">
+      <div className="flex flex-1 min-h-0 rounded-2xl overflow-hidden bg-card/70 backdrop-blur-md divide-x divide-border/40">
 
         {/* ── Left: Form panel ─────────────────────────────────────────────── */}
-        <div className="w-[400px] shrink-0 flex flex-col rounded-2xl bg-card/70 backdrop-blur-md overflow-hidden min-h-0">
+        <div className="w-[400px] shrink-0 flex flex-col overflow-hidden min-h-0">
 
           <div className="flex flex-col flex-1 min-h-0 px-4 pt-4">
           {/* Header */}
@@ -281,7 +281,7 @@ export function ProposalBuilderPage({ className, isDark = false, onToggleDark }:
 
         {/* ── Center: AI chat ───────────────────────────────────────────────── */}
         {aiOpen && (
-          <div className="w-[340px] shrink-0 flex flex-col rounded-2xl bg-card/70 backdrop-blur-md overflow-hidden min-h-0">
+          <div className="w-[340px] shrink-0 flex flex-col overflow-hidden min-h-0">
 
             {/* Messages */}
             <div className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-3">
@@ -362,7 +362,7 @@ export function ProposalBuilderPage({ className, isDark = false, onToggleDark }:
         )}
 
         {/* ── Right: Financial view ─────────────────────────────────────────── */}
-        <div className="flex-1 flex flex-col min-w-0 rounded-2xl bg-card/70 backdrop-blur-md overflow-hidden min-h-0">
+        <div className="flex-1 flex flex-col min-w-0 overflow-hidden min-h-0">
 
           {/* Top bar */}
           <div className="flex items-center justify-between px-5 py-3 border-b border-border/60 bg-card/80 shrink-0">

@@ -929,11 +929,11 @@ export function DocumentAgentPage({ className, isDark = false, onToggleDark }: {
       )}
 
       {/* Desktop + mobile panels */}
-      <div className="flex flex-1 min-h-0 gap-4">
+      <div className="flex flex-1 min-h-0 rounded-2xl overflow-hidden bg-card/70 backdrop-blur-md divide-x divide-border/40">
 
       {/* ── 1: File rail (templates + recents) ── */}
       <div className={cn(
-        "shrink-0 flex flex-col rounded-2xl bg-card/70 backdrop-blur-md overflow-hidden min-h-0 transition-all duration-300",
+        "shrink-0 flex flex-col overflow-hidden min-h-0 transition-all duration-300",
         railCollapsed ? "w-[48px]" : "w-[280px]",
         mobileView === "rail" ? "flex" : "hidden md:flex"
       )}>
@@ -954,7 +954,7 @@ export function DocumentAgentPage({ className, isDark = false, onToggleDark }: {
 
       {/* ── 2: Chat panel ── */}
       <div className={cn(
-        "w-full md:w-[340px] shrink-0 flex flex-col rounded-2xl bg-card/70 backdrop-blur-md overflow-hidden min-h-0",
+        "w-full md:w-[340px] shrink-0 flex flex-col overflow-hidden min-h-0 bg-card",
         mobileView === "chat" ? "flex" : "hidden md:flex"
       )}>
         <ChatPanel
@@ -974,7 +974,7 @@ export function DocumentAgentPage({ className, isDark = false, onToggleDark }: {
 
       {/* ── 3: Document editor ── */}
       <div className={cn(
-        "flex-1 flex flex-col min-w-0 rounded-2xl overflow-hidden bg-card/70 backdrop-blur-md",
+        "flex-1 flex flex-col min-w-0 overflow-hidden",
         mobileView === "doc" ? "flex" : "hidden md:flex"
       )}>
         {/* Top bar */}
