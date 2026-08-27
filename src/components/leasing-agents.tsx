@@ -77,7 +77,7 @@ const LeasingAgents = React.forwardRef<HTMLDivElement, LeasingAgentsProps>(
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
                       <p className="text-sm font-medium text-sidebar-foreground/90">{item.tenant}</p>
-                      <AgentBtn variant="run" label={`${item.tenant} — ${item.action}`} className="opacity-0 group-hover/row:opacity-100" />
+                      <AgentBtn variant="run" label={`${item.tenant} — ${item.action} · in approval for ${item.inApprovalFor}`} className="opacity-0 group-hover/row:opacity-100" />
                     </div>
                     <p className="text-sm text-sidebar-foreground/55">{item.action}</p>
                     <p className="text-sm font-medium text-sidebar-primary mt-0.5">In approval for {item.inApprovalFor}</p>

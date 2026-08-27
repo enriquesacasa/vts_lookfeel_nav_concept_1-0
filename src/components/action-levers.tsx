@@ -57,7 +57,7 @@ function ActionRow({ item, onRun }: { item: ActionItem; onRun: () => void }) {
               <TrendingUp className="h-3 w-3 shrink-0 text-sidebar-foreground/50" />
               <span className="text-sm text-sidebar-foreground/60">{item.impact}</span>
             </div>
-            <AgentBtn variant="run" label={item.text} onClick={onRun} className="opacity-0 group-hover/row:opacity-100" />
+            <AgentBtn variant="run" label={`${item.text} · ${item.value} · ${item.impact}${item.detail ? ` · ${item.detail}` : ""}`} onClick={onRun} className="opacity-0 group-hover/row:opacity-100" />
           </div>
           {item.detail && (
             <p className="text-sm mt-0.5 text-sidebar-foreground/50">{item.detail}</p>

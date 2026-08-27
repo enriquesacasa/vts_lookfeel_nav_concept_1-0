@@ -272,7 +272,7 @@ function AiInsightCard() {
             <p className="text-sm text-sidebar-foreground/85 flex-1 min-w-0 truncate">{item.text}</p>
             <div className="relative shrink-0">
               <span className="text-sm font-medium tabular-nums text-sidebar-primary transition-opacity duration-150 group-hover/row:opacity-0">{item.value}</span>
-              <AgentBtn variant="run" label={item.text} className="absolute inset-y-0 right-0 opacity-0 group-hover/row:opacity-100 transition-opacity duration-150 my-auto h-auto py-1" />
+              <AgentBtn variant="run" label={`${item.text} · ${item.value}${item.data ? ` · ${item.data}` : ""}`} className="absolute inset-y-0 right-0 opacity-0 group-hover/row:opacity-100 transition-opacity duration-150 my-auto h-auto py-1" />
             </div>
           </div>
         ))}
