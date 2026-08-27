@@ -120,6 +120,15 @@ const SESSIONS: DocSession[] = [
   },
 ]
 
+const NEW_SESSION_ID = "s-new"
+
+const NEW_SESSION: DocSession = {
+  id: NEW_SESSION_ID,
+  title: "New document",
+  time: "",
+  messages: [],
+}
+
 const BLANK_DOC = ""
 
 const SAMPLE_KPMG_AMENDMENT = `LEASE AMENDMENT NO. 3
@@ -593,6 +602,18 @@ function ChatPanel({ sessions, activeId, onSelectSession: _onSelectSession, onNe
 
     const currentMsgs = active?.messages ?? []
     const userMsgCount = currentMsgs.filter(m => m.role === "user").length
+
+    // If we're in the generic new-doc state, detect doc type from the message and switch context
+    if (ctxRef.current === "__new__" && userMsgCount === 0) {
+      const t = text.toLowerCase()
+      if (t.includes("loi") || t.includes("letter of intent")) ctxRef.current = "loi"
+      else if (t.includes("amendment")) ctxRef.current = "lease-amendment"
+      else if (t.includes("option") || t.includes("notice")) ctxRef.current = "options-notice"
+      else if (t.includes("first draft") || t.includes("lease")) ctxRef.current = "first-draft"
+      else if (t.includes("estoppel")) ctxRef.current = "estoppel"
+      else if (t.includes("nda") || t.includes("confidentiality")) ctxRef.current = "nda"
+    }
+
     const ctx = ctxRef.current
 
     setLocalSessions(prev => prev.map(s =>
@@ -604,8 +625,8 @@ function ChatPanel({ sessions, activeId, onSelectSession: _onSelectSession, onNe
       let replyContent: string
       let shouldDraft = false
 
-      if (ctx) {
-        const qs = FOLLOWUP_QUESTIONS[ctx] ?? FOLLOWUP_QUESTIONS["__new__"]
+      if (ctx && ctx !== "__new__") {
+        const qs = FOLLOWUP_QUESTIONS[ctx]
         if (userMsgCount === 0) {
           replyContent = qs[0]
         } else if (userMsgCount === 1) {
@@ -614,6 +635,10 @@ function ChatPanel({ sessions, activeId, onSelectSession: _onSelectSession, onNe
           replyContent = "Got it — I have everything I need. Give me a moment to draft this."
           shouldDraft = true
         }
+      } else if (ctx === "__new__") {
+        // Still unknown type — ask for clarification
+        replyContent = FOLLOWUP_QUESTIONS["__new__"][userMsgCount === 0 ? 0 : 1] ?? "Got it — drafting now."
+        if (userMsgCount >= 1) shouldDraft = true
       } else {
         replyContent = generateDocResponse(text)
       }
@@ -828,17 +853,12 @@ function DocumentEditor({ title: _title, content }: { title: string; content: st
 
 function EmptyDocState({ onSelect }: { onSelect: (t: DocTemplate) => void }) {
   return (
-    <div className="flex flex-col items-center justify-center h-full text-center px-8 bg-background">
-      <div className="h-14 w-14 rounded-2xl bg-primary/10 border border-primary/15 flex items-center justify-center mb-5">
-        <PenLine className="h-7 w-7 text-primary" />
-      </div>
-      <p className="text-lg font-semibold text-foreground mb-1.5">No document open</p>
-      <p className="text-sm text-muted-foreground mb-6 max-w-xs leading-relaxed">Pick a template from the left panel, describe what you need in the chat, or start from an existing document.</p>
-      <div className="flex flex-wrap gap-2 justify-center">
-        {TEMPLATES.slice(0, 3).map(t => (
+    <div className="flex flex-col items-center justify-center h-full text-center px-10 bg-background">
+      <p className="text-2xl font-bold text-foreground mb-8">What do you want to draft?</p>
+      <div className="flex flex-wrap gap-2 justify-center max-w-lg">
+        {TEMPLATES.map(t => (
           <Button key={t.id} variant="outline" onClick={() => onSelect(t)}
-            className="flex items-center gap-2 rounded-lg border-border/60 px-3 py-2 text-sm text-foreground hover:bg-muted/60 transition-colors h-auto">
-            <FileText className="h-3.5 w-3.5 text-muted-foreground" />
+            className="rounded-full border-border px-4 py-2 text-sm text-primary font-medium hover:bg-muted/60 transition-colors h-auto">
             {t.name}
           </Button>
         ))}
@@ -852,18 +872,15 @@ function EmptyDocState({ onSelect }: { onSelect: (t: DocTemplate) => void }) {
 type MobileView = "rail" | "chat" | "doc"
 
 export function DocumentAgentPage({ className, isDark = false, onToggleDark }: { className?: string; isDark?: boolean; onToggleDark?: () => void }) {
-  const [sessions, setSessions]         = React.useState<DocSession[]>(SESSIONS)
-  const [activeId, setActiveId]         = React.useState(SESSIONS[0].id)
-  const [recentDocs, setRecentDocs]     = React.useState<RecentDoc[]>(RECENT_DOCS)
-  const [activeDocId, setActiveDocId]   = React.useState<string | null>(RECENT_DOCS[0].id)
+  const [sessions, setSessions]         = React.useState<DocSession[]>([NEW_SESSION, ...SESSIONS])
+  const [activeId, setActiveId]         = React.useState<string>(NEW_SESSION_ID)
+  const [recentDocs, setRecentDocs]     = React.useState<RecentDoc[]>([{ id: "d-new", name: "New document", type: "Document", modified: "Just now" }, ...RECENT_DOCS])
+  const [activeDocId, setActiveDocId]   = React.useState<string | null>("d-new")
   const [railCollapsed, setRailCollapsed] = React.useState(false)
-  const [templateContext, setTemplateContext] = React.useState<string | null>(null)
+  const [templateContext, setTemplateContext] = React.useState<string | null>("__new__")
   const [mobileView, setMobileView]     = React.useState<MobileView>("rail")
   const [logoOpen, setLogoOpen]         = React.useState(false)
-  const [activeDoc, setActiveDoc]       = React.useState<{ title: string; content: string } | null>({
-    title: SESSIONS[0].docTitle ?? SESSIONS[0].title,
-    content: SAMPLE_LOI,
-  })
+  const [activeDoc, setActiveDoc]       = React.useState<{ title: string; content: string } | null>({ title: "New document", content: BLANK_DOC })
 
   const goBack = () => {
     const prev = window.history.length > 1 ? null : "#/dashboard"
