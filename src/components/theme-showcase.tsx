@@ -651,7 +651,7 @@ export function ThemeShowcase({ isDark, onToggleDark }: ThemeShowcaseProps) {
                   <p className="text-[10px] font-medium uppercase tracking-widest text-sidebar-foreground/50 mb-1">VTS Agents</p>
                   <h3 className="text-xl font-semibold text-sidebar-foreground">Deal Intelligence</h3>
                 </div>
-                <Button variant="outline" size="sm" className="shrink-0 text-sidebar-foreground border-current bg-transparent hover:bg-white/10 text-xs">View Active Agents</Button>
+                <Button variant="outline" size="sm" className="shrink-0 text-sidebar-foreground border-current bg-transparent hover:bg-sidebar-accent/60 text-xs">View Active Agents</Button>
               </div>
               <div className="rounded-lg bg-primary/15 border border-primary/25 px-3 py-2.5 flex items-center gap-2.5">
                 <Sparkle className="h-4 w-4 shrink-0 text-sidebar-primary" />
@@ -677,12 +677,12 @@ export function ThemeShowcase({ isDark, onToggleDark }: ThemeShowcaseProps) {
           <div className="space-y-3">
             <p className="text-sm font-semibold text-foreground">Live Status</p>
             <div className={cn(cardBase, "bg-sidebar border-transparent flex items-center gap-4")}>
-              <Loader2 className="h-5 w-5 text-violet-400 animate-spin shrink-0" />
+              <Loader2 className="h-5 w-5 text-primary animate-spin shrink-0" />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-sidebar-foreground">1 agent running</p>
                 <p className="text-xs text-sidebar-foreground/60 truncate">Northeast Corridor Portfolio · Q3 NOI improvement</p>
               </div>
-              <Button variant="outline" size="sm" className="shrink-0 text-sidebar-foreground border-current bg-transparent hover:bg-white/10 text-xs">View</Button>
+              <Button variant="outline" size="sm" className="shrink-0 text-sidebar-foreground border-current bg-transparent hover:bg-sidebar-accent/60 text-xs">View</Button>
             </div>
             <div className={cn(cardBase, "space-y-1.5")}>
               <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-3">Recent Runs</p>

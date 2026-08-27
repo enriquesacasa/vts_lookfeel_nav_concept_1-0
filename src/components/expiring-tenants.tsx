@@ -47,7 +47,7 @@ const ExpiringTenants = React.forwardRef<HTMLDivElement, ExpiringTenantsProps>(
             <p className="text-[10px] font-medium uppercase tracking-widest mb-1 text-sidebar-foreground/75">Leases</p>
             <h2 className="text-xl font-semibold text-sidebar-foreground">Expiring tenants by SF</h2>
           </div>
-          <Button variant="outline" size="sm" className="shrink-0 text-white/80 border-white/25 bg-transparent hover:bg-white/10 hover:text-white dark:bg-white/8 dark:border-white/25 dark:text-white dark:hover:bg-white/15">View expiring leases</Button>
+          <Button variant="outline" size="sm" className="shrink-0 text-sidebar-foreground/80 border-sidebar-border/40 hover:text-sidebar-foreground bg-transparent hover:bg-sidebar-accent/60">View expiring leases</Button>
         </div>
 
         <div className="flex-1">

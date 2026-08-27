@@ -146,7 +146,7 @@ const LeasingActivity = React.forwardRef<HTMLDivElement, LeasingActivityProps>(
           </thead>
           <tbody>
             {sorted.map((d, i) => (
-              <tr key={i} className={cn("cursor-pointer hover:bg-muted/40 dark:hover:bg-white/4 transition-colors", i > 0 && "border-t border-border/40")}>
+              <tr key={i} className={cn("cursor-pointer hover:bg-muted/40 transition-colors", i > 0 && "border-t border-border/40")}>
                 <td className="py-2.5 font-medium text-foreground text-sm whitespace-nowrap">{d.tenant}</td>
                 <td className="py-2.5 pl-3 text-sm text-muted-foreground whitespace-nowrap">
                   <div>{d.space}</div>

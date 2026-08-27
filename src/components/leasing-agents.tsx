@@ -1,6 +1,5 @@
 import * as React from "react"
-import { cn, cardBase, sidebarBtn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { cn, cardBase } from "@/lib/utils"
 import { AlertTriangle, Clock, Sparkle } from "lucide-react"
 import { AgentBtn } from "@/components/agent-btn"
 import type { Deal, DecisionItem } from "@/components/leasing-activity"
@@ -23,12 +22,9 @@ const LeasingAgents = React.forwardRef<HTMLDivElement, LeasingAgentsProps>(
         {/* Header */}
         <div className="flex items-start justify-between gap-2">
           <div>
-            <p className="text-[10px] font-medium uppercase tracking-widest mb-1 text-sidebar-foreground/70">VTS Agents</p>
+            <p className="text-[10px] font-medium uppercase tracking-widest mb-1 text-sidebar-foreground/70">Ask VTS</p>
             <h2 className="text-xl font-semibold text-sidebar-foreground">Leasing actions</h2>
           </div>
-          <Button variant="outline" size="sm" className={cn("shrink-0", sidebarBtn)}>
-            View active agents
-          </Button>
         </div>
 
         {/* Summary bar */}
@@ -56,7 +52,7 @@ const LeasingAgents = React.forwardRef<HTMLDivElement, LeasingAgentsProps>(
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
                       <p className="text-sm font-medium text-sidebar-foreground/90">{d.tenant}</p>
-                      <AgentBtn variant="run" label="Run agent" className="opacity-0 group-hover/row:opacity-100" />
+                      <AgentBtn variant="run" label={`${d.tenant} — ${d.space} · ${d.stage}${d.note ? ` · ${d.note}` : ""}`} className="opacity-0 group-hover/row:opacity-100" />
                     </div>
                     <p className="text-sm text-sidebar-foreground/55">{d.space} · {d.stage}</p>
                     {d.note && <p className="text-sm text-sidebar-foreground/45 mt-0.5">{d.note}</p>}
@@ -81,7 +77,7 @@ const LeasingAgents = React.forwardRef<HTMLDivElement, LeasingAgentsProps>(
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
                       <p className="text-sm font-medium text-sidebar-foreground/90">{item.tenant}</p>
-                      <AgentBtn variant="run" label="Run agent" className="opacity-0 group-hover/row:opacity-100" />
+                      <AgentBtn variant="run" label={`${item.tenant} — ${item.action}`} className="opacity-0 group-hover/row:opacity-100" />
                     </div>
                     <p className="text-sm text-sidebar-foreground/55">{item.action}</p>
                     <p className="text-sm font-medium text-sidebar-primary mt-0.5">In approval for {item.inApprovalFor}</p>

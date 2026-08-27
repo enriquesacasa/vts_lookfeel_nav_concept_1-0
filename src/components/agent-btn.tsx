@@ -103,11 +103,16 @@ export function AgentBtn({ label, onClick, variant = "icon", className }: AgentB
   const [hovered, setHovered] = React.useState(false)
 
   if (variant === "run") {
+    const runMsg = label || "Ask VTS"
+    const handleRun = (e: React.MouseEvent) => {
+      openChat({ message: runMsg, suggestions: getSuggestions(runMsg) })
+      onClick?.(e)
+    }
     return (
-      <Button variant="outline" size="sm" onClick={onClick}
+      <Button variant="outline" size="sm" onClick={handleRun}
         className={cn("gap-1 shrink-0", sidebarBtn, className)}>
         <Sparkle className="h-3 w-3" />
-        Run Agent
+        Ask VTS
       </Button>
     )
   }
@@ -145,11 +150,11 @@ export function AgentBtn({ label, onClick, variant = "icon", className }: AgentB
           >
             <span className={cn(
               "agent-glow-blob pointer-events-none absolute inset-[-5px] rounded-full opacity-0 blur-[8px] transition-opacity duration-400",
-              "bg-gradient-to-br from-[oklch(0.60_0.18_265)] via-[oklch(0.52_0.20_277)] to-[oklch(0.56_0.17_293)]",
+              "bg-gradient-to-br from-primary/80 via-primary to-primary/70",
               hovered && "opacity-40"
             )} />
             {hovered && (
-              <span className="pointer-events-none absolute inset-0 rounded-[inherit] bg-[oklch(0.51_0.175_277/0.4)] animate-sparkle-ping" />
+              <span className="pointer-events-none absolute inset-0 rounded-[inherit] bg-primary/40 animate-sparkle-ping" />
             )}
             <Sparkle className={cn(
               "agent-sparkle-icon h-3.5 w-3.5 relative z-10 transition-transform duration-300",
@@ -200,13 +205,13 @@ export function AgentBtn({ label, onClick, variant = "icon", className }: AgentB
           {/* Soft outer glow blob — blooms behind button on hover */}
           <span className={cn(
             "agent-glow-blob pointer-events-none absolute inset-[-5px] rounded-full opacity-0 blur-[8px] transition-opacity duration-400",
-            "bg-gradient-to-br from-[oklch(0.60_0.18_265)] via-[oklch(0.52_0.20_277)] to-[oklch(0.56_0.17_293)]",
+            "bg-gradient-to-br from-primary/80 via-primary to-primary/70",
             hovered && "opacity-40"
           )} />
 
           {/* Ping ring */}
           {hovered && (
-            <span className="pointer-events-none absolute inset-0 rounded-[inherit] bg-[oklch(0.51_0.175_277/0.4)] animate-sparkle-ping" />
+            <span className="pointer-events-none absolute inset-0 rounded-[inherit] bg-primary/40 animate-sparkle-ping" />
           )}
 
           <Sparkle className={cn(

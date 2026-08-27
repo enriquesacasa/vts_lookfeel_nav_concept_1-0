@@ -181,7 +181,7 @@ export function clearFilterKey(
 // mutually-exclusive filters (e.g. All / Expiring / Renewal).
 
 export const FILTER_TAB_GROUP_CLS =
-  "bg-muted/60 dark:bg-white/6 p-1 rounded-lg gap-0 overflow-x-auto"
+  "bg-muted/60 dark:bg-muted/30 p-1 rounded-lg gap-0 overflow-x-auto"
 
 export const FILTER_TAB_ITEM_CLS =
   `text-xs px-3 whitespace-nowrap rounded-md ${TOGGLE_INACTIVE} ${TOGGLE_HOVER}`

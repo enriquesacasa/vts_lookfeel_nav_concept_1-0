@@ -62,7 +62,7 @@ const TopTenants = React.forwardRef<HTMLDivElement, TopTenantsProps>(
             <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">Tenants</p>
             <h2 className="text-xl font-semibold text-foreground">Top tenants by % of RBA</h2>
           </div>
-          <Button variant="outline" size="sm" className="shrink-0 text-primary border-primary bg-transparent hover:bg-primary/10 hover:text-primary dark:bg-white/8 dark:border-white/25 dark:text-white dark:hover:bg-white/15">View tenants</Button>
+          <Button variant="outline" size="sm" className="shrink-0 text-primary border-primary bg-transparent hover:bg-primary/10 hover:text-primary dark:bg-sidebar-accent dark:border-sidebar-border dark:text-sidebar-foreground dark:hover:bg-sidebar-accent/80">View tenants</Button>
         </div>
 
         <ResponsiveContainer width="100%" height={tenants.length * 30 + 32} minWidth={0}>

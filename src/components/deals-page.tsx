@@ -1,5 +1,5 @@
 import * as React from "react"
-import { cn, cardBase, sidebarBtn } from "@/lib/utils"
+import { cn, cardBase } from "@/lib/utils"
 
 const CardCtx = React.createContext(cardBase)
 import { Button } from "@/components/ui/button"
@@ -140,7 +140,7 @@ const STATUS_CONFIG: Record<Status, { label: string; icon: React.ElementType; cl
   active:   { label: "Active",    icon: CheckCircle2, cls: "text-success bg-success/10" },
   stalled:  { label: "Stalled",   icon: Clock,        cls: "text-warning bg-warning/10" },
   "at-risk":{ label: "At Risk",   icon: AlertTriangle,cls: "text-destructive bg-destructive/10" },
-  executed: { label: "Executed",  icon: CheckCircle2, cls: "text-emerald-600 bg-emerald-500/10" },
+  executed: { label: "Executed",  icon: CheckCircle2, cls: "text-success bg-success/10" },
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -244,17 +244,11 @@ function AiInsightCard() {
           {isV2 && <div className="h-7 w-7 bg-ai/20 flex items-center justify-center shrink-0">
             <Sparkle className="h-4 w-4 text-sidebar-primary" />
           </div>}
-          {!isV2 && <p className="text-[10px] font-medium uppercase tracking-widest mb-1 text-sidebar-foreground/70">VTS Agents</p>}
+          {!isV2 && <p className="text-[10px] font-medium uppercase tracking-widest mb-1 text-sidebar-foreground/70">Ask VTS</p>}
           <p className={cn("font-medium text-sidebar-foreground", isV2 ? "text-sm" : "text-xl font-medium")}>
-            {isV2 ? "VTS Agents" : "Deal intelligence"}
+            {isV2 ? "Ask VTS" : "Deal intelligence"}
           </p>
         </div>
-        <Button variant="outline" size="sm" className={cn(
-          cn("shrink-0", sidebarBtn),
-          isV2 && "rounded-none"
-        )}>
-          View Active Agents
-        </Button>
       </div>
 
       {/* Summary alert */}
@@ -278,7 +272,7 @@ function AiInsightCard() {
             <p className="text-sm text-sidebar-foreground/85 flex-1 min-w-0 truncate">{item.text}</p>
             <div className="relative shrink-0">
               <span className="text-sm font-medium tabular-nums text-sidebar-primary transition-opacity duration-150 group-hover/row:opacity-0">{item.value}</span>
-              <AgentBtn variant="run" label="Run agent" className="absolute inset-y-0 right-0 opacity-0 group-hover/row:opacity-100 transition-opacity duration-150 my-auto h-auto py-1" />
+              <AgentBtn variant="run" label={item.text} className="absolute inset-y-0 right-0 opacity-0 group-hover/row:opacity-100 transition-opacity duration-150 my-auto h-auto py-1" />
             </div>
           </div>
         ))}
@@ -490,7 +484,7 @@ export function DealsPage({ onDealClick }: { onDealClick?: (deal: Deal) => void 
               const noiPct = deal.budgetNoi > 0 ? Math.round((noiDiff / deal.budgetNoi) * 100) : 0
               function fmtNoi(n: number) { return n >= 1000000 ? `$${(n / 1000000).toFixed(1)}M` : `$${(n / 1000).toFixed(0)}K` }
               return (
-                <tr key={deal.id} onClick={() => onDealClick?.(deal)} className={cn("cursor-pointer hover:bg-muted/40 dark:hover:bg-white/4 transition-colors", i > 0 && "border-t border-border/40")}>
+                <tr key={deal.id} onClick={() => onDealClick?.(deal)} className={cn("cursor-pointer hover:bg-muted/40 transition-colors", i > 0 && "border-t border-border/40")}>
                   <td className="py-3">
                     <div className="flex items-center gap-2.5">
                       <TenantAvatar name={deal.tenant} />

@@ -322,8 +322,8 @@ function DesktopNav({ className, onCollapsedChange, assets, portfolios, selected
               className={cn(
                 "rounded-xl px-3 py-2.5 w-full flex items-center gap-2.5 cursor-pointer transition-colors border",
                 dropdownOpen
-                  ? "bg-sidebar-accent/70 border-sidebar-foreground/30 dark:bg-white/20 dark:border-white/30"
-                  : "bg-sidebar-accent/40 border-sidebar-foreground/20 hover:bg-sidebar-accent/60 dark:bg-white/12 dark:border-white/20 dark:hover:bg-white/18"
+                  ? "bg-sidebar-accent/70 border-sidebar-foreground/30 dark:bg-sidebar-accent/70 dark:border-sidebar-border/30"
+                  : "bg-sidebar-accent/40 border-sidebar-foreground/20 hover:bg-sidebar-accent/60 dark:bg-sidebar-accent/40 dark:border-sidebar-border/20 dark:hover:bg-sidebar-accent"
               )}
             >
               <Building2 className="h-[18px] w-[18px] shrink-0 text-sidebar-foreground/60" />
@@ -641,7 +641,7 @@ function MobileNav({ onLogoClick, onNavItemClick, activePage, assets, portfolios
         </Button>
       </header>
 
-      {sheetOpen && <div className="fixed inset-0 z-50 bg-black/40" onClick={() => setSheetOpen(false)} />}
+      {sheetOpen && <div className="fixed inset-0 z-50 bg-foreground/40" onClick={() => setSheetOpen(false)} />}
 
       <div className={cn(
         "fixed top-0 left-0 z-[60] h-full w-[280px] bg-sidebar border-r border-sidebar-border flex flex-col transition-transform duration-300 ease-in-out",

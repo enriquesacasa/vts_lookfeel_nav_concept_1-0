@@ -1,6 +1,5 @@
 import * as React from "react"
-import { cn, cardBase, sidebarBtn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { cn, cardBase } from "@/lib/utils"
 import { AlertTriangle, Zap, ShieldAlert, Sparkle, TrendingUp } from "lucide-react"
 import { AgentBtn } from "@/components/agent-btn"
 
@@ -83,12 +82,9 @@ const ActionLevers = React.forwardRef<HTMLDivElement, ActionLeversProps>(
         {/* Header */}
         <div className="flex items-start justify-between gap-2">
           <div>
-            <p className="text-[10px] font-medium uppercase tracking-widest mb-1 text-sidebar-foreground/70">VTS Agents</p>
+            <p className="text-[10px] font-medium uppercase tracking-widest mb-1 text-sidebar-foreground/70">Ask VTS</p>
             <h2 className="text-xl font-semibold text-sidebar-foreground">Financial levers</h2>
           </div>
-          <Button variant="outline" size="sm" className={cn("shrink-0", sidebarBtn)}>
-            View active agents
-          </Button>
         </div>
 
         {/* Summary bar */}

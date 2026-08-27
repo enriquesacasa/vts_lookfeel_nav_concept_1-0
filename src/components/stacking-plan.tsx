@@ -558,7 +558,7 @@ export const StackingPlan = forwardRef<StackingPlanHandle>(function StackingPlan
   })
 
   return (
-    <div className="flex flex-col flex-1 bg-card/70 dark:bg-white/8 backdrop-blur-md rounded-xl overflow-hidden mt-4 mb-6">
+    <div className="flex flex-col flex-1 bg-card/70 dark:bg-card/80 backdrop-blur-md rounded-xl overflow-hidden mt-4 mb-6">
 
       {/* Filter bar */}
       <div className="px-3 py-3 border-b border-border">
@@ -679,7 +679,7 @@ export const StackingPlan = forwardRef<StackingPlanHandle>(function StackingPlan
 
                   return (
                     <div key={space.suite}
-                      className="relative flex flex-col justify-between border-r border-black/10 dark:border-white/5 last:border-r-0 cursor-default transition-all overflow-hidden"
+                      className="relative flex flex-col justify-between border-r border-foreground/10 dark:border-foreground/5 last:border-r-0 cursor-default transition-all overflow-hidden"
                       style={{
                         width: `${widthPct}%`,
                         flexShrink: 0,
@@ -756,17 +756,17 @@ export const StackingPlan = forwardRef<StackingPlanHandle>(function StackingPlan
                         {/* Badges column */}
                         <div className="flex flex-col items-end gap-1 shrink-0">
                           {show("Deals") && space.deals != null && (
-                            <span className={cn("font-medium px-1.5 py-0.5 rounded whitespace-nowrap bg-white/18 border border-white/25", cfg.metaCls)} style={{ color: c.text }}>
+                            <span className={cn("font-medium px-1.5 py-0.5 rounded whitespace-nowrap bg-foreground/10 border border-foreground/20", cfg.metaCls)} style={{ color: c.text }}>
                               {space.deals} {space.deals === 1 ? "Deal" : "Deals"}
                             </span>
                           )}
                           {show("Executed Deal") && space.executedDeal && (
-                            <span className={cn("font-medium px-1.5 py-0.5 rounded flex items-center gap-1 whitespace-nowrap bg-white/18 border border-white/25", cfg.metaCls)} style={{ color: c.text }}>
+                            <span className={cn("font-medium px-1.5 py-0.5 rounded flex items-center gap-1 whitespace-nowrap bg-foreground/10 border border-foreground/20", cfg.metaCls)} style={{ color: c.text }}>
                               <FileCheckIcon className="size-3 shrink-0" /> Executed
                             </span>
                           )}
                           {show("Committed Lease") && space.committedLease && (
-                            <span className={cn("font-medium px-1.5 py-0.5 rounded flex items-center gap-1 whitespace-nowrap bg-white/18 border border-white/25", cfg.metaCls)} style={{ color: c.text }}>
+                            <span className={cn("font-medium px-1.5 py-0.5 rounded flex items-center gap-1 whitespace-nowrap bg-foreground/10 border border-foreground/20", cfg.metaCls)} style={{ color: c.text }}>
                               <HandshakeIcon className="size-3 shrink-0" /> {space.dealNote ?? "Committed"}
                             </span>
                           )}
@@ -775,13 +775,13 @@ export const StackingPlan = forwardRef<StackingPlanHandle>(function StackingPlan
                           {show("Options") && space.leaseOptions && space.leaseOptions.length > 0 && (
                             <Popover onOpenChange={(open) => setActiveHighlight(open ? buildHighlight(space, "options") : null)}>
                               <PopoverTrigger className={cn("cursor-pointer flex items-center gap-1 font-medium px-1.5 py-0.5 rounded whitespace-nowrap hover:brightness-110 transition-all bg-primary/15 border border-primary/35", cfg.metaCls)} style={{ color: c.text }}>
-                                <ScrollTextIcon className="size-3 text-blue-400 shrink-0" />
+                                <ScrollTextIcon className="size-3 text-primary shrink-0" />
                                 <span className="hidden sm:inline">{space.leaseOptions.length} {space.leaseOptions.length === 1 ? "Option" : "Options"}</span>
                                 <span className="sm:hidden">{space.leaseOptions.length}</span>
                               </PopoverTrigger>
                               <PopoverContent side="left" align="start" className="w-80 p-0 overflow-hidden">
                                 <div className="px-3 py-2.5 flex items-center gap-2 bg-muted/50 border-b border-border">
-                                  <ScrollTextIcon className="size-3.5 text-blue-500" />
+                                  <ScrollTextIcon className="size-3.5 text-primary" />
                                   <span className="text-sm font-semibold text-foreground">Lease Options</span>
                                   <span className="ml-auto text-xs text-muted-foreground">{space.suite} · {space.tenant ?? "Vacant"}</span>
                                 </div>
@@ -825,13 +825,13 @@ export const StackingPlan = forwardRef<StackingPlanHandle>(function StackingPlan
                           {show("Encumbrances") && space.encumbrances && space.encumbrances.length > 0 && (
                             <Popover onOpenChange={(open) => setActiveHighlight(open ? buildHighlight(space, "encumbrances") : null)}>
                               <PopoverTrigger className={cn("cursor-pointer flex items-center gap-1 font-medium px-1.5 py-0.5 rounded whitespace-nowrap hover:brightness-110 transition-all bg-chart-1/15 border border-chart-1/35", cfg.metaCls)} style={{ color: c.text }}>
-                                <ConstructionIcon className="size-3 text-orange-400 shrink-0" />
+                                <ConstructionIcon className="size-3 text-warning shrink-0" />
                                 <span className="hidden sm:inline">{space.encumbrances.length} {space.encumbrances.length === 1 ? "Encumbrance" : "Encumbrances"}</span>
                                 <span className="sm:hidden">{space.encumbrances.length}</span>
                               </PopoverTrigger>
                               <PopoverContent side="left" align="start" className="w-80 p-0 overflow-hidden">
                                 <div className="px-3 py-2.5 flex items-center gap-2 bg-muted/50 border-b border-border">
-                                  <ConstructionIcon className="size-3.5 text-orange-500" />
+                                  <ConstructionIcon className="size-3.5 text-warning" />
                                   <span className="text-sm font-semibold text-foreground">Encumbrances</span>
                                   <span className="ml-auto text-xs text-muted-foreground">{space.suite} · {space.tenant ?? "Vacant"}</span>
                                 </div>

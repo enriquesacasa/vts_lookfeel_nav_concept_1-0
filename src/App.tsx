@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Sparkle, Wand } from "lucide-react"
+import { Wand } from "lucide-react"
 import { AppNav } from "@/components/app-nav"
 import { BuildingHeader } from "@/components/building-header"
 import { AvailabilityOverview } from "@/components/availability-overview"
@@ -22,6 +22,7 @@ import { StackingPlan } from "@/components/stacking-plan"
 import { EmailFlow } from "@/components/email-flow"
 import { AskVTSPage } from "@/components/ask-vts"
 import { DocumentAgentPage } from "@/components/document-agent-page"
+import { ProposalBuilderPage } from "@/components/proposal-builder-page"
 import { ChatPatternProvider } from "@/contexts/chat-pattern"
 import { ChatSideOver } from "@/components/chat-side-over"
 import { ChatSidePush, SIDE_PUSH_WIDTH } from "@/components/chat-side-push"
@@ -250,7 +251,7 @@ export default function App() {
   const [isDark, setIsDark] = React.useState(() => document.documentElement.classList.contains("dark"))
 
   React.useEffect(() => {
-    const globalPages = ["theme", "principles", "activity", "reminders", "avatar", "inquiry-email", "inquiry-email-forward", "inquiry-email-confirm", "ask-vts", "document-agent"]
+    const globalPages = ["theme", "principles", "activity", "reminders", "avatar", "inquiry-email", "inquiry-email-forward", "inquiry-email-confirm", "ask-vts", "document-agent", "proposal-builder"]
     const hash = globalPages.includes(currentPage)
       ? `/${currentPage}`
       : `/${currentPage}/${selectedAssetId}`
@@ -552,6 +553,10 @@ export default function App() {
         <DocumentAgentPage isDark={isDark} onToggleDark={toggleDark} />
       </ChatPatternProvider>
     )
+  }
+
+  if (currentPage === "proposal-builder") {
+    return <ProposalBuilderPage isDark={isDark} onToggleDark={toggleDark} />
   }
 
   const standalonePages = ["theme", "principles", "inquiry-email", "inquiry-email-forward", "inquiry-email-confirm"]

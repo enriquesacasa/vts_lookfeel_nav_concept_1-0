@@ -14,10 +14,10 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { LogoMenuContent } from "@/components/logo-menu-content"
 import {
-  ArrowUp, PenLine, SquarePen, PanelLeft, ChevronDown,
-  MoreHorizontal, Share2, Pencil, Trash2, ThumbsUp, ThumbsDown,
+  ArrowUp, PenLine, PanelLeft, ChevronDown,
+  MoreHorizontal, Share2, Pencil, Trash2, ThumbsUp,
   Copy, RefreshCw, FileText, FilePlus2, Upload, Download, Mail,
-  ChevronRight, ExternalLink, Bold, Italic, AlignLeft, AlignCenter, AlignRight, AlignJustify,
+  ExternalLink, Bold, Italic, AlignLeft, AlignCenter, AlignRight, AlignJustify,
   Link, List, ListOrdered, Underline, Strikethrough,
   Undo2, Redo2, Indent, Outdent, Table, Image,
   Sparkle, Search, Clock, Mic, AudioLines, Plus, Pin, Archive, X, ArrowLeft,
@@ -94,9 +94,147 @@ const SESSIONS: DocSession[] = [
       { id: "m2", role: "assistant", timestamp: "2:11 PM", content: "I've pulled the original KPMG lease and drafted Amendment No. 3 to add Floor 22 as expansion premises.\n\n**Key terms added:**\n— Expansion premises: Suite 2200, Floor 22 (~12,000 sf)\n— Expansion commencement: Subject to size confirmation\n— Rent: Left as [TBD] pending your input\n— Existing terms otherwise unchanged\n\nWant me to model the economics and fill in the expansion rent?" },
     ],
   },
+  {
+    id: "s3", title: "Apex Capital First Draft", time: "Aug 22",
+    docTitle: "Apex Capital First Draft Lease",
+    messages: [
+      { id: "m1", role: "user",      timestamp: "11:05 AM", content: "Generate a first draft lease for Apex Capital, Floor 31, 8,500 sf." },
+      { id: "m2", role: "assistant", timestamp: "11:06 AM", content: "First draft generated from the VTS standard form.\n\n**Key terms:**\n— Premises: Suite 3100, Floor 31, ~8,500 sf\n— Term: 5 years from February 1, 2027\n— Base rent: $78.00 PSF/yr NNN, 3% annual escalations\n— TI allowance: $65.00 PSF ($552,500)\n— Free rent: 6 months from commencement\n\nThis is marked as a draft for discussion only. Want me to flag any non-standard clauses or compare against recent comps?" },
+    ],
+  },
+  {
+    id: "s4", title: "Deloitte Expansion Notice", time: "Aug 20",
+    docTitle: "Deloitte Expansion Option Notice",
+    messages: [
+      { id: "m1", role: "user",      timestamp: "3:22 PM", content: "Draft the expansion option notice for Deloitte. They want Floor 19." },
+      { id: "m2", role: "assistant", timestamp: "3:23 PM", content: "Options notice drafted per Section 42 of the Deloitte lease.\n\n**Summary:**\n— Expansion space: Suite 1900, Floor 19, ~9,200 sf\n— Proposed commencement: January 1, 2027\n— Notice delivered 12+ months in advance, satisfying the lease requirement\n\nI flagged that delivery must be by certified mail per Section 42(b). Want me to draft an email cover note with a follow-up hard copy reminder?" },
+    ],
+  },
+  {
+    id: "s5", title: "Meridian Estoppel Cert.", time: "Aug 18",
+    docTitle: "Meridian Health Estoppel Cert.",
+    messages: [
+      { id: "m1", role: "user",      timestamp: "10:14 AM", content: "Generate the estoppel certificate for Meridian Health. Lender is requesting it." },
+      { id: "m2", role: "assistant", timestamp: "10:15 AM", content: "Estoppel certificate drafted from the Meridian Health lease record.\n\n**Confirmed:**\n— Lease in full force and effect, no modifications\n— Term expires April 30, 2031 with one 5-year renewal option at FMV\n— Rent current through August 2026, no prepaid rent\n— Security deposit: $97,500 on file\n— No defaults or outstanding claims by either party\n\nReady for tenant signature. Want me to send to Meridian's legal contact on file?" },
+    ],
+  },
 ]
 
 const BLANK_DOC = ""
+
+const SAMPLE_KPMG_AMENDMENT = `LEASE AMENDMENT NO. 3
+
+Date: August 26, 2026
+
+Re: Lease dated January 15, 2019, as amended, between VTS Tower, LLC
+("Landlord") and KPMG LLP ("Tenant") — Suite 1500, VTS Tower
+
+This Third Amendment to Lease ("Amendment") is entered into as of
+the date above between Landlord and Tenant.
+
+1. EXPANSION PREMISES
+Tenant shall lease Suite 2200, Floor 22, containing approximately
+12,000 rentable square feet ("Expansion Premises"). Landlord shall
+deliver the Expansion Premises on November 1, 2026.
+
+2. EXPANSION TERM
+The term for the Expansion Premises shall be coterminous with the
+existing lease, expiring June 30, 2031.
+
+3. BASE RENT — EXPANSION PREMISES
+$[TBD] per rentable square foot per year, NNN, commencing on the
+Expansion Commencement Date, with 3% annual escalations.
+
+4. TENANT IMPROVEMENT ALLOWANCE
+Landlord shall provide $60.00 PSF ($720,000) for the Expansion Premises.
+
+5. ALL OTHER TERMS
+All other terms and conditions of the original lease and prior
+amendments remain in full force and effect.`
+
+const SAMPLE_APEX_LEASE = `FIRST DRAFT LEASE AGREEMENT
+
+Date: August 22, 2026
+
+Between: VTS Tower, LLC ("Landlord")
+And:     Apex Capital Partners LLC ("Tenant")
+
+Re: Suite 3100, Floor 31, VTS Tower, New York, NY
+
+1. PREMISES
+Approximately 8,500 rentable square feet on Floor 31.
+
+2. TERM
+Five (5) years commencing February 1, 2027.
+
+3. BASE RENT
+Year 1: $78.00 PSF/yr NNN
+Annual escalations: 3% per year.
+
+4. TENANT IMPROVEMENT ALLOWANCE
+$65.00 per rentable square foot ($552,500 total).
+
+5. FREE RENT
+Six (6) months abatement from commencement.
+
+[DRAFT — for discussion purposes only. Not for distribution.]`
+
+const SAMPLE_DELOITTE_NOTICE = `NOTICE OF EXERCISE OF EXPANSION OPTION
+
+Date: August 20, 2026
+
+To:   VTS Tower, LLC ("Landlord")
+From: Deloitte LLP ("Tenant")
+
+Re: Lease dated March 1, 2020 — Suite 1800, VTS Tower
+
+Pursuant to Section 42 of the above-referenced Lease, Tenant hereby
+exercises its Expansion Option for the following premises:
+
+EXPANSION SPACE
+Suite 1900, Floor 19, containing approximately 9,200 rentable square feet.
+
+EXPANSION COMMENCEMENT DATE
+January 1, 2027, or upon substantial completion of Landlord's Work.
+
+NOTICE DELIVERY DATE
+This notice is delivered more than 12 months prior to the proposed
+Expansion Commencement Date, satisfying the notice requirement under
+Section 42(b) of the Lease.
+
+Tenant requests Landlord's written acknowledgment within 10 business days.`
+
+const SAMPLE_MERIDIAN_ESTOPPEL = `TENANT ESTOPPEL CERTIFICATE
+
+Date: August 18, 2026
+
+Tenant:   Meridian Health Systems, Inc.
+Landlord: VTS Tower, LLC
+Premises: Suite 600, Floor 6, VTS Tower, New York, NY
+
+The undersigned ("Tenant") hereby certifies to Landlord and its lender:
+
+1. LEASE STATUS
+The Lease dated May 1, 2021 is in full force and effect and has not
+been modified except as noted herein.
+
+2. TERM
+The Lease term expires April 30, 2031. Tenant has one (1) renewal
+option for five (5) years at fair market value.
+
+3. RENT
+Current monthly base rent: $48,750. No free rent periods are outstanding.
+Tenant has paid rent through August 2026. No prepaid rent exists beyond
+the current month.
+
+4. NO DEFAULT
+To Tenant's knowledge, neither Landlord nor Tenant is in default.
+Tenant has no claims, defenses, or offsets against Landlord.
+
+5. SECURITY DEPOSIT
+Tenant has deposited $97,500 as a security deposit.
+
+Signed by Tenant's authorized representative.`
 
 const SAMPLE_LOI = `LETTER OF INTENT
 
@@ -140,6 +278,22 @@ An amount equal to two (2) months of base rent.
 7. THIS LOI IS NON-BINDING
 This LOI is intended solely as a statement of intent and shall
 not constitute a binding contract between the parties.`
+
+const DOC_CONTENT: Record<string, string> = {
+  d1: SAMPLE_LOI,
+  d2: SAMPLE_KPMG_AMENDMENT,
+  d3: SAMPLE_APEX_LEASE,
+  d4: SAMPLE_DELOITTE_NOTICE,
+  d5: SAMPLE_MERIDIAN_ESTOPPEL,
+}
+
+const DOC_SESSION_MAP: Record<string, string> = {
+  d1: "s1",
+  d2: "s2",
+  d3: "s3",
+  d4: "s4",
+  d5: "s5",
+}
 
 function generateDocResponse(text: string): string {
   const l = text.toLowerCase()
@@ -258,17 +412,17 @@ function FileRail({ onSelectDoc, onNewFromTemplate, onNewDoc, activeDocId, colla
           </CollapsibleTrigger>
           <CollapsibleContent className="flex flex-col gap-0.5">
             {TEMPLATES.map(t => (
-              <button key={t.id} onClick={() => onNewFromTemplate(t)}
-                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all hover:bg-muted/60 text-foreground">
+              <Button key={t.id} variant="ghost" onClick={() => onNewFromTemplate(t)}
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all hover:bg-muted/60 text-foreground h-auto justify-start">
                 <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
                 <span className="text-sm truncate">{t.name}</span>
-              </button>
+              </Button>
             ))}
-            <button
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all hover:bg-muted/60 text-foreground">
+            <Button variant="ghost"
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all hover:bg-muted/60 text-foreground h-auto justify-start">
               <Upload className="h-4 w-4 text-muted-foreground shrink-0" />
               <span className="text-sm text-muted-foreground">Upload template…</span>
-            </button>
+            </Button>
           </CollapsibleContent>
         </Collapsible>
 
@@ -360,17 +514,64 @@ const TEMPLATE_SUGGESTIONS: Record<string, string[]> = {
   "__new__":         ["Draft an LOI", "Create a lease amendment", "Write an options notice", "Start from a template"],
 }
 
-function ChatPanel({ sessions, activeId, onSelectSession, onNewSession, templateContext, onSendSuggestion }: {
+const FOLLOWUP_QUESTIONS: Record<string, [string, string]> = {
+  "loi":             ["What's the tenant name, premises size, and target floor?", "What are the proposed economic terms — base rent, TI allowance, and free rent period?"],
+  "lease-amendment": ["Which tenant and lease needs amending? What's the current premises?", "What are the specific changes — additional space, modified rent, or updated term?"],
+  "options-notice":  ["Which option is being exercised — renewal, expansion, or termination? For which tenant?", "What's the proposed effective date and any specific conditions to include?"],
+  "first-draft":     ["What's the tenant name, premises size, and proposed floor?", "What are the proposed economic terms — base rent, TI allowance, free rent, and lease term?"],
+  "estoppel":        ["Which tenant and lease is this for? Who is requesting the estoppel?", "Are there any lease modifications or outstanding matters to disclose?"],
+  "nda":             ["Is this mutual or one-way? Who are the two parties?", "What's the purpose — deal discussions, property tour, or financing? Any special term or carve-outs?"],
+  "__new__":         ["What type of document do you need — LOI, amendment, lease, notice, or something else?", "What deal or property is this for? Any specific parties or terms to include?"],
+}
+
+function getDraftContent(ctx: string, messages: DocMessage[]): string {
+  const userAnswers = messages.filter(m => m.role === "user").map(m => m.content)
+  const hint = userAnswers.join(" ").toLowerCase()
+  if (ctx === "loi" || hint.includes("loi") || hint.includes("letter of intent")) return SAMPLE_LOI
+  if (ctx === "lease-amendment" || hint.includes("amendment")) return SAMPLE_KPMG_AMENDMENT
+  if (ctx === "first-draft" || hint.includes("first draft") || hint.includes("lease")) return SAMPLE_APEX_LEASE
+  if (ctx === "options-notice" || hint.includes("option") || hint.includes("notice")) return SAMPLE_DELOITTE_NOTICE
+  if (ctx === "estoppel" || hint.includes("estoppel")) return SAMPLE_MERIDIAN_ESTOPPEL
+  if (ctx === "nda" || hint.includes("nda") || hint.includes("confidentiality")) return `CONFIDENTIALITY AGREEMENT
+
+Date: ${new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+
+This Confidentiality Agreement ("Agreement") is entered into between the parties
+identified above in connection with discussions regarding a potential transaction.
+
+1. CONFIDENTIAL INFORMATION
+Each party agrees to keep confidential all non-public information disclosed by
+the other party in connection with the proposed transaction.
+
+2. TERM
+This Agreement shall remain in effect for two (2) years from the date above.
+
+3. PERMITTED DISCLOSURE
+Confidential information may be disclosed only to employees, advisors, or
+representatives who have a need to know for purposes of evaluating the transaction.
+
+4. NO BINDING OBLIGATION
+This Agreement does not obligate either party to proceed with any transaction.
+
+[DRAFT — for review and execution]`
+  return BLANK_DOC
+}
+
+function ChatPanel({ sessions, activeId, onSelectSession: _onSelectSession, onNewSession: _onNewSession, templateContext, onSendSuggestion, onDraftReady }: {
   sessions: DocSession[]
   activeId: string
   onSelectSession: (id: string) => void
   onNewSession: () => void
   templateContext: string | null
   onSendSuggestion: (text: string) => void
+  onDraftReady?: (content: string) => void
 }) {
   const [input, setInput] = React.useState("")
   const [localSessions, setLocalSessions] = React.useState(sessions)
   const bottomRef = React.useRef<HTMLDivElement>(null)
+  // Persist templateContext across renders — cleared only after draft is produced
+  const ctxRef = React.useRef<string | null>(templateContext)
+  React.useEffect(() => { if (templateContext) ctxRef.current = templateContext }, [templateContext])
 
   React.useEffect(() => {
     setLocalSessions(prev => {
@@ -389,15 +590,51 @@ function ChatPanel({ sessions, activeId, onSelectSession, onNewSession, template
     const userMsg: DocMessage = { id: `u${Date.now()}`, role: "user", content: text, timestamp: now }
     const thinkId = `t${Date.now()}`
     const thinkMsg: DocMessage = { id: thinkId, role: "assistant", content: "Working on it…", timestamp: now }
+
+    const currentMsgs = active?.messages ?? []
+    const userMsgCount = currentMsgs.filter(m => m.role === "user").length
+    const ctx = ctxRef.current
+
     setLocalSessions(prev => prev.map(s =>
       s.id !== activeId ? s : { ...s, messages: [...s.messages, userMsg, thinkMsg] }
     ))
+
     setTimeout(() => {
+      const allMsgs = [...currentMsgs, userMsg]
+      let replyContent: string
+      let shouldDraft = false
+
+      if (ctx) {
+        const qs = FOLLOWUP_QUESTIONS[ctx] ?? FOLLOWUP_QUESTIONS["__new__"]
+        if (userMsgCount === 0) {
+          replyContent = qs[0]
+        } else if (userMsgCount === 1) {
+          replyContent = qs[1]
+        } else {
+          replyContent = "Got it — I have everything I need. Give me a moment to draft this."
+          shouldDraft = true
+        }
+      } else {
+        replyContent = generateDocResponse(text)
+      }
+
       setLocalSessions(prev => prev.map(s => {
         if (s.id !== activeId) return s
-        const reply: DocMessage = { id: `r${Date.now()}`, role: "assistant", content: generateDocResponse(text), timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) }
+        const reply: DocMessage = { id: `r${Date.now()}`, role: "assistant", content: replyContent, timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) }
         return { ...s, messages: [...s.messages.filter(m => m.id !== thinkId), reply] }
       }))
+
+      if (shouldDraft) {
+        setTimeout(() => {
+          const draftContent = getDraftContent(ctx!, allMsgs)
+          const doneMsg: DocMessage = { id: `done${Date.now()}`, role: "assistant", content: "Done — the draft is ready in the document panel. Review it and let me know if you want to change anything.", timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) }
+          setLocalSessions(prev => prev.map(s =>
+            s.id !== activeId ? s : { ...s, messages: [...s.messages, doneMsg] }
+          ))
+          ctxRef.current = null
+          onDraftReady?.(draftContent)
+        }, 1200)
+      }
     }, 900)
   }
 
@@ -481,9 +718,9 @@ function Sep() {
   return <div className="w-px h-4 bg-border/50 mx-0.5 shrink-0" />
 }
 
-function TBtn({ children, title, active }: { children: React.ReactNode; title?: string; active?: boolean }) {
+function TBtn({ children, title, active, onClick }: { children: React.ReactNode; title?: string; active?: boolean; onClick?: () => void }) {
   return (
-    <Button variant="ghost" size="icon-sm" title={title}
+    <Button variant="ghost" size="icon-sm" title={title} onClick={onClick}
       className={cn("h-7 w-7 shrink-0", active ? "bg-muted text-foreground" : "text-muted-foreground")}>
       {children}
     </Button>
@@ -492,7 +729,7 @@ function TBtn({ children, title, active }: { children: React.ReactNode; title?: 
 
 // ─── Document editor ──────────────────────────────────────────────────────────
 
-function DocumentEditor({ title, content }: { title: string; content: string }) {
+function DocumentEditor({ title: _title, content }: { title: string; content: string }) {
   const [align, setAlign] = React.useState<"left"|"center"|"right"|"justify">("left")
   const editorRef = React.useRef<HTMLDivElement>(null)
 
@@ -519,10 +756,8 @@ function DocumentEditor({ title, content }: { title: string; content: string }) 
 
         {/* Style picker */}
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm" className="h-7 px-2 text-xs text-muted-foreground gap-1 shrink-0 w-[100px] justify-between">
-              Normal text <ChevronDown className="h-3 w-3" />
-            </Button>
+          <DropdownMenuTrigger render={<Button variant="ghost" size="sm" className="h-7 px-2 text-xs text-muted-foreground gap-1 shrink-0 w-[100px] justify-between" />}>
+            Normal text <ChevronDown className="h-3 w-3" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-44">
             <DropdownMenuItem className="text-sm" onClick={() => exec("formatBlock", "p")}>Normal text</DropdownMenuItem>
@@ -549,10 +784,8 @@ function DocumentEditor({ title, content }: { title: string; content: string }) 
 
         {/* Alignment */}
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon-sm" title="Alignment" className="h-7 w-7 text-muted-foreground shrink-0">
-              {alignIcon}
-            </Button>
+          <DropdownMenuTrigger render={<Button variant="ghost" size="icon-sm" title="Alignment" className="h-7 w-7 text-muted-foreground shrink-0" />}>
+            {alignIcon}
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start">
             <DropdownMenuItem className="gap-2 text-sm" onClick={() => { exec("justifyLeft"); setAlign("left") }}><AlignLeft className="h-3.5 w-3.5" />Left</DropdownMenuItem>
@@ -582,8 +815,7 @@ function DocumentEditor({ title, content }: { title: string; content: string }) 
             ref={editorRef}
             contentEditable
             suppressContentEditableWarning
-            className="outline-none text-sm text-foreground leading-relaxed min-h-[800px] [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:mb-3 [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:mb-2 [&_h3]:text-base [&_h3]:font-medium [&_h3]:mb-1.5 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:mb-0.5 [&_a]:text-primary [&_a]:underline"
-            style={{ fontFamily: "Georgia, 'Times New Roman', serif", fontSize: "14px", lineHeight: "1.9", whiteSpace: "pre-wrap" }}
+            className="outline-none font-serif text-sm leading-loose whitespace-pre-wrap text-foreground min-h-[800px] [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:mb-3 [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:mb-2 [&_h3]:text-base [&_h3]:font-medium [&_h3]:mb-1.5 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:mb-0.5 [&_a]:text-primary [&_a]:underline"
             dangerouslySetInnerHTML={{ __html: content.replace(/\n/g, "<br>") }}
           />
         </div>
@@ -604,11 +836,11 @@ function EmptyDocState({ onSelect }: { onSelect: (t: DocTemplate) => void }) {
       <p className="text-sm text-muted-foreground mb-6 max-w-xs leading-relaxed">Pick a template from the left panel, describe what you need in the chat, or start from an existing document.</p>
       <div className="flex flex-wrap gap-2 justify-center">
         {TEMPLATES.slice(0, 3).map(t => (
-          <button key={t.id} onClick={() => onSelect(t)}
-            className="flex items-center gap-2 rounded-lg border border-border/60 px-3 py-2 text-sm text-foreground hover:bg-muted/60 transition-colors">
+          <Button key={t.id} variant="outline" onClick={() => onSelect(t)}
+            className="flex items-center gap-2 rounded-lg border-border/60 px-3 py-2 text-sm text-foreground hover:bg-muted/60 transition-colors h-auto">
             <FileText className="h-3.5 w-3.5 text-muted-foreground" />
             {t.name}
-          </button>
+          </Button>
         ))}
       </div>
     </div>
@@ -639,9 +871,13 @@ export function DocumentAgentPage({ className, isDark = false, onToggleDark }: {
   }
 
   const openDoc = (title: string, docId: string | null = null) => {
-    setActiveDoc({ title, content: SAMPLE_LOI })
+    const content = docId && DOC_CONTENT[docId] ? DOC_CONTENT[docId] : SAMPLE_LOI
+    setActiveDoc({ title, content })
     setActiveDocId(docId)
     setTemplateContext(null)
+    if (docId && DOC_SESSION_MAP[docId]) {
+      setActiveId(DOC_SESSION_MAP[docId])
+    }
   }
 
   const newFromTemplate = (t: DocTemplate) => {
@@ -727,7 +963,12 @@ export function DocumentAgentPage({ className, isDark = false, onToggleDark }: {
           onSelectSession={id => { setActiveId(id); const s = sessions.find(x => x.id === id); if (s?.docTitle) { openDoc(s.docTitle); setMobileView("doc") } }}
           onNewSession={newSession}
           templateContext={templateContext}
-          onSendSuggestion={() => { setTemplateContext(null); setMobileView("doc") }}
+          onSendSuggestion={() => { setMobileView("doc") }}
+          onDraftReady={content => {
+            setActiveDoc(prev => prev ? { ...prev, content } : { title: "Draft", content })
+            setTemplateContext(null)
+            setMobileView("doc")
+          }}
         />
       </div>
 
@@ -748,11 +989,9 @@ export function DocumentAgentPage({ className, isDark = false, onToggleDark }: {
           <div className="flex items-center gap-2 shrink-0">
             {activeDoc && (<>
               <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="gap-1.5 text-xs h-7">
-                    <Download className="h-3.5 w-3.5" />Export
-                    <ChevronDown className="h-3 w-3 text-muted-foreground" />
-                  </Button>
+                <DropdownMenuTrigger render={<Button variant="outline" size="sm" className="gap-1.5 text-xs h-7" />}>
+                  <Download className="h-3.5 w-3.5" />Export
+                  <ChevronDown className="h-3 w-3 text-muted-foreground" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-44">
                   <DropdownMenuItem className="gap-2 text-sm"><FileText className="h-3.5 w-3.5" />Download as Word</DropdownMenuItem>

@@ -14,7 +14,8 @@ interface LogoMenuContentProps {
 const PROTOTYPE_LINKS = [
   { label: "Main view",       hash: "#/dashboard" },
   { label: "Inquiry email",   hash: "#/inquiry-email" },
-  { label: "Doc Drafting",    hash: "#/document-agent" },
+  { label: "Doc Drafting",       hash: "#/document-agent" },
+  { label: "Proposal builder",   hash: "#/proposal-builder" },
 ]
 
 const DOC_LINKS = [

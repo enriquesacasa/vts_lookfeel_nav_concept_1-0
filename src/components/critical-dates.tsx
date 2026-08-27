@@ -147,7 +147,7 @@ const CriticalDates = React.forwardRef<HTMLDivElement, CriticalDatesProps>(
               {sorted.map((d, i) => {
                 const u = urgency(d.monthsOut)
                 return (
-                  <tr key={i} title="View Lease" className={cn("cursor-pointer hover:bg-muted/40 dark:hover:bg-white/4 transition-colors", i > 0 && "border-t border-border/40")}>
+                  <tr key={i} title="View Lease" className={cn("cursor-pointer hover:bg-muted/40 transition-colors", i > 0 && "border-t border-border/40")}>
                     <td className="py-2.5 text-sm font-medium text-foreground whitespace-nowrap">
                       {d.tenant}
                     </td>
