@@ -12,7 +12,7 @@ interface AgentBtnProps {
   className?: string
 }
 
-export function AgentBtn({ label, onClick, variant = "icon", className }: AgentBtnProps) {
+export function AgentBtn({ onClick, variant = "icon", className }: AgentBtnProps) {
   const [hovered, setHovered] = React.useState(false)
 
   if (variant === "run") {
