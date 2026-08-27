@@ -15,7 +15,7 @@ import {
   MoreHorizontal, Share2, Pencil, Pin, Archive, Trash2, ThumbsUp, ThumbsDown, Copy, RefreshCw, ChevronRight,
 } from "lucide-react"
 import { useChatPattern } from "@/contexts/chat-pattern"
-import { AGENTS } from "@/components/agents-page"
+import { AGENTS, AgentDetailPanel } from "@/components/agents-page"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -375,6 +375,8 @@ export function AskVTSPage({ className, newChatKey }: { className?: string; newC
   const [mobileShowChat, setMobileShowChat] = React.useState(false)
   const [railCollapsed, setRailCollapsed]   = React.useState(false)
   const [recentsOpen, setRecentsOpen]       = React.useState(true)
+  const [agentsOpen, setAgentsOpen]         = React.useState(true)
+  const [selectedAgentId, setSelectedAgentId] = React.useState<string | null>(null)
   const [contextSuggestions, setContextSuggestions] = React.useState<string[]>([])
   const bottomRef = React.useRef<HTMLDivElement>(null)
   const pendingAutoRef = React.useRef<string | null>(null)
@@ -535,27 +537,62 @@ export function AskVTSPage({ className, newChatKey }: { className?: string; newC
                 New chat
               </Button>
 
-              <Collapsible open={recentsOpen} onOpenChange={setRecentsOpen} className="flex flex-col flex-1 min-h-0">
-                <CollapsibleTrigger className="flex items-center justify-between w-full mb-2">
-                  <span className="text-sm font-medium text-foreground">Recents</span>
-                  <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform", !recentsOpen && "-rotate-90")} />
-                </CollapsibleTrigger>
-                <CollapsibleContent className="flex flex-col gap-0.5 flex-1 overflow-y-auto min-h-0">
-                  {convs.map(conv => (
-                    <ConvListItem
-                      key={conv.id}
-                      conv={conv}
-                      selected={conv.id === activeId}
-                      onSelect={() => { setActiveId(conv.id); setMobileShowChat(true) }}
-                    />
-                  ))}
-                </CollapsibleContent>
-              </Collapsible>
+              <div className="flex flex-col flex-1 min-h-0 overflow-y-auto gap-4">
+                <Collapsible open={recentsOpen} onOpenChange={setRecentsOpen}>
+                  <CollapsibleTrigger className="flex items-center justify-between w-full mb-2">
+                    <span className="text-sm font-medium text-foreground">Recents</span>
+                    <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform", !recentsOpen && "-rotate-90")} />
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="flex flex-col gap-0.5">
+                    {convs.map(conv => (
+                      <ConvListItem
+                        key={conv.id}
+                        conv={conv}
+                        selected={conv.id === activeId}
+                        onSelect={() => { setActiveId(conv.id); setSelectedAgentId(null); setMobileShowChat(true) }}
+                      />
+                    ))}
+                  </CollapsibleContent>
+                </Collapsible>
+
+                <Collapsible open={agentsOpen} onOpenChange={setAgentsOpen}>
+                  <CollapsibleTrigger className="flex items-center justify-between w-full mb-2">
+                    <span className="text-sm font-medium text-foreground">Agents</span>
+                    <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform", !agentsOpen && "-rotate-90")} />
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="flex flex-col gap-0.5">
+                    {AGENTS.map(agent => (
+                      <button
+                        key={agent.id}
+                        onClick={() => { setSelectedAgentId(agent.id); setMobileShowChat(true) }}
+                        className="flex items-center gap-2.5 w-full px-2.5 py-2 rounded-xl text-left hover:bg-muted/60 transition-colors group"
+                      >
+                        <div className="h-7 w-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                          <agent.icon className="h-3.5 w-3.5 text-primary" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-foreground truncate">{agent.name}</p>
+                          <p className="text-[11px] text-muted-foreground truncate">{agent.tagline}</p>
+                        </div>
+                      </button>
+                    ))}
+                  </CollapsibleContent>
+                </Collapsible>
+              </div>
             </div>
           )}
         </div>
 
-        {/* Right: chat panel */}
+        {/* Right: agent detail or chat panel */}
+        {selectedAgentId ? (
+          <div className={cn(
+            "rounded-2xl backdrop-blur-md min-h-0 overflow-y-auto p-5 w-full",
+            "bg-card/70",
+            mobileShowChat ? "block" : "hidden md:block"
+          )}>
+            <AgentDetailPanel agent={AGENTS.find(a => a.id === selectedAgentId)!} />
+          </div>
+        ) : (
         <div className={cn(
           "rounded-2xl backdrop-blur-md p-5 min-h-0 flex flex-col",
           "bg-card/70",
@@ -661,6 +698,7 @@ export function AskVTSPage({ className, newChatKey }: { className?: string; newC
           )}
 
         </div>
+        )}
       </div>
     </div>
   )

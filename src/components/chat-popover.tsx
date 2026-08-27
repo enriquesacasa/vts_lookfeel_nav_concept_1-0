@@ -145,7 +145,7 @@ export function ChatPopoverContent({ initialMessage, suggestions, onClose, onOpe
 
       {/* Suggestion pills — always in DOM to avoid layout shift */}
       {suggestions && suggestions.length > 0 && (
-        <div className={cn("shrink-0 px-3 pb-2 flex flex-col gap-1.5 transition-opacity duration-200", suggestionsVisible ? "opacity-100" : "opacity-0 pointer-events-none")}>
+        <div className={cn("shrink-0 px-3 flex flex-col gap-1.5 transition-all duration-200 overflow-hidden", suggestionsVisible ? "opacity-100 pb-2 max-h-48" : "opacity-0 pointer-events-none pb-0 max-h-0")}>
           {suggestions.map((s, i) => (
             <button
               key={i}

@@ -1203,7 +1203,7 @@ function ActivityDetailTab({ agentId }: { agentId: string }) {
   )
 }
 
-function AgentDetailPanel({ agent }: { agent: AgentDef }) {
+export function AgentDetailPanel({ agent }: { agent: AgentDef }) {
   const [tab, setTab] = React.useState("about")
   const Icon = agent.icon
 
