@@ -116,8 +116,8 @@ function ConvListItem({ conv, selected, onSelect }: {
         <DropdownMenuTrigger
           onClick={e => e.stopPropagation()}
           className={cn(
-            "shrink-0 h-6 w-6 items-center justify-center rounded-md",
-            hovered ? "flex" : "hidden",
+            "shrink-0 h-6 w-6 flex items-center justify-center rounded-md",
+            hovered ? "visible" : "invisible",
             selected ? "text-primary hover:bg-primary/20" : "text-muted-foreground hover:bg-muted"
           )}
         >
@@ -143,14 +143,6 @@ function ConvListItem({ conv, selected, onSelect }: {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {!hovered && (
-        <span className={cn(
-          "shrink-0 text-[10px] font-medium rounded-md px-1.5 py-0.5 whitespace-nowrap",
-          selected ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground"
-        )}>
-          {conv.time}
-        </span>
-      )}
     </div>
   )
 }
@@ -161,16 +153,10 @@ function MessageRow({ message }: { message: Message }) {
   const isUser = message.role === "user"
   return (
     <div className={cn("flex gap-3", isUser && "flex-row-reverse")}>
-      <div className={cn(
-        "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border",
-        isUser ? "bg-muted/60 border-border/50" : "bg-primary/10 border-primary/20"
-      )}>
-        <Sparkle className={cn("h-4 w-4", isUser ? "text-muted-foreground" : "text-primary")} />
-      </div>
       <div className={cn("flex flex-col gap-1 max-w-lg", isUser && "items-end")}>
         <div className={cn(
-          "rounded-xl border px-4 py-3 text-sm text-foreground leading-relaxed",
-          isUser ? "bg-primary/10 border-primary/20" : "bg-muted/20 border-border/60"
+          "rounded-xl px-4 py-3 text-sm text-foreground leading-relaxed",
+          isUser ? "bg-primary/10" : "bg-muted/40"
         )}>
           {message.content.split("\n").map((line, i) => (
             <p key={i} className={i > 0 && line ? "mt-1.5" : i > 0 ? "mt-1" : ""}>{line}</p>
