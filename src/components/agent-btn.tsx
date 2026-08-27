@@ -5,7 +5,7 @@ import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip
 import { Sparkle } from "lucide-react"
 
 interface AgentBtnProps {
-  label: string
+  label?: string
   onClick?: (e: React.MouseEvent) => void
   /** "icon" = icon-only with tooltip (default). "run" = inline text button. */
   variant?: "icon" | "run"
@@ -62,12 +62,9 @@ export function AgentBtn({ label, onClick, variant = "icon", className }: AgentB
         </Button>
       </TooltipTrigger>
       <TooltipContent side="top" className="bg-sidebar text-sidebar-foreground border-transparent font-medium" arrowClassName="fill-sidebar">
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-1.5 font-medium text-sidebar-foreground">
-            <Sparkle className="h-3 w-3 animate-sparkle-spin" />
-            Run Agent
-          </div>
-          <p className="text-sidebar-foreground/70 font-normal">{label}</p>
+        <div className="flex items-center gap-1.5">
+          <Sparkle className="h-3 w-3 animate-sparkle-spin" />
+          Ask VTS
         </div>
       </TooltipContent>
     </Tooltip>
