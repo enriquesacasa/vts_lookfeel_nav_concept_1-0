@@ -420,7 +420,7 @@ export default function App() {
         actions: (
           <div className="flex items-center gap-2">
             <StatusBadge status={selectedDealStatus} onChange={setSelectedDealStatus} />
-            <AgentBtn className="!size-9" label={`${selectedDeal.tenant} — ${selectedDeal.stage} — ${selectedDealStatus}`} />
+            <AgentBtn className="!size-9" entity="Deal" label={`${selectedDeal.tenant} — ${selectedDeal.stage} — ${selectedDealStatus}`} />
           </div>
         ),
         stats: [],
@@ -585,30 +585,82 @@ export default function App() {
 
   return (
     <ChatPatternProvider onOpenChat={goAskVts}>
-      <div className="min-h-screen">
-        <AgentsViewAwareNav
-          onCollapsedChange={setNavCollapsed}
-          assets={ASSETS}
-          portfolios={PORTFOLIOS}
-          selectedAssetId={selectedAssetId}
-          onAssetChange={id => {
-            const newIsPortfolioOrAll = id === "all" || PORTFOLIOS.some(p => p.id === id)
-            if (newIsPortfolioOrAll && (currentPage === "stacking" || currentPage === "spaces")) {
-              setCurrentPage("dashboard")
-            }
-            setSelectedAssetId(id)
-          }}
-          isDark={isDark}
-          onLogoClick={toggleDark}
-          onNavItemClick={id => { setCurrentPage(id); setSelectedDeal(null); if (id === "ask-vts") setAskVtsKey(k => k + 1) }}
-          activePage={currentPage}
-        />
-        <SidePushMain navCollapsed={navCollapsed}>
-          {renderPage(currentPage)}
-        </SidePushMain>
-        <ChatSideOver />
-        <ChatSidePush />
-      </div>
+      <AppShell
+        navCollapsed={navCollapsed}
+        setNavCollapsed={setNavCollapsed}
+        selectedAssetId={selectedAssetId}
+        setSelectedAssetId={setSelectedAssetId}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+        setSelectedDeal={setSelectedDeal}
+        setAskVtsKey={setAskVtsKey}
+        isDark={isDark}
+        toggleDark={toggleDark}
+        renderPage={renderPage}
+      />
     </ChatPatternProvider>
+  )
+}
+
+interface AppShellProps {
+  navCollapsed: boolean
+  setNavCollapsed: (v: boolean) => void
+  selectedAssetId: string
+  setSelectedAssetId: (id: string) => void
+  currentPage: string
+  setCurrentPage: (p: string) => void
+  setSelectedDeal: (d: null) => void
+  setAskVtsKey: (fn: (k: number) => number) => void
+  isDark: boolean
+  toggleDark: () => void
+  renderPage: (page: string) => React.ReactNode
+}
+
+function AppShell({ navCollapsed, setNavCollapsed, selectedAssetId, setSelectedAssetId, currentPage, setCurrentPage, setSelectedDeal, setAskVtsKey, isDark, toggleDark, renderPage }: AppShellProps) {
+  const { closeSideOver, closeSidePush, sidePushOpen } = useChatPattern()
+  React.useEffect(() => {
+    closeSideOver()
+    closeSidePush()
+  }, [currentPage])
+  const prevSidePushRef = React.useRef(false)
+  React.useEffect(() => {
+    if (sidePushOpen && !prevSidePushRef.current) {
+      setNavCollapsed(true)
+    } else if (!sidePushOpen && prevSidePushRef.current) {
+      setNavCollapsed(false)
+    }
+    prevSidePushRef.current = sidePushOpen
+  }, [sidePushOpen])
+  const handleNavItemClick = (id: string) => {
+    setCurrentPage(id)
+    setSelectedDeal(null)
+    if (id === "ask-vts") setAskVtsKey(k => k + 1)
+  }
+  return (
+    <div className="min-h-screen">
+      <AgentsViewAwareNav
+        collapsed={navCollapsed}
+        onCollapsedChange={setNavCollapsed}
+        assets={ASSETS}
+        portfolios={PORTFOLIOS}
+        selectedAssetId={selectedAssetId}
+        onAssetChange={id => {
+          const newIsPortfolioOrAll = id === "all" || PORTFOLIOS.some(p => p.id === id)
+          if (newIsPortfolioOrAll && (currentPage === "stacking" || currentPage === "spaces")) {
+            setCurrentPage("dashboard")
+          }
+          setSelectedAssetId(id)
+        }}
+        isDark={isDark}
+        onLogoClick={toggleDark}
+        onNavItemClick={handleNavItemClick}
+        activePage={currentPage}
+      />
+      <SidePushMain navCollapsed={navCollapsed}>
+        {renderPage(currentPage)}
+      </SidePushMain>
+      <ChatSideOver />
+      <ChatSidePush />
+    </div>
   )
 }

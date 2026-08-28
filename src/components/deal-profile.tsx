@@ -149,7 +149,7 @@ function StageJourneyBar({ currentStage, onChange }: { currentStage: StageValue;
                   "h-5 w-5 rounded-full flex items-center justify-center transition-all",
                   isActive && "bg-primary-foreground",
                   isPast   && "bg-primary-foreground/50",
-                  isFuture && "bg-primary-foreground/15 border border-primary-foreground/50 group-hover:border-primary-foreground/80",
+                  isFuture && "bg-transparent border border-primary-foreground/40 group-hover:border-primary-foreground/70",
                 )}>
                   {isPast   && <Check className="h-2.5 w-2.5 text-primary" />}
                 </div>
@@ -242,7 +242,7 @@ function FieldRow({ icon: Icon, label, children }: { icon?: React.ElementType; l
       <div className="w-4 shrink-0 mt-0.5">
         {Icon && <Icon className="h-3.5 w-3.5 text-muted-foreground" />}
       </div>
-      <span className="text-xs text-muted-foreground w-32 shrink-0 pt-px">{label}</span>
+      <span className="text-xs text-muted-foreground w-24 shrink-0 pt-px">{label}</span>
       <div className="text-sm text-foreground font-medium flex-1">
         {children ?? <span className="text-muted-foreground/40 font-normal">—</span>}
       </div>
@@ -547,6 +547,10 @@ type EncumbranceItem = {
 }
 
 const DEAL_ENCUMBRANCES: Record<string, EncumbranceItem[]> = {
+  "d00": [
+    { optionType: "ROFO", holder: "Sullivan & Cromwell", suite: "Suite 0800", floor: "Floor 8", sf: 18000, priority: 1, expiry: "Apr 30, 2029", notes: "Must be exercised within 30 days of landlord offering the space to market" },
+    { optionType: "Expansion Option", holder: "Meridian Health Partners", suite: "Suite 0800", floor: "Floor 8", sf: 18000, priority: 2, expiry: "Mar 31, 2028", notes: "One-time right; exercisable during the 6-month window before the triggering event" },
+  ],
   "d01": [
     { optionType: "ROFO", holder: "Starbucks Corporation", suite: "Suite 750", floor: "Floor 7", sf: 8200, priority: 1, expiry: "Dec 31, 2027", notes: "Must exercise within 30 days of landlord notice" },
     { optionType: "Expansion Option", holder: "Starbucks Corporation", suite: "Suite 900", floor: "Floor 9", sf: 12000, priority: 1, expiry: "Jun 30, 2028" },
@@ -565,12 +569,21 @@ const DEAL_ENCUMBRANCES: Record<string, EncumbranceItem[]> = {
   ],
 }
 
-const ENCUMBRANCE_TYPE_STYLE: Record<string, string> = {
-  "ROFO":              "bg-blue-500/10 text-blue-600 border-blue-500/20",
-  "ROFR":              "bg-violet-500/10 text-violet-600 border-violet-500/20",
-  "Expansion Option":  "bg-emerald-500/10 text-emerald-600 border-emerald-500/20",
-  "Contraction Option":"bg-amber-500/10 text-amber-600 border-amber-500/20",
+const HEALTH_REC_OVERRIDES: Record<string, { summary?: string; signals?: string[]; recs: { action: string; urgency: string; agentId: string }[] }> = {
+  "d00": {
+    summary: "2 encumbrances detected on Suite 0800. Rights holders must be notified before the space can be offered to Amazon.",
+    signals: [
+      "ROFO held by Sullivan & Cromwell — 1st priority, expires Apr 30, 2029",
+      "Expansion Option held by Meridian Health Partners — 2nd priority, expires Mar 31, 2028",
+      "Both rights encumber Suite 0800 · 18,000 sf — Amazon's target space",
+    ],
+    recs: [
+      { action: "Draft ROFO notice to Sullivan & Cromwell for Suite 0800", urgency: "Before proceeding", agentId: "doc-drafting" },
+      { action: "Draft expansion option notice to Meridian Health Partners for Suite 0800", urgency: "This week", agentId: "doc-drafting" },
+    ],
+  },
 }
+
 
 function EncumbrancesTab({ deal }: { deal: Deal }) {
   const items = DEAL_ENCUMBRANCES[deal.id] ?? []
@@ -580,19 +593,40 @@ function EncumbrancesTab({ deal }: { deal: Deal }) {
   }
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col divide-y divide-border">
       {items.map((enc, i) => (
-        <div key={i} className="flex flex-col gap-1.5 py-3 px-3 rounded-lg border border-border/60 bg-card">
-          <div className="flex items-center gap-2">
-            <Badge variant="outline" className={cn("text-[10px] border shrink-0", ENCUMBRANCE_TYPE_STYLE[enc.optionType] ?? "")}>{enc.optionType}</Badge>
-            <p className="text-sm font-semibold text-foreground truncate">{enc.holder}</p>
-            <span className="ml-auto text-xs text-muted-foreground shrink-0">Priority {enc.priority}</span>
+        <div key={i} className={cn("py-4", i === 0 ? "pt-0" : "")}>
+          <div className="flex items-start gap-3 mb-3">
+            <span className="mt-0.5 size-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 text-primary-foreground bg-primary">{enc.priority}</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-base font-semibold leading-tight text-foreground">{enc.optionType}</p>
+              <p className="text-sm text-muted-foreground mt-0.5">{enc.holder} · {enc.suite}</p>
+            </div>
           </div>
-          <div className="flex flex-wrap gap-x-4 gap-y-0.5">
-            <p className="text-xs text-muted-foreground"><span className="text-foreground/70">Space:</span> {enc.suite} · {enc.sf.toLocaleString()} sf</p>
-            {enc.expiry && <p className="text-xs text-muted-foreground"><span className="text-foreground/70">Expires:</span> {enc.expiry}</p>}
+          <div className="ml-9 flex flex-col gap-3">
+            <div className="flex items-center gap-4">
+              <Button variant="link" size="sm" className="px-0 h-auto text-sm text-primary">View in abstract</Button>
+              <Button variant="link" size="sm" className="px-0 h-auto text-sm text-primary">View in lease</Button>
+            </div>
+            <div className="rounded-md border border-border overflow-hidden">
+              {[
+                { label: "Space", value: `${enc.suite} · ${enc.sf.toLocaleString()} sf` },
+                { label: "Floor", value: enc.floor },
+                ...(enc.expiry ? [{ label: "Expires", value: enc.expiry }] : []),
+                { label: "Priority", value: `${enc.priority}${enc.priority === 1 ? "st" : enc.priority === 2 ? "nd" : "rd"} right` },
+              ].map(({ label, value }, fi) => (
+                <div key={label} className={cn("flex items-baseline gap-3 px-3 py-2", fi % 2 === 0 ? "bg-muted/50" : "bg-background")}>
+                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide whitespace-nowrap w-20 shrink-0">{label}</span>
+                  <span className="text-sm text-foreground font-medium">{value}</span>
+                </div>
+              ))}
+            </div>
+            {enc.notes && (
+              <div className="rounded-md bg-muted/50 border border-border px-3 py-2.5">
+                <p className="text-sm text-foreground leading-relaxed italic">&ldquo;{enc.notes}&rdquo;</p>
+              </div>
+            )}
           </div>
-          {enc.notes && <p className="text-xs text-muted-foreground/80 italic">{enc.notes}</p>}
         </div>
       ))}
     </div>
@@ -964,9 +998,11 @@ function RecRow({ action, urgency, agentId }: { action: string; urgency: string;
   )
 }
 
-function DealHealthCard({ status, stage }: { status: DealStatus; stage: StageValue }) {
+function DealHealthCard({ status, stage, dealId }: { status: DealStatus; stage: StageValue; dealId?: string }) {
   const stageHealth = HEALTH_BY_STAGE[stage]
-  const cfg = stageHealth?.[status] ?? stageHealth?.active ?? HEALTH_BY_STAGE["Inquiry"].active!
+  const baseCfg = stageHealth?.[status] ?? stageHealth?.active ?? HEALTH_BY_STAGE["Inquiry"].active!
+  const override = dealId ? HEALTH_REC_OVERRIDES[dealId] : undefined
+  const cfg = override ? { ...baseCfg, ...override } : baseCfg
   return (
     <div className={cn(cardBase, "border-transparent flex flex-col gap-4 bg-sidebar-accent")}>
       <div className="flex items-start justify-between gap-2">
@@ -1036,22 +1072,27 @@ export function DealProfile({ deal, onBack: _onBack, status: statusProp, onStatu
       {/* Agent strip */}
 
       {/* Main content grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-stretch">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 items-stretch">
 
         {/* Left col: Deal Health + tabbed content */}
-        <div className="lg:col-span-2 flex flex-col gap-4 h-full">
-          <DealHealthCard status={status} stage={stage} />
+        <div className="lg:col-span-3 flex flex-col gap-4 h-full">
+          <DealHealthCard status={status} stage={stage} dealId={deal.id} />
 
           <div className={cn(cardBase, "flex-1")}>
             <ToggleGroup type="single" value={tab} onValueChange={v => v && setTab(v as string)}
               className={cn(FILTER_TAB_GROUP_CLS, "w-full mb-5")}>
               <ToggleGroupItem value="updates"   size="sm" className={cn(FILTER_TAB_ITEM_CLS, "flex-1 text-sm")}>Updates</ToggleGroupItem>
               <ToggleGroupItem value="tasks"        size="sm" className={cn(FILTER_TAB_ITEM_CLS, "flex-1 text-sm")}>Tasks</ToggleGroupItem>
-              <ToggleGroupItem value="encumbrances" size="sm" className={cn(FILTER_TAB_ITEM_CLS, "flex-1 text-sm")}>Encumbrances</ToggleGroupItem>
+              <ToggleGroupItem value="encumbrances" size="sm" className={cn(FILTER_TAB_ITEM_CLS, "flex-1 text-sm")}>
+                Encumbrances
+                {(DEAL_ENCUMBRANCES[deal.id]?.length ?? 0) > 0 && (
+                  <span className="ml-0.5 inline-flex items-center justify-center min-w-4 h-4 px-1 rounded-full text-[10px] font-bold bg-destructive text-white">{DEAL_ENCUMBRANCES[deal.id].length}</span>
+                )}
+              </ToggleGroupItem>
               <ToggleGroupItem value="tours"        size="sm" className={cn(FILTER_TAB_ITEM_CLS, "flex-1 text-sm")}>Tours</ToggleGroupItem>
               <ToggleGroupItem value="proposals"    size="sm" className={cn(FILTER_TAB_ITEM_CLS, "flex-1 text-sm")}>Proposals</ToggleGroupItem>
               <ToggleGroupItem value="leases"       size="sm" className={cn(FILTER_TAB_ITEM_CLS, "flex-1 text-sm")}>Legal</ToggleGroupItem>
-              <ToggleGroupItem value="documents"    size="sm" className={cn(FILTER_TAB_ITEM_CLS, "flex-1 text-sm")}>Documents</ToggleGroupItem>
+              <ToggleGroupItem value="documents"    size="sm" className={cn(FILTER_TAB_ITEM_CLS, "flex-1 text-sm")}>Docs</ToggleGroupItem>
             </ToggleGroup>
             {tab === "updates"      && <ActivityFeed deal={deal} stage={stage} />}
             {tab === "tasks"        && <TasksTab stage={stage} />}
@@ -1064,7 +1105,7 @@ export function DealProfile({ deal, onBack: _onBack, status: statusProp, onStatu
         </div>
 
         {/* Right: info */}
-        <div className={cn(cardBase)}>
+        <div className={cn(cardBase, "lg:col-span-1 overflow-y-auto max-h-[80vh] lg:max-h-none")}>
           <p className="text-sm font-semibold text-foreground mb-4">Info</p>
           <OverviewTab deal={deal} stageIdx={stageIdx} />
         </div>

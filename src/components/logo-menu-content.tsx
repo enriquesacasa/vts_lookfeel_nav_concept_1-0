@@ -29,10 +29,10 @@ const AGENTS_VIEWS: { id: AgentsView; label: string; description: string }[] = [
 ]
 
 const CHAT_PATTERNS: { id: ChatPattern; label: string; active: boolean }[] = [
-  { id: "full-screen", label: "Full screen", active: true  },
-  { id: "popover",     label: "Popover",     active: true  },
-  { id: "side-over",   label: "Side over",   active: true  },
   { id: "side-push",   label: "Side push",   active: true  },
+  { id: "side-over",   label: "Side over",   active: true  },
+  { id: "popover",     label: "Popover",     active: true  },
+  { id: "full-screen", label: "Full screen", active: true  },
 ]
 
 export function LogoMenuContent({ isDark = false, onToggleDark, onNavigate, onClose }: LogoMenuContentProps) {

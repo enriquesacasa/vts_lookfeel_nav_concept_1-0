@@ -154,6 +154,7 @@ interface Portfolio {
 
 interface DesktopNavProps {
   className?: string
+  collapsed?: boolean
   onCollapsedChange?: (collapsed: boolean) => void
   assets?: Array<{ id: string; name: string; address: string }>
   portfolios?: Portfolio[]
@@ -166,8 +167,9 @@ interface DesktopNavProps {
   hideAgentsPage?: boolean
 }
 
-function DesktopNav({ className, onCollapsedChange, assets, portfolios, selectedAssetId, onAssetChange, isDark, onLogoClick, onNavItemClick, activePage, hideAgentsPage }: DesktopNavProps) {
-  const [collapsed, setCollapsed] = React.useState(false)
+function DesktopNav({ className, collapsed: collapsedProp, onCollapsedChange, assets, portfolios, selectedAssetId, onAssetChange, isDark, onLogoClick, onNavItemClick, activePage, hideAgentsPage }: DesktopNavProps) {
+  const [collapsedInternal, setCollapsedInternal] = React.useState(false)
+  const collapsed = collapsedProp !== undefined ? collapsedProp : collapsedInternal
   const [active, setActive] = React.useState(activePage ?? "dashboard")
   const [logoOpen, setLogoOpen] = React.useState(false)
 
@@ -204,7 +206,7 @@ function DesktopNav({ className, onCollapsedChange, assets, portfolios, selected
   }, [dropdownOpen])
 
   const toggle = (val: boolean) => {
-    setCollapsed(val)
+    setCollapsedInternal(val)
     onCollapsedChange?.(val)
     if (!val) {
       // When expanding, re-open the section that owns the active item
@@ -811,6 +813,7 @@ function MobileNav({ onLogoClick, onNavItemClick, activePage, assets, portfolios
 
 interface AppNavProps {
   className?: string
+  collapsed?: boolean
   onCollapsedChange?: (collapsed: boolean) => void
   assets?: Array<{ id: string; name: string; address: string }>
   portfolios?: Portfolio[]
@@ -823,8 +826,8 @@ interface AppNavProps {
   hideAgentsPage?: boolean
 }
 
-export function AppNav({ className, onCollapsedChange, assets, portfolios, selectedAssetId, onAssetChange, isDark, onLogoClick, onNavItemClick, activePage, hideAgentsPage }: AppNavProps) {
+export function AppNav({ className, collapsed, onCollapsedChange, assets, portfolios, selectedAssetId, onAssetChange, isDark, onLogoClick, onNavItemClick, activePage, hideAgentsPage }: AppNavProps) {
   const isMobile = useIsMobile()
   if (isMobile) return <MobileNav onLogoClick={onLogoClick} onNavItemClick={onNavItemClick} activePage={activePage} assets={assets} portfolios={portfolios} selectedAssetId={selectedAssetId} onAssetChange={onAssetChange} hideAgentsPage={hideAgentsPage} />
-  return <DesktopNav className={className} onCollapsedChange={onCollapsedChange} assets={assets} portfolios={portfolios} selectedAssetId={selectedAssetId} onAssetChange={onAssetChange} isDark={isDark} onLogoClick={onLogoClick} onNavItemClick={onNavItemClick} activePage={activePage} hideAgentsPage={hideAgentsPage} />
+  return <DesktopNav className={className} collapsed={collapsed} onCollapsedChange={onCollapsedChange} assets={assets} portfolios={portfolios} selectedAssetId={selectedAssetId} onAssetChange={onAssetChange} isDark={isDark} onLogoClick={onLogoClick} onNavItemClick={onNavItemClick} activePage={activePage} hideAgentsPage={hideAgentsPage} />
 }

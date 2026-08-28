@@ -2,6 +2,9 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 import { Search, Sparkle } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { useChatPattern, type TransferMessage } from "@/contexts/chat-pattern"
+import { ChatPopoverContent } from "@/components/chat-popover"
 
 interface BuildingStat {
   label: string
@@ -21,9 +24,27 @@ interface BuildingHeaderProps {
   onAskVts?: () => void
 }
 
-const BuildingHeader = React.forwardRef<HTMLDivElement, BuildingHeaderProps>(
-  ({ image, name, address, city, stats, badges, actions, className, onAskVts }, ref) => (
-    <div ref={ref} className={cn(className)}>
+function BuildingHeader({ image, name, address, city, stats, badges, actions, className }: BuildingHeaderProps) {
+  const { pattern, openChat } = useChatPattern()
+  const [popoverOpen, setPopoverOpen] = React.useState(false)
+
+  const handleAskVts = () => {
+    if (pattern === "popover") {
+      setPopoverOpen(true)
+    } else {
+      openChat({})
+    }
+  }
+
+  const askVtsBtn = (
+    <Button className="hidden sm:inline-flex gap-1.5" onClick={handleAskVts}>
+      <Sparkle className="h-3.5 w-3.5" />
+      Ask VTS
+    </Button>
+  )
+
+  return (
+    <div className={cn(className)}>
       {/* Hero section */}
       <div className="flex items-center gap-4 py-3">
         {image && (
@@ -50,10 +71,24 @@ const BuildingHeader = React.forwardRef<HTMLDivElement, BuildingHeaderProps>(
           {badges && <div className="flex flex-wrap gap-1.5 mt-2">{badges}</div>}
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          <Button className="hidden sm:inline-flex gap-1.5" onClick={onAskVts}>
-            <Sparkle className="h-3.5 w-3.5" />
-            Ask VTS
-          </Button>
+          {pattern === "popover" ? (
+            <Popover open={popoverOpen} onOpenChange={setPopoverOpen} modal={false}>
+              <PopoverTrigger render={<span />}>
+                {askVtsBtn}
+              </PopoverTrigger>
+              <PopoverContent side="bottom" align="end" className="p-0 overflow-hidden w-auto" sideOffset={8}>
+                <ChatPopoverContent
+                  initialMessage=""
+                  suggestions={[]}
+                  onClose={() => setPopoverOpen(false)}
+                  onOpenFullScreen={(messages: TransferMessage[]) => {
+                    setPopoverOpen(false)
+                    openChat({ transferMessages: messages })
+                  }}
+                />
+              </PopoverContent>
+            </Popover>
+          ) : askVtsBtn}
           <Button variant="outline" size="icon" aria-label="Search">
             <Search className="h-3.5 w-3.5" />
           </Button>
@@ -78,7 +113,7 @@ const BuildingHeader = React.forwardRef<HTMLDivElement, BuildingHeaderProps>(
       </div>
     </div>
   )
-)
+}
 BuildingHeader.displayName = "BuildingHeader"
 
 export { BuildingHeader }

@@ -10,8 +10,8 @@ export interface TransferMessage {
 }
 
 export interface ChatContext {
-  message: string
-  suggestions: string[]
+  message?: string
+  suggestions?: string[]
   transferMessages?: TransferMessage[]
 }
 
@@ -30,7 +30,7 @@ interface ChatPatternContextValue {
 }
 
 const ChatPatternContext = React.createContext<ChatPatternContextValue>({
-  pattern: "full-screen",
+  pattern: "side-push",
   setPattern: () => {},
   pending: null,
   openChat: () => {},
@@ -53,25 +53,22 @@ interface ChatPatternProviderProps {
 }
 
 export function ChatPatternProvider({ children, onOpenChat }: ChatPatternProviderProps) {
-  const [pattern, setPattern] = React.useState<ChatPattern>("full-screen")
+  const [pattern, setPattern] = React.useState<ChatPattern>("side-push")
   const [pending, setPending] = React.useState<ChatContext | null>(null)
   const [sideOverOpen, setSideOverOpen] = React.useState(false)
   const [sidePushOpen, setSidePushOpen] = React.useState(false)
   const [agentsView, setAgentsView] = React.useState<AgentsView>("ask-vts")
 
   const openChat = React.useCallback((ctx: ChatContext) => {
-    if (ctx.transferMessages) {
+    if (ctx.transferMessages || pattern === "full-screen") {
       setPending(ctx)
       onOpenChat()
     } else if (pattern === "side-over") {
       setPending(ctx)
       setSideOverOpen(true)
-    } else if (pattern === "side-push") {
+    } else if (pattern === "side-push" || pattern === "popover") {
       setPending(ctx)
       setSidePushOpen(true)
-    } else if (pattern === "full-screen") {
-      setPending(ctx)
-      onOpenChat()
     }
   }, [pattern, onOpenChat])
 

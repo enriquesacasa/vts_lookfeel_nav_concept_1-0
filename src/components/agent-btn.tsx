@@ -9,6 +9,7 @@ import { ChatPopoverContent } from "@/components/chat-popover"
 
 interface AgentBtnProps {
   label?: string
+  entity?: string
   onClick?: (e: React.MouseEvent) => void
   /** "icon" = icon-only with tooltip (default). "run" = inline text button. */
   variant?: "icon" | "run"
@@ -51,8 +52,15 @@ function getSuggestions(label: string): string[] {
       `Draft a countersign narrative for ${tenant}`,
     ]
   }
-  // Touring
+  // Touring — Amazon: encumbrance-specific suggestions
   if (l.includes("touring") || l.includes("tour")) {
+    if (tenant.toLowerCase().includes("amazon")) {
+      return [
+        `What encumbrances burden the spaces ${tenant} is touring and how do they affect deal viability?`,
+        `Which encumbrance holders have priority rights over ${tenant}'s target spaces — and what's our exposure?`,
+        `What feedback has ${tenant} given so far?`,
+      ]
+    }
     return [
       `Which spaces are the best fit for ${tenant} based on their requirements?`,
       `Draft a tour follow-up email for ${tenant}`,
@@ -115,7 +123,8 @@ function getSuggestions(label: string): string[] {
   ]
 }
 
-export function AgentBtn({ label, onClick, variant = "icon", className }: AgentBtnProps) {
+export function AgentBtn({ label, entity, onClick, variant = "icon", className }: AgentBtnProps) {
+  const tooltipText = entity ? `Ask VTS about this ${entity}` : "Ask VTS"
   const { pattern, openChat } = useChatPattern()
   const [popoverOpen, setPopoverOpen] = React.useState(false)
   const [hovered, setHovered] = React.useState(false)
@@ -181,10 +190,10 @@ export function AgentBtn({ label, onClick, variant = "icon", className }: AgentB
             )} />
           </Button>
           </TooltipTrigger>
-          <TooltipContent side="top" className="bg-sidebar text-sidebar-foreground border-transparent font-medium" arrowClassName="fill-sidebar">
+          <TooltipContent side="top">
             <div className="flex items-center gap-1.5">
-              <Sparkle className="h-3 w-3 animate-sparkle-spin" />
-              Ask VTS
+              <Sparkle className="h-3 w-3" />
+              {tooltipText}
             </div>
           </TooltipContent>
         </PopoverTrigger>
@@ -240,10 +249,10 @@ export function AgentBtn({ label, onClick, variant = "icon", className }: AgentB
           )} />
         </Button>
       </TooltipTrigger>
-      <TooltipContent side="top" className="bg-sidebar text-sidebar-foreground border-transparent font-medium" arrowClassName="fill-sidebar">
+      <TooltipContent side="top">
         <div className="flex items-center gap-1.5">
-          <Sparkle className="h-3 w-3 animate-sparkle-spin" />
-          Ask VTS
+          <Sparkle className="h-3 w-3" />
+          {tooltipText}
         </div>
       </TooltipContent>
     </Tooltip>

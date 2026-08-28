@@ -1,5 +1,5 @@
 import { useState, forwardRef, useImperativeHandle } from "react"
-import { Settings2Icon, DownloadIcon, ChevronDownIcon, ConstructionIcon, ScrollTextIcon, HandshakeIcon, FileCheckIcon, ClockIcon } from "lucide-react"
+import { Settings2Icon, DownloadIcon, ChevronDownIcon, ConstructionIcon, HandshakeIcon, FileCheckIcon } from "lucide-react"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
@@ -11,14 +11,23 @@ import { AgentBtn } from "@/components/agent-btn"
 // Expiration bucket colors — semantic, intentionally not theme tokens
 // vacant/available use theme-aware values; year buckets are fixed semantic colors
 export const COLORS: Record<string, { bg: string; text: string; dashed?: boolean; darkBg?: string }> = {
-  vacant:    { bg: "transparent", text: "oklch(0.60 0.02 258)", dashed: true },
+  vacant:    { bg: "oklch(0.26 0.006 258)", text: "oklch(0.72 0.018 278)" },
   m2m:       { bg: "var(--color-destructive)", text: "#fff" },
   "2026":    { bg: "var(--color-chart-1)",     text: "#fff" },
   "2027":    { bg: "var(--color-chart-2)",     text: "#fff" },
   "2028":    { bg: "var(--color-chart-3)",     text: "#fff" },
   "2029":    { bg: "var(--color-chart-4)",     text: "#fff" },
   "2030":    { bg: "var(--color-chart-5)",     text: "#fff" },
-  available: { bg: "oklch(0.26 0.006 258)", text: "oklch(0.72 0.018 278)" },
+  available: { bg: "transparent", text: "oklch(0.60 0.02 258)", dashed: true },
+}
+
+const TENANT_PALETTE = [
+  "var(--color-chart-1)", "var(--color-chart-2)", "var(--color-chart-3)",
+  "var(--color-chart-4)", "var(--color-chart-5)",
+]
+function getTenantColor(tenant: string, allTenants: string[]): { bg: string; text: string } {
+  const idx = allTenants.indexOf(tenant)
+  return { bg: TENANT_PALETTE[idx % TENANT_PALETTE.length], text: "#fff" }
 }
 
 type ExpBucket = keyof typeof COLORS
@@ -254,8 +263,7 @@ export const FILTER_DEFS: FilterDef[] = [
   { key: "size",           label: "Size",            options: [{ label: "Under 5,000 sf", value: "xs" }, { label: "5,000–10,000 sf", value: "sm" }, { label: "10,000–20,000 sf", value: "md" }, { label: "Over 20,000 sf", value: "lg" }] },
   { key: "expBucket", label: "LXD", options: LEGEND_KEYS.map(({ label, key }) => ({ label, value: key })) },
   { key: "industry",       label: "Industry",        options: ["Financial Services", "Legal", "Technology", "Healthcare", "Retail", "Media & Entertainment"].map((i) => ({ label: i, value: i })) },
-  { key: "options",        label: "Options",         options: ["Renewal Option", "Expansion Option", "Termination Option", "ROFO", "ROFR"].map((o) => ({ label: o, value: o })) },
-  { key: "encumbrances",   label: "Encumbrances",    options: ["Expansion Option", "ROFO", "ROFR"].map((o) => ({ label: o, value: o })) },
+  { key: "encumbrances",   label: "Encumbrances",    options: ["Renewal Option", "Expansion Option", "Contraction Option", "Termination Option", "ROFO", "ROFR"].map((o) => ({ label: o, value: o })) },
   { key: "availability",   label: "Availability",    options: [{ label: "Available", value: "available" }, { label: "Not Available", value: "not-available" }] },
   { key: "occupancy",      label: "Occupancy",       options: [{ label: "Occupied", value: "occupied" }, { label: "Vacant", value: "vacant" }] },
   { key: "listingStatus",  label: "Listing Status",  options: [{ label: "Listed", value: "listed" }, { label: "Not Listed", value: "not-listed" }] },
@@ -266,11 +274,11 @@ export const VIEW_OPTIONS = [
   "Tenant Name", "DBA", "Standardized Tenant (ST)", "Industry", "Space", "Total Size",
   "LCD", "LXD", "In-place rent ($/sf/yr)", "Base rent ($/sf/yr)", "Gross rent ($/sf/yr)",
   "Days Listed", "Days Vacant", "Deals", "Executed Deal", "Committed Lease",
-  "Options", "Encumbrances", "Internal Space Note", "0sf spaces",
+  "Total Encumbrances", "List Encumbrances", "Internal Space Note", "0sf spaces",
 ]
 
 export const DEFAULT_VIEW_OPTIONS = new Set([
-  "Tenant Name", "Space", "Total Size", "LCD", "LXD", "Base rent ($/sf/yr)", "Options", "Deals", "Encumbrances",
+  "Tenant Name", "Space", "Total Size", "LCD", "LXD", "Base rent ($/sf/yr)", "Deals", "Total Encumbrances",
 ])
 
 type ViewType = "Condensed" | "Standard" | "Expanded"
@@ -291,8 +299,11 @@ export function matchesFilters(space: Space, active: Record<string, string[]>): 
   }
   if (f("expBucket").length && !f("expBucket").includes(space.expBucket as string)) return false
   if (f("industry").length && (!space.industry || !f("industry").includes(space.industry))) return false
-  if (f("options").length && !space.leaseOptions?.some((o) => f("options").includes(o))) return false
-  if (f("encumbrances").length && !space.encumbrances?.some((e) => f("encumbrances").includes(e.optionType))) return false
+  if (f("encumbrances").length) {
+    const inRenewal = f("encumbrances").includes("Renewal Option") && space.leaseOptions?.includes("Renewal Option")
+    const inEncs = space.encumbrances?.some((e) => f("encumbrances").includes(e.optionType))
+    if (!inRenewal && !inEncs) return false
+  }
   if (f("availability").length) {
     const isUnoccupied = space.expBucket === "available" || space.expBucket === "vacant"
     if (!f("availability").some((v) => (v === "available" ? isUnoccupied : !isUnoccupied))) return false
@@ -311,13 +322,13 @@ export function matchesFilters(space: Space, active: Record<string, string[]>): 
   return true
 }
 
-type ExpirationMode = "in-place" | "in-place-committed" | "moving-forward" | "lease-abstract"
+type ExpirationMode = "lease-abstract-in-place" | "lease-abstract-committed" | "in-place" | "in-place-committed"
 
 const EXPIRATION_MODE_LABELS: Record<ExpirationMode, string> = {
-  "in-place":           "Expirations (In-Place)",
-  "in-place-committed": "Expirations (In-Place + Committed)",
-  "moving-forward":     "Expirations (Moving Forward)",
-  "lease-abstract":     "Expirations (Lease Abstract)",
+  "lease-abstract-in-place":  "Lease Abstract Data (In-Place)",
+  "lease-abstract-committed": "Lease Abstract Data (In-Place + Committed)",
+  "in-place":                 "ERP Lease Data (In-Place)",
+  "in-place-committed":       "ERP Lease Data (In-Place + Committed)",
 }
 
 function parseMDY(s: string): Date {
@@ -378,7 +389,7 @@ function getSpaceAtDate(space: Space, date: Date): Space {
 const ALL_LXD_DATES = floors.flatMap((f) =>
   f.spaces.flatMap((s) => [s.lxd, s.committedLxd].filter(Boolean) as string[])
 ).map(parseMDY)
-const SLIDER_MIN_DATE = new Date(2026, 5, 1)
+const SLIDER_MIN_DATE = (() => { const d = new Date(); d.setDate(1); d.setHours(0,0,0,0); return d })()
 const SLIDER_MAX_DATE = (() => {
   const last = ALL_LXD_DATES.reduce((a, b) => (b > a ? b : a), SLIDER_MIN_DATE)
   const d = new Date(last); d.setMonth(d.getMonth() + 1); return d
@@ -418,18 +429,16 @@ function buildSpaceLabel(space: Space, floorNumber: number): string {
 function ExpirationModePopover({ mode, onSelect }: { mode: ExpirationMode; onSelect: (m: ExpirationMode) => void }) {
   return (
     <Popover>
-      <PopoverTrigger render={<Button variant="outline" size="sm" className="mr-2 shrink-0 gap-1 font-normal whitespace-nowrap max-w-[220px] sm:max-w-none truncate" />}>
-        {mode === "moving-forward" && <ClockIcon className="size-3 shrink-0" />}
-        <span className="truncate">{EXPIRATION_MODE_LABELS[mode]}</span>
+      <PopoverTrigger render={<Button variant="outline" size="sm" className="mr-2 shrink-0 gap-1 font-normal whitespace-nowrap" />}>
+        <span>{EXPIRATION_MODE_LABELS[mode]}</span>
         <ChevronDownIcon data-icon="inline-end" className="shrink-0" />
       </PopoverTrigger>
-      <PopoverContent align="start" className="w-64 p-2">
-        <p className="text-xs font-semibold text-muted-foreground px-1 mb-1.5 uppercase tracking-wide">Expiration View</p>
+      <PopoverContent align="start" className="w-auto min-w-[var(--anchor-width)] p-2">
+        <p className="text-xs font-semibold text-muted-foreground px-1 mb-1.5 uppercase tracking-wide">Data Source</p>
         <div className="flex flex-col gap-0.5">
-          {(["in-place", "in-place-committed", "moving-forward", "lease-abstract"] as ExpirationMode[]).map((m) => (
+          {(["lease-abstract-in-place", "lease-abstract-committed", "in-place", "in-place-committed"] as ExpirationMode[]).map((m) => (
             <Button key={m} variant="ghost" size="sm" onClick={() => onSelect(m)}
               className={cn("w-full justify-start gap-2 h-auto py-2 font-normal", mode === m && "bg-primary/10 text-primary font-medium")}>
-              {m === "moving-forward" && <ClockIcon className="size-3.5 shrink-0" />}
               <span>{EXPIRATION_MODE_LABELS[m]}</span>
             </Button>
           ))}
@@ -440,9 +449,11 @@ function ExpirationModePopover({ mode, onSelect }: { mode: ExpirationMode; onSel
 }
 
 // --- View Settings Popover ---
-function ViewSettingsPopover({ viewType, onViewTypeChange, enabledOptions, onToggleOption }: {
+function ViewSettingsPopover({ viewType, onViewTypeChange, enabledOptions, onToggleOption, showSlider, onToggleSlider, colorMode, onColorModeChange }: {
   viewType: ViewType; onViewTypeChange: (v: ViewType) => void
   enabledOptions: Set<string>; onToggleOption: (opt: string) => void
+  showSlider: boolean; onToggleSlider: () => void
+  colorMode: "expiration" | "tenant"; onColorModeChange: (m: "expiration" | "tenant") => void
 }) {
   return (
     <Popover>
@@ -455,7 +466,7 @@ function ViewSettingsPopover({ viewType, onViewTypeChange, enabledOptions, onTog
         <div className="px-3 py-2.5 border-b border-border bg-muted/40">
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">View Type</p>
         </div>
-        <div className="p-2 border-b border-border">
+        <div className="p-2">
           <ToggleGroup type="single" value={viewType}
             onValueChange={(v) => { if (v && v !== viewType) onViewTypeChange(v as ViewType) }}
             className={cn(FILTER_TAB_GROUP_CLS, "w-full")}>
@@ -465,9 +476,24 @@ function ViewSettingsPopover({ viewType, onViewTypeChange, enabledOptions, onTog
           </ToggleGroup>
         </div>
         <div className="px-3 py-2.5 border-b border-border bg-muted/40">
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Color by</p>
+        </div>
+        <div className="p-2">
+          <ToggleGroup type="single" value={colorMode}
+            onValueChange={(v) => { if (v && v !== colorMode) onColorModeChange(v as "expiration" | "tenant") }}
+            className={cn(FILTER_TAB_GROUP_CLS, "w-full")}>
+            <ToggleGroupItem value="expiration" size="sm" className={cn(FILTER_TAB_ITEM_CLS, "flex-1")}>Expiration</ToggleGroupItem>
+            <ToggleGroupItem value="tenant" size="sm" className={cn(FILTER_TAB_ITEM_CLS, "flex-1")}>Tenant</ToggleGroupItem>
+          </ToggleGroup>
+        </div>
+        <div className="px-3 py-2.5 border-b border-border bg-muted/40">
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">View Options</p>
         </div>
         <div className="max-h-64 overflow-y-auto py-1">
+          <label className="flex items-center gap-2.5 px-3 py-1.5 hover:bg-muted cursor-pointer">
+            <Checkbox checked={showSlider} onCheckedChange={onToggleSlider} className="size-3.5" />
+            <span className="text-sm">Time slider</span>
+          </label>
           {VIEW_OPTIONS.map((opt) => (
             <label key={opt} className="flex items-center gap-2.5 px-3 py-1.5 hover:bg-muted cursor-pointer">
               <Checkbox checked={enabledOptions.has(opt)} onCheckedChange={() => onToggleOption(opt)} className="size-3.5" />
@@ -495,36 +521,26 @@ export const StackingPlan = forwardRef<StackingPlanHandle>(function StackingPlan
   const [activeFilters, setActiveFilters] = useState<Record<string, string[]>>({})
   const [viewType, setViewType] = useState<ViewType>("Standard")
   const [enabledOptions, setEnabledOptions] = useState<Set<string>>(new Set(DEFAULT_VIEW_OPTIONS))
-  const [expirationMode, setExpirationMode] = useState<ExpirationMode>("in-place")
+  const [expirationMode, setExpirationMode] = useState<ExpirationMode>("lease-abstract-in-place")
   const [sliderMonths, setSliderMonths] = useState(0)
+  const [showSlider, setShowSlider] = useState(false)
+  const [colorMode, setColorMode] = useState<"expiration" | "tenant">("expiration")
 
   type CircleInfo = { color: "blue" | "orange"; n: number }
-  type HighlightState = { active: string; type: "options" | "encumbrances"; circles: Record<string, CircleInfo[]> }
+  type HighlightState = { active: string; type: "encumbrances"; circles: Record<string, CircleInfo[]> }
   const [activeHighlight, setActiveHighlight] = useState<HighlightState | null>(null)
 
-  function buildHighlight(space: Space, type: "options" | "encumbrances"): HighlightState {
+  function buildHighlight(space: Space): HighlightState {
     const circles: Record<string, CircleInfo[]> = {}
-    const all = floors.flatMap((f) => f.spaces)
-    if (type === "options") {
-      const SOURCE_OPTS = new Set(["Renewal Option", "Termination Option"])
-      ;(space.leaseOptions ?? []).forEach((optType, i) => {
-        const n = i + 1
-        if (SOURCE_OPTS.has(optType)) {
-          circles[space.suite] = [...(circles[space.suite] ?? []), { color: "blue" as const, n }]
-        } else {
-          all.forEach((s) => {
-            if (s.encumbrances?.some((e) => e.suite === space.suite && e.optionType === optType)) {
-              circles[s.suite] = [...(circles[s.suite] ?? []), { color: "blue" as const, n }]
-            }
-          })
-        }
-      })
-    } else {
-      space.encumbrances?.forEach((e) => {
-        circles[e.suite] = [{ color: "orange" as const, n: e.priority }]
-      })
+    // Renewal option held by this tenant burdens this space — mark it
+    if (space.leaseOptions?.includes("Renewal Option")) {
+      circles[space.suite] = [{ color: "blue" as const, n: 1 }]
     }
-    return { active: space.suite, type, circles }
+    // Third-party encumbrances: highlight the source tenant's suite
+    space.encumbrances?.forEach((e) => {
+      circles[e.suite] = [{ color: "orange" as const, n: e.priority }]
+    })
+    return { active: space.suite, type: "encumbrances", circles }
   }
 
   useImperativeHandle(ref, () => ({
@@ -552,11 +568,12 @@ export const StackingPlan = forwardRef<StackingPlanHandle>(function StackingPlan
 
   const resolvedFloors = floors.map((floor) => {
     const spaces = floor.spaces.map((space) => {
-      if (expirationMode === "in-place-committed" && space.committedLease && space.committedTenant) {
+      if ((expirationMode === "in-place-committed" || expirationMode === "lease-abstract-committed") && space.committedLease && space.committedTenant) {
         return { ...space, expBucket: space.committedExpBucket ?? "2030", tenant: space.committedTenant, lcd: space.committedLcd, lxd: space.committedLxd } as Space
       }
-      if (expirationMode === "moving-forward") return getSpaceAtDate(space, sliderDate)
-      if (expirationMode === "lease-abstract") { if (!space.tenant) return null; return space }
+      if (expirationMode === "lease-abstract-in-place" || expirationMode === "lease-abstract-committed") {
+        return getSpaceAtDate(space, sliderDate)
+      }
       return space
     })
     return { ...floor, spaces: spaces.filter((s): s is Space => s !== null) }
@@ -570,6 +587,10 @@ export const StackingPlan = forwardRef<StackingPlanHandle>(function StackingPlan
       return { ...floor, spaces, totalSf }
     })
     .filter((floor) => floor.spaces.length > 0)
+
+  const allTenants = [...new Set(
+    resolvedFloors.flatMap((f) => f.spaces).map((s) => s.tenant).filter(Boolean) as string[]
+  )]
 
   const totalSf = resolvedFloors.reduce((s, f) => s + f.totalSf, 0)
   const bucketStats = LEGEND_KEYS.map(({ label, key }) => {
@@ -601,7 +622,7 @@ export const StackingPlan = forwardRef<StackingPlanHandle>(function StackingPlan
             <ExpirationModePopover mode={expirationMode} onSelect={setExpirationMode} />
           </div>
           {/* Legend — inline on sm+, hidden here on mobile */}
-          <div className="hidden sm:flex items-center overflow-x-auto flex-1 min-w-0">
+          <div className={cn("hidden sm:flex items-center overflow-x-auto flex-1 min-w-0", colorMode !== "expiration" && "sm:hidden")}>
             {bucketStats.map(({ label, key, sf, pct }) => {
               const c = COLORS[key]
               const isActive = (activeFilters.expBucket ?? []).includes(key)
@@ -623,7 +644,7 @@ export const StackingPlan = forwardRef<StackingPlanHandle>(function StackingPlan
             })}
           </div>
           <div className="ml-auto shrink-0 flex items-center gap-1.5 px-3 border-l border-border">
-            <ViewSettingsPopover viewType={viewType} onViewTypeChange={setViewType} enabledOptions={enabledOptions} onToggleOption={toggleOption} />
+            <ViewSettingsPopover viewType={viewType} onViewTypeChange={setViewType} enabledOptions={enabledOptions} onToggleOption={toggleOption} showSlider={showSlider} onToggleSlider={() => setShowSlider((v) => !v)} colorMode={colorMode} onColorModeChange={setColorMode} />
             <Button size="sm" variant="outline" className="gap-1.5">
               <DownloadIcon className="size-4 shrink-0" />
               <span className="hidden sm:inline">Export</span>
@@ -631,7 +652,7 @@ export const StackingPlan = forwardRef<StackingPlanHandle>(function StackingPlan
           </div>
         </div>
         {/* Legend row — mobile only, second row */}
-        <div className="flex sm:hidden items-center overflow-x-auto border-b-0">
+        <div className={cn("flex sm:hidden items-center overflow-x-auto border-b-0", colorMode !== "expiration" && "hidden")}>
           {bucketStats.map(({ label, key, sf, pct }) => {
             const c = COLORS[key]
             const isActive = (activeFilters.expBucket ?? []).includes(key)
@@ -653,7 +674,7 @@ export const StackingPlan = forwardRef<StackingPlanHandle>(function StackingPlan
           })}
         </div>
 
-        {expirationMode === "moving-forward" && (
+        {showSlider && (
           <div className="flex items-center gap-3 px-4 py-3 border-t border-border bg-muted/20">
             <span className="text-xs text-muted-foreground shrink-0">{formatSliderDate(SLIDER_MIN_DATE)}</span>
             <input type="range" min={0} max={SLIDER_TOTAL_MONTHS} step={1} value={sliderMonths}
@@ -688,9 +709,11 @@ export const StackingPlan = forwardRef<StackingPlanHandle>(function StackingPlan
               {/* Spaces */}
               <div className="flex flex-1 min-w-0">
                 {floor.spaces.map((space) => {
-                  const c = COLORS[space.expBucket]
                   const isVacant = space.expBucket === "vacant"
                   const isAvailable = space.expBucket === "available"
+                  const c = (colorMode === "tenant" && space.tenant && !isVacant && !isAvailable)
+                    ? getTenantColor(space.tenant, allTenants)
+                    : COLORS[space.expBucket]
                   const widthPct = floor.totalSf > 0 ? (space.sf / floor.totalSf) * 100 : 100
 
                   const isActive = activeHighlight?.active === space.suite
@@ -701,22 +724,25 @@ export const StackingPlan = forwardRef<StackingPlanHandle>(function StackingPlan
                   const spaceLabel = buildSpaceLabel(space, floor.number)
                   return (
                     <div key={space.suite}
-                      className="group/space relative flex flex-col justify-between border-r border-foreground/10 dark:border-foreground/5 last:border-r-0 cursor-default transition-all overflow-hidden hover:brightness-110"
+                      className="group/space relative flex flex-col justify-between border-r border-foreground/10 dark:border-foreground/5 last:border-r-0 cursor-default transition-all overflow-hidden"
                       style={{
                         width: `${widthPct}%`,
                         flexShrink: 0,
                         background: c.bg,
                         color: c.text,
-                        border: c.dashed ? "2px dashed var(--color-border)" : undefined,
+                        border: (c as { dashed?: boolean }).dashed ? "2px dashed var(--color-border)" : undefined,
                         padding: cfg.padding,
                         boxShadow: isActive
-                          ? `inset 0 0 0 2.5px ${activeHighlight?.type === "options" ? "var(--color-primary)" : "var(--color-chart-1)"}`
+                          ? `inset 0 0 0 2.5px var(--color-chart-1)`
                           : isRelated
-                            ? `inset 0 0 0 2px ${activeHighlight?.type === "options" ? "color-mix(in oklch, var(--color-primary) 40%, transparent)" : "color-mix(in oklch, var(--color-chart-1) 40%, transparent)"}`
+                            ? `inset 0 0 0 2px color-mix(in oklch, var(--color-chart-1) 40%, transparent)`
                             : undefined,
-                        filter: isDimmed ? "brightness(0.75) saturate(0.5)" : undefined,
-                        transition: "filter 0.15s ease, box-shadow 0.15s ease",
+                        opacity: isDimmed ? 0.45 : undefined,
+                        transition: "box-shadow 0.15s ease",
                       }}>
+
+                      {/* hover overlay — avoids CSS filter which breaks popover z-index */}
+                      <div className="absolute inset-0 pointer-events-none opacity-0 group-hover/space:opacity-100 transition-opacity duration-150 bg-foreground/10" />
 
                       <div className="flex items-start gap-1">
                         <div className="min-w-0 flex-1 flex flex-col gap-0.5 overflow-hidden">
@@ -730,7 +756,7 @@ export const StackingPlan = forwardRef<StackingPlanHandle>(function StackingPlan
                                     <span key={i} className={cn("size-4 rounded-full flex items-center justify-center text-[9px] font-bold shrink-0 text-primary-foreground", ci.color === "blue" ? "bg-primary" : "bg-chart-1")}>{ci.n}</span>
                                   ))}
                                   <span className="ml-1.5 mt-1 opacity-0 group-hover/space:opacity-100 transition-opacity duration-150 pointer-events-none group-hover/space:pointer-events-auto shrink-0 flex items-center">
-                                    <AgentBtn label={spaceLabel} className="!size-5" />
+                                    <AgentBtn label={spaceLabel} entity="Space" className="!size-5" />
                                   </span>
                                 </div>
                               )}
@@ -749,7 +775,7 @@ export const StackingPlan = forwardRef<StackingPlanHandle>(function StackingPlan
                                     <span key={i} className={cn("size-4 rounded-full flex items-center justify-center text-[9px] font-bold shrink-0 text-primary-foreground", ci.color === "blue" ? "bg-primary" : "bg-chart-1")}>{ci.n}</span>
                                   ))}
                                   <span className="ml-1.5 mt-1 opacity-0 group-hover/space:opacity-100 transition-opacity duration-150 pointer-events-none group-hover/space:pointer-events-auto shrink-0 flex items-center">
-                                    <AgentBtn label={spaceLabel} className="!size-5" />
+                                    <AgentBtn label={spaceLabel} entity="Space" className="!size-5" />
                                   </span>
                                 </div>
                               )}
@@ -784,123 +810,134 @@ export const StackingPlan = forwardRef<StackingPlanHandle>(function StackingPlan
                         {/* Badges column */}
                         <div className="flex flex-col items-end gap-1 shrink-0">
                           {show("Deals") && space.deals != null && (
-                            <span className={cn("font-medium px-1.5 py-0.5 rounded whitespace-nowrap bg-foreground/10 border border-foreground/20", cfg.metaCls)} style={{ color: c.text }}>
+                            <span className={cn("font-medium px-1.5 py-0.5 rounded whitespace-nowrap bg-muted border border-border text-muted-foreground", cfg.metaCls)}>
                               {space.deals} {space.deals === 1 ? "Deal" : "Deals"}
                             </span>
                           )}
                           {show("Executed Deal") && space.executedDeal && (
-                            <span className={cn("font-medium px-1.5 py-0.5 rounded flex items-center gap-1 whitespace-nowrap bg-foreground/10 border border-foreground/20", cfg.metaCls)} style={{ color: c.text }}>
+                            <span className={cn("font-medium px-1.5 py-0.5 rounded flex items-center gap-1 whitespace-nowrap bg-muted border border-border text-muted-foreground", cfg.metaCls)}>
                               <FileCheckIcon className="size-3 shrink-0" /> Executed
                             </span>
                           )}
                           {show("Committed Lease") && space.committedLease && (
-                            <span className={cn("font-medium px-1.5 py-0.5 rounded flex items-center gap-1 whitespace-nowrap bg-foreground/10 border border-foreground/20", cfg.metaCls)} style={{ color: c.text }}>
+                            <span className={cn("font-medium px-1.5 py-0.5 rounded flex items-center gap-1 whitespace-nowrap bg-muted border border-border text-muted-foreground", cfg.metaCls)}>
                               <HandshakeIcon className="size-3 shrink-0" /> {space.dealNote ?? "Committed"}
                             </span>
                           )}
 
-                          {/* Options badge */}
-                          {show("Options") && space.leaseOptions && space.leaseOptions.length > 0 && (
-                            <Popover onOpenChange={(open) => setActiveHighlight(open ? buildHighlight(space, "options") : null)}>
-                              <PopoverTrigger className={cn("cursor-pointer flex items-center gap-1 font-medium px-1.5 py-0.5 rounded whitespace-nowrap hover:brightness-110 transition-all bg-primary/15 border border-primary/35", cfg.metaCls)} style={{ color: c.text }}>
-                                <ScrollTextIcon className="size-3 text-primary shrink-0" />
-                                <span className="hidden sm:inline">{space.leaseOptions.length} {space.leaseOptions.length === 1 ? "Option" : "Options"}</span>
-                                <span className="sm:hidden">{space.leaseOptions.length}</span>
-                              </PopoverTrigger>
-                              <PopoverContent side="left" align="start" className="w-80 p-0 overflow-hidden">
-                                <div className="px-3 py-2.5 flex items-center gap-2 bg-muted/50 border-b border-border">
-                                  <ScrollTextIcon className="size-3.5 text-primary" />
-                                  <span className="text-sm font-semibold text-foreground">Lease Options</span>
-                                  <span className="ml-auto text-xs text-muted-foreground">{space.suite} · {space.tenant ?? "Vacant"}</span>
-                                </div>
-                                <div className="max-h-[480px] overflow-y-auto">
-                                  {space.leaseOptions.map((opt, i) => {
-                                    const details = OPTION_DETAILS[opt]
-                                    return (
-                                      <div key={opt} className={cn("px-3 py-3", i > 0 && "border-t border-border")}>
-                                        <div className="flex items-start gap-2 mb-2">
-                                          <span className="mt-0.5 size-4 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 text-primary-foreground bg-primary">{i + 1}</span>
-                                          <p className="text-sm font-semibold leading-tight text-foreground">{opt}</p>
+                          {/* Encumbrances badge — renewal option (in-place tenant) + third-party encumbrances */}
+                          {show("Total Encumbrances") && (() => {
+                            const hasRenewal = space.leaseOptions?.includes("Renewal Option") && !!space.tenant
+                            const encs = space.encumbrances ?? []
+                            if (!hasRenewal && encs.length === 0) return null
+                            const totalCount = (hasRenewal ? 1 : 0) + encs.length
+                            return (
+                              <Popover onOpenChange={(open) => setActiveHighlight(open ? buildHighlight(space) : null)}>
+                                <PopoverTrigger className={cn("cursor-pointer flex items-center gap-1 font-medium px-1.5 py-0.5 rounded whitespace-nowrap transition-all bg-primary hover:bg-primary/90 border border-primary text-primary-foreground", cfg.metaCls)}>
+                                  <ConstructionIcon className="size-3 shrink-0 text-primary-foreground" />
+                                  <span className="hidden sm:inline">{totalCount} {totalCount === 1 ? "Encumbrance" : "Encumbrances"}</span>
+                                  <span className="sm:hidden">{totalCount}</span>
+                                </PopoverTrigger>
+                                <PopoverContent side="left" align="start" className="w-80 p-0 overflow-hidden">
+                                  <div className="px-3 py-2.5 flex items-center gap-2 bg-muted/50 border-b border-border">
+                                    <ConstructionIcon className="size-3.5 text-primary" />
+                                    <span className="text-sm font-semibold text-foreground">Encumbrances</span>
+                                    <span className="ml-auto text-xs text-muted-foreground">{space.suite} · {space.tenant ?? "Vacant"}</span>
+                                  </div>
+                                  <div className="max-h-[480px] overflow-y-auto">
+                                    {hasRenewal && (() => {
+                                      const details = OPTION_DETAILS["Renewal Option"]
+                                      return (
+                                        <div className="px-3 py-3">
+                                          <div className="flex items-start gap-2 mb-2">
+                                            <span className="mt-0.5 size-4 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 text-primary-foreground bg-primary">1</span>
+                                            <div className="flex-1 min-w-0">
+                                              <p className="text-sm font-semibold leading-tight text-foreground">Renewal Option</p>
+                                              <p className="text-xs text-muted-foreground mt-0.5 leading-tight">Held by {space.tenant}</p>
+                                            </div>
+                                          </div>
+                                          {details && (
+                                            <div className="ml-6 flex flex-col gap-2">
+                                              <div className="flex items-center gap-3">
+                                                <Button variant="link" size="sm" className="px-0 h-auto text-xs text-primary">View in Abstract</Button>
+                                                <Button variant="link" size="sm" className="px-0 h-auto text-xs text-primary">View in Lease</Button>
+                                              </div>
+                                              <div className="rounded-md border border-border overflow-hidden">
+                                                {details.fields.map(({ label, value }, fi) => (
+                                                  <div key={label} className={cn("flex items-baseline gap-2 px-2.5 py-1.5", fi % 2 === 0 ? "bg-muted/50" : "bg-background")}>
+                                                    <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide whitespace-nowrap w-28 shrink-0">{label}</span>
+                                                    <span className="text-xs text-foreground font-medium">{value}</span>
+                                                  </div>
+                                                ))}
+                                              </div>
+                                              <div className="rounded-md bg-muted/50 border border-border px-2.5 py-2">
+                                                <p className="text-xs text-foreground leading-relaxed italic">&ldquo;{details.legalSnippet}&rdquo;</p>
+                                              </div>
+                                            </div>
+                                          )}
                                         </div>
-                                        {details && (
+                                      )
+                                    })()}
+                                    {encs.map((enc, i) => {
+                                      const details = OPTION_DETAILS[enc.optionType]
+                                      return (
+                                        <div key={i} className={cn("px-3 py-3", (i > 0 || hasRenewal) && "border-t border-border")}>
+                                          <div className="flex items-start gap-2 mb-2">
+                                            <span className="mt-0.5 size-4 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 text-primary-foreground bg-primary">{enc.priority}</span>
+                                            <div className="flex-1 min-w-0">
+                                              <p className="text-sm font-semibold leading-tight text-foreground">{enc.optionType}</p>
+                                              <p className="text-xs text-muted-foreground mt-0.5 leading-tight">{enc.tenant} · Suite {enc.suite}</p>
+                                            </div>
+                                          </div>
                                           <div className="ml-6 flex flex-col gap-2">
                                             <div className="flex items-center gap-3">
                                               <Button variant="link" size="sm" className="px-0 h-auto text-xs text-primary">View in Abstract</Button>
                                               <Button variant="link" size="sm" className="px-0 h-auto text-xs text-primary">View in Lease</Button>
                                             </div>
                                             <div className="rounded-md border border-border overflow-hidden">
-                                              {details.fields.map(({ label, value }, fi) => (
+                                              {enc.details.map(({ label, value }, fi) => (
                                                 <div key={label} className={cn("flex items-baseline gap-2 px-2.5 py-1.5", fi % 2 === 0 ? "bg-muted/50" : "bg-background")}>
                                                   <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide whitespace-nowrap w-28 shrink-0">{label}</span>
                                                   <span className="text-xs text-foreground font-medium">{value}</span>
                                                 </div>
                                               ))}
                                             </div>
-                                            <div className="rounded-md bg-muted/50 border border-border px-2.5 py-2">
-                                              <p className="text-xs text-foreground leading-relaxed italic">&ldquo;{details.legalSnippet}&rdquo;</p>
-                                            </div>
-                                          </div>
-                                        )}
-                                      </div>
-                                    )
-                                  })}
-                                </div>
-                              </PopoverContent>
-                            </Popover>
-                          )}
-
-                          {/* Encumbrances badge */}
-                          {show("Encumbrances") && space.encumbrances && space.encumbrances.length > 0 && (
-                            <Popover onOpenChange={(open) => setActiveHighlight(open ? buildHighlight(space, "encumbrances") : null)}>
-                              <PopoverTrigger className={cn("cursor-pointer flex items-center gap-1 font-medium px-1.5 py-0.5 rounded whitespace-nowrap hover:brightness-110 transition-all bg-chart-1/15 border border-chart-1/35", cfg.metaCls)} style={{ color: c.text }}>
-                                <ConstructionIcon className="size-3 text-warning shrink-0" />
-                                <span className="hidden sm:inline">{space.encumbrances.length} {space.encumbrances.length === 1 ? "Encumbrance" : "Encumbrances"}</span>
-                                <span className="sm:hidden">{space.encumbrances.length}</span>
-                              </PopoverTrigger>
-                              <PopoverContent side="left" align="start" className="w-80 p-0 overflow-hidden">
-                                <div className="px-3 py-2.5 flex items-center gap-2 bg-muted/50 border-b border-border">
-                                  <ConstructionIcon className="size-3.5 text-warning" />
-                                  <span className="text-sm font-semibold text-foreground">Encumbrances</span>
-                                  <span className="ml-auto text-xs text-muted-foreground">{space.suite} · {space.tenant ?? "Vacant"}</span>
-                                </div>
-                                <div className="max-h-[480px] overflow-y-auto">
-                                  {space.encumbrances.map((enc, i) => {
-                                    const details = OPTION_DETAILS[enc.optionType]
-                                    return (
-                                      <div key={i} className={cn("px-3 py-3", i > 0 && "border-t border-border")}>
-                                        <div className="flex items-start gap-2 mb-2">
-                                          <span className="mt-0.5 size-4 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 text-primary-foreground bg-chart-1">{enc.priority}</span>
-                                          <div className="flex-1 min-w-0">
-                                            <p className="text-sm font-semibold leading-tight text-foreground">{enc.optionType}</p>
-                                            <p className="text-xs text-muted-foreground mt-0.5 leading-tight">{enc.tenant} · Suite {enc.suite}</p>
-                                          </div>
-                                        </div>
-                                        <div className="ml-6 flex flex-col gap-2">
-                                          <div className="flex items-center gap-3">
-                                            <Button variant="link" size="sm" className="px-0 h-auto text-xs text-primary">View in Abstract</Button>
-                                            <Button variant="link" size="sm" className="px-0 h-auto text-xs text-primary">View in Lease</Button>
-                                          </div>
-                                          <div className="rounded-md border border-border overflow-hidden">
-                                            {enc.details.map(({ label, value }, fi) => (
-                                              <div key={label} className={cn("flex items-baseline gap-2 px-2.5 py-1.5", fi % 2 === 0 ? "bg-muted/50" : "bg-background")}>
-                                                <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide whitespace-nowrap w-28 shrink-0">{label}</span>
-                                                <span className="text-xs text-foreground font-medium">{value}</span>
+                                            {details && (
+                                              <div className="rounded-md bg-muted/50 border border-border px-2.5 py-2">
+                                                <p className="text-xs text-foreground leading-relaxed italic">&ldquo;{details.legalSnippet}&rdquo;</p>
                                               </div>
-                                            ))}
+                                            )}
                                           </div>
-                                          {details && (
-                                            <div className="rounded-md bg-muted/50 border border-border px-2.5 py-2">
-                                              <p className="text-xs text-foreground leading-relaxed italic">&ldquo;{details.legalSnippet}&rdquo;</p>
-                                            </div>
-                                          )}
                                         </div>
-                                      </div>
-                                    )
-                                  })}
-                                </div>
-                              </PopoverContent>
-                            </Popover>
-                          )}
+                                      )
+                                    })}
+                                  </div>
+                                </PopoverContent>
+                              </Popover>
+                            )
+                          })()}
+
+                          {/* List Encumbrances — inline list of count · tenant · type */}
+                          {show("List Encumbrances") && (() => {
+                            const hasRenewal = space.leaseOptions?.includes("Renewal Option") && !!space.tenant
+                            const encs = space.encumbrances ?? []
+                            if (!hasRenewal && encs.length === 0) return null
+                            const items: { label: string; type: string }[] = [
+                              ...(hasRenewal ? [{ label: space.tenant!, type: "Renewal Option" }] : []),
+                              ...encs.map((e) => ({ label: e.tenant, type: e.optionType })),
+                            ]
+                            return (
+                              <div className={cn("flex flex-col gap-0.5", cfg.metaCls)}>
+                                {items.map((item, i) => (
+                                  <div key={i} className="flex items-center gap-1 text-primary-foreground">
+                                    <span className="size-3.5 rounded-full flex items-center justify-center text-[9px] font-bold shrink-0 text-primary-foreground bg-primary">{i + 1}</span>
+                                    <span className="truncate">{item.label}</span>
+                                    <span className="text-primary-foreground/60 shrink-0">· {item.type}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            )
+                          })()}
                         </div>
                       </div>
 

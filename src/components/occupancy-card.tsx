@@ -91,7 +91,7 @@ const OccupancyCard = React.forwardRef<HTMLDivElement, OccupancyCardProps>(
                 <div className="flex items-center gap-2 shrink-0 text-[11px] text-muted-foreground tabular-nums">
                   <span>{fmt(e.sf)} sf</span>
                   <span className="text-foreground/60">{e.date}</span>
-                  <AgentBtn label={`Research ${e.tenant} ${e.type === "move-in" ? "move-in" : "move-out"} and surface next steps`} onClick={e => e.stopPropagation()} />
+                  <AgentBtn entity="Tenant" label={`Research ${e.tenant} ${e.type === "move-in" ? "move-in" : "move-out"} and surface next steps`} onClick={e => e.stopPropagation()} />
                 </div>
               </div>
             ))}
@@ -113,7 +113,7 @@ const OccupancyCard = React.forwardRef<HTMLDivElement, OccupancyCardProps>(
                     "text-[10px] font-medium",
                     v.daysVacant > 180 ? "text-destructive" : v.daysVacant > 90 ? "text-warning" : "text-muted-foreground"
                   )}>{v.daysVacant} d</span>
-                  <AgentBtn label={`Find prospects and leasing strategy for ${v.space}`} onClick={e => e.stopPropagation()} />
+                  <AgentBtn entity="Space" label={`Find prospects and leasing strategy for ${v.space}`} onClick={e => e.stopPropagation()} />
                 </div>
               </div>
             ))}
@@ -137,7 +137,7 @@ const OccupancyCard = React.forwardRef<HTMLDivElement, OccupancyCardProps>(
                     <span className="text-[11px] font-medium text-foreground block">{e.date}</span>
                     <span className="text-[10px] text-muted-foreground tabular-nums">{fmt(e.sf)} sf</span>
                   </div>
-                  <AgentBtn label={`Analyze ${e.tenant} expiration and recommend renewal strategy`} onClick={e => e.stopPropagation()} />
+                  <AgentBtn entity="Lease" label={`Analyze ${e.tenant} expiration and recommend renewal strategy`} onClick={e => e.stopPropagation()} />
                 </div>
               </div>
             ))}

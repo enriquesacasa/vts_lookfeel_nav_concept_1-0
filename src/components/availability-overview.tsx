@@ -113,7 +113,7 @@ const AvailabilityOverview = React.forwardRef<HTMLDivElement, AvailabilityOvervi
                             ? "bg-warning/10 text-warning"
                             : "bg-primary/10 text-primary"
                       )}>{v.daysVacant} d</span>
-                      <AgentBtn label={`${v.space} — ${v.sf.toLocaleString()} sf vacant · ${v.daysVacant} days on market`} onClick={e => e.stopPropagation()} />
+                      <AgentBtn entity="Space" label={`${v.space} — ${v.sf.toLocaleString()} sf vacant · ${v.daysVacant} days on market`} onClick={e => e.stopPropagation()} />
                     </div>
                   </div>
                 ))}

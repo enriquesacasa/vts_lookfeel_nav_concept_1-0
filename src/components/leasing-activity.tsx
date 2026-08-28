@@ -174,7 +174,7 @@ const LeasingActivity = React.forwardRef<HTMLDivElement, LeasingActivityProps>(
                   <RentDelta base={d.baseRent} budget={d.budgetRent} />
                 </td>
                 <td className="py-2.5 pl-2 text-right whitespace-nowrap">
-                  <AgentBtn label={`${d.tenant} — ${d.stage} · ${d.sf.toLocaleString()} sf, ${d.space} · $${d.baseRent}/sf base vs $${d.budgetRent}/sf budget · status: ${d.status}${d.stalledDays ? ` · stalled ${d.stalledDays} days` : ""}${d.note ? ` · ${d.note}` : ""}`} onClick={e => e.stopPropagation()} />
+                  <AgentBtn entity="Deal" label={`${d.tenant} — ${d.stage} · ${d.sf.toLocaleString()} sf, ${d.space} · $${d.baseRent}/sf base vs $${d.budgetRent}/sf budget · status: ${d.status}${d.stalledDays ? ` · stalled ${d.stalledDays} days` : ""}${d.note ? ` · ${d.note}` : ""}`} onClick={e => e.stopPropagation()} />
                 </td>
               </tr>
             ))}

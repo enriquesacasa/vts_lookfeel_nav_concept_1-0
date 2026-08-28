@@ -239,7 +239,7 @@ I can draft a next-step recommendation, pull activity history, or model the econ
   return "I'm analyzing your request across all active deals and agent activity. In production this draws from live deal data, agent outputs, and portfolio intelligence."
 }
 
-const SUGGESTED = [
+export const SUGGESTED = [
   { label: "Review pipeline health",   prompt: "Which deals need attention today?" },
   { label: "Surface stalled deals",    prompt: "Show me all stalled deals and their cost of delay." },
   { label: "Check NOI vs budget",      prompt: "Which active deals are above budget NOI?" },
