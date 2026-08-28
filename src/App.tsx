@@ -257,11 +257,12 @@ export default function App() {
 
   React.useEffect(() => {
     const globalPages = ["theme", "principles", "activity", "reminders", "avatar", "inquiry-email", "inquiry-email-forward", "inquiry-email-confirm", "ask-vts", "document-agent", "proposal-builder"]
-    const hash = globalPages.includes(currentPage)
+    let base = globalPages.includes(currentPage)
       ? `/${currentPage}`
       : `/${currentPage}/${selectedAssetId}`
-    if (window.location.hash !== `#${hash}`) window.location.hash = hash
-  }, [currentPage, selectedAssetId])
+    if (selectedDeal) base += `?deal=${selectedDeal.id}`
+    if (window.location.hash !== `#${base}`) window.location.hash = base
+  }, [currentPage, selectedAssetId, selectedDeal])
 
   React.useEffect(() => {
     if (pipelineToast) {
@@ -280,6 +281,8 @@ export default function App() {
         const deal = DEALS.find(d => d.id === dealId) ?? null
         setSelectedDeal(deal)
         if (dealId === "d00") setPipelineToast(true)
+      } else {
+        setSelectedDeal(null)
       }
     }
     window.addEventListener("hashchange", onHashChange)
