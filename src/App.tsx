@@ -1,5 +1,7 @@
 import * as React from "react"
-import { Wand } from "lucide-react"
+import { Wand, Sparkle } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { AgentBtn } from "@/components/agent-btn"
 import { AppNav } from "@/components/app-nav"
 import { BuildingHeader } from "@/components/building-header"
 import { AvailabilityOverview } from "@/components/availability-overview"
@@ -15,7 +17,7 @@ import { LeasingAgents } from "@/components/leasing-agents"
 import { AgentsPage } from "@/components/agents-page"
 import { DealsPage, DEALS } from "@/components/deals-page"
 import type { Deal as DealsPageDeal } from "@/components/deals-page"
-import { DealProfile, TenantLogoImage } from "@/components/deal-profile"
+import { DealProfile, TenantLogoImage, StatusBadge, type DealStatus } from "@/components/deal-profile"
 import { ThemeShowcase } from "@/components/theme-showcase"
 import { AgentPrinciples } from "@/components/agent-principles"
 import { StackingPlan } from "@/components/stacking-plan"
@@ -246,6 +248,10 @@ export default function App() {
     const { dealId } = parseHash()
     return dealId ? (DEALS.find(d => d.id === dealId) ?? null) : null
   })
+  const [selectedDealStatus, setSelectedDealStatus] = React.useState<DealStatus>("active")
+  React.useEffect(() => {
+    if (selectedDeal) setSelectedDealStatus(selectedDeal.status as DealStatus)
+  }, [selectedDeal])
   const [pipelineToast, setPipelineToast] = React.useState(() => parseHash().dealId === "d00")
   const [askVtsKey, setAskVtsKey] = React.useState(0)
   const [isDark, setIsDark] = React.useState(() => document.documentElement.classList.contains("dark"))
@@ -408,7 +414,13 @@ export default function App() {
         city: selectedDeal.asset,
         name: (<span><span className="font-semibold">{selectedDeal.tenant}</span>{" "}<span className="text-muted-foreground font-light">| {selectedDeal.dealType}</span></span>),
         address: `${selectedDeal.space} · ${selectedDeal.sf.toLocaleString()} sf`,
-        image: <div className="relative shrink-0 w-16 h-16 sm:w-24 sm:h-24 rounded-xl overflow-hidden"><TenantLogoImage name={selectedDeal.tenant} /></div>,
+        image: <div className="relative shrink-0 w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-full overflow-hidden border border-border/30 shadow-sm"><TenantLogoImage name={selectedDeal.tenant} /></div>,
+        actions: (
+          <div className="flex items-center gap-2">
+            <StatusBadge status={selectedDealStatus} onChange={setSelectedDealStatus} />
+            <AgentBtn className="!size-9" label={`${selectedDeal.tenant} — ${selectedDeal.stage} — ${selectedDealStatus}`} />
+          </div>
+        ),
         stats: [],
       } : pagedHeaderProps
       return (
@@ -418,9 +430,9 @@ export default function App() {
               Amazon deal added to your pipeline.
             </div>
           )}
-          <BuildingHeader {...dealHeaderProps} onAskVts={goAskVts} />
+          <BuildingHeader {...dealHeaderProps} />
           {selectedDeal
-            ? <DealProfile deal={selectedDeal} onBack={() => setSelectedDeal(null)} />
+            ? <DealProfile deal={selectedDeal} onBack={() => setSelectedDeal(null)} status={selectedDealStatus} onStatusChange={setSelectedDealStatus} />
             : <DealsPage onDealClick={deal => setSelectedDeal(deal)} />
           }
         </div>

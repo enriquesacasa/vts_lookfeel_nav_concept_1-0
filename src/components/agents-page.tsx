@@ -319,6 +319,9 @@ export const AGENTS: AgentDef[] = [
   },
 ]
 
+export const AGENT_ICON_MAP: Record<string, React.ElementType> =
+  Object.fromEntries(AGENTS.map(a => [a.name, a.icon]))
+
 const ALL_RUNS: AgentRun[] = [
   // Deal Capture
   {

@@ -17,10 +17,10 @@ interface AgentBtnProps {
 
 function getSuggestions(label: string): string[] {
   const l = label.toLowerCase()
+  const tenant = label.split(" — ")[0]
 
   // Stalled deal
   if (l.includes("stalled")) {
-    const tenant = label.split(" — ")[0]
     return [
       `What's the cost of delay on the ${tenant} deal per day?`,
       `Draft a re-engagement email to ${tenant}'s rep`,
@@ -29,34 +29,54 @@ function getSuggestions(label: string): string[] {
   }
   // At-risk deal
   if (l.includes("at-risk") || l.includes("competitor")) {
-    const tenant = label.split(" — ")[0]
     return [
       `What concessions could win back ${tenant}?`,
       `Compare our proposal to likely competing buildings`,
       `What's the NOI impact if we lose ${tenant}?`,
     ]
   }
-  // LOI / Lease Out
-  if (l.includes("loi") || l.includes("lease out")) {
-    const tenant = label.split(" — ")[0]
+  // LOI / Legal / Lease Out
+  if (l.includes("loi") || l.includes("legal") || l.includes("lease out")) {
     return [
       `Summarize open items and blockers for the ${tenant} deal`,
       `Draft a follow-up to accelerate ${tenant} to execution`,
       `What's the budget NOI delta if ${tenant} closes at current rent?`,
     ]
   }
-  // Proposal / deal stage
-  if (l.includes("proposal") || l.includes("counter")) {
-    const tenant = label.split(" — ")[0]
+  // Proposal
+  if (l.includes("proposal")) {
     return [
       `What are the key risks in the ${tenant} proposal?`,
       `Model the economics if ${tenant} counters below budget`,
       `Draft a countersign narrative for ${tenant}`,
     ]
   }
+  // Touring
+  if (l.includes("touring") || l.includes("tour")) {
+    return [
+      `Which spaces are the best fit for ${tenant} based on their requirements?`,
+      `Draft a tour follow-up email for ${tenant}`,
+      `What feedback has ${tenant} given so far?`,
+    ]
+  }
+  // Inquiry
+  if (l.includes("inquiry")) {
+    return [
+      `Run Space Match for ${tenant}'s requirements`,
+      `Summarize the ${tenant} requirement and suggest next steps`,
+      `Draft an intro email to ${tenant}'s broker`,
+    ]
+  }
+  // Executed / closed
+  if (l.includes("executed")) {
+    return [
+      `What were the final economics on the ${tenant} deal?`,
+      `Are there any post-close tasks outstanding for ${tenant}?`,
+      `How did the ${tenant} deal compare to budget?`,
+    ]
+  }
   // Lease expiration
   if (l.includes("lease expiration")) {
-    const tenant = label.split(" — ")[0]
     return [
       `What's the NOI at risk if ${tenant} doesn't renew?`,
       `When should we start the renewal conversation with ${tenant}?`,
@@ -65,7 +85,6 @@ function getSuggestions(label: string): string[] {
   }
   // Renewal window
   if (l.includes("renewal window")) {
-    const tenant = label.split(" — ")[0]
     return [
       `Has ${tenant} signaled renewal intent yet?`,
       `Draft an opening renewal proposal for ${tenant}`,
@@ -74,7 +93,6 @@ function getSuggestions(label: string): string[] {
   }
   // Options (ROFO, contraction, expansion)
   if (l.includes("rofo") || l.includes("contraction") || l.includes("expansion option")) {
-    const tenant = label.split(" — ")[0]
     return [
       `What's the financial impact if ${tenant} exercises this option?`,
       `What should our response strategy be for ${tenant}'s option?`,

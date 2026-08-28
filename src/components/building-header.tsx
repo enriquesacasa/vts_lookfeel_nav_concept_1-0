@@ -16,12 +16,13 @@ interface BuildingHeaderProps {
   city: string
   stats: BuildingStat[]
   badges?: React.ReactNode
+  actions?: React.ReactNode
   className?: string
   onAskVts?: () => void
 }
 
 const BuildingHeader = React.forwardRef<HTMLDivElement, BuildingHeaderProps>(
-  ({ image, name, address, city, stats, badges, className, onAskVts }, ref) => (
+  ({ image, name, address, city, stats, badges, actions, className, onAskVts }, ref) => (
     <div ref={ref} className={cn(className)}>
       {/* Hero section */}
       <div className="flex items-center gap-4 py-3">
@@ -39,9 +40,12 @@ const BuildingHeader = React.forwardRef<HTMLDivElement, BuildingHeaderProps>(
               {city}
             </p>
           )}
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-medium text-foreground leading-tight mb-1.5">
-            {name}
-          </h1>
+          <div className="flex items-center gap-6 mb-1.5 flex-wrap">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-medium text-foreground leading-tight">
+              {name}
+            </h1>
+            {actions}
+          </div>
           <p className="text-sm text-foreground">{address}</p>
           {badges && <div className="flex flex-wrap gap-1.5 mt-2">{badges}</div>}
         </div>

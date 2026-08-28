@@ -61,7 +61,7 @@ export function LogoMenuContent({ isDark = false, onToggleDark, onNavigate, onCl
       </div>
       {/* Agents */}
       <div className="px-3 py-2.5 border-b border-border">
-        <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-2">Agents</p>
+        <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-2">Agent placements</p>
         <div className="flex flex-col gap-1">
           {AGENTS_VIEWS.map(({ id, label }) => (
             <div key={id}

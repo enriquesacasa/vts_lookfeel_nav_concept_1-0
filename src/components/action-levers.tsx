@@ -82,7 +82,7 @@ const ActionLevers = React.forwardRef<HTMLDivElement, ActionLeversProps>(
         {/* Header */}
         <div className="flex items-start justify-between gap-2">
           <div>
-            <p className="text-[10px] font-medium uppercase tracking-widest mb-1 text-sidebar-foreground/70">Ask VTS</p>
+            <p className="text-[10px] font-medium uppercase tracking-widest mb-1 text-sidebar-foreground/70">VTS agents</p>
             <h2 className="text-xl font-semibold text-sidebar-foreground">Financial levers</h2>
           </div>
         </div>

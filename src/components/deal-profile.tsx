@@ -5,39 +5,70 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { FILTER_TAB_GROUP_CLS, FILTER_TAB_ITEM_CLS } from "@/components/filter-chip"
+import { AgentBtn } from "@/components/agent-btn"
 import {
   ChevronRight, ChevronDown, Check, FileText, Download, Send,
   Building2, User, MapPin, Ruler, Tag, Calendar,
-  CheckCircle2, Clock, AlertTriangle, HeartPulse, Zap, TrendingUp,
-  TrendingDown, Minus, ExternalLink, Bot, ChevronUp,
+  CheckCircle2, Clock, AlertTriangle, HeartPulse, Zap,
+  ExternalLink, Bot, ChevronUp,
+  Briefcase, Globe, Mail, DollarSign, Layers, Target,
+  Star, Home, SquareStack, Scale, Gavel, Trophy,
 } from "lucide-react"
-import type { Deal } from "@/components/deals-page"
+import { AGENT_ICON_MAP, AGENTS } from "@/components/agents-page"
+import { TENANT_LOGO, type Deal } from "@/components/deals-page"
 
 // ─── Tenant logo ──────────────────────────────────────────────────────────────
 
-const TENANT_LOGO: Record<string, string> = {
-  "Starbucks Corporation": "/vts_lookfeel_nav_concept_1-0/logos/starbucks.png",
-  "Pfizer Inc.":           "/vts_lookfeel_nav_concept_1-0/logos/pfizer.png",
-  "Morgan Stanley":        "/vts_lookfeel_nav_concept_1-0/logos/morganstanley.png",
-  "Deloitte LLP":          "/vts_lookfeel_nav_concept_1-0/logos/deloitte.png",
-  "KPMG":                  "/vts_lookfeel_nav_concept_1-0/logos/kpmg.png",
-  "Ernst & Young":         "/vts_lookfeel_nav_concept_1-0/logos/ey.png",
-  "HSBC Holdings":         "/vts_lookfeel_nav_concept_1-0/logos/hsbc.png",
-  "Latham & Watkins":      "/vts_lookfeel_nav_concept_1-0/logos/lw.png",
-  "JPMorgan Chase":        "/vts_lookfeel_nav_concept_1-0/logos/jpmorgan.png",
-  "Amazon.com":            "/vts_lookfeel_nav_concept_1-0/logos/amazon.png",
+const TENANT_DOMAIN: Record<string, string> = {
+  "Starbucks Corporation": "starbucks.com",
+  "Pfizer Inc.":           "pfizer.com",
+  "Morgan Stanley":        "morganstanley.com",
+  "Deloitte LLP":          "deloitte.com",
+  "KPMG":                  "kpmg.com",
+  "Ernst & Young":         "ey.com",
+  "HSBC Holdings":         "hsbc.com",
+  "Latham & Watkins":      "lw.com",
+  "JPMorgan Chase":        "jpmorgan.com",
+  "Amazon.com":            "amazon.com",
+  "WeWork":                "wework.com",
+  "Google LLC":            "google.com",
+  "Tesla Inc.":            "tesla.com",
+  "Cisco Systems":         "cisco.com",
+  "Salesforce Inc.":       "salesforce.com",
+  "BlackRock":             "blackrock.com",
+  "Goldman Sachs":         "goldmansachs.com",
+  "McKinsey & Co.":        "mckinsey.com",
+  "Spotify":               "spotify.com",
+  "Airbnb":                "airbnb.com",
+  "Stripe":                "stripe.com",
+  "Twitter/X":             "x.com",
+  "Uber Technologies":     "uber.com",
+  "Microsoft":             "microsoft.com",
+  "Meta Platforms":        "meta.com",
 }
 
 export function TenantLogoImage({ name }: { name: string }) {
-  const [failed, setFailed] = React.useState(false)
-  const src = TENANT_LOGO[name]
+  const domain = TENANT_DOMAIN[name]
+  const clearbitSrc = domain ? `https://logo.clearbit.com/${domain}?size=256` : null
+  const brandfetchSrc = domain ? `https://cdn.brandfetch.io/${domain}/w/256/h/256` : null
+  const localSrc = TENANT_LOGO[name] || null
+  const sources = [clearbitSrc, brandfetchSrc, localSrc].filter(Boolean) as string[]
+  const [srcIdx, setSrcIdx] = React.useState(0)
+  const src = sources[srcIdx] ?? null
   const initials = name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()
-  if (src && !failed) {
+
+  const handleError = () => {
+    if (srcIdx < sources.length - 1) setSrcIdx(i => i + 1)
+    else setSrcIdx(sources.length) // exhausted — show initials
+  }
+
+  if (src) {
     return (
-      <div className="h-full w-full bg-background flex items-center justify-center p-2">
-        <img src={src} alt={name} className="max-h-full max-w-full object-contain" onError={() => setFailed(true)} />
+      <div className="h-full w-full bg-background flex items-center justify-center">
+        <img src={src} alt={name} className="h-full w-full object-contain" onError={handleError} />
       </div>
     )
   }
@@ -51,7 +82,7 @@ export function TenantLogoImage({ name }: { name: string }) {
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type StageValue = "Inquiry" | "Touring" | "Proposal" | "LOI" | "Legal" | "Lease Out" | "Executed"
-type DealStatus = "active" | "stalled" | "at-risk" | "executed"
+export type DealStatus = "active" | "stalled" | "at-risk" | "executed"
 
 const ALL_STAGES: StageValue[] = ["Inquiry", "Touring", "Proposal", "LOI", "Legal", "Lease Out", "Executed"]
 
@@ -64,21 +95,15 @@ const STATUS_CONFIG: Record<DealStatus, { label: string; Icon: React.ElementType
   executed:  { label: "Executed", Icon: CheckCircle2,  cls: "text-success bg-success/10 border-success/20",         dot: "bg-success" },
 }
 
-function StatusBadge({ status, onChange }: { status: DealStatus; onChange: (s: DealStatus) => void }) {
+export function StatusBadge({ status, onChange }: { status: DealStatus; onChange: (s: DealStatus) => void }) {
   const [open, setOpen] = React.useState(false)
   const cfg = STATUS_CONFIG[status]
   const options: DealStatus[] = ["active", "stalled", "at-risk"]
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger>
-        <span className={cn(
-          "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium transition-opacity hover:opacity-80 cursor-pointer",
-          cfg.cls
-        )}>
-          <span className={cn("h-1.5 w-1.5 rounded-full", cfg.dot)} />
-          {cfg.label}
-          <ChevronDown className="h-3 w-3 opacity-60" />
-        </span>
+      <PopoverTrigger render={<Button variant="outline" className={cn("gap-1.5", cfg.cls)} />}>
+        {cfg.label}
+        <ChevronDown className="h-3 w-3 opacity-60" />
       </PopoverTrigger>
       <PopoverContent className="w-40 p-1" align="start">
         {options.map(opt => {
@@ -108,33 +133,34 @@ function StatusBadge({ status, onChange }: { status: DealStatus; onChange: (s: D
 function StageJourneyBar({ currentStage, onChange }: { currentStage: StageValue; onChange: (s: StageValue) => void }) {
   const currentIdx = ALL_STAGES.indexOf(currentStage)
   return (
-    <div className={cn(cardBase, "py-4 overflow-x-auto")}>
-      <div className="flex items-center min-w-max">
+    <div className="rounded-xl bg-primary px-4 py-3">
+      <div className="flex items-center flex-wrap gap-y-2">
         {ALL_STAGES.map((stage, i) => {
           const isPast   = i < currentIdx
           const isActive = stage === currentStage
           const isFuture = i > currentIdx
           return (
             <React.Fragment key={stage}>
-              {i > 0 && <div className={cn("flex-1 h-px min-w-[20px] mx-1", isPast ? "bg-primary/60" : "bg-border")} />}
+              {i > 0 && (
+                <div className={cn("flex-1 h-px min-w-3 mx-1.5", isPast ? "bg-primary-foreground/50" : "bg-primary-foreground/20")} />
+              )}
               <button
-                onClick={() => onChange(stage)}
-                className="flex flex-col items-center gap-1.5 shrink-0 group"
+                onClick={() => { if (i > currentIdx) onChange(stage) }}
+                className={cn("flex items-center gap-1.5 shrink-0 group", isPast && "cursor-default")}
               >
                 <div className={cn(
-                  "h-7 w-7 rounded-full flex items-center justify-center border-2 transition-all group-hover:scale-110",
-                  isActive && "bg-primary border-primary shadow-sm shadow-primary/30",
-                  isPast   && "bg-primary/15 border-primary/60",
-                  isFuture && "bg-muted border-border group-hover:border-muted-foreground",
+                  "h-5 w-5 rounded-full flex items-center justify-center transition-all",
+                  isActive && "bg-primary-foreground",
+                  isPast   && "bg-primary-foreground/50",
+                  isFuture && "bg-primary-foreground/15 border border-primary-foreground/50 group-hover:border-primary-foreground/80",
                 )}>
-                  {isPast   && <Check className="h-3 w-3 text-primary" />}
-                  {isActive && <span className="h-2 w-2 rounded-full bg-primary-foreground" />}
+                  {isPast   && <Check className="h-2.5 w-2.5 text-primary" />}
                 </div>
                 <span className={cn(
-                  "text-[10px] font-medium whitespace-nowrap transition-colors",
-                  isActive && "text-primary font-semibold",
-                  isPast   && "text-muted-foreground",
-                  isFuture && "text-muted-foreground/40 group-hover:text-muted-foreground",
+                  "text-xs whitespace-nowrap transition-colors",
+                  isActive && "text-primary-foreground font-semibold",
+                  isPast   && "text-primary-foreground/85 font-medium",
+                  isFuture && "text-primary-foreground/55 group-hover:text-primary-foreground/80",
                 )}>
                   {stage}
                 </span>
@@ -157,18 +183,12 @@ function delta(actual: number, budget: number): { dir: "up" | "down" | "flat"; p
 }
 
 function KpiCell({ label, value, sub, trend }: { label: string; value: string; sub?: string; trend?: "up" | "down" | "flat" }) {
-  const Icon = trend === "up" ? TrendingUp : trend === "down" ? TrendingDown : Minus
   const cls = trend === "up" ? "text-success" : trend === "down" ? "text-destructive" : "text-muted-foreground"
   return (
-    <div className="flex flex-col gap-0.5 min-w-0">
-      <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground">{label}</p>
-      <p className="text-xl font-semibold text-foreground leading-none">{value}</p>
-      {sub && (
-        <div className={cn("flex items-center gap-1 text-[11px] font-medium", cls)}>
-          {trend && trend !== "flat" && <Icon className="h-3 w-3" />}
-          <span>{sub}</span>
-        </div>
-      )}
+    <div className="flex-1 min-w-[120px] px-5 py-4 flex flex-col gap-0.5">
+      <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">{label}</p>
+      <p className="text-2xl font-medium text-foreground leading-none">{value}</p>
+      {sub && <p className={cn("text-xs font-medium mt-1", cls)}>{sub}</p>}
     </div>
   )
 }
@@ -181,7 +201,7 @@ function FinancialBar({ deal, stageIdx }: { deal: Deal; stageIdx: number }) {
   const tiCost = stageIdx >= 2 ? deal.sf * 80 : null
 
   return (
-    <div className={cn(cardBase, "flex flex-wrap gap-x-8 gap-y-4 py-4")}>
+    <div className={cn(cardBase, "flex flex-wrap divide-x divide-border/60 !p-0 overflow-hidden")}>
       {deal.budgetNer > 0 && (
         <KpiCell
           label="NER"
@@ -278,7 +298,7 @@ function AgentStrip({ deal, stage }: { deal: Deal; stage: StageValue }) {
         <div className={cn(cardBase, "bg-primary/5 border-primary/20 flex flex-col sm:flex-row gap-4")}>
           <div className="flex items-start gap-3 flex-1 min-w-0">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 border border-primary/20 mt-0.5">
-              <Bot className="h-4 w-4 text-primary" />
+              {(() => { const I = AGENT_ICON_MAP[AGENT_INFO[focus.featuredId]?.name] ?? Bot; return <I className="h-4 w-4 text-primary" /> })()}
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
@@ -315,7 +335,7 @@ function AgentStrip({ deal, stage }: { deal: Deal; stage: StageValue }) {
               )}
             >
               <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-muted/60">
-                <Bot className="h-3.5 w-3.5 text-muted-foreground" />
+                {(() => { const I = AGENT_ICON_MAP[info.name] ?? Bot; return <I className="h-3.5 w-3.5 text-muted-foreground" /> })()}
               </div>
               <div>
                 <p className="text-xs font-semibold text-foreground whitespace-nowrap">{info.name}</p>
@@ -331,82 +351,109 @@ function AgentStrip({ deal, stage }: { deal: Deal; stage: StageValue }) {
 
 // ─── Field row ────────────────────────────────────────────────────────────────
 
-function FieldRow({ icon: Icon, label, children }: { icon?: React.ElementType; label: string; children: React.ReactNode }) {
+function FieldRow({ icon: Icon, label, children }: { icon?: React.ElementType; label: string; children?: React.ReactNode }) {
   return (
     <div className="flex items-start gap-3 py-2.5 border-b border-border/50 last:border-0">
       <div className="w-4 shrink-0 mt-0.5">
         {Icon && <Icon className="h-3.5 w-3.5 text-muted-foreground" />}
       </div>
       <span className="text-xs text-muted-foreground w-32 shrink-0 pt-px">{label}</span>
-      <div className="text-sm text-foreground font-medium flex-1">{children}</div>
+      <div className="text-sm text-foreground font-medium flex-1">
+        {children ?? <span className="text-muted-foreground/40 font-normal">—</span>}
+      </div>
     </div>
   )
 }
 
-// ─── Overview tab ─────────────────────────────────────────────────────────────
+// ─── Info tab ─────────────────────────────────────────────────────────────────
+
+function InfoFieldRow({ label, value }: { label: string; value?: string }) {
+  return (
+    <div className="flex items-center justify-between py-2.5 border-b border-border/50 last:border-0 gap-4">
+      <span className="text-sm text-muted-foreground shrink-0">{label}</span>
+      {value
+        ? <span className="text-sm font-semibold text-foreground text-right">{value}</span>
+        : <button className="text-sm text-muted-foreground/50 hover:text-primary transition-colors">Add</button>
+      }
+    </div>
+  )
+}
+
+function InfoSection({ title, action, children }: { title: string; action?: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <div className="rounded-xl border border-border overflow-hidden">
+      <div className="flex items-center justify-between px-5 py-3.5 border-b border-border bg-card">
+        <p className="text-sm font-semibold text-foreground">{title}</p>
+        {action}
+      </div>
+      <div className="px-5 bg-card">{children}</div>
+    </div>
+  )
+}
 
 function OverviewTab({ deal, stageIdx }: { deal: Deal; stageIdx: number }) {
   return (
     <div>
-      <FieldRow icon={User}      label="Tenant">{deal.tenant}</FieldRow>
-      <FieldRow icon={Building2} label="Asset">{deal.asset}</FieldRow>
-      <FieldRow icon={MapPin}    label="Space">{deal.space}</FieldRow>
-      <FieldRow icon={Ruler}     label="Size">{deal.sf.toLocaleString()} sf</FieldRow>
-      <FieldRow icon={Tag}       label="Type">{deal.dealType}</FieldRow>
-      {deal.contact && <FieldRow icon={User} label="Contact">{deal.contact}</FieldRow>}
-      {deal.term && <FieldRow icon={Calendar} label="Term">{deal.term} months ({(deal.term / 12).toFixed(0)} yrs)</FieldRow>}
-      <FieldRow label="Source">Email inbound · CBRE</FieldRow>
+        <FieldRow icon={User}      label="Tenant">{deal.tenant}</FieldRow>
+        <FieldRow icon={Building2} label="Asset">{deal.asset}</FieldRow>
+        <FieldRow icon={MapPin}    label="Space">{deal.space}</FieldRow>
+        <FieldRow icon={Ruler}     label="Size">{deal.sf.toLocaleString()} sf</FieldRow>
+        <FieldRow icon={Tag}       label="Type">{deal.dealType}</FieldRow>
+        {deal.contact && <FieldRow icon={User}      label="Contact">{deal.contact}</FieldRow>}
+        <FieldRow icon={Briefcase}  label="Broker">CBRE</FieldRow>
+        <FieldRow icon={Layers}     label="Industry">Technology</FieldRow>
+        <FieldRow icon={Globe}      label="City / submarket">Midtown Manhattan</FieldRow>
+        {deal.term && <FieldRow icon={Calendar} label="Term">{deal.term} months ({(deal.term / 12).toFixed(0)} yrs)</FieldRow>}
+        <FieldRow icon={Mail}       label="Source">Email inbound</FieldRow>
 
-      {/* Requirements section */}
-      <div className="mt-4 mb-1">
-        <p className="text-sm font-semibold text-foreground">Requirements</p>
-      </div>
-      <FieldRow icon={Ruler}    label="Size range">16,000 – 20,000 sf</FieldRow>
-      <FieldRow label="Floors">6th floor or above</FieldRow>
-      <FieldRow label="Target occupancy">Q1 2027</FieldRow>
-      <FieldRow label="Budget / sf">Up to ${deal.budgetNer.toFixed(2)} PSF/yr</FieldRow>
-      <FieldRow label="Special">Dedicated server room · Open plan · 4:1,000 parking</FieldRow>
+        <div className="mt-4 mb-1"><p className="text-sm font-semibold text-foreground">Requirements</p></div>
+        <FieldRow icon={Ruler}      label="Size range">16,000 – 20,000 sf</FieldRow>
+        <FieldRow icon={User}       label="Size (desks)" />
+        <FieldRow icon={SquareStack}label="Floors">6th floor or above</FieldRow>
+        <FieldRow icon={DollarSign} label="Target price">Up to ${deal.budgetNer.toFixed(2)} PSF/yr</FieldRow>
+        <FieldRow icon={Calendar}   label="Target LCD" />
+        <FieldRow icon={Target}     label="Target occupancy">Q1 2027</FieldRow>
+        <FieldRow icon={Star}       label="Special">Dedicated server room · Open plan · 4:1,000 parking</FieldRow>
 
-      {stageIdx >= 1 && (
-        <>
+        <div className="mt-4 mb-1"><p className="text-sm font-semibold text-foreground">Current lease</p></div>
+        <FieldRow icon={Home}       label="Current address" />
+        <FieldRow icon={Ruler}      label="Current size" />
+        <FieldRow icon={DollarSign} label="Current rent" />
+        <FieldRow icon={Calendar}   label="Current LXD" />
+
+        {stageIdx >= 1 && (<>
           <div className="mt-4 mb-1"><p className="text-sm font-semibold text-foreground">Tour</p></div>
-          <FieldRow icon={Calendar} label="Tour date">Sep 3, 2026 · 10:00 AM</FieldRow>
-          <FieldRow label="Spaces toured">Suite 0800 – Floor 8 · Suite 0900 – Floor 9</FieldRow>
-        </>
-      )}
-      {stageIdx >= 2 && (
-        <>
+          <FieldRow icon={Calendar}   label="Tour date">Sep 3, 2026 · 10:00 AM</FieldRow>
+          <FieldRow icon={MapPin}     label="Spaces toured">Suite 0800 – Floor 8 · Suite 0900 – Floor 9</FieldRow>
+        </>)}
+        {stageIdx >= 2 && (<>
           <div className="mt-4 mb-1"><p className="text-sm font-semibold text-foreground">Proposal</p></div>
-          <FieldRow label="Asking rent">$98.00 PSF/yr</FieldRow>
-          <FieldRow label="TI package">$80.00 PSF</FieldRow>
-          <FieldRow label="Free rent">4 months</FieldRow>
-          <FieldRow label="Lease term">8 years</FieldRow>
-        </>
-      )}
-      {stageIdx >= 3 && (
-        <>
+          <FieldRow icon={DollarSign} label="Asking rent">$98.00 PSF/yr</FieldRow>
+          <FieldRow icon={Building2}  label="TI package">$80.00 PSF</FieldRow>
+          <FieldRow icon={Calendar}   label="Free rent">4 months</FieldRow>
+          <FieldRow icon={FileText}   label="Lease term">8 years</FieldRow>
+        </>)}
+        {stageIdx >= 3 && (<>
           <div className="mt-4 mb-1"><p className="text-sm font-semibold text-foreground">LOI</p></div>
-          <FieldRow icon={Calendar} label="LOI date">Oct 15, 2026</FieldRow>
-          <FieldRow label="LOI terms">$94.00 PSF · 8 yrs · $80 TI · 4 mo free rent</FieldRow>
-          <FieldRow label="Counters">1 counter received</FieldRow>
-          <FieldRow label="Legal counsel">Skadden Arps (Tenant) · Willkie Farr (Landlord)</FieldRow>
-        </>
-      )}
-      {stageIdx >= 4 && (
-        <>
+          <FieldRow icon={Calendar}   label="LOI date">Oct 15, 2026</FieldRow>
+          <FieldRow icon={FileText}   label="LOI terms">$94.00 PSF · 8 yrs · $80 TI · 4 mo free rent</FieldRow>
+          <FieldRow icon={Tag}        label="Counters">1 counter received</FieldRow>
+          <FieldRow icon={Scale}      label="Legal counsel">Skadden Arps (Tenant) · Willkie Farr (Landlord)</FieldRow>
+        </>)}
+        {stageIdx >= 4 && (<>
           <div className="mt-4 mb-1"><p className="text-sm font-semibold text-foreground">Legal</p></div>
-          <FieldRow icon={Calendar} label="Execution target">Dec 1, 2026</FieldRow>
-          <FieldRow label="Open items">2 redlines · 1 insurance item</FieldRow>
-        </>
-      )}
-      {stageIdx >= 5 && (
-        <>
+          <FieldRow icon={Calendar}   label="Execution target">Dec 1, 2026</FieldRow>
+          <FieldRow icon={AlertTriangle} label="Open items">2 redlines · 1 insurance item</FieldRow>
+        </>)}
+        {stageIdx >= 5 && (<>
           <div className="mt-4 mb-1"><p className="text-sm font-semibold text-foreground">Execution</p></div>
-          <FieldRow icon={Calendar} label="Execution date">Dec 15, 2026</FieldRow>
-          <FieldRow icon={Calendar} label="Effective date">Jan 1, 2027</FieldRow>
-          <FieldRow icon={Calendar} label="Expiry">Dec 31, 2034</FieldRow>
-        </>
-      )}
+          <FieldRow icon={Calendar}   label="Execution date">Dec 15, 2026</FieldRow>
+          <FieldRow icon={Calendar}   label="Effective date">Jan 1, 2027</FieldRow>
+          <FieldRow icon={Calendar}   label="Expiry">Dec 31, 2034</FieldRow>
+        </>)}
+
+        <div className="mt-4 mb-1"><p className="text-sm font-semibold text-foreground">Competitive set</p></div>
+        <FieldRow icon={Trophy} label="Competitive set"><span className="text-muted-foreground/50 font-normal text-sm">Not set</span></FieldRow>
     </div>
   )
 }
@@ -577,6 +624,52 @@ function ProposalsTab({ deal, stageIdx }: { deal: Deal; stageIdx: number }) {
   )
 }
 
+// ─── Tasks tab ────────────────────────────────────────────────────────────────
+
+type TaskItem = { id: number; label: string; done: boolean; due?: string; assignee?: string }
+
+const STAGE_TASKS: Record<StageValue, TaskItem[]> = {
+  "Inquiry":    [{ id: 1, label: "Qualify tenant requirements", done: false, due: "This week", assignee: "You" }, { id: 2, label: "Schedule intro call", done: false, due: "Fri", assignee: "You" }, { id: 3, label: "Add to deal pipeline", done: true, assignee: "You" }],
+  "Touring":    [{ id: 1, label: "Prepare tour itinerary", done: true, assignee: "You" }, { id: 2, label: "Collect tenant feedback", done: false, due: "After tour", assignee: "You" }, { id: 3, label: "Shortlist top 2 suites", done: false, due: "This week", assignee: "You" }, { id: 4, label: "Schedule follow-up tour", done: false, due: "Next week", assignee: "You" }],
+  "Proposal":   [{ id: 1, label: "Draft initial proposal", done: true, assignee: "You" }, { id: 2, label: "Review proposal with landlord", done: false, due: "Wed", assignee: "You" }, { id: 3, label: "Send proposal to tenant", done: false, due: "Thu", assignee: "You" }],
+  "LOI":        [{ id: 1, label: "Counter lease terms", done: false, due: "Mon", assignee: "You" }, { id: 2, label: "Align on TI allowance", done: false, due: "This week", assignee: "You" }, { id: 3, label: "Confirm free rent period", done: true, assignee: "You" }, { id: 4, label: "Get legal review of redlines", done: false, due: "Next week", assignee: "Legal" }],
+  "Legal":      [{ id: 1, label: "Review redlines with counsel", done: false, due: "Mon", assignee: "Legal" }, { id: 2, label: "Resolve subleasing rights flag", done: false, due: "This week", assignee: "You" }, { id: 3, label: "Confirm TI escalation clause", done: true, assignee: "Legal" }],
+  "Lease Out":  [{ id: 1, label: "Collect signatures - tenant", done: false, due: "This week", assignee: "You" }, { id: 2, label: "Collect signatures - landlord", done: false, due: "This week", assignee: "You" }, { id: 3, label: "File executed lease", done: false, due: "After signing", assignee: "You" }],
+  "Executed":   [{ id: 1, label: "Archive deal documents", done: true, assignee: "You" }, { id: 2, label: "Send close announcement", done: false, due: "This week", assignee: "You" }, { id: 3, label: "Log commission details", done: false, assignee: "You" }],
+}
+
+function TasksTab({ stage }: { stage: StageValue }) {
+  const [tasks, setTasks] = React.useState<TaskItem[]>(() => STAGE_TASKS[stage] ?? [])
+  React.useEffect(() => { setTasks(STAGE_TASKS[stage] ?? []) }, [stage])
+
+  const toggle = (id: number) => setTasks(ts => ts.map(t => t.id === id ? { ...t, done: !t.done } : t))
+
+  return (
+    <div className="flex flex-col gap-1">
+      {tasks.map(task => (
+        <button key={task.id} onClick={() => toggle(task.id)}
+          className="flex items-start gap-3 px-3 py-2.5 rounded-lg hover:bg-sidebar-accent/50 transition-colors text-left w-full group">
+          <div className={cn(
+            "mt-0.5 shrink-0 w-4 h-4 rounded border flex items-center justify-center transition-colors",
+            task.done ? "bg-primary border-primary" : "border-border group-hover:border-primary/60"
+          )}>
+            {task.done && <svg className="w-2.5 h-2.5 text-primary-foreground" fill="none" viewBox="0 0 10 8"><path d="M1 4l3 3 5-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+          </div>
+          <div className="flex-1 min-w-0">
+            <span className={cn("text-sm", task.done ? "line-through text-muted-foreground" : "text-foreground")}>{task.label}</span>
+            {(task.due || task.assignee) && (
+              <div className="flex gap-2 mt-0.5">
+                {task.due && <span className="text-xs text-muted-foreground">{task.due}</span>}
+                {task.assignee && <span className="text-xs text-muted-foreground/60">{task.assignee}</span>}
+              </div>
+            )}
+          </div>
+        </button>
+      ))}
+    </div>
+  )
+}
+
 // ─── Documents tab ────────────────────────────────────────────────────────────
 
 type DocItem = { name: string; type: string; date: string }
@@ -623,8 +716,8 @@ const DOC_TYPE_STYLE: Record<string, string> = {
   "Due diligence":  "bg-destructive/10 text-destructive border-destructive/20",
 }
 
-function DocumentsTab({ deal }: { deal: Deal }) {
-  const docs = getDocuments(deal.stage as StageValue)
+function DocumentsTab({ deal, stage }: { deal: Deal; stage: StageValue }) {
+  const docs = getDocuments(stage)
   const byType = docs.reduce<Record<string, DocItem[]>>((acc, d) => {
     ;(acc[d.type] = acc[d.type] ?? []).push(d)
     return acc
@@ -704,77 +797,215 @@ const GENERIC_FEED: FeedEntry[] = [
   { initials: "VTS", name: "VTS system",    timestamp: "Yesterday",       message: "Stage updated to current stage.", kind: "update" },
 ]
 
-function ActivityFeed({ deal }: { deal: Deal }) {
-  const [collapsed, setCollapsed] = React.useState(false)
-  const [comment, setComment] = React.useState("")
-  const feed = DEAL_FEEDS[deal.id] ?? GENERIC_FEED
+const STAGE_FEEDS: Record<StageValue, FeedEntry[]> = {
+  "Inquiry": [
+    { initials: "AI",  name: "Deal Capture",     timestamp: "Today · 9:02 AM",  message: "Deal created from inbound email. Stage set to Inquiry. Budget NER set to $98.00 based on current market rate.", kind: "agent" },
+    { initials: "JL",  name: "Jessica Lee",      timestamp: "Today · 8:47 AM",  message: "Received inbound inquiry from Amazon.com. 18,000 sf request on Floor 8, VTS Tower.", kind: "comment" },
+    { initials: "RC",  name: "Ryan Chen",        timestamp: "Today · 8:55 AM",  message: "Forwarded the inquiry to Sarah Okonkwo at CBRE.", kind: "comment" },
+  ],
+  "Touring": [
+    { initials: "AI",  name: "Space Match",      timestamp: "Today · 2:05 PM",  message: "Ranked 14 available floors. Suite 2100 flagged as best fit — 54,000 sf uninterrupted, open plan, no column interference.", kind: "agent" },
+    { initials: "AI",  name: "Tour Coordinator", timestamp: "Today · 1:45 PM",  message: "Tour scheduled Sep 10 · 10:00 AM. Confirmation sent to Derek Chan and Morgan Stanley facilities team.", kind: "agent" },
+    { initials: "DC",  name: "Derek Chan",       timestamp: "Today · 1:40 PM",  message: "Morgan Stanley team confirmed tour interest. Coordinating schedule with facilities for Suite 2100 and 2200.", kind: "comment" },
+    { initials: "VTS", name: "VTS system",       timestamp: "Yesterday · 4:12 PM", message: "Stage updated: Inquiry → Touring.", kind: "update" },
+  ],
+  "Proposal": [
+    { initials: "AI",  name: "Proposal Builder", timestamp: "Today · 11:00 AM", message: "Proposal assembled for Suite 2100: 54,000 sf · $98 NER · 10-year term · $120 TI allowance. Ready for review.", kind: "agent" },
+    { initials: "SO",  name: "Sarah Okonkwo",    timestamp: "Today · 9:14 AM",  message: "Confirmed with the Amazon team — they want to move forward. Initial proposal request submitted.", kind: "comment" },
+    { initials: "VTS", name: "VTS system",       timestamp: "Yesterday · 8:00 AM", message: "Stage updated: Touring → Proposal.", kind: "update" },
+  ],
+  "LOI": [
+    { initials: "AI",  name: "Counsel Handoff",  timestamp: "Today · 10:30 AM", message: "LOI terms extracted (18 fields). 2 flags raised: TI escalation clause and subleasing rights at 75% (market 85%). Legal brief ready.", kind: "agent" },
+    { initials: "SL",  name: "Sandra Li",        timestamp: "Today · 9:00 AM",  message: "LOI executed this morning. Routing to outside counsel — Skadden on tenant side, Willkie Farr on landlord side.", kind: "comment" },
+    { initials: "VTS", name: "VTS system",       timestamp: "Yesterday · 8:00 AM", message: "Stage updated: Proposal → LOI.", kind: "update" },
+  ],
+  "Legal": [
+    { initials: "AI",  name: "Negotiation Guidance", timestamp: "Today · 3:00 PM", message: "Tracking 12 open redlines. Scope drift detected on subleasing rights — moved without agreement in round 2.", kind: "agent" },
+    { initials: "MT",  name: "Mark Torres",      timestamp: "Today · 2:00 PM",  message: "Round 2 redlines received from Skadden. Key open items: subleasing rights, TI escalation, and renewal option window.", kind: "comment" },
+    { initials: "VTS", name: "VTS system",       timestamp: "Yesterday · 8:00 AM", message: "Stage updated: LOI → Legal.", kind: "update" },
+  ],
+  "Lease Out": [
+    { initials: "AI",  name: "Execution Management", timestamp: "Today · 3:00 PM", message: "Signatory verified. Execution package assembled: lease + exhibits A–D. 2 outstanding signatures — Tenant CFO and Landlord VP.", kind: "agent" },
+    { initials: "LG",  name: "Luis Garcia",      timestamp: "Today · 11:30 AM", message: "Final terms agreed with landlord. Routing execution package today.", kind: "comment" },
+    { initials: "VTS", name: "VTS system",       timestamp: "Yesterday · 8:00 AM", message: "Stage updated: Legal → Lease Out.", kind: "update" },
+  ],
+  "Executed": [
+    { initials: "AI",  name: "Operational Handoff", timestamp: "Today · 5:00 PM", message: "Notified property management. 16 buildout and compliance tasks created. Key dates and owners loaded into PMS.", kind: "agent" },
+    { initials: "AI",  name: "Data Writeback",   timestamp: "Today · 4:30 PM",  message: "24 final terms extracted and synced. VTS ✓ · Financial model ✓ · Reporting ✓. Zero discrepancies detected.", kind: "agent" },
+    { initials: "AC",  name: "Adam Chen",        timestamp: "Today · 4:00 PM",  message: "Lease executed. All parties signed. Effective date Jan 1, 2027.", kind: "comment" },
+    { initials: "VTS", name: "VTS system",       timestamp: "Today · 4:05 PM",  message: "Stage updated: Lease Out → Executed.", kind: "update" },
+  ],
+}
+
+function getStageFeeds(stage: StageValue): FeedEntry[] {
+  return STAGE_FEEDS[stage] ?? GENERIC_FEED
+}
+
+const REACTIONS = ["👍", "👏", "🎉", "❤️"]
+
+function UpdateCard({ entry }: { entry: FeedEntry }) {
+  const [reactions, setReactions] = React.useState<Record<string, number>>({})
+  const toggle = (r: string) => setReactions(prev => ({ ...prev, [r]: (prev[r] ?? 0) === 1 ? 0 : 1 }))
+
+  if (entry.kind === "update") {
+    return (
+      <div className="rounded-lg bg-muted/50 px-3 py-2.5 flex items-center gap-2">
+        <div className="h-5 w-5 rounded-full bg-muted-foreground/15 text-muted-foreground flex items-center justify-center shrink-0">
+          <span className="text-[8px] font-bold">VTS</span>
+        </div>
+        <span className="text-xs text-foreground/75 flex-1">{entry.message}</span>
+        <span className="text-[10px] text-muted-foreground shrink-0">{entry.timestamp}</span>
+      </div>
+    )
+  }
+
+  if (entry.kind === "agent") {
+    const AgentIcon = AGENT_ICON_MAP[entry.name] ?? Bot
+    return (
+      <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 flex flex-col gap-2.5">
+        <div className="flex items-center gap-2.5">
+          <div className="h-8 w-8 rounded-full bg-primary/15 text-primary flex items-center justify-center shrink-0">
+            <AgentIcon className="h-4 w-4" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-primary leading-none">{entry.name}</p>
+            <p className="text-[11px] text-muted-foreground mt-0.5">{entry.timestamp}</p>
+          </div>
+          <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20">
+            <Zap className="h-2.5 w-2.5 text-primary" />
+            <span className="text-[10px] font-medium text-primary">Agent</span>
+          </div>
+        </div>
+        <p className="text-sm text-foreground/80 leading-relaxed pl-[42px]">{entry.message}</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="rounded-xl border border-border bg-card p-4 flex flex-col gap-3">
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex items-center gap-2.5">
+          <div className="h-8 w-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-semibold shrink-0">
+            {entry.initials}
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-foreground leading-none">{entry.name}</p>
+            <p className="text-[11px] text-muted-foreground mt-0.5">{entry.timestamp}</p>
+          </div>
+        </div>
+      </div>
+      <p className="text-sm text-foreground leading-relaxed">{entry.message}</p>
+      <div className="flex items-center gap-3 pt-1 border-t border-border/50">
+        <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+          <button className="hover:text-foreground transition-colors">Share</button>
+          <span className="opacity-40">·</span>
+          <button className="hover:text-foreground transition-colors">Edit</button>
+          <span className="opacity-40">·</span>
+          <button className="hover:text-destructive transition-colors">Delete</button>
+          <span className="opacity-40">·</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          {REACTIONS.map(r => (
+            <button key={r} onClick={() => toggle(r)}
+              className={cn("h-7 px-2 rounded-md text-sm transition-colors flex items-center gap-1",
+                reactions[r] ? "bg-primary/10 text-primary" : "hover:bg-muted text-muted-foreground"
+              )}>
+              {r}{reactions[r] ? <span className="text-[10px] font-medium">{reactions[r]}</span> : null}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="flex items-center gap-2">
+        <div className="h-6 w-6 rounded-full bg-muted text-muted-foreground flex items-center justify-center text-[9px] font-semibold shrink-0">ES</div>
+        <input className="flex-1 text-xs bg-muted/50 rounded-lg px-3 py-1.5 text-muted-foreground placeholder:text-muted-foreground/60 outline-none focus:ring-1 focus:ring-border" placeholder="Add a comment…" />
+      </div>
+    </div>
+  )
+}
+
+const TIMELINE_WEEKS = [
+  { label: "Jun 9", hasUpdate: false },
+  { label: "Jun 16", hasUpdate: false },
+  { label: "Jun 23", hasUpdate: true },
+  { label: "Jun 30", hasUpdate: false },
+  { label: "Jul 7", hasUpdate: false },
+  { label: "Jul 14", hasUpdate: false },
+  { label: "Jul 21", hasUpdate: true },
+  { label: "Jul 28", hasUpdate: false },
+  { label: "Last week", hasUpdate: true, isCurrent: true },
+  { label: "This week", hasUpdate: false, isNext: true },
+]
+
+function UpdatesTimeline() {
+  const [selected, setSelected] = React.useState(8)
+  return (
+    <div className="overflow-x-auto mb-2 -mx-1 px-1">
+      <div className="flex items-center min-w-max gap-0">
+        {TIMELINE_WEEKS.map((w, i) => {
+          const isSelected = i === selected
+          const hasUpdate  = w.hasUpdate && !w.isNext
+          return (
+            <React.Fragment key={i}>
+              {i > 0 && (
+                <div className={cn("flex-1 h-px min-w-[16px]", hasUpdate ? "bg-foreground/20" : "bg-border/40")} />
+              )}
+              <button onClick={() => setSelected(i)} className="flex flex-col items-center gap-1.5 shrink-0 group px-1">
+                <div className={cn(
+                  "rounded-full transition-all",
+                  isSelected
+                    ? "h-3 w-3 bg-foreground"
+                    : hasUpdate
+                      ? "h-2.5 w-2.5 bg-foreground/40 group-hover:bg-foreground/60"
+                      : "h-2 w-2 bg-border group-hover:bg-muted-foreground/40",
+                )} />
+                <span className={cn(
+                  "text-[10px] whitespace-nowrap transition-colors",
+                  isSelected ? "text-foreground font-semibold" : "text-muted-foreground",
+                )}>{w.label}</span>
+              </button>
+            </React.Fragment>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+function ActivityFeed({ deal, stage }: { deal: Deal; stage: StageValue }) {
+  const [draft, setDraft] = React.useState("")
+  const stageFeed = getStageFeeds(stage)
+  const dealFeed = DEAL_FEEDS[deal.id] ?? []
+  const seen = new Set(stageFeed.map(e => e.message))
+  const feed = [...stageFeed, ...dealFeed.filter(e => !seen.has(e.message))]
 
   return (
     <div className="flex flex-col gap-0">
-      {/* Header with collapse */}
-      <button
-        onClick={() => setCollapsed(c => !c)}
-        className="flex items-center justify-between w-full py-1 mb-3 group"
-      >
-        <p className="text-sm font-semibold text-foreground">Activity</p>
-        <div className="flex items-center gap-1.5 text-xs text-muted-foreground group-hover:text-foreground transition-colors">
-          <span>{collapsed ? "Show" : "Hide"}</span>
-          {collapsed ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronUp className="h-3.5 w-3.5" />}
-        </div>
-      </button>
-
-      {!collapsed && (
-        <>
-          <div className="flex flex-col gap-2 mb-4">
-            {feed.map((entry, i) => (
-              <div key={i} className={cn(
-                "rounded-lg px-3 py-2.5 space-y-1.5",
-                entry.kind === "update" ? "bg-muted/50" :
-                entry.kind === "agent"  ? "bg-primary/5 border border-primary/15" :
-                "bg-card border border-border"
-              )}>
-                <div className="flex items-center gap-2">
-                  <div className={cn(
-                    "h-6 w-6 rounded-full flex items-center justify-center text-[9px] font-semibold shrink-0",
-                    entry.kind === "update" ? "bg-muted-foreground/15 text-muted-foreground" :
-                    entry.kind === "agent"  ? "bg-primary/15 text-primary" :
-                    "bg-foreground/10 text-foreground"
-                  )}>
-                    {entry.kind === "agent" ? <Bot className="h-3 w-3" /> : entry.initials}
-                  </div>
-                  <span className={cn(
-                    "text-xs font-semibold flex-1 min-w-0 truncate",
-                    entry.kind === "agent" ? "text-primary" : "text-foreground"
-                  )}>{entry.name}</span>
-                  <span className="text-[10px] text-muted-foreground shrink-0">{entry.timestamp}</span>
-                </div>
-                <p className={cn(
-                  "text-xs leading-relaxed pl-8",
-                  entry.kind === "update" ? "text-muted-foreground" : "text-foreground/80"
-                )}>
-                  {entry.message}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          <Separator className="mb-4" />
-
-          <div className="flex gap-2 items-end">
-            <Textarea
-              value={comment}
-              onChange={e => setComment(e.target.value)}
-              placeholder="Add a comment…"
-              className="flex-1 resize-none text-sm min-h-[60px]"
-              rows={2}
-            />
-            <Button size="sm" disabled={!comment.trim()} className="shrink-0 gap-1.5" onClick={() => setComment("")}>
+      <div className="flex flex-col gap-3">
+        {/* Composer */}
+        <div className="rounded-xl border border-border bg-card p-3 flex flex-col gap-2">
+          <Textarea value={draft} onChange={e => setDraft(e.target.value)}
+            placeholder="Post an update…"
+            className="resize-none text-sm min-h-[60px] border-0 bg-transparent p-0 focus-visible:ring-0 shadow-none"
+            rows={2}
+          />
+          <div className="flex items-center justify-between gap-2">
+            <Button size="sm" variant="outline" className="gap-1.5 text-primary border-primary/30 hover:bg-primary/5"
+              onClick={() => setDraft("Draft a deal update for Amazon.com summarizing current stage, recent activity, and next steps.")}>
+              <Zap className="h-3.5 w-3.5" />
+              Draft with VTS
+            </Button>
+            <Button size="sm" disabled={!draft.trim()} className="gap-1.5" onClick={() => setDraft("")}>
               <Send className="h-3.5 w-3.5" />
               Post
             </Button>
           </div>
-        </>
-      )}
+        </div>
+
+        {feed.length === 0
+          ? <p className="text-sm text-muted-foreground py-4 text-center">No updates yet.</p>
+          : feed.map((e, i) => <UpdateCard key={i} entry={e} />)
+        }
+      </div>
     </div>
   )
 }
@@ -789,101 +1020,109 @@ const HEALTH_TIERS = {
 } as const
 type HealthTier = keyof typeof HEALTH_TIERS
 
-const HEALTH_BY_STATUS: Record<string, { tier: HealthTier; label: string; summary: string; signals: string[]; recs: { action: string; urgency: string }[] }> = {
-  active: {
-    tier: 1, label: "On track",
-    summary: "This deal is progressing normally. No immediate action required.",
-    signals: [
-      "Email thread active in the last 72 hours",
-      "No counter-proposal overdue",
-      "No competing deal detected for this space",
-    ],
-    recs: [{ action: "Prepare next step documentation", urgency: "This week" }],
+type HealthEntry = { tier: HealthTier; label: string; summary: string; signals: string[]; recs: { action: string; urgency: string; agentId: string }[] }
+
+const HEALTH_BY_STAGE: Record<StageValue, Partial<Record<DealStatus, HealthEntry>>> = {
+  "Inquiry": {
+    active: { tier: 1, label: "On track", summary: "Requirement captured. Coordinating tour schedule with the tenant team.", signals: ["Inbound inquiry parsed and logged", "Tenant rep identified: Sarah Okonkwo at CBRE", "Space requirement matched to 3 available suites"], recs: [{ action: "Schedule initial tours", urgency: "This week", agentId: "tour-agent" }] },
+    stalled: { tier: 2, label: "Stalled", summary: "No tour scheduled yet. Inquiry risks going cold.", signals: ["Requirement captured 8 days ago", "No tour date confirmed", "Competing buildings may be scheduling faster"], recs: [{ action: "Re-engage tenant rep", urgency: "Today", agentId: "deal-momentum" }, { action: "Schedule tour", urgency: "Today", agentId: "tour-agent" }] },
+    "at-risk": { tier: 3, label: "At risk", summary: "Inquiry has not progressed. Tenant may be disengaging.", signals: ["12 days since inquiry", "No response to outreach", "Competitor tour detected"], recs: [{ action: "Send urgent re-engagement", urgency: "Today", agentId: "deal-momentum" }, { action: "Analyze deal intelligence", urgency: "Today", agentId: "deal-intelligence" }] },
   },
-  stalled: {
-    tier: 2, label: "Stalled",
-    summary: "Deal has had no activity in over 10 days. Action recommended.",
-    signals: [
-      `No inbound communication detected for ${26} days`,
-      "Last proposal sent — no counter received",
-      "Competing opportunity detected at 2 other buildings",
-    ],
-    recs: [
-      { action: "Send follow-up via Deal Momentum", urgency: "Today" },
-      { action: "Schedule check-in call", urgency: "This week" },
-    ],
+  "Touring": {
+    active: { tier: 1, label: "On track", summary: "Tours underway. Capturing tenant feedback and matching spaces.", signals: ["Tour scheduled for Sep 10 · 10:00 AM", "Suite 2100 ranked best fit", "No competing tour detected"], recs: [{ action: "Prepare proposal for top-ranked suite", urgency: "This week", agentId: "proposal-builder" }] },
+    stalled: { tier: 2, label: "Stalled", summary: "Tour completed but no follow-up from tenant rep.", signals: ["Tour completed 9 days ago", "No feedback received", "Proposal not yet requested"], recs: [{ action: "Follow up on tour feedback", urgency: "Today", agentId: "deal-momentum" }, { action: "Prepare proactive proposal", urgency: "This week", agentId: "proposal-builder" }] },
+    "at-risk": { tier: 3, label: "At risk", summary: "Tenant toured a competitor property. Engagement declining.", signals: ["Competitor tour detected at 2 other buildings", "Last communication 14 days ago", "No proposal request received"], recs: [{ action: "Model concession scenarios", urgency: "Today", agentId: "scenario-modeling" }, { action: "Send differentiation brief", urgency: "Today", agentId: "deal-momentum" }] },
   },
-  "at-risk": {
-    tier: 3, label: "At risk",
-    summary: "Multiple risk signals detected. Immediate attention recommended.",
-    signals: [
-      "Tenant has been seen touring a competitor property",
-      "Last communication over 14 days ago",
-      "Budget gap of 12% detected vs. market rate",
-    ],
-    recs: [
-      { action: "Escalate to senior leadership", urgency: "Today" },
-      { action: "Prepare concession scenario", urgency: "Today" },
-    ],
+  "Proposal": {
+    active: { tier: 1, label: "On track", summary: "Proposal delivered. Monitoring for counter and feedback.", signals: ["Proposal sent to tenant team", "No counter overdue", "Deal Momentum watching engagement signals"], recs: [{ action: "Prepare counter-proposal scenarios", urgency: "This week", agentId: "scenario-modeling" }] },
+    stalled: { tier: 2, label: "Stalled", summary: "Proposal sent with no counter received. Follow-up needed.", signals: ["Proposal delivered 11 days ago", "No counter received", "Board review may be causing delay"], recs: [{ action: "Send follow-up on proposal", urgency: "Today", agentId: "deal-momentum" }, { action: "Model alternative proposal terms", urgency: "This week", agentId: "scenario-modeling" }] },
+    "at-risk": { tier: 3, label: "At risk", summary: "Multiple risk signals on proposal stage. Intervention recommended.", signals: ["Tenant seen touring competitor", "Budget gap of 12% vs market", "Last communication 14 days ago"], recs: [{ action: "Model concession scenarios", urgency: "Today", agentId: "scenario-modeling" }, { action: "Analyze deal intelligence", urgency: "Today", agentId: "deal-intelligence" }] },
   },
-  executed: {
-    tier: 1, label: "Executed",
-    summary: "Lease executed. Operational handoff in progress.",
-    signals: ["Lease signed by all parties", "Effective date confirmed", "Operational tasks created"],
-    recs: [{ action: "Confirm buildout timeline with property team", urgency: "This week" }],
+  "LOI": {
+    active: { tier: 1, label: "On track", summary: "LOI executed. Preparing legal package for counsel.", signals: ["LOI signed by all parties", "Key terms extracted: 18 fields", "2 flags raised: TI escalation and subleasing rights"], recs: [{ action: "Prepare counsel handoff package", urgency: "This week", agentId: "counsel-handoff" }] },
+    stalled: { tier: 2, label: "Stalled", summary: "LOI signed but legal package not yet initiated.", signals: ["LOI executed 7 days ago", "No counsel engaged yet", "Clock running on exclusivity window"], recs: [{ action: "Initiate counsel handoff", urgency: "Today", agentId: "counsel-handoff" }, { action: "Flag exclusivity timeline risk", urgency: "Today", agentId: "deal-momentum" }] },
+    "at-risk": { tier: 3, label: "At risk", summary: "LOI terms at risk. Open items need immediate resolution.", signals: ["Subleasing rights dispute unresolved", "TI escalation clause flagged", "Exclusivity window closing in 5 days"], recs: [{ action: "Escalate flagged terms to counsel", urgency: "Today", agentId: "counsel-handoff" }, { action: "Prepare negotiation guidance", urgency: "Today", agentId: "negotiation-guidance" }] },
+  },
+  "Legal": {
+    active: { tier: 1, label: "On track", summary: "Legal review underway. Tracking open redlines.", signals: ["12 open redlines tracked", "Both counsel parties engaged", "No scope drift detected"], recs: [{ action: "Monitor redline resolution progress", urgency: "This week", agentId: "negotiation-guidance" }] },
+    stalled: { tier: 2, label: "Stalled", summary: "Legal review stalled. Redlines not progressing.", signals: ["No redline movement in 8 days", "Scope drift detected on subleasing rights", "Tenant counsel unresponsive"], recs: [{ action: "Escalate stalled redlines", urgency: "Today", agentId: "negotiation-guidance" }, { action: "Prepare concession on open items", urgency: "Today", agentId: "scenario-modeling" }] },
+    "at-risk": { tier: 3, label: "At risk", summary: "Critical legal issues detected. Immediate attention required.", signals: ["Subleasing rights moved without agreement", "3 rounds of redlines unresolved", "Tenant threatening to walk"], recs: [{ action: "Convene negotiation call", urgency: "Today", agentId: "negotiation-guidance" }, { action: "Escalate to senior leadership", urgency: "Today", agentId: "deal-health" }] },
+  },
+  "Lease Out": {
+    active: { tier: 1, label: "On track", summary: "Lease out for signature. Tracking outstanding signatures.", signals: ["2 outstanding signatures: Tenant CFO and Landlord VP", "Execution package assembled", "Effective date confirmed"], recs: [{ action: "Track signature completion", urgency: "This week", agentId: "execution-management" }] },
+    stalled: { tier: 2, label: "Stalled", summary: "Lease out but no signatures received yet.", signals: ["Lease sent 6 days ago", "No signatures returned", "Signatory availability unconfirmed"], recs: [{ action: "Follow up with signatories", urgency: "Today", agentId: "execution-management" }, { action: "Re-engage tenant rep", urgency: "Today", agentId: "deal-momentum" }] },
+    "at-risk": { tier: 3, label: "At risk", summary: "Signature process at risk. Deal may not close.", signals: ["Tenant CFO travel delay", "Landlord VP approval pending board", "Competing lease opportunity detected"], recs: [{ action: "Escalate signature urgency", urgency: "Today", agentId: "execution-management" }, { action: "Prepare contingency scenarios", urgency: "Today", agentId: "scenario-modeling" }] },
+  },
+  "Executed": {
+    active: { tier: 1, label: "On track", summary: "Lease executed. Operational handoff in progress.", signals: ["Lease signed by all parties", "Effective date Jan 1, 2027", "16 operational tasks created"], recs: [{ action: "Complete operational handoff", urgency: "This week", agentId: "operational-handoff" }, { action: "Sync final terms to all systems", urgency: "This week", agentId: "data-writeback" }] },
+    stalled: { tier: 2, label: "Stalled", summary: "Execution complete but handoff tasks not started.", signals: ["Lease executed 3 days ago", "Property management not notified", "Buildout tasks not created"], recs: [{ action: "Initiate operational handoff", urgency: "Today", agentId: "operational-handoff" }, { action: "Sync final terms", urgency: "Today", agentId: "data-writeback" }] },
+    "at-risk": { tier: 3, label: "At risk", summary: "Post-execution tasks falling behind. Tenant move-in at risk.", signals: ["Buildout permit delayed", "Property management handoff incomplete", "Move-in date conflicts detected"], recs: [{ action: "Escalate buildout timeline", urgency: "Today", agentId: "operational-handoff" }, { action: "Resolve move-in conflicts", urgency: "Today", agentId: "data-writeback" }] },
   },
 }
 
-function DealHealthCard({ status }: { status: DealStatus }) {
-  const [open, setOpen] = React.useState(false)
-  const cfg = HEALTH_BY_STATUS[status] ?? HEALTH_BY_STATUS.active
+function RecRow({ action, urgency, agentId }: { action: string; urgency: string; agentId: string }) {
+  const agent = AGENTS.find(a => a.id === agentId)
+  const AgentIcon = agent ? (AGENT_ICON_MAP[agent.name] ?? Bot) : Bot
+
+  return (
+    <div className="flex items-center gap-2.5 rounded-lg p-3 border border-primary/25 bg-primary/15">
+      <Zap className="h-4 w-4 shrink-0 text-sidebar-primary" />
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium text-sidebar-foreground/90">{action}</p>
+        <p className="text-xs text-sidebar-foreground/55">{urgency}</p>
+      </div>
+      {agent && (
+        <Button variant="outline" size="sm" onClick={() => {}}
+          className="gap-1.5 shrink-0 text-sidebar-foreground/85 border-current bg-transparent hover:bg-white/10">
+          <AgentIcon className="h-3 w-3" />
+          {agent.name}
+        </Button>
+      )}
+    </div>
+  )
+}
+
+function DealHealthCard({ status, stage }: { status: DealStatus; stage: StageValue }) {
+  const stageHealth = HEALTH_BY_STAGE[stage]
+  const cfg = stageHealth?.[status] ?? stageHealth?.active ?? HEALTH_BY_STAGE["Inquiry"].active!
   const style = HEALTH_TIERS[cfg.tier]
 
   return (
-    <div className={cn(cardBase, "flex flex-col gap-3")}>
-      <div className="flex items-start gap-2.5">
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 border border-primary/20 mt-0.5">
-          <HeartPulse className="h-4 w-4 text-primary" />
+    <div className={cn(cardBase, "border-transparent flex flex-col gap-4 bg-sidebar-accent")}>
+      <div className="flex items-start justify-between gap-2">
+        <div>
+          <p className="text-[10px] font-medium uppercase tracking-widest mb-1 text-sidebar-foreground/70">VTS agents</p>
+          <h2 className="text-xl font-semibold text-sidebar-foreground">Deal Health</h2>
         </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-base font-semibold text-foreground leading-tight">Deal Health</p>
-          <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{cfg.summary}</p>
-        </div>
-        <Badge variant="outline" className={cn("shrink-0 gap-1.5 font-medium text-xs", style.cls)}>
-          <span className={cn("h-1.5 w-1.5 rounded-full", style.dot)} />
-          {cfg.label}
-        </Badge>
       </div>
 
-      <div className="flex flex-wrap gap-2">
+      <div className="rounded-lg px-3 py-2 flex items-center gap-3 bg-sidebar-foreground/10">
+        <HeartPulse className="h-4 w-4 shrink-0 text-sidebar-primary" />
+        <p className="text-sm leading-snug text-sidebar-foreground/70 flex-1">{cfg.summary}</p>
+        <Popover>
+          <PopoverTrigger render={<Button variant="outline" size="sm" className="shrink-0 gap-1.5 text-sidebar-foreground/85 border-current bg-transparent hover:bg-white/10" />}>
+            Signals
+            <ChevronDown className="h-3 w-3" />
+          </PopoverTrigger>
+          <PopoverContent className="w-64 p-3" align="end">
+            <p className="text-xs font-semibold text-foreground mb-2">Signals</p>
+            <div className="flex flex-col gap-2">
+              {cfg.signals.map((s, i) => (
+                <div key={i} className="flex items-start gap-2 text-xs text-foreground/80 leading-snug">
+                  <CheckCircle2 className="h-3.5 w-3.5 text-success shrink-0 mt-0.5" />
+                  {s}
+                </div>
+              ))}
+            </div>
+          </PopoverContent>
+        </Popover>
+      </div>
+
+      <div className="flex flex-col gap-2">
         {cfg.recs.map(r => (
-          <div key={r.action} className="flex items-center gap-2 rounded-lg border border-border/60 bg-muted/30 px-3 py-1.5">
-            <Zap className="h-3 w-3 text-muted-foreground shrink-0" />
-            <span className="text-xs text-foreground">{r.action}</span>
-            <span className="text-[10px] text-muted-foreground">{r.urgency}</span>
-          </div>
+          <RecRow key={r.action} action={r.action} urgency={r.urgency} agentId={r.agentId} />
         ))}
       </div>
-
-      <button
-        onClick={() => setOpen(o => !o)}
-        className="flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 transition-colors w-fit"
-      >
-        <ChevronDown className={cn("h-3.5 w-3.5 transition-transform duration-200", open && "rotate-180")} />
-        {open ? "Hide signals" : "Why"}
-      </button>
-
-      {open && (
-        <div className="flex flex-col gap-1.5 pt-1 border-t border-border/60">
-          <p className="text-xs font-semibold text-foreground mb-1">Signals</p>
-          {cfg.signals.map((s, i) => (
-            <div key={i} className="flex items-start gap-2.5 text-xs text-foreground/80 leading-snug">
-              <CheckCircle2 className="h-3.5 w-3.5 text-success shrink-0 mt-0.5" />
-              {s}
-            </div>
-          ))}
-        </div>
-      )}
     </div>
   )
 }
@@ -893,66 +1132,59 @@ function DealHealthCard({ status }: { status: DealStatus }) {
 interface DealProfileProps {
   deal: Deal
   onBack: () => void
+  status?: DealStatus
+  onStatusChange?: (s: DealStatus) => void
 }
 
-export function DealProfile({ deal, onBack }: DealProfileProps) {
-  const [stage, setStage]   = React.useState<StageValue>(deal.stage as StageValue)
-  const [status, setStatus] = React.useState<DealStatus>(deal.status as DealStatus)
-  const [tab, setTab]       = React.useState("overview")
+export function DealProfile({ deal, onBack, status: statusProp, onStatusChange }: DealProfileProps) {
+  const [stage, setStage]           = React.useState<StageValue>(deal.stage as StageValue)
+  const [internalStatus, setInternalStatus] = React.useState<DealStatus>(deal.status as DealStatus)
+  const status    = statusProp ?? internalStatus
+  const setStatus = onStatusChange ?? setInternalStatus
+  const [tab, setTab]               = React.useState("updates")
   const stageIdx = ALL_STAGES.indexOf(stage)
 
   return (
     <div className="flex flex-col gap-4 mt-4 pb-8">
 
-      {/* Breadcrumb + status */}
-      <div className="flex items-center gap-2 flex-wrap">
-        <nav className="flex items-center gap-1 text-xs text-muted-foreground">
-          <Button
-            variant="ghost" size="sm"
-            onClick={onBack}
-            className="h-auto p-0 text-xs font-normal text-muted-foreground hover:text-foreground hover:bg-transparent"
-          >
-            Deals
-          </Button>
-          <ChevronRight className="h-3 w-3 shrink-0" />
-          <span className="text-foreground font-medium">{deal.tenant}</span>
-        </nav>
-        <div className="ml-auto">
-          <StatusBadge status={status} onChange={setStatus} />
-        </div>
-      </div>
-
-      {/* Stage journey */}
-      <StageJourneyBar currentStage={stage} onChange={s => { setStage(s); setTab("overview") }} />
-
       {/* Financial KPI bar */}
       <FinancialBar deal={deal} stageIdx={stageIdx} />
 
-      {/* Agent strip */}
-      <AgentStrip deal={deal} stage={stage} />
+      {/* Stage journey */}
+      <StageJourneyBar currentStage={stage} onChange={s => { setStage(s); setTab("updates") }} />
 
-      {/* Deal Health */}
-      <DealHealthCard status={status} />
+      {/* Agent strip */}
 
       {/* Main content grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-stretch">
 
-        {/* Left: tabbed detail */}
-        <div className={cn(cardBase, "lg:col-span-2")}>
-          <ToggleGroup type="single" value={tab} onValueChange={v => v && setTab(v as string)}
-            className={cn(FILTER_TAB_GROUP_CLS, "w-full mb-5")}>
-            <ToggleGroupItem value="overview"  size="sm" className={cn(FILTER_TAB_ITEM_CLS, "flex-1 text-sm")}>Overview</ToggleGroupItem>
-            <ToggleGroupItem value="proposals" size="sm" className={cn(FILTER_TAB_ITEM_CLS, "flex-1 text-sm")}>Proposals</ToggleGroupItem>
-            <ToggleGroupItem value="documents" size="sm" className={cn(FILTER_TAB_ITEM_CLS, "flex-1 text-sm")}>Documents</ToggleGroupItem>
-          </ToggleGroup>
-          {tab === "overview"  && <OverviewTab deal={deal} stageIdx={stageIdx} />}
-          {tab === "proposals" && <ProposalsTab deal={deal} stageIdx={stageIdx} />}
-          {tab === "documents" && <DocumentsTab deal={deal} />}
+        {/* Left col: Deal Health + tabbed content */}
+        <div className="lg:col-span-2 flex flex-col gap-4 h-full">
+          <DealHealthCard status={status} stage={stage} />
+
+          <div className={cn(cardBase, "flex-1")}>
+            <ToggleGroup type="single" value={tab} onValueChange={v => v && setTab(v as string)}
+              className={cn(FILTER_TAB_GROUP_CLS, "w-full mb-5")}>
+              <ToggleGroupItem value="updates"   size="sm" className={cn(FILTER_TAB_ITEM_CLS, "flex-1 text-sm")}>Updates</ToggleGroupItem>
+              <ToggleGroupItem value="tasks"     size="sm" className={cn(FILTER_TAB_ITEM_CLS, "flex-1 text-sm")}>Tasks</ToggleGroupItem>
+              <ToggleGroupItem value="tours"     size="sm" className={cn(FILTER_TAB_ITEM_CLS, "flex-1 text-sm")}>Tours</ToggleGroupItem>
+              <ToggleGroupItem value="proposals" size="sm" className={cn(FILTER_TAB_ITEM_CLS, "flex-1 text-sm")}>Proposals</ToggleGroupItem>
+              <ToggleGroupItem value="leases"    size="sm" className={cn(FILTER_TAB_ITEM_CLS, "flex-1 text-sm")}>Legal</ToggleGroupItem>
+              <ToggleGroupItem value="documents" size="sm" className={cn(FILTER_TAB_ITEM_CLS, "flex-1 text-sm")}>Documents</ToggleGroupItem>
+            </ToggleGroup>
+            {tab === "updates"   && <ActivityFeed deal={deal} stage={stage} />}
+            {tab === "tasks"     && <TasksTab stage={stage} />}
+            {tab === "tours"     && <p className="text-sm text-muted-foreground py-8 text-center">No tours scheduled.</p>}
+            {tab === "proposals" && <ProposalsTab deal={deal} stageIdx={stageIdx} />}
+            {tab === "leases"    && <p className="text-sm text-muted-foreground py-8 text-center">No leases on file.</p>}
+            {tab === "documents" && <DocumentsTab deal={deal} stage={stage} />}
+          </div>
         </div>
 
-        {/* Right: activity feed */}
+        {/* Right: info */}
         <div className={cn(cardBase)}>
-          <ActivityFeed deal={deal} />
+          <p className="text-sm font-semibold text-foreground mb-4">Info</p>
+          <OverviewTab deal={deal} stageIdx={stageIdx} />
         </div>
 
       </div>

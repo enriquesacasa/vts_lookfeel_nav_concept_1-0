@@ -15,7 +15,7 @@ import { AgentBtn } from "@/components/agent-btn"
 
 // ── Tenant logos ─────────────────────────────────────────────────────────────
 
-const TENANT_LOGO: Record<string, string> = {
+export const TENANT_LOGO: Record<string, string> = {
   "Starbucks Corporation": "/vts_lookfeel_nav_concept_1-0/logos/starbucks.png",
   "Pfizer Inc.":           "/vts_lookfeel_nav_concept_1-0/logos/pfizer.png",
   "Morgan Stanley":        "/vts_lookfeel_nav_concept_1-0/logos/morganstanley.png",
@@ -244,7 +244,7 @@ function AiInsightCard() {
           {isV2 && <div className="h-7 w-7 bg-ai/20 flex items-center justify-center shrink-0">
             <Sparkle className="h-4 w-4 text-sidebar-primary" />
           </div>}
-          {!isV2 && <p className="text-[10px] font-medium uppercase tracking-widest mb-1 text-sidebar-foreground/70">Ask VTS</p>}
+          {!isV2 && <p className="text-[10px] font-medium uppercase tracking-widest mb-1 text-sidebar-foreground/70">VTS agents</p>}
           <p className={cn("font-medium text-sidebar-foreground", isV2 ? "text-sm" : "text-xl font-medium")}>
             {isV2 ? "Ask VTS" : "Deal intelligence"}
           </p>
