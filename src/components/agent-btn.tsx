@@ -138,6 +138,7 @@ export function AgentBtn({ label, onClick, variant = "icon", className }: AgentB
   const msg = label || "Ask VTS"
 
   const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
     if (pattern === "popover") {
       setPopoverOpen(true)
     } else {

@@ -533,6 +533,72 @@ function TasksTab({ stage }: { stage: StageValue }) {
   )
 }
 
+// ─── Encumbrances tab ─────────────────────────────────────────────────────────
+
+type EncumbranceItem = {
+  optionType: string
+  holder: string
+  suite: string
+  floor: string
+  sf: number
+  priority: number
+  expiry?: string
+  notes?: string
+}
+
+const DEAL_ENCUMBRANCES: Record<string, EncumbranceItem[]> = {
+  "d01": [
+    { optionType: "ROFO", holder: "Starbucks Corporation", suite: "Suite 750", floor: "Floor 7", sf: 8200, priority: 1, expiry: "Dec 31, 2027", notes: "Must exercise within 30 days of landlord notice" },
+    { optionType: "Expansion Option", holder: "Starbucks Corporation", suite: "Suite 900", floor: "Floor 9", sf: 12000, priority: 1, expiry: "Jun 30, 2028" },
+  ],
+  "d02": [
+    { optionType: "ROFO", holder: "Apex Capital", suite: "Floor 11", floor: "Floor 11", sf: 45000, priority: 1, expiry: "Mar 15, 2027" },
+    { optionType: "Contraction Option", holder: "Apex Capital", suite: "Floor 12 – North Wing", floor: "Floor 12", sf: 18000, priority: 1, notes: "One-time right, exercisable at 36-month mark" },
+  ],
+  "d04": [
+    { optionType: "ROFO", holder: "Atlas Group", suite: "Floors 4–5", floor: "Floors 4–5", sf: 61000, priority: 1, expiry: "Jan 1, 2028" },
+    { optionType: "Expansion Option", holder: "Atlas Group", suite: "Floor 6", floor: "Floor 6", sf: 30500, priority: 2, expiry: "Jan 1, 2029", notes: "Subject to landlord availability" },
+    { optionType: "ROFR", holder: "Third-party tenant", suite: "Floor 4", floor: "Floor 4", sf: 30500, priority: 1, notes: "Existing ROFR from Horizon Ventures; may conflict" },
+  ],
+  "d05": [
+    { optionType: "Expansion Option", holder: "Vertex Studios", suite: "Suite 650", floor: "Floor 6", sf: 9800, priority: 1, expiry: "Sep 30, 2027" },
+  ],
+}
+
+const ENCUMBRANCE_TYPE_STYLE: Record<string, string> = {
+  "ROFO":              "bg-blue-500/10 text-blue-600 border-blue-500/20",
+  "ROFR":              "bg-violet-500/10 text-violet-600 border-violet-500/20",
+  "Expansion Option":  "bg-emerald-500/10 text-emerald-600 border-emerald-500/20",
+  "Contraction Option":"bg-amber-500/10 text-amber-600 border-amber-500/20",
+}
+
+function EncumbrancesTab({ deal }: { deal: Deal }) {
+  const items = DEAL_ENCUMBRANCES[deal.id] ?? []
+
+  if (!items.length) {
+    return <p className="text-sm text-muted-foreground py-8 text-center">No encumbrances on file for this deal.</p>
+  }
+
+  return (
+    <div className="flex flex-col gap-2">
+      {items.map((enc, i) => (
+        <div key={i} className="flex flex-col gap-1.5 py-3 px-3 rounded-lg border border-border/60 bg-card">
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className={cn("text-[10px] border shrink-0", ENCUMBRANCE_TYPE_STYLE[enc.optionType] ?? "")}>{enc.optionType}</Badge>
+            <p className="text-sm font-semibold text-foreground truncate">{enc.holder}</p>
+            <span className="ml-auto text-xs text-muted-foreground shrink-0">Priority {enc.priority}</span>
+          </div>
+          <div className="flex flex-wrap gap-x-4 gap-y-0.5">
+            <p className="text-xs text-muted-foreground"><span className="text-foreground/70">Space:</span> {enc.suite} · {enc.sf.toLocaleString()} sf</p>
+            {enc.expiry && <p className="text-xs text-muted-foreground"><span className="text-foreground/70">Expires:</span> {enc.expiry}</p>}
+          </div>
+          {enc.notes && <p className="text-xs text-muted-foreground/80 italic">{enc.notes}</p>}
+        </div>
+      ))}
+    </div>
+  )
+}
+
 // ─── Documents tab ────────────────────────────────────────────────────────────
 
 type DocItem = { name: string; type: string; date: string }
@@ -980,18 +1046,20 @@ export function DealProfile({ deal, onBack: _onBack, status: statusProp, onStatu
             <ToggleGroup type="single" value={tab} onValueChange={v => v && setTab(v as string)}
               className={cn(FILTER_TAB_GROUP_CLS, "w-full mb-5")}>
               <ToggleGroupItem value="updates"   size="sm" className={cn(FILTER_TAB_ITEM_CLS, "flex-1 text-sm")}>Updates</ToggleGroupItem>
-              <ToggleGroupItem value="tasks"     size="sm" className={cn(FILTER_TAB_ITEM_CLS, "flex-1 text-sm")}>Tasks</ToggleGroupItem>
-              <ToggleGroupItem value="tours"     size="sm" className={cn(FILTER_TAB_ITEM_CLS, "flex-1 text-sm")}>Tours</ToggleGroupItem>
-              <ToggleGroupItem value="proposals" size="sm" className={cn(FILTER_TAB_ITEM_CLS, "flex-1 text-sm")}>Proposals</ToggleGroupItem>
-              <ToggleGroupItem value="leases"    size="sm" className={cn(FILTER_TAB_ITEM_CLS, "flex-1 text-sm")}>Legal</ToggleGroupItem>
-              <ToggleGroupItem value="documents" size="sm" className={cn(FILTER_TAB_ITEM_CLS, "flex-1 text-sm")}>Documents</ToggleGroupItem>
+              <ToggleGroupItem value="tasks"        size="sm" className={cn(FILTER_TAB_ITEM_CLS, "flex-1 text-sm")}>Tasks</ToggleGroupItem>
+              <ToggleGroupItem value="encumbrances" size="sm" className={cn(FILTER_TAB_ITEM_CLS, "flex-1 text-sm")}>Encumbrances</ToggleGroupItem>
+              <ToggleGroupItem value="tours"        size="sm" className={cn(FILTER_TAB_ITEM_CLS, "flex-1 text-sm")}>Tours</ToggleGroupItem>
+              <ToggleGroupItem value="proposals"    size="sm" className={cn(FILTER_TAB_ITEM_CLS, "flex-1 text-sm")}>Proposals</ToggleGroupItem>
+              <ToggleGroupItem value="leases"       size="sm" className={cn(FILTER_TAB_ITEM_CLS, "flex-1 text-sm")}>Legal</ToggleGroupItem>
+              <ToggleGroupItem value="documents"    size="sm" className={cn(FILTER_TAB_ITEM_CLS, "flex-1 text-sm")}>Documents</ToggleGroupItem>
             </ToggleGroup>
-            {tab === "updates"   && <ActivityFeed deal={deal} stage={stage} />}
-            {tab === "tasks"     && <TasksTab stage={stage} />}
-            {tab === "tours"     && <p className="text-sm text-muted-foreground py-8 text-center">No tours scheduled.</p>}
-            {tab === "proposals" && <ProposalsTab deal={deal} stageIdx={stageIdx} />}
-            {tab === "leases"    && <p className="text-sm text-muted-foreground py-8 text-center">No leases on file.</p>}
-            {tab === "documents" && <DocumentsTab stage={stage} />}
+            {tab === "updates"      && <ActivityFeed deal={deal} stage={stage} />}
+            {tab === "tasks"        && <TasksTab stage={stage} />}
+            {tab === "tours"        && <p className="text-sm text-muted-foreground py-8 text-center">No tours scheduled.</p>}
+            {tab === "proposals"    && <ProposalsTab deal={deal} stageIdx={stageIdx} />}
+            {tab === "leases"       && <p className="text-sm text-muted-foreground py-8 text-center">No leases on file.</p>}
+            {tab === "encumbrances" && <EncumbrancesTab deal={deal} />}
+            {tab === "documents"    && <DocumentsTab stage={stage} />}
           </div>
         </div>
 
