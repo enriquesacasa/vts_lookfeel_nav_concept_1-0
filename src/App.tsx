@@ -1,6 +1,5 @@
 import * as React from "react"
-import { Wand, Sparkle } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Wand } from "lucide-react"
 import { AgentBtn } from "@/components/agent-btn"
 import { AppNav } from "@/components/app-nav"
 import { BuildingHeader } from "@/components/building-header"

@@ -2,20 +2,17 @@ import * as React from "react"
 import { cn, cardBase } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { FILTER_TAB_GROUP_CLS, FILTER_TAB_ITEM_CLS } from "@/components/filter-chip"
-import { AgentBtn } from "@/components/agent-btn"
 import {
-  ChevronRight, ChevronDown, Check, FileText, Download, Send,
+  ChevronDown, Check, FileText, Download, Send,
   Building2, User, MapPin, Ruler, Tag, Calendar,
   CheckCircle2, Clock, AlertTriangle, HeartPulse, Zap,
-  ExternalLink, Bot, ChevronUp,
+  Bot,
   Briefcase, Globe, Mail, DollarSign, Layers, Target,
-  Star, Home, SquareStack, Scale, Gavel, Trophy,
+  Star, Home, SquareStack, Scale, Trophy,
 } from "lucide-react"
 import { AGENT_ICON_MAP, AGENTS } from "@/components/agents-page"
 import { TENANT_LOGO, type Deal } from "@/components/deals-page"
@@ -232,122 +229,10 @@ function FinancialBar({ deal, stageIdx }: { deal: Deal; stageIdx: number }) {
 
 // ─── Agent strip ──────────────────────────────────────────────────────────────
 
-const AGENT_INFO: Record<string, { name: string; tagline: string }> = {
-  "deal-capture":        { name: "Deal Capture",        tagline: "Capture every deal signal automatically" },
-  "deal-intelligence":   { name: "Deal Intelligence",   tagline: "Build the full picture before anyone has to ask" },
-  "space-match":         { name: "Space Match",         tagline: "Find the right space for every requirement" },
-  "tour-agent":          { name: "Tour Coordinator",    tagline: "Schedule and log every tour automatically" },
-  "deal-health":         { name: "Deal Health",         tagline: "Know the strength of every deal" },
-  "proposal-builder":    { name: "Proposal Builder",    tagline: "Build proposals from deal data automatically" },
-  "scenario-modeling":   { name: "Scenario Modeling",   tagline: "Model the deal before committing" },
-  "approval-readiness":  { name: "Approval Readiness",  tagline: "Turn a proposal into a decision-ready package" },
-  "negotiation-guidance":{ name: "Negotiation Guidance",tagline: "Help teams resolve open terms faster" },
-  "counsel-handoff":     { name: "Counsel Handoff",     tagline: "Give counsel a package, not a blank page" },
-  "deal-momentum":       { name: "Deal Momentum",       tagline: "Keep stalled deals moving" },
-  "execution-management":{ name: "Execution Management",tagline: "Take the deal from final terms through signature" },
-  "operational-handoff": { name: "Operational Handoff", tagline: "Turn the executed lease into work automatically" },
-  "data-writeback":      { name: "Data Writeback",      tagline: "Make execution the end of data entry" },
-}
 
-const STAGE_DEFAULT_AGENTS: Record<StageValue, string[]> = {
-  "Inquiry":   ["deal-capture", "deal-intelligence", "deal-health"],
-  "Touring":   ["space-match", "tour-agent", "deal-intelligence", "deal-health"],
-  "Proposal":  ["proposal-builder", "scenario-modeling", "deal-momentum", "deal-health"],
-  "LOI":       ["negotiation-guidance", "counsel-handoff", "approval-readiness", "deal-momentum"],
-  "Legal":     ["counsel-handoff", "negotiation-guidance", "execution-management"],
-  "Lease Out": ["execution-management", "approval-readiness"],
-  "Executed":  ["operational-handoff", "data-writeback"],
-}
 
 // Featured agents per deal — one is the spotlight
-const DEAL_AGENT_FOCUS: Record<string, { featuredId: string; insight: string }> = {
-  "d00": {
-    featuredId: "deal-capture",
-    insight: "Parsed inbound email from Sarah Okonkwo at CBRE. Extracted tenant, space, size, and rep in 4 seconds. Deal record created and staged at Inquiry.",
-  },
-  "d08": {
-    featuredId: "space-match",
-    insight: "Ranked 14 available floors across 3 assets. Suite 2100 flagged as non-obvious fit — uninterrupted 54,000 sf plate matching Morgan Stanley's open-plan requirement and no column interference.",
-  },
-  "d10": {
-    featuredId: "deal-momentum",
-    insight: "Stalled 26 days. Cost of delay: $3,705/day ($96,330 total). Board approval is the blocker. Two follow-ups ready — one to Paul Simmons, one CFO escalation. Ready to send on your approval.",
-  },
-  "d09": {
-    featuredId: "counsel-handoff",
-    insight: "Extracted 18 LOI terms with citations. Flagged 2 unusual positions: TI escalation clause (non-standard) and subleasing rights at 75% (market is 85%). First-draft legal brief assembled and ready to route.",
-  },
-  "d20": {
-    featuredId: "execution-management",
-    insight: "Signatory verified: Luis Garcia (EVP, authorized >$15M). Execution package assembled: lease + 4 exhibits. Tracking 2 outstanding signatures — Salesforce CFO counter and Landlord VP. ETA: Dec 15.",
-  },
-  "d22": {
-    featuredId: "data-writeback",
-    insight: "Extracted 24 final terms from the Goldman Sachs executed lease. Written to VTS deal record: ✓. Financial model sync: ✓. Reporting fields: ✓. Zero discrepancies detected across all systems.",
-  },
-}
 
-function AgentStrip({ deal, stage }: { deal: Deal; stage: StageValue }) {
-  const focus = DEAL_AGENT_FOCUS[deal.id]
-  const agentIds = STAGE_DEFAULT_AGENTS[stage] ?? []
-
-  return (
-    <div className="flex flex-col gap-3">
-      {/* Featured agent spotlight */}
-      {focus && (
-        <div className={cn(cardBase, "bg-primary/5 border-primary/20 flex flex-col sm:flex-row gap-4")}>
-          <div className="flex items-start gap-3 flex-1 min-w-0">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 border border-primary/20 mt-0.5">
-              {(() => { const I = AGENT_ICON_MAP[AGENT_INFO[focus.featuredId]?.name] ?? Bot; return <I className="h-4 w-4 text-primary" /> })()}
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <p className="text-base font-semibold text-primary">{AGENT_INFO[focus.featuredId]?.name}</p>
-                <Badge variant="outline" className="text-[10px] text-primary border-primary/30 bg-primary/5">Active on this deal</Badge>
-              </div>
-              <p className="text-sm text-foreground/80 mt-1 leading-relaxed">{focus.insight}</p>
-            </div>
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            className="shrink-0 gap-1.5 self-start border-primary/30 text-primary hover:bg-primary/10"
-            onClick={() => { window.location.hash = "#/agents" }}
-          >
-            View agent
-            <ExternalLink className="h-3.5 w-3.5" />
-          </Button>
-        </div>
-      )}
-
-      {/* Supporting agents row */}
-      <div className="flex gap-2 overflow-x-auto pb-1">
-        {agentIds.filter(id => id !== focus?.featuredId).map(id => {
-          const info = AGENT_INFO[id]
-          if (!info) return null
-          return (
-            <button
-              key={id}
-              onClick={() => { window.location.hash = "#/agents" }}
-              className={cn(
-                "flex items-center gap-2 shrink-0 rounded-xl border border-border bg-card px-3 py-2",
-                "hover:bg-muted/60 hover:border-border transition-colors text-left"
-              )}
-            >
-              <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-muted/60">
-                {(() => { const I = AGENT_ICON_MAP[info.name] ?? Bot; return <I className="h-3.5 w-3.5 text-muted-foreground" /> })()}
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-foreground whitespace-nowrap">{info.name}</p>
-                <p className="text-[10px] text-muted-foreground whitespace-nowrap max-w-[160px] truncate">{info.tagline}</p>
-              </div>
-            </button>
-          )
-        })}
-      </div>
-    </div>
-  )
-}
 
 // ─── Field row ────────────────────────────────────────────────────────────────
 
@@ -367,29 +252,7 @@ function FieldRow({ icon: Icon, label, children }: { icon?: React.ElementType; l
 
 // ─── Info tab ─────────────────────────────────────────────────────────────────
 
-function InfoFieldRow({ label, value }: { label: string; value?: string }) {
-  return (
-    <div className="flex items-center justify-between py-2.5 border-b border-border/50 last:border-0 gap-4">
-      <span className="text-sm text-muted-foreground shrink-0">{label}</span>
-      {value
-        ? <span className="text-sm font-semibold text-foreground text-right">{value}</span>
-        : <button className="text-sm text-muted-foreground/50 hover:text-primary transition-colors">Add</button>
-      }
-    </div>
-  )
-}
 
-function InfoSection({ title, action, children }: { title: string; action?: React.ReactNode; children: React.ReactNode }) {
-  return (
-    <div className="rounded-xl border border-border overflow-hidden">
-      <div className="flex items-center justify-between px-5 py-3.5 border-b border-border bg-card">
-        <p className="text-sm font-semibold text-foreground">{title}</p>
-        {action}
-      </div>
-      <div className="px-5 bg-card">{children}</div>
-    </div>
-  )
-}
 
 function OverviewTab({ deal, stageIdx }: { deal: Deal; stageIdx: number }) {
   return (
@@ -716,7 +579,7 @@ const DOC_TYPE_STYLE: Record<string, string> = {
   "Due diligence":  "bg-destructive/10 text-destructive border-destructive/20",
 }
 
-function DocumentsTab({ deal, stage }: { deal: Deal; stage: StageValue }) {
+function DocumentsTab({ stage }: { stage: StageValue }) {
   const docs = getDocuments(stage)
   const byType = docs.reduce<Record<string, DocItem[]>>((acc, d) => {
     ;(acc[d.type] = acc[d.type] ?? []).push(d)
@@ -923,53 +786,6 @@ function UpdateCard({ entry }: { entry: FeedEntry }) {
   )
 }
 
-const TIMELINE_WEEKS = [
-  { label: "Jun 9", hasUpdate: false },
-  { label: "Jun 16", hasUpdate: false },
-  { label: "Jun 23", hasUpdate: true },
-  { label: "Jun 30", hasUpdate: false },
-  { label: "Jul 7", hasUpdate: false },
-  { label: "Jul 14", hasUpdate: false },
-  { label: "Jul 21", hasUpdate: true },
-  { label: "Jul 28", hasUpdate: false },
-  { label: "Last week", hasUpdate: true, isCurrent: true },
-  { label: "This week", hasUpdate: false, isNext: true },
-]
-
-function UpdatesTimeline() {
-  const [selected, setSelected] = React.useState(8)
-  return (
-    <div className="overflow-x-auto mb-2 -mx-1 px-1">
-      <div className="flex items-center min-w-max gap-0">
-        {TIMELINE_WEEKS.map((w, i) => {
-          const isSelected = i === selected
-          const hasUpdate  = w.hasUpdate && !w.isNext
-          return (
-            <React.Fragment key={i}>
-              {i > 0 && (
-                <div className={cn("flex-1 h-px min-w-[16px]", hasUpdate ? "bg-foreground/20" : "bg-border/40")} />
-              )}
-              <button onClick={() => setSelected(i)} className="flex flex-col items-center gap-1.5 shrink-0 group px-1">
-                <div className={cn(
-                  "rounded-full transition-all",
-                  isSelected
-                    ? "h-3 w-3 bg-foreground"
-                    : hasUpdate
-                      ? "h-2.5 w-2.5 bg-foreground/40 group-hover:bg-foreground/60"
-                      : "h-2 w-2 bg-border group-hover:bg-muted-foreground/40",
-                )} />
-                <span className={cn(
-                  "text-[10px] whitespace-nowrap transition-colors",
-                  isSelected ? "text-foreground font-semibold" : "text-muted-foreground",
-                )}>{w.label}</span>
-              </button>
-            </React.Fragment>
-          )
-        })}
-      </div>
-    </div>
-  )
-}
 
 function ActivityFeed({ deal, stage }: { deal: Deal; stage: StageValue }) {
   const [draft, setDraft] = React.useState("")
@@ -1085,8 +901,6 @@ function RecRow({ action, urgency, agentId }: { action: string; urgency: string;
 function DealHealthCard({ status, stage }: { status: DealStatus; stage: StageValue }) {
   const stageHealth = HEALTH_BY_STAGE[stage]
   const cfg = stageHealth?.[status] ?? stageHealth?.active ?? HEALTH_BY_STAGE["Inquiry"].active!
-  const style = HEALTH_TIERS[cfg.tier]
-
   return (
     <div className={cn(cardBase, "border-transparent flex flex-col gap-4 bg-sidebar-accent")}>
       <div className="flex items-start justify-between gap-2">
@@ -1136,11 +950,11 @@ interface DealProfileProps {
   onStatusChange?: (s: DealStatus) => void
 }
 
-export function DealProfile({ deal, onBack, status: statusProp, onStatusChange }: DealProfileProps) {
+export function DealProfile({ deal, onBack: _onBack, status: statusProp, onStatusChange }: DealProfileProps) {
   const [stage, setStage]           = React.useState<StageValue>(deal.stage as StageValue)
   const [internalStatus, setInternalStatus] = React.useState<DealStatus>(deal.status as DealStatus)
   const status    = statusProp ?? internalStatus
-  const setStatus = onStatusChange ?? setInternalStatus
+  const _setStatus = onStatusChange ?? setInternalStatus; void _setStatus
   const [tab, setTab]               = React.useState("updates")
   const stageIdx = ALL_STAGES.indexOf(stage)
 
@@ -1177,7 +991,7 @@ export function DealProfile({ deal, onBack, status: statusProp, onStatusChange }
             {tab === "tours"     && <p className="text-sm text-muted-foreground py-8 text-center">No tours scheduled.</p>}
             {tab === "proposals" && <ProposalsTab deal={deal} stageIdx={stageIdx} />}
             {tab === "leases"    && <p className="text-sm text-muted-foreground py-8 text-center">No leases on file.</p>}
-            {tab === "documents" && <DocumentsTab deal={deal} stage={stage} />}
+            {tab === "documents" && <DocumentsTab stage={stage} />}
           </div>
         </div>
 
