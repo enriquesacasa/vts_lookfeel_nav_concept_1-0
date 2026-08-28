@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { cn } from "@/lib/utils"
 import { FilterBar, toggleFilterValue, clearFilterKey, type FilterDef, FILTER_TAB_GROUP_CLS, FILTER_TAB_ITEM_CLS } from "@/components/filter-chip"
+import { AgentBtn } from "@/components/agent-btn"
 
 // Expiration bucket colors — semantic, intentionally not theme tokens
 // vacant/available use theme-aware values; year buckets are fixed semantic colors
@@ -393,6 +394,26 @@ function formatSliderDate(d: Date): string {
   return d.toLocaleDateString("en-US", { month: "short", year: "numeric" })
 }
 
+function buildSpaceLabel(space: Space, floorNumber: number): string {
+  const parts: string[] = []
+  parts.push(`Suite ${space.suite}, Floor ${floorNumber} — ${space.sf.toLocaleString()} sf`)
+  if (space.tenant) parts.push(`Tenant: ${space.tenant}${space.dba ? ` (DBA: ${space.dba})` : ""}`)
+  else parts.push(`Status: Vacant/Available`)
+  if (space.industry) parts.push(`Industry: ${space.industry}`)
+  if (space.lcd && space.lxd) parts.push(`Lease: LCD ${space.lcd} / LXD ${space.lxd}`)
+  if (space.baseRent != null) parts.push(`Base rent: $${space.baseRent.toFixed(2)}/sf/yr`)
+  if (space.grossRent != null) parts.push(`Gross rent: $${space.grossRent.toFixed(2)}/sf/yr`)
+  if (space.leaseOptions?.length) parts.push(`Lease options: ${space.leaseOptions.join(", ")}`)
+  if (space.encumbrances?.length) {
+    const encs = space.encumbrances.map(e => `${e.optionType} by ${e.tenant} (Suite ${e.suite}, priority ${e.priority})`).join("; ")
+    parts.push(`Encumbrances: ${encs}`)
+  }
+  if (space.deals) parts.push(`Active deals: ${space.deals}`)
+  if (space.committedLease && space.committedTenant) parts.push(`Committed lease: ${space.committedTenant} (${space.committedLcd} – ${space.committedLxd})`)
+  if (space.internalNote) parts.push(`Note: ${space.internalNote}`)
+  return parts.join(" · ")
+}
+
 // --- Expiration Mode Popover ---
 function ExpirationModePopover({ mode, onSelect }: { mode: ExpirationMode; onSelect: (m: ExpirationMode) => void }) {
   return (
@@ -677,9 +698,10 @@ export const StackingPlan = forwardRef<StackingPlanHandle>(function StackingPlan
                   const isRelated = !isActive && spaceCircles.length > 0
                   const isDimmed = activeHighlight !== null && !isActive && !isRelated
 
+                  const spaceLabel = buildSpaceLabel(space, floor.number)
                   return (
                     <div key={space.suite}
-                      className="relative flex flex-col justify-between border-r border-foreground/10 dark:border-foreground/5 last:border-r-0 cursor-default transition-all overflow-hidden"
+                      className="group/space relative flex flex-col justify-between border-r border-foreground/10 dark:border-foreground/5 last:border-r-0 cursor-default transition-all overflow-hidden hover:brightness-110"
                       style={{
                         width: `${widthPct}%`,
                         flexShrink: 0,
@@ -696,8 +718,8 @@ export const StackingPlan = forwardRef<StackingPlanHandle>(function StackingPlan
                         transition: "filter 0.15s ease, box-shadow 0.15s ease",
                       }}>
 
-                      <div className="flex items-start justify-between gap-1">
-                        <div className="min-w-0 flex flex-col gap-0.5 overflow-hidden">
+                      <div className="flex items-start gap-1">
+                        <div className="min-w-0 flex-1 flex flex-col gap-0.5 overflow-hidden">
 
                           {isVacant || isAvailable ? (
                             <>
@@ -707,6 +729,9 @@ export const StackingPlan = forwardRef<StackingPlanHandle>(function StackingPlan
                                   {spaceCircles.map((ci, i) => (
                                     <span key={i} className={cn("size-4 rounded-full flex items-center justify-center text-[9px] font-bold shrink-0 text-primary-foreground", ci.color === "blue" ? "bg-primary" : "bg-chart-1")}>{ci.n}</span>
                                   ))}
+                                  <span className="ml-1.5 mt-1 opacity-0 group-hover/space:opacity-100 transition-opacity duration-150 pointer-events-none group-hover/space:pointer-events-auto shrink-0 flex items-center">
+                                    <AgentBtn label={spaceLabel} className="!size-5" />
+                                  </span>
                                 </div>
                               )}
                               {show("Total Size") && <p className={cn("opacity-75", cfg.metaCls)}>{space.sf.toLocaleString()} sf</p>}
@@ -723,6 +748,9 @@ export const StackingPlan = forwardRef<StackingPlanHandle>(function StackingPlan
                                   {spaceCircles.map((ci, i) => (
                                     <span key={i} className={cn("size-4 rounded-full flex items-center justify-center text-[9px] font-bold shrink-0 text-primary-foreground", ci.color === "blue" ? "bg-primary" : "bg-chart-1")}>{ci.n}</span>
                                   ))}
+                                  <span className="ml-1.5 mt-1 opacity-0 group-hover/space:opacity-100 transition-opacity duration-150 pointer-events-none group-hover/space:pointer-events-auto shrink-0 flex items-center">
+                                    <AgentBtn label={spaceLabel} className="!size-5" />
+                                  </span>
                                 </div>
                               )}
                               {show("DBA") && space.dba && <p className={cn("opacity-70 truncate", cfg.metaCls)}>DBA: {space.dba}</p>}
@@ -875,6 +903,8 @@ export const StackingPlan = forwardRef<StackingPlanHandle>(function StackingPlan
                           )}
                         </div>
                       </div>
+
+
                     </div>
                   )
                 })}
