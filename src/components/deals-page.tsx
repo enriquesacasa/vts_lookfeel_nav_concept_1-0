@@ -4,16 +4,17 @@ import { cn, cardBase } from "@/lib/utils"
 const CardCtx = React.createContext(cardBase)
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
-import { FILTER_TAB_GROUP_CLS, FILTER_TAB_ITEM_CLS } from "@/components/filter-chip"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { FilterBar, toggleFilterValue, clearFilterKey } from "@/components/filter-chip"
 import {
-  Sparkle, Search,
+  Sparkle, Search, Settings2, GripVertical, Eye, EyeOff,
   ChevronLeft, ChevronRight, AlertTriangle, Clock,
   CheckCircle2, TrendingUp, TrendingDown,
 } from "lucide-react"
 import { AgentBtn } from "@/components/agent-btn"
+import { getLatestHumanUpdate, getEncumbranceCount } from "@/components/deal-profile"
 import {
-  Table, TableHeader, TableBody, TableRow, TableCell, TableHead,
+  Table, TableHeader, TableBody, TableRow, TableCell,
   SortableHead, useSortState,
 } from "@/components/sortable-table"
 
@@ -80,11 +81,12 @@ function TenantAvatar({ name }: { name: string }) {
 
 type Stage = "Inquiry" | "Touring" | "Proposal" | "LOI" | "Legal" | "Lease Out" | "Executed"
 type Status = "active" | "stalled" | "at-risk" | "executed"
+type DealType = "New Deal" | "Renewal" | "Expansion"
 
 export interface Deal {
   id: string
   tenant: string
-  dealType: "New Deal" | "Renewal" | "Expansion"
+  dealType: DealType
   asset: string
   space: string
   sf: number
@@ -104,41 +106,40 @@ export interface Deal {
 // ── Mock data ─────────────────────────────────────────────────────────────────
 
 export const DEALS: Deal[] = [
-  { id:"d00", tenant:"Amazon.com", dealType:"New Deal", asset:"VTS Tower", space:"Suite 0800 – Floor 8", sf:18000, stage:"Inquiry", status:"active", ner:0, budgetNer:98.00, noi:0, budgetNoi:1764000, lastUpdated:"2026-08-25", contact:"Sarah Okonkwo · CBRE" },
-  { id:"d01", tenant:"Starbucks Corporation", dealType:"New Deal",  asset:"VTS Tower HQ",         space:"Suite 800",    sf:28500,  stage:"Legal",    status:"active",   ner:52.00, budgetNer:50.00, noi:1482000,  budgetNoi:1425000,  lastUpdated:"2026-07-14", term:84,  contact:"Sarah Chen" },
-  { id:"d02", tenant:"Apex Capital",          dealType:"Renewal",   asset:"Empire State Bldg",    space:"Floor 12",     sf:45000,  stage:"Proposal", status:"active",   ner:48.00, budgetNer:52.00, noi:2160000,  budgetNoi:2340000,  lastUpdated:"2026-07-10", term:60,  contact:"Mark Torres",    note:"Counter awaiting response" },
-  { id:"d03", tenant:"Meridian Health",       dealType:"New Deal",  asset:"VTS Tower HQ",         space:"Suite 1800",   sf:33000,  stage:"Lease Out",status:"stalled",  ner:55.00, budgetNer:55.00, noi:1815000,  budgetNoi:1815000,  lastUpdated:"2026-06-26", term:120, contact:"Priya Nair",     stalledDays:18 },
-  { id:"d04", tenant:"Atlas Group",           dealType:"Expansion", asset:"Salesforce Tower",     space:"Floors 2–3",   sf:61000,  stage:"Proposal", status:"at-risk",  ner:44.00, budgetNer:50.00, noi:2684000,  budgetNoi:3050000,  lastUpdated:"2026-07-01", term:72,  contact:"James Wu",       note:"Considering competitor" },
-  { id:"d05", tenant:"Vertex Studios",        dealType:"New Deal",  asset:"One Financial Plaza",  space:"Suite 600",    sf:19800,  stage:"LOI",      status:"active",   ner:58.00, budgetNer:56.00, noi:1148400,  budgetNoi:1108800,  lastUpdated:"2026-07-15", term:48,  contact:"Laura Kim" },
-  { id:"d06", tenant:"Bluewave LLC",          dealType:"New Deal",  asset:"Willis Tower",         space:"Suite 300",    sf:12400,  stage:"Lease Out",status:"active",   ner:51.00, budgetNer:51.00, noi:632400,   budgetNoi:632400,   lastUpdated:"2026-07-12", term:36,  contact:"Tom Reyes" },
-  { id:"d07", tenant:"Pfizer Inc.",           dealType:"Renewal",   asset:"30 Hudson Yards",      space:"Floors 18–20", sf:88000,  stage:"LOI",      status:"active",   ner:62.00, budgetNer:60.00, noi:5456000,  budgetNoi:5280000,  lastUpdated:"2026-07-09", term:120, contact:"Anna Brooks" },
-  { id:"d08", tenant:"Morgan Stanley",        dealType:"New Deal",  asset:"One World Trade Ctr",  space:"Suite 2200",   sf:54000,  stage:"Touring",  status:"active",   ner:0,     budgetNer:68.00, noi:0,        budgetNoi:3672000,  lastUpdated:"2026-07-13", term:84,  contact:"Derek Chan" },
-  { id:"d09", tenant:"Deloitte LLP",          dealType:"Expansion", asset:"VTS Tower HQ",         space:"Suite 500",    sf:43000,  stage:"Legal",    status:"active",   ner:72.00, budgetNer:70.00, noi:3096000,  budgetNoi:3010000,  lastUpdated:"2026-07-15", term:60,  contact:"Sandra Li" },
-  { id:"d10", tenant:"KPMG",                  dealType:"Renewal",   asset:"Empire State Bldg",    space:"Suite 3400",   sf:117000, stage:"Proposal", status:"stalled",  ner:49.00, budgetNer:55.00, noi:5733000,  budgetNoi:6435000,  lastUpdated:"2026-06-20", term:96,  contact:"Paul Simmons",  stalledDays:26, note:"Waiting on board approval" },
-  { id:"d11", tenant:"Ernst & Young",         dealType:"New Deal",  asset:"Salesforce Tower",     space:"Suite 2200",   sf:80100,  stage:"Proposal", status:"active",   ner:58.00, budgetNer:57.00, noi:4645800,  budgetNoi:4565700,  lastUpdated:"2026-07-08", term:72,  contact:"Claire Marsh" },
-  { id:"d12", tenant:"HSBC Holdings",         dealType:"Renewal",   asset:"One Financial Plaza",  space:"Suite 900",    sf:69300,  stage:"Inquiry",  status:"active",   ner:0,     budgetNer:42.00, noi:0,        budgetNoi:2910600,  lastUpdated:"2026-07-14", contact:"Frank Lee" },
-  { id:"d13", tenant:"Latham & Watkins",      dealType:"New Deal",  asset:"30 Hudson Yards",      space:"Floors 14–15", sf:119000, stage:"LOI",      status:"at-risk",  ner:65.00, budgetNer:66.00, noi:7735000,  budgetNoi:7854000,  lastUpdated:"2026-07-03", term:60,  contact:"Grace Yu",       note:"Competitor offering lower TI" },
-  { id:"d14", tenant:"JPMorgan Chase",        dealType:"Expansion", asset:"VTS Tower HQ",         space:"Floor 6",      sf:55800,  stage:"Legal",    status:"active",   ner:75.00, budgetNer:72.00, noi:4185000,  budgetNoi:4017600,  lastUpdated:"2026-07-16", term:120, contact:"Ryan Patel" },
-  { id:"d15", tenant:"Amazon.com",            dealType:"New Deal",  asset:"Willis Tower",         space:"Floors 4–6",   sf:150000, stage:"Touring",  status:"active",   ner:0,     budgetNer:45.00, noi:0,        budgetNoi:6750000,  lastUpdated:"2026-07-11", contact:"Mia Zhao" },
-  { id:"d16", tenant:"WeWork",                dealType:"Renewal",   asset:"Transamerica Pyramid", space:"Floors 10–12", sf:36000,  stage:"Lease Out",status:"stalled",  ner:38.00, budgetNer:40.00, noi:1368000,  budgetNoi:1440000,  lastUpdated:"2026-06-18", term:24,  contact:"Ethan Ross",    stalledDays:28, note:"Budget constraints" },
-  { id:"d17", tenant:"Google LLC",            dealType:"New Deal",  asset:"200 Berkeley Street",  space:"Floors 5–8",   sf:200000, stage:"LOI",      status:"active",   ner:82.00, budgetNer:80.00, noi:16400000, budgetNoi:16000000, lastUpdated:"2026-07-14", term:144, contact:"Nina Patel" },
-  { id:"d18", tenant:"Tesla Inc.",            dealType:"New Deal",  asset:"One Peachtree Center", space:"Suite 1100",   sf:25000,  stage:"Proposal", status:"active",   ner:35.00, budgetNer:33.00, noi:875000,   budgetNoi:825000,   lastUpdated:"2026-07-07", term:60,  contact:"Omar Khalid" },
-  { id:"d19", tenant:"Cisco Systems",         dealType:"Renewal",   asset:"Two Union Square",     space:"Floors 20–22", sf:72000,  stage:"LOI",      status:"active",   ner:58.00, budgetNer:55.00, noi:4176000,  budgetNoi:3960000,  lastUpdated:"2026-07-10", term:84,  contact:"Jenny Park" },
-  { id:"d20", tenant:"Salesforce Inc.",       dealType:"Expansion", asset:"Salesforce Tower",     space:"Floor 30",     sf:40000,  stage:"Legal",    status:"active",   ner:90.00, budgetNer:88.00, noi:3600000,  budgetNoi:3520000,  lastUpdated:"2026-07-15", term:60,  contact:"Luis Garcia" },
-  { id:"d21", tenant:"BlackRock",             dealType:"New Deal",  asset:"One World Trade Ctr",  space:"Floors 50–52", sf:95000,  stage:"Proposal", status:"at-risk",  ner:78.00, budgetNer:80.00, noi:7410000,  budgetNoi:7600000,  lastUpdated:"2026-06-30", term:120, contact:"Kate Morrison",  note:"Slow on responses" },
-  { id:"d22", tenant:"Goldman Sachs",         dealType:"Renewal",   asset:"30 Hudson Yards",      space:"Floors 5–9",   sf:185000, stage:"Executed", status:"executed", ner:88.00, budgetNer:85.00, noi:16280000, budgetNoi:15725000, lastUpdated:"2026-07-01", term:120, contact:"Adam Chen" },
-  { id:"d23", tenant:"McKinsey & Co.",        dealType:"New Deal",  asset:"Empire State Bldg",    space:"Suite 4200",   sf:32000,  stage:"LOI",      status:"active",   ner:71.00, budgetNer:70.00, noi:2272000,  budgetNoi:2240000,  lastUpdated:"2026-07-13", term:72,  contact:"Tara Singh" },
-  { id:"d24", tenant:"Spotify",               dealType:"New Deal",  asset:"200 Berkeley Street",  space:"Suite 700",    sf:18500,  stage:"Touring",  status:"active",   ner:0,     budgetNer:76.00, noi:0,        budgetNoi:1406000,  lastUpdated:"2026-07-15", contact:"Ben Walsh" },
-  { id:"d25", tenant:"Airbnb",                dealType:"New Deal",  asset:"Salesforce Tower",     space:"Floor 25",     sf:22000,  stage:"Inquiry",  status:"active",   ner:0,     budgetNer:82.00, noi:0,        budgetNoi:1804000,  lastUpdated:"2026-07-16", contact:"Lily Chen" },
-  { id:"d26", tenant:"Stripe",                dealType:"Expansion", asset:"Two Union Square",     space:"Floor 15",     sf:15000,  stage:"Proposal", status:"active",   ner:62.00, budgetNer:60.00, noi:930000,   budgetNoi:900000,   lastUpdated:"2026-07-12", term:48,  contact:"Raj Mehta" },
-  { id:"d27", tenant:"Twitter/X",             dealType:"Renewal",   asset:"Salesforce Tower",     space:"Floors 10–12", sf:65000,  stage:"LOI",      status:"stalled",  ner:45.00, budgetNer:52.00, noi:2925000,  budgetNoi:3380000,  lastUpdated:"2026-06-15", term:36,  contact:"Dana Fox",      stalledDays:31, note:"Seeking major concessions" },
-  { id:"d28", tenant:"Uber Technologies",     dealType:"New Deal",  asset:"One Peachtree Center", space:"Suite 800",    sf:30000,  stage:"Proposal", status:"active",   ner:38.00, budgetNer:36.00, noi:1140000,  budgetNoi:1080000,  lastUpdated:"2026-07-09", term:60,  contact:"Kai Brown" },
-  { id:"d29", tenant:"Microsoft",             dealType:"New Deal",  asset:"One World Trade Ctr",  space:"Floors 60–65", sf:250000, stage:"Legal",    status:"active",   ner:92.00, budgetNer:90.00, noi:23000000, budgetNoi:22500000, lastUpdated:"2026-07-14", term:180, contact:"Helen Chow" },
-  { id:"d30", tenant:"Meta Platforms",        dealType:"Expansion", asset:"30 Hudson Yards",      space:"Floors 25–28", sf:130000, stage:"Executed", status:"executed", ner:75.00, budgetNer:73.00, noi:9750000,  budgetNoi:9490000,  lastUpdated:"2026-06-28", term:96,  contact:"Sean Park" },
+  { id:"d00", tenant:"Amazon.com",           dealType:"New Deal",  asset:"VTS Tower",            space:"Suite 0800 – Floor 8", sf:18000,  stage:"Inquiry",   status:"active",   ner:0,     budgetNer:98.00, noi:0,        budgetNoi:1764000,  lastUpdated:"2026-08-25", contact:"Sarah Okonkwo · CBRE" },
+  { id:"d01", tenant:"Starbucks Corporation",dealType:"New Deal",  asset:"VTS Tower HQ",          space:"Suite 800",            sf:28500,  stage:"Legal",     status:"active",   ner:52.00, budgetNer:50.00, noi:1482000,  budgetNoi:1425000,  lastUpdated:"2026-07-14", term:84,  contact:"Sarah Chen" },
+  { id:"d02", tenant:"Apex Capital",         dealType:"Renewal",   asset:"Empire State Bldg",     space:"Floor 12",             sf:45000,  stage:"Proposal",  status:"active",   ner:48.00, budgetNer:52.00, noi:2160000,  budgetNoi:2340000,  lastUpdated:"2026-07-10", term:60,  contact:"Mark Torres",  note:"Counter awaiting response" },
+  { id:"d03", tenant:"Meridian Health",      dealType:"New Deal",  asset:"VTS Tower HQ",          space:"Suite 1800",           sf:33000,  stage:"Lease Out", status:"stalled",  ner:55.00, budgetNer:55.00, noi:1815000,  budgetNoi:1815000,  lastUpdated:"2026-06-26", term:120, contact:"Priya Nair",   stalledDays:18 },
+  { id:"d04", tenant:"Atlas Group",          dealType:"Expansion", asset:"Salesforce Tower",      space:"Floors 2–3",           sf:61000,  stage:"Proposal",  status:"at-risk",  ner:44.00, budgetNer:50.00, noi:2684000,  budgetNoi:3050000,  lastUpdated:"2026-07-01", term:72,  contact:"James Wu",     note:"Considering competitor" },
+  { id:"d05", tenant:"Vertex Studios",       dealType:"New Deal",  asset:"One Financial Plaza",   space:"Suite 600",            sf:19800,  stage:"LOI",       status:"active",   ner:58.00, budgetNer:56.00, noi:1148400,  budgetNoi:1108800,  lastUpdated:"2026-07-15", term:48,  contact:"Laura Kim" },
+  { id:"d06", tenant:"Bluewave LLC",         dealType:"New Deal",  asset:"Willis Tower",          space:"Suite 300",            sf:12400,  stage:"Lease Out", status:"active",   ner:51.00, budgetNer:51.00, noi:632400,   budgetNoi:632400,   lastUpdated:"2026-07-12", term:36,  contact:"Tom Reyes" },
+  { id:"d07", tenant:"Pfizer Inc.",          dealType:"Renewal",   asset:"30 Hudson Yards",       space:"Floors 18–20",         sf:88000,  stage:"LOI",       status:"active",   ner:62.00, budgetNer:60.00, noi:5456000,  budgetNoi:5280000,  lastUpdated:"2026-07-09", term:120, contact:"Anna Brooks" },
+  { id:"d08", tenant:"Morgan Stanley",       dealType:"New Deal",  asset:"One World Trade Ctr",   space:"Suite 2200",           sf:54000,  stage:"Touring",   status:"active",   ner:0,     budgetNer:68.00, noi:0,        budgetNoi:3672000,  lastUpdated:"2026-07-13", term:84,  contact:"Derek Chan" },
+  { id:"d09", tenant:"Deloitte LLP",         dealType:"Expansion", asset:"VTS Tower HQ",          space:"Suite 500",            sf:43000,  stage:"Legal",     status:"active",   ner:72.00, budgetNer:70.00, noi:3096000,  budgetNoi:3010000,  lastUpdated:"2026-07-15", term:60,  contact:"Sandra Li" },
+  { id:"d10", tenant:"KPMG",                 dealType:"Renewal",   asset:"Empire State Bldg",     space:"Suite 3400",           sf:117000, stage:"Proposal",  status:"stalled",  ner:49.00, budgetNer:55.00, noi:5733000,  budgetNoi:6435000,  lastUpdated:"2026-06-20", term:96,  contact:"Paul Simmons", stalledDays:26, note:"Waiting on board approval" },
+  { id:"d11", tenant:"Ernst & Young",        dealType:"New Deal",  asset:"Salesforce Tower",      space:"Suite 2200",           sf:80100,  stage:"Proposal",  status:"active",   ner:58.00, budgetNer:57.00, noi:4645800,  budgetNoi:4565700,  lastUpdated:"2026-07-08", term:72,  contact:"Claire Marsh" },
+  { id:"d12", tenant:"HSBC Holdings",        dealType:"Renewal",   asset:"One Financial Plaza",   space:"Suite 900",            sf:69300,  stage:"Inquiry",   status:"active",   ner:0,     budgetNer:42.00, noi:0,        budgetNoi:2910600,  lastUpdated:"2026-07-14", contact:"Frank Lee" },
+  { id:"d13", tenant:"Latham & Watkins",     dealType:"New Deal",  asset:"30 Hudson Yards",       space:"Floors 14–15",         sf:119000, stage:"LOI",       status:"at-risk",  ner:65.00, budgetNer:66.00, noi:7735000,  budgetNoi:7854000,  lastUpdated:"2026-07-03", term:60,  contact:"Grace Yu",     note:"Competitor offering lower TI" },
+  { id:"d14", tenant:"JPMorgan Chase",       dealType:"Expansion", asset:"VTS Tower HQ",          space:"Floor 6",              sf:55800,  stage:"Legal",     status:"active",   ner:75.00, budgetNer:72.00, noi:4185000,  budgetNoi:4017600,  lastUpdated:"2026-07-16", term:120, contact:"Ryan Patel" },
+  { id:"d15", tenant:"Amazon.com",           dealType:"New Deal",  asset:"Willis Tower",          space:"Floors 4–6",           sf:150000, stage:"Touring",   status:"active",   ner:0,     budgetNer:45.00, noi:0,        budgetNoi:6750000,  lastUpdated:"2026-07-11", contact:"Mia Zhao" },
+  { id:"d16", tenant:"WeWork",               dealType:"Renewal",   asset:"Transamerica Pyramid",  space:"Floors 10–12",         sf:36000,  stage:"Lease Out", status:"stalled",  ner:38.00, budgetNer:40.00, noi:1368000,  budgetNoi:1440000,  lastUpdated:"2026-06-18", term:24,  contact:"Ethan Ross",   stalledDays:28, note:"Budget constraints" },
+  { id:"d17", tenant:"Google LLC",           dealType:"New Deal",  asset:"200 Berkeley Street",   space:"Floors 5–8",           sf:200000, stage:"LOI",       status:"active",   ner:82.00, budgetNer:80.00, noi:16400000, budgetNoi:16000000, lastUpdated:"2026-07-14", term:144, contact:"Nina Patel" },
+  { id:"d18", tenant:"Tesla Inc.",           dealType:"New Deal",  asset:"One Peachtree Center",  space:"Suite 1100",           sf:25000,  stage:"Proposal",  status:"active",   ner:35.00, budgetNer:33.00, noi:875000,   budgetNoi:825000,   lastUpdated:"2026-07-07", term:60,  contact:"Omar Khalid" },
+  { id:"d19", tenant:"Cisco Systems",        dealType:"Renewal",   asset:"Two Union Square",      space:"Floors 20–22",         sf:72000,  stage:"LOI",       status:"active",   ner:58.00, budgetNer:55.00, noi:4176000,  budgetNoi:3960000,  lastUpdated:"2026-07-10", term:84,  contact:"Jenny Park" },
+  { id:"d20", tenant:"Salesforce Inc.",      dealType:"Expansion", asset:"Salesforce Tower",      space:"Floor 30",             sf:40000,  stage:"Legal",     status:"active",   ner:90.00, budgetNer:88.00, noi:3600000,  budgetNoi:3520000,  lastUpdated:"2026-07-15", term:60,  contact:"Luis Garcia" },
+  { id:"d21", tenant:"BlackRock",            dealType:"New Deal",  asset:"One World Trade Ctr",   space:"Floors 50–52",         sf:95000,  stage:"Proposal",  status:"at-risk",  ner:78.00, budgetNer:80.00, noi:7410000,  budgetNoi:7600000,  lastUpdated:"2026-06-30", term:120, contact:"Kate Morrison", note:"Slow on responses" },
+  { id:"d22", tenant:"Goldman Sachs",        dealType:"Renewal",   asset:"30 Hudson Yards",       space:"Floors 5–9",           sf:185000, stage:"Executed",  status:"executed", ner:88.00, budgetNer:85.00, noi:16280000, budgetNoi:15725000, lastUpdated:"2026-07-01", term:120, contact:"Adam Chen" },
+  { id:"d23", tenant:"McKinsey & Co.",       dealType:"New Deal",  asset:"Empire State Bldg",     space:"Suite 4200",           sf:32000,  stage:"LOI",       status:"active",   ner:71.00, budgetNer:70.00, noi:2272000,  budgetNoi:2240000,  lastUpdated:"2026-07-13", term:72,  contact:"Tara Singh" },
+  { id:"d24", tenant:"Spotify",              dealType:"New Deal",  asset:"200 Berkeley Street",   space:"Suite 700",            sf:18500,  stage:"Touring",   status:"active",   ner:0,     budgetNer:76.00, noi:0,        budgetNoi:1406000,  lastUpdated:"2026-07-15", contact:"Ben Walsh" },
+  { id:"d25", tenant:"Airbnb",               dealType:"New Deal",  asset:"Salesforce Tower",      space:"Floor 25",             sf:22000,  stage:"Inquiry",   status:"active",   ner:0,     budgetNer:82.00, noi:0,        budgetNoi:1804000,  lastUpdated:"2026-07-16", contact:"Lily Chen" },
+  { id:"d26", tenant:"Stripe",               dealType:"Expansion", asset:"Two Union Square",      space:"Floor 15",             sf:15000,  stage:"Proposal",  status:"active",   ner:62.00, budgetNer:60.00, noi:930000,   budgetNoi:900000,   lastUpdated:"2026-07-12", term:48,  contact:"Raj Mehta" },
+  { id:"d27", tenant:"Twitter/X",            dealType:"Renewal",   asset:"Salesforce Tower",      space:"Floors 10–12",         sf:65000,  stage:"LOI",       status:"stalled",  ner:45.00, budgetNer:52.00, noi:2925000,  budgetNoi:3380000,  lastUpdated:"2026-06-15", term:36,  contact:"Dana Fox",     stalledDays:31, note:"Seeking major concessions" },
+  { id:"d28", tenant:"Uber Technologies",    dealType:"New Deal",  asset:"One Peachtree Center",  space:"Suite 800",            sf:30000,  stage:"Proposal",  status:"active",   ner:38.00, budgetNer:36.00, noi:1140000,  budgetNoi:1080000,  lastUpdated:"2026-07-09", term:60,  contact:"Kai Brown" },
+  { id:"d29", tenant:"Microsoft",            dealType:"New Deal",  asset:"One World Trade Ctr",   space:"Floors 60–65",         sf:250000, stage:"Legal",     status:"active",   ner:92.00, budgetNer:90.00, noi:23000000, budgetNoi:22500000, lastUpdated:"2026-07-14", term:180, contact:"Helen Chow" },
+  { id:"d30", tenant:"Meta Platforms",       dealType:"Expansion", asset:"30 Hudson Yards",       space:"Floors 25–28",         sf:130000, stage:"Executed",  status:"executed", ner:75.00, budgetNer:73.00, noi:9750000,  budgetNoi:9490000,  lastUpdated:"2026-06-28", term:96,  contact:"Sean Park" },
 ]
 
 const STAGES: Stage[] = ["Inquiry", "Touring", "Proposal", "LOI", "Legal", "Lease Out", "Executed"]
-
 
 const STATUS_CONFIG: Record<Status, { label: string; icon: React.ElementType; cls: string }> = {
   active:   { label: "Active",    icon: CheckCircle2, cls: "text-success bg-success/10" },
@@ -146,6 +147,33 @@ const STATUS_CONFIG: Record<Status, { label: string; icon: React.ElementType; cl
   "at-risk":{ label: "At Risk",   icon: AlertTriangle,cls: "text-destructive bg-destructive/10" },
   executed: { label: "Executed",  icon: CheckCircle2, cls: "text-success bg-success/10" },
 }
+
+// ── Column definitions ────────────────────────────────────────────────────────
+
+type SortKey = "tenant" | "sf" | "stage" | "ner" | "noi" | "lastUpdated" | "status" | "encumbrances" | "dealType" | "asset"
+
+interface ColDef {
+  id: string
+  label: string
+  sortable: boolean
+  right?: boolean
+  defaultVisible: boolean
+}
+
+const ALL_COLUMNS: ColDef[] = [
+  { id: "tenant",       label: "Tenant",         sortable: true,  defaultVisible: true  },
+  { id: "asset",        label: "Asset / Space",  sortable: true,  defaultVisible: true  },
+  { id: "sf",           label: "Size",           sortable: true,  right: true, defaultVisible: true  },
+  { id: "dealType",     label: "Deal type",      sortable: true,  defaultVisible: false },
+  { id: "stage",        label: "Stage",          sortable: true,  defaultVisible: true  },
+  { id: "status",       label: "Status",         sortable: true,  defaultVisible: true  },
+  { id: "update",       label: "Latest update",  sortable: false, defaultVisible: true  },
+  { id: "encumbrances", label: "Encumbrances",   sortable: true,  defaultVisible: true  },
+  { id: "ner",          label: "NER / Budget",   sortable: true,  right: true, defaultVisible: true  },
+  { id: "noi",          label: "NOI / Budget",   sortable: true,  right: true, defaultVisible: true  },
+  { id: "lastUpdated",  label: "Updated",        sortable: true,  right: true, defaultVisible: true  },
+  { id: "actions",      label: "",               sortable: false, defaultVisible: true  },
+]
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -160,9 +188,92 @@ function fmtSf(n: number) {
 
 function stageIndex(s: Stage) { return STAGES.indexOf(s) }
 
-type SortKey = "tenant" | "sf" | "stage" | "ner" | "noi" | "lastUpdated" | "status"
-
 const PAGE_SIZE = 10
+
+// ── Filter definitions ────────────────────────────────────────────────────────
+
+const ASSETS_IN_DEALS = Array.from(new Set(DEALS.map(d => d.asset))).sort()
+
+const FILTER_DEFS = [
+  { key: "status",   label: "Status",    options: (["active","stalled","at-risk","executed"] as Status[]).map(v => ({ label: STATUS_CONFIG[v].label, value: v })) },
+  { key: "stage",    label: "Stage",     options: STAGES.map(v => ({ label: v, value: v })) },
+  { key: "dealType", label: "Deal type", options: (["New Deal","Renewal","Expansion"] as DealType[]).map(v => ({ label: v, value: v })) },
+  { key: "asset",    label: "Asset",     options: ASSETS_IN_DEALS.map(v => ({ label: v, value: v })) },
+]
+
+// ── Column manager popover ────────────────────────────────────────────────────
+
+function ColumnManager({
+  columns, visible, order, onToggle, onReorder,
+}: {
+  columns: ColDef[]
+  visible: Set<string>
+  order: string[]
+  onToggle: (id: string) => void
+  onReorder: (newOrder: string[]) => void
+}) {
+  const [dragging, setDragging] = React.useState<string | null>(null)
+  const [dragOver, setDragOver] = React.useState<string | null>(null)
+
+  function onDragStart(id: string) { setDragging(id) }
+  function onDragEnd() { setDragging(null); setDragOver(null) }
+  function onDragOverItem(id: string) { setDragOver(id) }
+  function onDropItem(targetId: string) {
+    if (!dragging || dragging === targetId) return
+    const next = [...order]
+    const from = next.indexOf(dragging)
+    const to   = next.indexOf(targetId)
+    next.splice(from, 1)
+    next.splice(to, 0, dragging)
+    onReorder(next)
+    setDragging(null); setDragOver(null)
+  }
+
+  const colMap = Object.fromEntries(columns.map(c => [c.id, c]))
+  const manageable = order.filter(id => colMap[id]?.label)
+
+  return (
+    <Popover>
+      <PopoverTrigger className="inline-flex items-center gap-1.5 h-8 px-3 rounded-full border border-primary text-primary text-xs font-medium bg-transparent hover:bg-primary/10 transition-colors">
+        <Settings2 className="h-3.5 w-3.5" />
+        Columns
+      </PopoverTrigger>
+      <PopoverContent align="end" className="w-56 p-2">
+        <p className="text-xs font-medium text-muted-foreground px-2 pb-2">Drag to reorder</p>
+        <div className="flex flex-col gap-0.5">
+          {manageable.map(id => {
+            const col = colMap[id]
+            if (!col) return null
+            const isVisible = visible.has(id)
+            return (
+              <div
+                key={id}
+                draggable
+                onDragStart={() => onDragStart(id)}
+                onDragEnd={onDragEnd}
+                onDragOver={e => { e.preventDefault(); onDragOverItem(id) }}
+                onDrop={() => onDropItem(id)}
+                className={cn(
+                  "flex items-center gap-2 px-2 py-1.5 rounded-md cursor-grab active:cursor-grabbing select-none",
+                  dragOver === id && dragging !== id ? "bg-primary/10" : "hover:bg-muted/60"
+                )}
+              >
+                <GripVertical className="h-3.5 w-3.5 text-muted-foreground/50 shrink-0" />
+                <span className="flex-1 text-sm text-foreground">{col.label}</span>
+                <button
+                  onClick={() => onToggle(id)}
+                  className="shrink-0 text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {isVisible ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
+                </button>
+              </div>
+            )
+          })}
+        </div>
+      </PopoverContent>
+    </Popover>
+  )
+}
 
 // ── Pipeline viz ──────────────────────────────────────────────────────────────
 
@@ -219,12 +330,11 @@ function PipelineViz({ deals, className }: { deals: Deal[]; className?: string }
           )
         })}
       </div>
-
     </div>
   )
 }
 
-// ── AI insight card (matches Financial Levers) ────────────────────────────────
+// ── AI insight card ───────────────────────────────────────────────────────────
 
 const AI_ACTIONS = [
   { text: "4 deals stalling 20+ days",   value: "276K sf",   data: "Atlas Group, KPMG, WeWork, Twitter/X" },
@@ -241,7 +351,6 @@ function AiInsightCard() {
         ? "border border-sidebar-border bg-sidebar flex flex-col gap-0"
         : cn(card, "border-transparent flex flex-col gap-4 bg-sidebar-accent")
     )}>
-      {/* Header */}
       <div className={cn("flex items-center justify-between gap-2", isV2 ? "px-4 py-3 border-b border-sidebar-border" : "")}>
         <div className={cn("flex items-center gap-2.5", !isV2 && "flex-col items-start gap-0")}>
           {isV2 && <div className="h-7 w-7 bg-ai/20 flex items-center justify-center shrink-0">
@@ -254,7 +363,6 @@ function AiInsightCard() {
         </div>
       </div>
 
-      {/* Summary alert */}
       <div className={cn("flex items-center gap-2", isV2 ? "px-4 py-2.5 border-b border-sidebar-border" : "rounded-lg px-3 py-2 bg-sidebar-foreground/10")}>
         <Sparkle className="h-4 w-4 shrink-0 text-sidebar-primary" />
         <p className="text-sm leading-snug text-sidebar-foreground/70">
@@ -262,7 +370,6 @@ function AiInsightCard() {
         </p>
       </div>
 
-      {/* Action rows */}
       <div className={cn("flex flex-col", isV2 ? "" : "gap-2")}>
         {AI_ACTIONS.map((item, i) => (
           <div key={i} className={cn(
@@ -330,25 +437,33 @@ function KpiSummary({ deals }: { deals: Deal[] }) {
   )
 }
 
-// ── Status filter tabs ────────────────────────────────────────────────────────
-
-const STATUS_TABS: { label: string; value: Status | "all" }[] = [
-  { label: "All",      value: "all" },
-  { label: "Active",   value: "active" },
-  { label: "At Risk",  value: "at-risk" },
-  { label: "Stalled",  value: "stalled" },
-  { label: "Executed", value: "executed" },
-]
-
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 export function DealsPage({ onDealClick }: { onDealClick?: (deal: Deal) => void }) {
   const card = cardBase
   const [keyword, setKeyword] = React.useState("")
-  const [statusFilter, setStatusFilter] = React.useState<Status | "all">("all")
-  const [stageFilter, setStageFilter] = React.useState<Stage | "all">("all")
+  const [activeFilters, setActiveFilters] = React.useState<Record<string, string[]>>({})
   const { sortKey, sortDir, handleSort: _handleSort } = useSortState<SortKey>("lastUpdated", "desc")
   const [page, setPage] = React.useState(1)
+
+  // Column visibility + order
+  const [visible, setVisible] = React.useState<Set<string>>(
+    () => new Set(ALL_COLUMNS.filter(c => c.defaultVisible).map(c => c.id))
+  )
+  const [colOrder, setColOrder] = React.useState<string[]>(
+    () => ALL_COLUMNS.map(c => c.id)
+  )
+
+  function toggleCol(id: string) {
+    setVisible(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id); else next.add(id)
+      return next
+    })
+  }
+  function onFilterToggle(key: string, value: string) { setActiveFilters(prev => toggleFilterValue(prev, key, value)); setPage(1) }
+  function onFilterClear(key: string) { setActiveFilters(prev => clearFilterKey(prev, key)); setPage(1) }
+  function onClearAll() { setActiveFilters({}); setPage(1) }
 
   const filtered = React.useMemo(() => {
     let r = [...DEALS]
@@ -356,25 +471,34 @@ export function DealsPage({ onDealClick }: { onDealClick?: (deal: Deal) => void 
       const q = keyword.toLowerCase()
       r = r.filter(d => d.tenant.toLowerCase().includes(q) || d.asset.toLowerCase().includes(q) || d.space.toLowerCase().includes(q))
     }
-    if (statusFilter !== "all") r = r.filter(d => d.status === statusFilter)
-    if (stageFilter !== "all") r = r.filter(d => d.stage === stageFilter)
+    for (const [key, values] of Object.entries(activeFilters)) {
+      if (!values.length) continue
+      r = r.filter(d => values.includes(String(d[key as keyof Deal])))
+    }
     r.sort((a, b) => {
       let av: string | number, bv: string | number
-      if (sortKey === "stage")       { av = stageIndex(a.stage); bv = stageIndex(b.stage) }
-      else if (sortKey === "tenant") { av = a.tenant.toLowerCase(); bv = b.tenant.toLowerCase() }
-      else if (sortKey === "status") { av = a.status; bv = b.status }
-      else                           { av = a[sortKey] as number | string; bv = b[sortKey] as number | string }
+      if (sortKey === "stage")             { av = stageIndex(a.stage); bv = stageIndex(b.stage) }
+      else if (sortKey === "tenant")       { av = a.tenant.toLowerCase(); bv = b.tenant.toLowerCase() }
+      else if (sortKey === "status")       { av = a.status; bv = b.status }
+      else if (sortKey === "encumbrances") { av = getEncumbranceCount(a.id); bv = getEncumbranceCount(b.id) }
+      else if (sortKey === "asset")        { av = a.asset.toLowerCase(); bv = b.asset.toLowerCase() }
+      else if (sortKey === "dealType")     { av = a.dealType; bv = b.dealType }
+      else                                 { av = a[sortKey] as number | string; bv = b[sortKey] as number | string }
       if (av < bv) return sortDir === "asc" ? -1 : 1
       if (av > bv) return sortDir === "asc" ? 1 : -1
       return 0
     })
     return r
-  }, [keyword, statusFilter, stageFilter, sortKey, sortDir])
+  }, [keyword, activeFilters, sortKey, sortDir])
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
   function handleSort(key: SortKey) { _handleSort(key); setPage(1) }
+
+  const orderedCols = colOrder
+    .map(id => ALL_COLUMNS.find(c => c.id === id))
+    .filter((c): c is ColDef => !!c && visible.has(c.id))
 
   return (
     <CardCtx.Provider value={card}>
@@ -389,41 +513,33 @@ export function DealsPage({ onDealClick }: { onDealClick?: (deal: Deal) => void 
 
       {/* Deals table */}
       <div className={cn(card)}>
-        {/* Status tabs + search */}
-        <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
-          <ToggleGroup
-            type="single"
-            value={statusFilter}
-            onValueChange={v => { if (v) { setStatusFilter(v as "all" | Status); setPage(1) } }}
-            className={FILTER_TAB_GROUP_CLS}
-          >
-            {STATUS_TABS.map(tab => (
-              <ToggleGroupItem key={tab.value} value={tab.value} size="sm" className={FILTER_TAB_ITEM_CLS}>
-                {tab.label}
-              </ToggleGroupItem>
-            ))}
-          </ToggleGroup>
-          <div className="flex items-center gap-2 sm:ml-auto">
-            <div className="relative">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
-              <Input
-                value={keyword}
-                onChange={e => { setKeyword(e.target.value); setPage(1) }}
-                placeholder="Search tenant, asset…"
-                className="pl-8 h-8 text-sm w-48"
-              />
-            </div>
-            <ToggleGroup
-              type="single"
-              value={stageFilter}
-              onValueChange={v => { if (v) { setStageFilter(v as "all" | Stage); setPage(1) } }}
-              className={FILTER_TAB_GROUP_CLS}
-            >
-              <ToggleGroupItem value="all" size="sm" className={FILTER_TAB_ITEM_CLS}>All stages</ToggleGroupItem>
-              {STAGES.filter(s => DEALS.some(d => d.stage === s)).map(s => (
-                <ToggleGroupItem key={s} value={s} size="sm" className={cn(FILTER_TAB_ITEM_CLS, "px-2.5")}>{s}</ToggleGroupItem>
-              ))}
-            </ToggleGroup>
+        {/* Filters row */}
+        <div className="flex flex-wrap items-center gap-2 mb-4">
+          <div className="relative">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+            <Input
+              value={keyword}
+              onChange={e => { setKeyword(e.target.value); setPage(1) }}
+              placeholder="Search tenant, asset…"
+              className="pl-8 h-8 text-sm w-48"
+            />
+          </div>
+          <FilterBar
+            filters={FILTER_DEFS}
+            active={activeFilters}
+            onToggle={onFilterToggle}
+            onClear={onFilterClear}
+            onClearAll={onClearAll}
+            visibleCount={4}
+          />
+          <div className="ml-auto">
+            <ColumnManager
+              columns={ALL_COLUMNS}
+              visible={visible}
+              order={colOrder}
+              onToggle={toggleCol}
+              onReorder={setColOrder}
+            />
           </div>
         </div>
 
@@ -431,20 +547,24 @@ export function DealsPage({ onDealClick }: { onDealClick?: (deal: Deal) => void 
         <Table className="border-collapse">
           <TableHeader>
             <TableRow className="border-b-2 border-border/60 hover:bg-transparent">
-              <SortableHead col="tenant"      sortKey={sortKey} sortDir={sortDir} onSort={handleSort}>Tenant</SortableHead>
-              <SortableHead col={null}        sortKey={sortKey} sortDir={sortDir} onSort={handleSort} className="pl-4">Asset / Space</SortableHead>
-              <SortableHead col="sf"          sortKey={sortKey} sortDir={sortDir} onSort={handleSort} className="pl-4" right>Size</SortableHead>
-              <SortableHead col="stage"       sortKey={sortKey} sortDir={sortDir} onSort={handleSort} className="pl-4">Stage</SortableHead>
-              <SortableHead col="status"      sortKey={sortKey} sortDir={sortDir} onSort={handleSort} className="pl-4">Status</SortableHead>
-              <SortableHead col="ner"         sortKey={sortKey} sortDir={sortDir} onSort={handleSort} className="pl-3" right>NER / Budget</SortableHead>
-              <SortableHead col="noi"         sortKey={sortKey} sortDir={sortDir} onSort={handleSort} className="pl-3" right>NOI / Budget</SortableHead>
-              <SortableHead col="lastUpdated" sortKey={sortKey} sortDir={sortDir} onSort={handleSort} className="pl-4" right>Updated</SortableHead>
-              <TableHead className="pb-2 pt-0 pl-2 w-8" />
+              {orderedCols.map(col => (
+                <SortableHead
+                  key={col.id}
+                  col={col.sortable ? col.id as SortKey : null}
+                  sortKey={sortKey}
+                  sortDir={sortDir}
+                  onSort={handleSort}
+                  right={col.right}
+                  className={col.right ? "pl-3" : col.id === "tenant" ? undefined : "pl-4"}
+                >
+                  {col.label}
+                </SortableHead>
+              ))}
             </TableRow>
           </TableHeader>
           <TableBody>
             {paginated.length === 0 && (
-              <TableRow><TableCell colSpan={9} className="py-10 text-center text-sm text-muted-foreground">No deals match your filters.</TableCell></TableRow>
+              <TableRow><TableCell colSpan={orderedCols.length} className="py-10 text-center text-sm text-muted-foreground">No deals match your filters.</TableCell></TableRow>
             )}
             {paginated.map((deal, i) => {
               const days = daysSince(deal.lastUpdated)
@@ -457,73 +577,133 @@ export function DealsPage({ onDealClick }: { onDealClick?: (deal: Deal) => void 
               function fmtNoi(n: number) { return n >= 1000000 ? `$${(n / 1000000).toFixed(1)}M` : `$${(n / 1000).toFixed(0)}K` }
               return (
                 <TableRow key={deal.id} onClick={() => onDealClick?.(deal)} className={cn("cursor-pointer hover:bg-muted/40 transition-colors", i > 0 ? "border-t border-border/40" : "border-0")}>
-                  <TableCell className="py-3">
-                    <div className="flex items-center gap-2.5">
-                      <TenantAvatar name={deal.tenant} />
-                      <div>
-                        <div className="font-medium text-foreground">{deal.tenant}</div>
-                        <div className="text-[11px] text-muted-foreground">{deal.dealType}</div>
-                        {deal.note && (
-                          <div className="text-[10px] text-warning flex items-center gap-0.5 mt-0.5">
-                            <AlertTriangle className="h-2.5 w-2.5 shrink-0" />{deal.note}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell className="py-3 pl-4">
-                    <div className="text-foreground/80 truncate max-w-[140px]">{deal.asset}</div>
-                    <div className="text-[11px] text-muted-foreground">{deal.space}</div>
-                  </TableCell>
-                  <TableCell className="py-3 pl-4 text-right tabular-nums font-medium text-foreground whitespace-nowrap">{fmtSf(deal.sf)}</TableCell>
-                  <TableCell className="py-3 pl-4 whitespace-nowrap">
-                    <div className="flex gap-1">
-                      {STAGES.map(s => (
-                        <span key={s} className={cn(
-                          "h-1.5 w-4 rounded-full transition-colors",
-                          stageIndex(s) <= stageIndex(deal.stage) ? "bg-primary" : "bg-muted-foreground/20"
-                        )} />
-                      ))}
-                    </div>
-                    <div className="text-[10px] text-muted-foreground mt-0.5">{deal.stage}</div>
-                  </TableCell>
-                  <TableCell className="py-3 pl-4">
-                    <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium", statusCfg.cls)}>
-                      {statusCfg.label}
-                    </span>
-                  </TableCell>
-                  <TableCell className="py-3 pl-3 text-right tabular-nums whitespace-nowrap">
-                    {deal.ner > 0 ? (
-                      <div className="text-right tabular-nums">
-                        <div className="text-sm font-medium text-foreground">${deal.ner.toFixed(2)}</div>
-                        <div className={cn("text-[10px] font-medium", nerDiff >= 0 ? "text-success" : "text-destructive")}>
-                          {nerDiff >= 0 ? "+" : ""}{nerPct}% vs ${deal.budgetNer.toFixed(2)}
-                        </div>
-                      </div>
-                    ) : (
-                      <span className="text-muted-foreground/50 text-xs">—</span>
-                    )}
-                  </TableCell>
-                  <TableCell className="py-3 pl-3 text-right tabular-nums whitespace-nowrap">
-                    {deal.noi > 0 ? (
-                      <div className="text-right tabular-nums">
-                        <div className="text-sm font-medium text-foreground">{fmtNoi(deal.noi)}</div>
-                        <div className={cn("text-[10px] font-medium", noiDiff >= 0 ? "text-success" : "text-destructive")}>
-                          {noiDiff >= 0 ? "+" : ""}{noiPct}% vs {fmtNoi(deal.budgetNoi)}
-                        </div>
-                      </div>
-                    ) : (
-                      <span className="text-muted-foreground/50 text-xs">—</span>
-                    )}
-                  </TableCell>
-                  <TableCell className="py-3 pl-4 text-right">
-                    <span className={cn("text-xs tabular-nums", stale ? "text-warning font-medium" : "text-muted-foreground")}>
-                      {days === 0 ? "Today" : days === 1 ? "1d ago" : `${days}d ago`}
-                    </span>
-                  </TableCell>
-                  <TableCell className="py-3 pl-2">
-                    <AgentBtn entity="Deal" label={`${deal.tenant} — ${deal.dealType} · ${deal.sf.toLocaleString()} sf, ${deal.space} at ${deal.asset} · stage: ${deal.stage}${deal.note ? ` · ${deal.note}` : ""}`} />
-                  </TableCell>
+                  {orderedCols.map(col => {
+                    switch (col.id) {
+                      case "tenant":
+                        return (
+                          <TableCell key="tenant" className="py-3">
+                            <div className="flex items-center gap-2.5">
+                              <TenantAvatar name={deal.tenant} />
+                              <div>
+                                <div className="font-medium text-foreground">{deal.tenant}</div>
+                                <div className="text-[11px] text-muted-foreground">{deal.dealType}</div>
+                              </div>
+                            </div>
+                          </TableCell>
+                        )
+                      case "asset":
+                        return (
+                          <TableCell key="asset" className="py-3 pl-4">
+                            <div className="text-foreground/80 truncate max-w-[140px]">{deal.asset}</div>
+                            <div className="text-[11px] text-muted-foreground">{deal.space}</div>
+                          </TableCell>
+                        )
+                      case "sf":
+                        return <TableCell key="sf" className="py-3 pl-4 text-right tabular-nums font-medium text-foreground whitespace-nowrap">{fmtSf(deal.sf)}</TableCell>
+                      case "dealType":
+                        return <TableCell key="dealType" className="py-3 pl-4 text-sm text-foreground/80 whitespace-nowrap">{deal.dealType}</TableCell>
+                      case "stage":
+                        return (
+                          <TableCell key="stage" className="py-3 pl-4 whitespace-nowrap">
+                            <div className="flex gap-1">
+                              {STAGES.map(s => (
+                                <span key={s} className={cn(
+                                  "h-1.5 w-4 rounded-full transition-colors",
+                                  stageIndex(s) <= stageIndex(deal.stage) ? "bg-primary" : "bg-muted-foreground/20"
+                                )} />
+                              ))}
+                            </div>
+                            <div className="text-[10px] text-muted-foreground mt-0.5">{deal.stage}</div>
+                          </TableCell>
+                        )
+                      case "status":
+                        return (
+                          <TableCell key="status" className="py-3 pl-4">
+                            <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium", statusCfg.cls)}>
+                              {statusCfg.label}
+                            </span>
+                          </TableCell>
+                        )
+                      case "update":
+                        return (
+                          <TableCell key="update" className="py-3 pl-4 whitespace-normal max-w-[220px]">
+                            {(() => {
+                              const u = getLatestHumanUpdate(deal.id, deal.stage)
+                              if (!u) return <span className="text-muted-foreground/40 text-xs">—</span>
+                              return (
+                                <div>
+                                  <span className="text-xs text-foreground/80 line-clamp-2 leading-normal">{u.message}</span>
+                                  <div className="text-xs text-muted-foreground mt-0.5">
+                                    <span className="font-semibold text-foreground/70">{u.name}</span>
+                                    {" · "}{u.timestamp}
+                                  </div>
+                                </div>
+                              )
+                            })()}
+                          </TableCell>
+                        )
+                      case "encumbrances":
+                        return (
+                          <TableCell key="encumbrances" className="py-3 pl-4 whitespace-nowrap">
+                            <div className="flex items-center justify-center">
+                              {(() => {
+                                const count = getEncumbranceCount(deal.id)
+                                if (count === 0) return <span className="text-muted-foreground/40 text-xs">—</span>
+                                return (
+                                  <span className="inline-flex items-center justify-center min-w-6 h-6 px-2 rounded-full text-sm font-bold bg-destructive text-white tabular-nums">{count}</span>
+                                )
+                              })()}
+                            </div>
+                          </TableCell>
+                        )
+                      case "ner":
+                        return (
+                          <TableCell key="ner" className="py-3 pl-3 text-right tabular-nums whitespace-nowrap">
+                            {deal.ner > 0 ? (
+                              <div className="text-right tabular-nums">
+                                <div className="text-sm font-medium text-foreground">${deal.ner.toFixed(2)}</div>
+                                <div className={cn("text-[10px] font-medium", nerDiff >= 0 ? "text-success" : "text-destructive")}>
+                                  {nerDiff >= 0 ? "+" : ""}{nerPct}% vs ${deal.budgetNer.toFixed(2)}
+                                </div>
+                              </div>
+                            ) : (
+                              <span className="text-muted-foreground/50 text-xs">—</span>
+                            )}
+                          </TableCell>
+                        )
+                      case "noi":
+                        return (
+                          <TableCell key="noi" className="py-3 pl-3 text-right tabular-nums whitespace-nowrap">
+                            {deal.noi > 0 ? (
+                              <div className="text-right tabular-nums">
+                                <div className="text-sm font-medium text-foreground">{fmtNoi(deal.noi)}</div>
+                                <div className={cn("text-[10px] font-medium", noiDiff >= 0 ? "text-success" : "text-destructive")}>
+                                  {noiDiff >= 0 ? "+" : ""}{noiPct}% vs {fmtNoi(deal.budgetNoi)}
+                                </div>
+                              </div>
+                            ) : (
+                              <span className="text-muted-foreground/50 text-xs">—</span>
+                            )}
+                          </TableCell>
+                        )
+                      case "lastUpdated":
+                        return (
+                          <TableCell key="lastUpdated" className="py-3 pl-4 text-right">
+                            <span className={cn("text-xs tabular-nums", stale ? "text-warning font-medium" : "text-muted-foreground")}>
+                              {days === 0 ? "Today" : days === 1 ? "1d ago" : `${days}d ago`}
+                            </span>
+                          </TableCell>
+                        )
+                      case "actions":
+                        return (
+                          <TableCell key="actions" className="py-3 pl-2">
+                            <AgentBtn entity="Deal" label={`${deal.tenant} — ${deal.dealType} · ${deal.sf.toLocaleString()} sf, ${deal.space} at ${deal.asset} · stage: ${deal.stage}${deal.note ? ` · ${deal.note}` : ""}`} />
+                          </TableCell>
+                        )
+                      default:
+                        return null
+                    }
+                  })}
                 </TableRow>
               )
             })}

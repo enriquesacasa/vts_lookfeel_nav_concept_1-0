@@ -805,6 +805,17 @@ function getStageFeeds(stage: StageValue): FeedEntry[] {
   return STAGE_FEEDS[stage] ?? GENERIC_FEED
 }
 
+export function getEncumbranceCount(dealId: string): number {
+  return (DEAL_ENCUMBRANCES[dealId] ?? []).length
+}
+
+export function getLatestHumanUpdate(dealId: string, stage: string): { message: string; name: string; timestamp: string } | null {
+  const feed = DEAL_FEEDS[dealId] ?? getStageFeeds(stage as StageValue)
+  const entry = feed.find(e => e.kind === "comment")
+  if (!entry) return null
+  return { message: entry.message, name: entry.name, timestamp: entry.timestamp }
+}
+
 const REACTIONS = ["👍", "👏", "🎉", "❤️"]
 
 function UpdateCard({ entry }: { entry: FeedEntry }) {
