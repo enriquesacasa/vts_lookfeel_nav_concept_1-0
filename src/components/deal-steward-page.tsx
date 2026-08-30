@@ -20,8 +20,8 @@ import { LogoMenuContent } from "@/components/logo-menu-content"
 import {
   ArrowUp, PanelLeft, ChevronDown, MoreHorizontal,
   FilePlus2, Mail, ExternalLink, Search, Mic, AudioLines,
-  Plus, X, ArrowLeft, Waypoints, Play, ThumbsUp, Copy, RefreshCw,
-  Clock,
+  Plus, X, ArrowLeft, Play, ThumbsUp, Copy, RefreshCw,
+  Clock, Activity,
 } from "lucide-react"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -182,7 +182,7 @@ function AgentRail({
         </Button>
         <DropdownMenu>
           <DropdownMenuTrigger className={buttonVariants({ variant: "ghost", size: "icon" })}>
-            <Waypoints className="h-4 w-4" />
+            <Activity className="h-4 w-4" />
           </DropdownMenuTrigger>
           <DropdownMenuContent side="right" align="start" className="w-56">
             {AGENT_TYPES.map(t => (
@@ -215,7 +215,7 @@ function AgentRail({
         <div className="flex items-center gap-2">
           <Popover open={logoOpen} onOpenChange={onLogoOpenChange}>
             <PopoverTrigger render={<div />} nativeButton={false} className="cursor-pointer focus:outline-none" aria-label="Open settings">
-              <Waypoints className="h-5 w-5 text-primary shrink-0" />
+              <Activity className="h-5 w-5 text-primary shrink-0" />
             </PopoverTrigger>
             <PopoverContent className="w-64 p-0 overflow-hidden" align="start">
               <LogoMenuContent isDark={isDark} onToggleDark={onToggleDark} onClose={() => onLogoOpenChange(false)} />
@@ -256,7 +256,7 @@ function AgentRail({
                   "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all h-auto justify-start",
                   activeAgentId === `type:${t.id}` ? "bg-primary/10 text-primary" : "hover:bg-muted/60 text-foreground"
                 )}>
-                <Waypoints className="h-4 w-4 text-muted-foreground shrink-0" />
+                <Activity className="h-4 w-4 text-muted-foreground shrink-0" />
                 <span className="text-sm truncate">{t.name}</span>
               </Button>
             ))}
@@ -526,7 +526,7 @@ function AgentSettingsPanel({
       {/* Top bar */}
       <div className="flex items-center justify-between px-5 py-3 border-b border-border/60 bg-card/80 shrink-0">
         <div className="flex items-center gap-2.5 min-w-0 flex-1 mr-3">
-          <Waypoints className="h-4 w-4 text-muted-foreground shrink-0" />
+          <Activity className="h-4 w-4 text-muted-foreground shrink-0" />
           <Input
             value={agentName}
             onChange={e => setAgentName(e.target.value)}
@@ -874,7 +874,7 @@ export function DealStewardPage({ className, isDark = false, onToggleDark }: {
           {mobileView === "chat" && (
             <Button variant="ghost" size="sm" className="ml-auto gap-1.5"
               onClick={() => setMobileView("settings")}>
-              <Waypoints className="h-4 w-4" />
+              <Activity className="h-4 w-4" />
               Settings
             </Button>
           )}

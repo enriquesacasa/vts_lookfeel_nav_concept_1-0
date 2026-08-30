@@ -5,7 +5,7 @@ import {
   Lock, Zap, Activity, ArrowLeft,
   Database, SlidersHorizontal, ChevronRight, HeartPulse, CalendarCheck,
   FileText, BarChart2, ClipboardCheck,
-  BrainCircuit, Scale, GitMerge, TrendingUp, FileCheck2, Building2, DatabaseZap, PenLine,
+  BrainCircuit, Scale, GitMerge, FileCheck2, Building2, DatabaseZap, PenLine,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -45,6 +45,24 @@ interface AgentRun {
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
 export const AGENTS: AgentDef[] = [
+  {
+    id: "deal-momentum",
+    name: "Deal Monitor",
+    tagline: "Keep stalled deals moving",
+    description:
+      "Identify what is stuck, who has the ball, what the delay is costing, and draft the next follow-up or escalation automatically.",
+    impact:
+      "Fewer deals lost to inertia, faster cycle times, and a clear action for every stalled deal.",
+    category: "Cross-Cutting",
+    capabilities: [
+      "Identify deals with no activity and score the cost of continued delay",
+      "Pinpoint who holds the ball and how long they have had it",
+      "Draft targeted follow-up messages and escalation notes",
+      "Recommend the next best action for each stalled deal",
+    ],
+    icon: Activity,
+    available: true,
+  },
   {
     id: "deal-capture",
     name: "Deal Capture",
@@ -243,24 +261,6 @@ export const AGENTS: AgentDef[] = [
       "Recommend specific tradeoffs and response strategies based on market data",
     ],
     icon: GitMerge,
-    available: true,
-  },
-  {
-    id: "deal-momentum",
-    name: "Deal Momentum",
-    tagline: "Keep stalled deals moving",
-    description:
-      "Identify what is stuck, who has the ball, what the delay is costing, and draft the next follow-up or escalation automatically.",
-    impact:
-      "Fewer deals lost to inertia, faster cycle times, and a clear action for every stalled deal.",
-    category: "Cross-Cutting",
-    capabilities: [
-      "Identify deals with no activity and score the cost of continued delay",
-      "Pinpoint who holds the ball and how long they have had it",
-      "Draft targeted follow-up messages and escalation notes",
-      "Recommend the next best action for each stalled deal",
-    ],
-    icon: TrendingUp,
     available: true,
   },
   {
@@ -781,7 +781,7 @@ const ALL_RUNS: AgentRun[] = [
     time: "Queued",
     summary: "Guidance will activate once counsel returns first redline set.",
   },
-  // Deal Momentum
+  // Deal Monitor
   {
     id: "dm-1",
     title: "3 stalled deals escalated",
@@ -789,7 +789,7 @@ const ALL_RUNS: AgentRun[] = [
     dealId: "d10",
     status: "complete",
     agentId: "deal-momentum",
-    category: "Deal Momentum",
+    category: "Deal Monitor",
     time: "This morning",
     summary: "Identified 3 deals with no activity for 10+ days. Drafted follow-up messages and flagged cost of delay.",
     output: "Stalled deals: KPMG (14 days, $2,800/day cost of delay), WeWork (11 days, $1,900/day), TechCo (10 days, $3,100/day). Follow-ups drafted and sent. Escalation flagged to Sarah Chen for KPMG.",
@@ -802,7 +802,7 @@ const ALL_RUNS: AgentRun[] = [
     asset: "VTS Tower – Floor 14",
     status: "running",
     agentId: "deal-momentum",
-    category: "Deal Momentum",
+    category: "Deal Monitor",
     time: "Running now",
     summary: "Drafting targeted follow-up for WeWork after 11 days of no response.",
   },
@@ -812,7 +812,7 @@ const ALL_RUNS: AgentRun[] = [
     asset: "All assets",
     status: "pending",
     agentId: "deal-momentum",
-    category: "Deal Momentum",
+    category: "Deal Monitor",
     time: "Queued",
     summary: "Scheduled end-of-month stall analysis across all active deals.",
   },

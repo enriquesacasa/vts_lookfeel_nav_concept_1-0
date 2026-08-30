@@ -16,7 +16,7 @@ const PROTOTYPE_LINKS = [
   { label: "Inquiry email",    hash: "#/inquiry-email" },
   { label: "Doc drafting",     hash: "#/document-agent" },
   { label: "Proposal builder", hash: "#/proposal-builder" },
-  { label: "Deal monitor",     hash: "#/deal-steward" },
+  { label: "Deal monitor",    hash: "#/deal-steward" },
 ]
 
 const DOC_LINKS = [

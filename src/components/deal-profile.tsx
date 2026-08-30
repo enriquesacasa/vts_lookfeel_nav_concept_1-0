@@ -731,7 +731,7 @@ const DEAL_FEEDS: Record<string, FeedEntry[]> = {
     { initials: "VTS", name: "VTS system",     timestamp: "Yesterday · 4:12 PM", message: "Stage updated: Inquiry → Touring.", kind: "update" },
   ],
   "d10": [
-    { initials: "AI",  name: "Deal Momentum",  timestamp: "Today · 11:00 AM", message: "Stalled 26 days. Cost of delay: $3,705/day ($96,330 total). Follow-up drafted — awaiting your approval before sending.", kind: "agent"  },
+    { initials: "AI",  name: "Deal Monitor",  timestamp: "Today · 11:00 AM", message: "Stalled 26 days. Cost of delay: $3,705/day ($96,330 total). Follow-up drafted — awaiting your approval before sending.", kind: "agent"  },
     { initials: "PS",  name: "Paul Simmons",   timestamp: "Jun 25 · 3:10 PM", message: "KPMG board review has been pushed to mid-August. Will revert once we have a date.", kind: "comment" },
     { initials: "VTS", name: "VTS system",     timestamp: "Jun 20 · 8:00 AM", message: "Stage updated: Inquiry → Proposal. Stall flag set at day 10.", kind: "update" },
     { initials: "MT",  name: "Mark Torres",    timestamp: "Jun 20 · 7:55 AM", message: "Proposal delivered to KPMG. Waiting on board sign-off for renewal authority.", kind: "comment" },
@@ -962,7 +962,7 @@ const HEALTH_BY_STAGE: Record<StageValue, Partial<Record<DealStatus, HealthEntry
     "at-risk": { tier: 3, label: "At risk", summary: "Tenant toured a competitor property. Engagement declining.", signals: ["Competitor tour detected at 2 other buildings", "Last communication 14 days ago", "No proposal request received"], recs: [{ action: "Model concession scenarios", urgency: "Today", agentId: "scenario-modeling" }, { action: "Send differentiation brief", urgency: "Today", agentId: "deal-momentum" }] },
   },
   "Proposal": {
-    active: { tier: 1, label: "On track", summary: "Proposal delivered. Monitoring for counter and feedback.", signals: ["Proposal sent to tenant team", "No counter overdue", "Deal Momentum watching engagement signals"], recs: [{ action: "Prepare counter-proposal scenarios", urgency: "This week", agentId: "scenario-modeling" }] },
+    active: { tier: 1, label: "On track", summary: "Proposal delivered. Monitoring for counter and feedback.", signals: ["Proposal sent to tenant team", "No counter overdue", "Deal Monitor watching engagement signals"], recs: [{ action: "Prepare counter-proposal scenarios", urgency: "This week", agentId: "scenario-modeling" }] },
     stalled: { tier: 2, label: "Stalled", summary: "Proposal sent with no counter received. Follow-up needed.", signals: ["Proposal delivered 11 days ago", "No counter received", "Board review may be causing delay"], recs: [{ action: "Send follow-up on proposal", urgency: "Today", agentId: "deal-momentum" }, { action: "Model alternative proposal terms", urgency: "This week", agentId: "scenario-modeling" }] },
     "at-risk": { tier: 3, label: "At risk", summary: "Multiple risk signals on proposal stage. Intervention recommended.", signals: ["Tenant seen touring competitor", "Budget gap of 12% vs market", "Last communication 14 days ago"], recs: [{ action: "Model concession scenarios", urgency: "Today", agentId: "scenario-modeling" }, { action: "Analyze deal intelligence", urgency: "Today", agentId: "deal-intelligence" }] },
   },
