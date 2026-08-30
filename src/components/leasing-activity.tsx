@@ -2,7 +2,10 @@ import * as React from "react"
 import { cn, cardBase } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { AgentBtn } from "@/components/agent-btn"
-import { ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react"
+import {
+  Table, TableHeader, TableBody, TableRow, TableCell, TableHead,
+  SortableHead, useSortState,
+} from "@/components/sortable-table"
 
 export interface Deal {
   tenant: string
@@ -29,7 +32,6 @@ interface LeasingActivityProps {
 }
 
 type SortKey = "tenant" | "space" | "sf" | "stage" | "status" | "baseRent"
-type SortDir = "asc" | "desc"
 
 const STAGE_ORDER = ["Proposal", "LOI", "Lease Out", "Executed"] as const
 const STATUS_ORDER: Deal["status"][] = ["at-risk", "stalled", "active"]
@@ -62,20 +64,9 @@ function RentDelta({ base, budget }: { base: number; budget: number }) {
   )
 }
 
-function SortIcon({ col, sortKey, sortDir }: { col: SortKey; sortKey: SortKey; sortDir: SortDir }) {
-  if (col !== sortKey) return <ChevronsUpDown className="h-3 w-3 opacity-40" />
-  return sortDir === "asc" ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />
-}
-
 const LeasingActivity = React.forwardRef<HTMLDivElement, LeasingActivityProps>(
   ({ deals, className }, ref) => {
-    const [sortKey, setSortKey] = React.useState<SortKey>("tenant")
-    const [sortDir, setSortDir] = React.useState<SortDir>("asc")
-
-    function handleSort(key: SortKey) {
-      if (key === sortKey) setSortDir(d => d === "asc" ? "desc" : "asc")
-      else { setSortKey(key); setSortDir("asc") }
-    }
+    const { sortKey, sortDir, handleSort } = useSortState<SortKey>("tenant")
 
     const sorted = [...deals].sort((a, b) => {
       let av: string | number
@@ -100,26 +91,6 @@ const LeasingActivity = React.forwardRef<HTMLDivElement, LeasingActivityProps>(
       return sortDir === "asc" ? cmp : -cmp
     })
 
-    function Th({ col, children, className: cls, right }: { col: SortKey; children: React.ReactNode; className?: string; right?: boolean }) {
-      return (
-        <th
-          onClick={() => handleSort(col)}
-          className={cn(
-            "pb-2 text-[10px] font-medium uppercase tracking-widest cursor-pointer select-none whitespace-nowrap transition-colors",
-            right ? "text-right pl-3" : "text-left",
-            sortKey === col ? "text-foreground/80" : "text-foreground/50",
-            "hover:text-foreground/80",
-            cls
-          )}
-        >
-          <span className={cn("inline-flex items-center gap-1", right && "justify-end w-full")}>
-            {children}
-            <SortIcon col={col} sortKey={sortKey} sortDir={sortDir} />
-          </span>
-        </th>
-      )
-    }
-
     return (
       <div ref={ref} className={cn(cardBase, className)}>
         <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2 mb-6">
@@ -133,26 +104,26 @@ const LeasingActivity = React.forwardRef<HTMLDivElement, LeasingActivityProps>(
         </div>
 
         <p className="text-sm font-semibold text-foreground mb-3">Active Deals</p>
-        <table className="w-full text-sm border-collapse">
-          <thead>
-            <tr className="border-b-2 border-border/60">
-              <Th col="tenant">Tenant</Th>
-              <Th col="space" className="pl-3">Space</Th>
-              <Th col="stage" className="pl-3">Stage</Th>
-              <Th col="status" className="pl-3">Status</Th>
-              <Th col="baseRent" right>Base rent / budget</Th>
-              <th className="pb-2 pl-2 w-8" />
-            </tr>
-          </thead>
-          <tbody>
+        <Table className="border-collapse">
+          <TableHeader>
+            <TableRow className="border-b-2 border-border/60 hover:bg-transparent">
+              <SortableHead col="tenant" sortKey={sortKey} sortDir={sortDir} onSort={handleSort}>Tenant</SortableHead>
+              <SortableHead col="space" sortKey={sortKey} sortDir={sortDir} onSort={handleSort} className="pl-3">Space</SortableHead>
+              <SortableHead col="stage" sortKey={sortKey} sortDir={sortDir} onSort={handleSort} className="pl-3">Stage</SortableHead>
+              <SortableHead col="status" sortKey={sortKey} sortDir={sortDir} onSort={handleSort} className="pl-3">Status</SortableHead>
+              <SortableHead col="baseRent" sortKey={sortKey} sortDir={sortDir} onSort={handleSort} right>Base rent / budget</SortableHead>
+              <TableHead className="pb-2 pt-0 pl-2 w-8" />
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {sorted.map((d, i) => (
-              <tr key={i} className={cn("cursor-pointer hover:bg-muted/40 transition-colors", i > 0 && "border-t border-border/40")}>
-                <td className="py-2.5 font-medium text-foreground text-sm whitespace-nowrap">{d.tenant}</td>
-                <td className="py-2.5 pl-3 text-sm text-muted-foreground whitespace-nowrap">
+              <TableRow key={i} className={cn("cursor-pointer hover:bg-muted/40 transition-colors", i > 0 ? "border-t border-border/40" : "border-0")}>
+                <TableCell className="py-2.5 font-medium text-foreground text-sm whitespace-nowrap">{d.tenant}</TableCell>
+                <TableCell className="py-2.5 pl-3 text-sm text-muted-foreground whitespace-nowrap">
                   <div>{d.space}</div>
                   <div className="text-[10px]">{fmtSf(d.sf)}</div>
-                </td>
-                <td className="py-2.5 pl-3 whitespace-nowrap">
+                </TableCell>
+                <TableCell className="py-2.5 pl-3 whitespace-nowrap">
                   <div className="flex gap-1">
                     {STAGE_ORDER.map(s => (
                       <span key={s} className={cn(
@@ -164,22 +135,22 @@ const LeasingActivity = React.forwardRef<HTMLDivElement, LeasingActivityProps>(
                     ))}
                   </div>
                   <div className="text-[10px] text-muted-foreground mt-0.5">{d.stage}</div>
-                </td>
-                <td className="py-2.5 pl-3">
+                </TableCell>
+                <TableCell className="py-2.5 pl-3">
                   <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium", STATUS_PILL[d.status])}>
                     {STATUS_LABEL[d.status]}
                   </span>
-                </td>
-                <td className="py-2.5 pl-3">
+                </TableCell>
+                <TableCell className="py-2.5 pl-3">
                   <RentDelta base={d.baseRent} budget={d.budgetRent} />
-                </td>
-                <td className="py-2.5 pl-2 text-right whitespace-nowrap">
+                </TableCell>
+                <TableCell className="py-2.5 pl-2 text-right whitespace-nowrap">
                   <AgentBtn entity="Deal" label={`${d.tenant} — ${d.stage} · ${d.sf.toLocaleString()} sf, ${d.space} · $${d.baseRent}/sf base vs $${d.budgetRent}/sf budget · status: ${d.status}${d.stalledDays ? ` · stalled ${d.stalledDays} days` : ""}${d.note ? ` · ${d.note}` : ""}`} onClick={e => e.stopPropagation()} />
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
     )
   }

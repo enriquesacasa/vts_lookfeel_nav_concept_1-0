@@ -1,5 +1,6 @@
 import * as React from "react"
 import { cn, cardBase } from "@/lib/utils"
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/sortable-table"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
@@ -183,7 +184,7 @@ function KpiCell({ label, value, sub, trend }: { label: string; value: string; s
   const cls = trend === "up" ? "text-success" : trend === "down" ? "text-destructive" : "text-muted-foreground"
   return (
     <div className="flex-1 min-w-[120px] px-5 py-4 flex flex-col gap-0.5">
-      <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">{label}</p>
+      <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground mb-1">{label}</p>
       <p className="text-2xl font-medium text-foreground leading-none">{value}</p>
       {sub && <p className={cn("text-xs font-medium mt-1", cls)}>{sub}</p>}
     </div>
@@ -366,7 +367,7 @@ const PARTY_STYLE: Record<ProposalRound["party"], string> = {
 }
 
 function DeltaCell({ value, base, fmt = "dollar" }: { value: number; base: number; fmt?: "dollar" | "months" | "years" }) {
-  if (!base) return <td className="px-3 py-2.5 text-sm font-medium text-foreground">{fmt === "dollar" ? `$${value.toFixed(2)}` : `${value}${fmt === "months" ? " mo" : " yr"}`}</td>
+  if (!base) return <TableCell className="px-3 py-2.5 text-sm font-medium text-foreground">{fmt === "dollar" ? `$${value.toFixed(2)}` : `${value}${fmt === "months" ? " mo" : " yr"}`}</TableCell>
   const pct = ((value - base) / base) * 100
   const up = pct > 0
   const flat = Math.abs(pct) < 0.5
@@ -374,10 +375,10 @@ function DeltaCell({ value, base, fmt = "dollar" }: { value: number; base: numbe
   const sign = flat ? "" : up ? "+" : ""
   const formatted = fmt === "dollar" ? `$${value.toFixed(2)}` : fmt === "months" ? `${value} mo` : `${value} yr`
   return (
-    <td className="px-3 py-2.5">
+    <TableCell className="px-3 py-2.5">
       <div className="text-sm font-medium text-foreground">{formatted}</div>
-      {!flat && <div className={cn("text-[10px] font-medium", cls)}>{sign}{pct.toFixed(1)}%</div>}
-    </td>
+      {!flat && <div className={cn("text-xs font-medium", cls)}>{sign}{pct.toFixed(1)}%</div>}
+    </TableCell>
   )
 }
 
@@ -401,35 +402,35 @@ function ProposalsTab({ deal, stageIdx }: { deal: Deal; stageIdx: number }) {
       <div>
         <p className="text-sm font-semibold text-foreground mb-3">Negotiation history</p>
         <div className="overflow-x-auto rounded-xl border border-border">
-          <table className="w-full text-left min-w-[600px]">
-            <thead>
-              <tr className="border-b border-border bg-muted/40">
-                <th className="px-3 py-2.5 text-xs font-semibold text-muted-foreground w-36">Round</th>
-                {cols.map(c => <th key={c} className="px-3 py-2.5 text-xs font-semibold text-muted-foreground">{c}</th>)}
-              </tr>
-            </thead>
-            <tbody>
+          <Table className="min-w-[600px]">
+            <TableHeader>
+              <TableRow className="border-b border-border bg-muted/40 hover:bg-muted/40">
+                <TableHead className="px-3 py-2.5 text-xs font-semibold text-muted-foreground w-36">Round</TableHead>
+                {cols.map(c => <TableHead key={c} className="px-3 py-2.5 text-xs font-semibold text-muted-foreground">{c}</TableHead>)}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {rounds.map((r, i) => {
                 const base = i === 0 ? null : rounds[0]
                 return (
-                  <tr key={i} className={cn("border-b border-border/50 last:border-0", r.party === "agreed" && "bg-success/5")}>
-                    <td className="px-3 py-2.5">
+                  <TableRow key={i} className={cn("border-b border-border/50 last:border-0 hover:bg-transparent", r.party === "agreed" && "bg-success/5")}>
+                    <TableCell className="px-3 py-2.5">
                       <div className="text-xs font-semibold text-foreground">{r.label}</div>
                       <div className={cn("inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-semibold border mt-0.5", PARTY_STYLE[r.party])}>
                         {r.party === "prior" ? "Prior" : r.party === "agreed" ? "Agreed" : r.party === "landlord" ? "Landlord" : "Tenant"}
                       </div>
-                    </td>
+                    </TableCell>
                     <DeltaCell value={r.rent}     base={base?.rent ?? 0}     fmt="dollar"  />
                     <DeltaCell value={r.ti}       base={base?.ti ?? 0}       fmt="dollar"  />
                     <DeltaCell value={r.freeRent} base={base?.freeRent ?? 0} fmt="months"  />
                     <DeltaCell value={r.term}     base={base?.term ?? 0}     fmt="years"   />
-                    <td className="px-3 py-2.5 text-sm text-foreground/80">{r.escalation}</td>
-                    <td className="px-3 py-2.5 text-sm text-foreground/80">{r.options}</td>
-                  </tr>
+                    <TableCell className="px-3 py-2.5 text-sm text-foreground/80">{r.escalation}</TableCell>
+                    <TableCell className="px-3 py-2.5 text-sm text-foreground/80">{r.options}</TableCell>
+                  </TableRow>
                 )
               })}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
       </div>
 
@@ -452,8 +453,8 @@ function ProposalsTab({ deal, stageIdx }: { deal: Deal; stageIdx: number }) {
                   <p className="text-xs text-muted-foreground">{item.label}</p>
                   <p className="text-sm font-semibold text-foreground">{item.current}</p>
                   <div className="flex items-center gap-1.5">
-                    <span className="text-[10px] text-muted-foreground line-through">{item.prior}</span>
-                    <span className={cn("text-[10px] font-semibold", item.up ? "text-success" : "text-destructive")}>{item.delta}</span>
+                    <span className="text-xs text-muted-foreground line-through">{item.prior}</span>
+                    <span className={cn("text-xs font-semibold", item.up ? "text-success" : "text-destructive")}>{item.delta}</span>
                   </div>
                 </div>
               ))}
@@ -817,7 +818,7 @@ function UpdateCard({ entry }: { entry: FeedEntry }) {
           <span className="text-[8px] font-bold">VTS</span>
         </div>
         <span className="text-xs text-foreground/75 flex-1">{entry.message}</span>
-        <span className="text-[10px] text-muted-foreground shrink-0">{entry.timestamp}</span>
+        <span className="text-xs text-muted-foreground shrink-0">{entry.timestamp}</span>
       </div>
     )
   }
@@ -832,11 +833,11 @@ function UpdateCard({ entry }: { entry: FeedEntry }) {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold text-primary leading-none">{entry.name}</p>
-            <p className="text-[11px] text-muted-foreground mt-0.5">{entry.timestamp}</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{entry.timestamp}</p>
           </div>
           <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20">
             <Zap className="h-2.5 w-2.5 text-primary" />
-            <span className="text-[10px] font-medium text-primary">Agent</span>
+            <span className="text-xs font-medium text-primary">Agent</span>
           </div>
         </div>
         <p className="text-sm text-foreground/80 leading-relaxed pl-[42px]">{entry.message}</p>
@@ -853,13 +854,13 @@ function UpdateCard({ entry }: { entry: FeedEntry }) {
           </div>
           <div>
             <p className="text-sm font-semibold text-foreground leading-none">{entry.name}</p>
-            <p className="text-[11px] text-muted-foreground mt-0.5">{entry.timestamp}</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{entry.timestamp}</p>
           </div>
         </div>
       </div>
       <p className="text-sm text-foreground leading-relaxed">{entry.message}</p>
       <div className="flex items-center gap-3 pt-1 border-t border-border/50">
-        <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <button className="hover:text-foreground transition-colors">Share</button>
           <span className="opacity-40">·</span>
           <button className="hover:text-foreground transition-colors">Edit</button>
@@ -873,7 +874,7 @@ function UpdateCard({ entry }: { entry: FeedEntry }) {
               className={cn("h-7 px-2 rounded-md text-sm transition-colors flex items-center gap-1",
                 reactions[r] ? "bg-primary/10 text-primary" : "hover:bg-muted text-muted-foreground"
               )}>
-              {r}{reactions[r] ? <span className="text-[10px] font-medium">{reactions[r]}</span> : null}
+              {r}{reactions[r] ? <span className="text-xs font-medium">{reactions[r]}</span> : null}
             </button>
           ))}
         </div>
@@ -981,15 +982,15 @@ function RecRow({ action, urgency, agentId }: { action: string; urgency: string;
   const AgentIcon = agent ? (AGENT_ICON_MAP[agent.name] ?? Bot) : Bot
 
   return (
-    <div className="flex items-center gap-2.5 rounded-lg p-3 border border-primary/25 bg-primary/15">
-      <Zap className="h-4 w-4 shrink-0 text-sidebar-primary" />
+    <div className="flex items-center gap-2.5 rounded-lg px-3 py-2 border border-primary/25 bg-primary/15">
+      <Zap className="h-3.5 w-3.5 shrink-0 text-sidebar-primary" />
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-sidebar-foreground/90">{action}</p>
+        <p className="text-xs font-medium text-sidebar-foreground/90">{action}</p>
         <p className="text-xs text-sidebar-foreground/55">{urgency}</p>
       </div>
       {agent && (
         <Button variant="outline" size="sm" onClick={() => {}}
-          className="gap-1.5 shrink-0 text-sidebar-foreground/85 border-current bg-transparent hover:bg-white/10">
+          className="gap-1.5 shrink-0 text-sidebar-foreground/85 border-current bg-transparent hover:bg-sidebar-foreground/10">
           <AgentIcon className="h-3 w-3" />
           {agent.name}
         </Button>
@@ -1013,10 +1014,10 @@ function DealHealthCard({ status, stage, dealId }: { status: DealStatus; stage: 
       </div>
 
       <div className="rounded-lg px-3 py-2 flex items-center gap-3 bg-sidebar-foreground/10">
-        <HeartPulse className="h-4 w-4 shrink-0 text-sidebar-primary" />
-        <p className="text-sm leading-snug text-sidebar-foreground/70 flex-1">{cfg.summary}</p>
+        <HeartPulse className="h-3.5 w-3.5 shrink-0 text-sidebar-primary" />
+        <p className="text-xs leading-snug text-sidebar-foreground/70 flex-1">{cfg.summary}</p>
         <Popover>
-          <PopoverTrigger render={<Button variant="outline" size="sm" className="shrink-0 gap-1.5 text-sidebar-foreground/85 border-current bg-transparent hover:bg-white/10" />}>
+          <PopoverTrigger render={<Button variant="outline" size="sm" className="shrink-0 gap-1.5 text-sidebar-foreground/85 border-current bg-transparent hover:bg-sidebar-foreground/10" />}>
             Signals
             <ChevronDown className="h-3 w-3" />
           </PopoverTrigger>

@@ -12,10 +12,11 @@ interface LogoMenuContentProps {
 }
 
 const PROTOTYPE_LINKS = [
-  { label: "Main view",       hash: "#/dashboard" },
-  { label: "Inquiry email",   hash: "#/inquiry-email" },
-  { label: "Doc Drafting",       hash: "#/document-agent" },
-  { label: "Proposal builder",   hash: "#/proposal-builder" },
+  { label: "Main view",        hash: "#/dashboard" },
+  { label: "Inquiry email",    hash: "#/inquiry-email" },
+  { label: "Doc drafting",     hash: "#/document-agent" },
+  { label: "Proposal builder", hash: "#/proposal-builder" },
+  { label: "Deal monitor",     hash: "#/deal-steward" },
 ]
 
 const DOC_LINKS = [

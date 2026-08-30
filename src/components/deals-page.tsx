@@ -7,11 +7,15 @@ import { Input } from "@/components/ui/input"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { FILTER_TAB_GROUP_CLS, FILTER_TAB_ITEM_CLS } from "@/components/filter-chip"
 import {
-  Sparkle, Search, ChevronUp, ChevronDown, ChevronsUpDown,
+  Sparkle, Search,
   ChevronLeft, ChevronRight, AlertTriangle, Clock,
   CheckCircle2, TrendingUp, TrendingDown,
 } from "lucide-react"
 import { AgentBtn } from "@/components/agent-btn"
+import {
+  Table, TableHeader, TableBody, TableRow, TableCell, TableHead,
+  SortableHead, useSortState,
+} from "@/components/sortable-table"
 
 // ── Tenant logos ─────────────────────────────────────────────────────────────
 
@@ -157,7 +161,6 @@ function fmtSf(n: number) {
 function stageIndex(s: Stage) { return STAGES.indexOf(s) }
 
 type SortKey = "tenant" | "sf" | "stage" | "ner" | "noi" | "lastUpdated" | "status"
-type SortDir = "asc" | "desc"
 
 const PAGE_SIZE = 10
 
@@ -327,13 +330,6 @@ function KpiSummary({ deals }: { deals: Deal[] }) {
   )
 }
 
-// ── Table sort icon ───────────────────────────────────────────────────────────
-
-function SortIcon({ active, dir }: { active: boolean; dir: SortDir }) {
-  if (!active) return <ChevronsUpDown className="h-3 w-3 opacity-40" />
-  return dir === "asc" ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />
-}
-
 // ── Status filter tabs ────────────────────────────────────────────────────────
 
 const STATUS_TABS: { label: string; value: Status | "all" }[] = [
@@ -351,8 +347,7 @@ export function DealsPage({ onDealClick }: { onDealClick?: (deal: Deal) => void 
   const [keyword, setKeyword] = React.useState("")
   const [statusFilter, setStatusFilter] = React.useState<Status | "all">("all")
   const [stageFilter, setStageFilter] = React.useState<Stage | "all">("all")
-  const [sortKey, setSortKey] = React.useState<SortKey>("lastUpdated")
-  const [sortDir, setSortDir] = React.useState<SortDir>("desc")
+  const { sortKey, sortDir, handleSort: _handleSort } = useSortState<SortKey>("lastUpdated", "desc")
   const [page, setPage] = React.useState(1)
 
   const filtered = React.useMemo(() => {
@@ -379,11 +374,7 @@ export function DealsPage({ onDealClick }: { onDealClick?: (deal: Deal) => void 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
-  const handleSort = (key: SortKey) => {
-    if (sortKey === key) setSortDir(d => d === "asc" ? "desc" : "asc")
-    else { setSortKey(key); setSortDir("desc") }
-    setPage(1)
-  }
+  function handleSort(key: SortKey) { _handleSort(key); setPage(1) }
 
   return (
     <CardCtx.Provider value={card}>
@@ -437,42 +428,23 @@ export function DealsPage({ onDealClick }: { onDealClick?: (deal: Deal) => void 
         </div>
 
         {/* Table */}
-        <table className="w-full text-sm border-collapse">
-          <thead>
-            <tr className="border-b-2 border-border/60">
-              {([
-                { key: "tenant",      label: "Tenant",        cls: "" },
-                { key: null,          label: "Asset / Space", cls: "pl-4" },
-                { key: "sf",          label: "Size",          cls: "pl-4 text-right" },
-                { key: "stage",       label: "Stage",         cls: "pl-4" },
-                { key: "status",      label: "Status",        cls: "pl-4" },
-                { key: "ner",         label: "NER / Budget",  cls: "pl-3 text-right" },
-                { key: "noi",         label: "NOI / Budget",  cls: "pl-3 text-right" },
-                { key: "lastUpdated", label: "Updated",       cls: "pl-4 text-right" },
-                { key: null,          label: "",              cls: "pl-2 w-8" },
-              ] as { key: SortKey | null; label: string; cls: string }[]).map((col, i) => (
-                <th
-                  key={i}
-                  onClick={() => col.key && handleSort(col.key)}
-                  className={cn(
-                    "pb-2 text-[10px] font-medium uppercase tracking-widest select-none whitespace-nowrap transition-colors",
-                    col.cls,
-                    col.key ? "cursor-pointer" : "",
-                    sortKey === col.key ? "text-foreground/80" : "text-foreground/50",
-                    col.key ? "hover:text-foreground/80" : ""
-                  )}
-                >
-                  <span className={cn("inline-flex items-center gap-1", col.cls.includes("text-right") && "justify-end w-full")}>
-                    {col.label}
-                    {col.key && <SortIcon active={sortKey === col.key} dir={sortDir} />}
-                  </span>
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
+        <Table className="border-collapse">
+          <TableHeader>
+            <TableRow className="border-b-2 border-border/60 hover:bg-transparent">
+              <SortableHead col="tenant"      sortKey={sortKey} sortDir={sortDir} onSort={handleSort}>Tenant</SortableHead>
+              <SortableHead col={null}        sortKey={sortKey} sortDir={sortDir} onSort={handleSort} className="pl-4">Asset / Space</SortableHead>
+              <SortableHead col="sf"          sortKey={sortKey} sortDir={sortDir} onSort={handleSort} className="pl-4" right>Size</SortableHead>
+              <SortableHead col="stage"       sortKey={sortKey} sortDir={sortDir} onSort={handleSort} className="pl-4">Stage</SortableHead>
+              <SortableHead col="status"      sortKey={sortKey} sortDir={sortDir} onSort={handleSort} className="pl-4">Status</SortableHead>
+              <SortableHead col="ner"         sortKey={sortKey} sortDir={sortDir} onSort={handleSort} className="pl-3" right>NER / Budget</SortableHead>
+              <SortableHead col="noi"         sortKey={sortKey} sortDir={sortDir} onSort={handleSort} className="pl-3" right>NOI / Budget</SortableHead>
+              <SortableHead col="lastUpdated" sortKey={sortKey} sortDir={sortDir} onSort={handleSort} className="pl-4" right>Updated</SortableHead>
+              <TableHead className="pb-2 pt-0 pl-2 w-8" />
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {paginated.length === 0 && (
-              <tr><td colSpan={9} className="py-10 text-center text-sm text-muted-foreground">No deals match your filters.</td></tr>
+              <TableRow><TableCell colSpan={9} className="py-10 text-center text-sm text-muted-foreground">No deals match your filters.</TableCell></TableRow>
             )}
             {paginated.map((deal, i) => {
               const days = daysSince(deal.lastUpdated)
@@ -484,8 +456,8 @@ export function DealsPage({ onDealClick }: { onDealClick?: (deal: Deal) => void 
               const noiPct = deal.budgetNoi > 0 ? Math.round((noiDiff / deal.budgetNoi) * 100) : 0
               function fmtNoi(n: number) { return n >= 1000000 ? `$${(n / 1000000).toFixed(1)}M` : `$${(n / 1000).toFixed(0)}K` }
               return (
-                <tr key={deal.id} onClick={() => onDealClick?.(deal)} className={cn("cursor-pointer hover:bg-muted/40 transition-colors", i > 0 && "border-t border-border/40")}>
-                  <td className="py-3">
+                <TableRow key={deal.id} onClick={() => onDealClick?.(deal)} className={cn("cursor-pointer hover:bg-muted/40 transition-colors", i > 0 ? "border-t border-border/40" : "border-0")}>
+                  <TableCell className="py-3">
                     <div className="flex items-center gap-2.5">
                       <TenantAvatar name={deal.tenant} />
                       <div>
@@ -498,13 +470,13 @@ export function DealsPage({ onDealClick }: { onDealClick?: (deal: Deal) => void 
                         )}
                       </div>
                     </div>
-                  </td>
-                  <td className="py-3 pl-4">
+                  </TableCell>
+                  <TableCell className="py-3 pl-4">
                     <div className="text-foreground/80 truncate max-w-[140px]">{deal.asset}</div>
                     <div className="text-[11px] text-muted-foreground">{deal.space}</div>
-                  </td>
-                  <td className="py-3 pl-4 text-right tabular-nums font-medium text-foreground whitespace-nowrap">{fmtSf(deal.sf)}</td>
-                  <td className="py-3 pl-4 whitespace-nowrap">
+                  </TableCell>
+                  <TableCell className="py-3 pl-4 text-right tabular-nums font-medium text-foreground whitespace-nowrap">{fmtSf(deal.sf)}</TableCell>
+                  <TableCell className="py-3 pl-4 whitespace-nowrap">
                     <div className="flex gap-1">
                       {STAGES.map(s => (
                         <span key={s} className={cn(
@@ -514,13 +486,13 @@ export function DealsPage({ onDealClick }: { onDealClick?: (deal: Deal) => void 
                       ))}
                     </div>
                     <div className="text-[10px] text-muted-foreground mt-0.5">{deal.stage}</div>
-                  </td>
-                  <td className="py-3 pl-4">
+                  </TableCell>
+                  <TableCell className="py-3 pl-4">
                     <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium", statusCfg.cls)}>
                       {statusCfg.label}
                     </span>
-                  </td>
-                  <td className="py-3 pl-3 text-right tabular-nums whitespace-nowrap">
+                  </TableCell>
+                  <TableCell className="py-3 pl-3 text-right tabular-nums whitespace-nowrap">
                     {deal.ner > 0 ? (
                       <div className="text-right tabular-nums">
                         <div className="text-sm font-medium text-foreground">${deal.ner.toFixed(2)}</div>
@@ -531,8 +503,8 @@ export function DealsPage({ onDealClick }: { onDealClick?: (deal: Deal) => void 
                     ) : (
                       <span className="text-muted-foreground/50 text-xs">—</span>
                     )}
-                  </td>
-                  <td className="py-3 pl-3 text-right tabular-nums whitespace-nowrap">
+                  </TableCell>
+                  <TableCell className="py-3 pl-3 text-right tabular-nums whitespace-nowrap">
                     {deal.noi > 0 ? (
                       <div className="text-right tabular-nums">
                         <div className="text-sm font-medium text-foreground">{fmtNoi(deal.noi)}</div>
@@ -543,20 +515,20 @@ export function DealsPage({ onDealClick }: { onDealClick?: (deal: Deal) => void 
                     ) : (
                       <span className="text-muted-foreground/50 text-xs">—</span>
                     )}
-                  </td>
-                  <td className="py-3 pl-4 text-right">
+                  </TableCell>
+                  <TableCell className="py-3 pl-4 text-right">
                     <span className={cn("text-xs tabular-nums", stale ? "text-warning font-medium" : "text-muted-foreground")}>
                       {days === 0 ? "Today" : days === 1 ? "1d ago" : `${days}d ago`}
                     </span>
-                  </td>
-                  <td className="py-3 pl-2">
+                  </TableCell>
+                  <TableCell className="py-3 pl-2">
                     <AgentBtn entity="Deal" label={`${deal.tenant} — ${deal.dealType} · ${deal.sf.toLocaleString()} sf, ${deal.space} at ${deal.asset} · stage: ${deal.stage}${deal.note ? ` · ${deal.note}` : ""}`} />
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               )
             })}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
 
         {/* Pagination */}
         <div className="flex items-center justify-between mt-4 pt-4 border-t border-border/40">

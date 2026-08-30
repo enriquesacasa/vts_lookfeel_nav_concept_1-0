@@ -21,14 +21,23 @@ export const COLORS: Record<string, { bg: string; text: string; dashed?: boolean
   available: { bg: "transparent", text: "oklch(0.60 0.02 258)", dashed: true },
 }
 
-const TENANT_PALETTE = [
-  "var(--color-chart-1)", "var(--color-chart-2)", "var(--color-chart-3)",
-  "var(--color-chart-4)", "var(--color-chart-5)",
+// Perceptually distinct colors — spread across hue wheel, consistent chroma/lightness
+const TENANT_PALETTE: { bg: string; text: string }[] = [
+  { bg: "oklch(0.52 0.20 250)",  text: "#fff" }, // blue
+  { bg: "oklch(0.54 0.18 145)",  text: "#fff" }, // green
+  { bg: "oklch(0.54 0.22 30)",   text: "#fff" }, // orange
+  { bg: "oklch(0.52 0.20 310)",  text: "#fff" }, // purple
+  { bg: "oklch(0.54 0.18 195)",  text: "#fff" }, // teal
+  { bg: "oklch(0.54 0.22 65)",   text: "#fff" }, // amber
+  { bg: "oklch(0.52 0.20 0)",    text: "#fff" }, // red
+  { bg: "oklch(0.54 0.18 270)",  text: "#fff" }, // indigo
+  { bg: "oklch(0.54 0.18 165)",  text: "#fff" }, // cyan-green
+  { bg: "oklch(0.52 0.20 340)",  text: "#fff" }, // pink
 ]
 
 function getTenantColor(tenant: string, allTenants: string[]): { bg: string; text: string } {
   const idx = allTenants.indexOf(tenant)
-  return { bg: TENANT_PALETTE[idx % TENANT_PALETTE.length], text: "#fff" }
+  return TENANT_PALETTE[idx % TENANT_PALETTE.length]
 }
 
 type ExpBucket = keyof typeof COLORS

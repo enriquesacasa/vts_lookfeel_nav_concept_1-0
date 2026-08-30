@@ -4,11 +4,13 @@ import { Button } from "@/components/ui/button"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { AgentBtn } from "@/components/agent-btn"
 import { FILTER_TAB_GROUP_CLS, FILTER_TAB_ITEM_CLS } from "@/components/filter-chip"
-import { ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react"
+import {
+  Table, TableHeader, TableBody, TableRow, TableCell, TableHead,
+  SortableHead, useSortState,
+} from "@/components/sortable-table"
 
 type DateCategory = "expiring" | "renewal" | "options" | "all"
 type SortKey = "tenant" | "type" | "space" | "date" | "monthsOut"
-type SortDir = "asc" | "desc"
 
 export interface CriticalDate {
   tenant: string
@@ -49,19 +51,10 @@ function fmtMonths(n: number) {
   return `${n} mo`
 }
 
-function SortIcon({ col, sortKey, sortDir }: { col: SortKey; sortKey: SortKey; sortDir: SortDir }) {
-  if (col !== sortKey) return <ChevronsUpDown className="h-3 w-3 opacity-40" />
-  return sortDir === "asc"
-    ? <ChevronUp className="h-3 w-3" />
-    : <ChevronDown className="h-3 w-3" />
-}
-
-
 const CriticalDates = React.forwardRef<HTMLDivElement, CriticalDatesProps>(
   ({ dates, className }, ref) => {
     const [active, setActive] = React.useState<DateCategory>("all")
-    const [sortKey, setSortKey] = React.useState<SortKey>("monthsOut")
-    const [sortDir, setSortDir] = React.useState<SortDir>("asc")
+    const { sortKey, sortDir, handleSort } = useSortState<SortKey>("monthsOut")
 
     const filtered = active === "all" ? dates : dates.filter(d => d.category === active)
 
@@ -73,30 +66,6 @@ const CriticalDates = React.forwardRef<HTMLDivElement, CriticalDatesProps>(
       const cmp = av < bv ? -1 : av > bv ? 1 : 0
       return sortDir === "asc" ? cmp : -cmp
     })
-
-    function handleSort(key: SortKey) {
-      if (key === sortKey) setSortDir(d => d === "asc" ? "desc" : "asc")
-      else { setSortKey(key); setSortDir("asc") }
-    }
-
-    function Th({ col, children, className: cls }: { col: SortKey; children: React.ReactNode; className?: string }) {
-      return (
-        <th
-          onClick={() => handleSort(col)}
-          className={cn(
-            "pb-2 text-left text-[10px] font-medium uppercase tracking-widest cursor-pointer select-none whitespace-nowrap",
-            sortKey === col ? "text-foreground/80" : "text-foreground/50",
-            "hover:text-foreground/80 transition-colors",
-            cls
-          )}
-        >
-          <span className="inline-flex items-center gap-1">
-            {children}
-            <SortIcon col={col} sortKey={sortKey} sortDir={sortDir} />
-          </span>
-        </th>
-      )
-    }
 
     return (
       <div ref={ref} className={cn(cardBase, "flex flex-col gap-4", className)}>
@@ -123,57 +92,54 @@ const CriticalDates = React.forwardRef<HTMLDivElement, CriticalDatesProps>(
           ))}
         </ToggleGroup>
 
-        {/* Table — scrolls within card, never causes page scroll */}
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm border-collapse min-w-[520px]">
-            <thead>
-              <tr className="border-b-2 border-border/60">
-                <Th col="tenant">Tenant</Th>
-                <Th col="space" className="pl-3">Space</Th>
-                <Th col="type" className="pl-3">Type</Th>
-                <Th col="date" className="pl-3 text-right whitespace-nowrap">Date</Th>
-                <Th col="monthsOut" className="pl-3 text-right whitespace-nowrap">Time</Th>
-                <th className="pb-2 pl-3 w-8" />
-              </tr>
-            </thead>
-            <tbody>
-              {sorted.length === 0 && (
-                <tr>
-                  <td colSpan={6} className="py-6 text-center text-sm text-muted-foreground">
-                    No dates in this category
-                  </td>
-                </tr>
-              )}
-              {sorted.map((d, i) => {
-                const u = urgency(d.monthsOut)
-                return (
-                  <tr key={i} title="View Lease" className={cn("cursor-pointer hover:bg-muted/40 transition-colors", i > 0 && "border-t border-border/40")}>
-                    <td className="py-2.5 text-sm font-medium text-foreground whitespace-nowrap">
-                      {d.tenant}
-                    </td>
-                    <td className="py-2.5 pl-3 text-sm font-medium text-muted-foreground whitespace-nowrap">
-                      {d.space}
-                    </td>
-                    <td className="py-2.5 pl-3 text-sm text-muted-foreground">
-                      <span className="truncate block">{d.type}</span>
-                    </td>
-                    <td className="py-2.5 pl-3 text-right font-medium whitespace-nowrap text-sm text-foreground">
-                      {d.date}
-                    </td>
-                    <td className="py-2.5 pl-3 text-right whitespace-nowrap">
-                      <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium tabular-nums", PILL[u])}>
-                        {fmtMonths(d.monthsOut)}
-                      </span>
-                    </td>
-                    <td className="py-2.5 pl-2 text-right whitespace-nowrap">
-                      <AgentBtn entity="Event" label={`${d.tenant} — ${d.type} · ${d.space}, ${d.sf.toLocaleString()} sf · ${d.date} (${fmtMonths(d.monthsOut)} out)`} onClick={e => e.stopPropagation()} />
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        </div>
+        <Table className="border-collapse min-w-[520px]">
+          <TableHeader>
+            <TableRow className="border-b-2 border-border/60 hover:bg-transparent">
+              <SortableHead col="tenant" sortKey={sortKey} sortDir={sortDir} onSort={handleSort}>Tenant</SortableHead>
+              <SortableHead col="space" sortKey={sortKey} sortDir={sortDir} onSort={handleSort} className="pl-3">Space</SortableHead>
+              <SortableHead col="type" sortKey={sortKey} sortDir={sortDir} onSort={handleSort} className="pl-3">Type</SortableHead>
+              <SortableHead col="date" sortKey={sortKey} sortDir={sortDir} onSort={handleSort} className="pl-3" right>Date</SortableHead>
+              <SortableHead col="monthsOut" sortKey={sortKey} sortDir={sortDir} onSort={handleSort} className="pl-3" right>Time</SortableHead>
+              <TableHead className="pb-2 pt-0 pl-3 w-8" />
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {sorted.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={6} className="py-6 text-center text-sm text-muted-foreground">
+                  No dates in this category
+                </TableCell>
+              </TableRow>
+            )}
+            {sorted.map((d, i) => {
+              const u = urgency(d.monthsOut)
+              return (
+                <TableRow key={i} title="View Lease" className={cn("cursor-pointer hover:bg-muted/40 transition-colors", i > 0 ? "border-t border-border/40" : "border-0")}>
+                  <TableCell className="py-2.5 text-sm font-medium text-foreground whitespace-nowrap">
+                    {d.tenant}
+                  </TableCell>
+                  <TableCell className="py-2.5 pl-3 text-sm font-medium text-muted-foreground whitespace-nowrap">
+                    {d.space}
+                  </TableCell>
+                  <TableCell className="py-2.5 pl-3 text-sm text-muted-foreground">
+                    <span className="truncate block">{d.type}</span>
+                  </TableCell>
+                  <TableCell className="py-2.5 pl-3 text-right font-medium whitespace-nowrap text-sm text-foreground">
+                    {d.date}
+                  </TableCell>
+                  <TableCell className="py-2.5 pl-3 text-right whitespace-nowrap">
+                    <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium tabular-nums", PILL[u])}>
+                      {fmtMonths(d.monthsOut)}
+                    </span>
+                  </TableCell>
+                  <TableCell className="py-2.5 pl-2 text-right whitespace-nowrap">
+                    <AgentBtn entity="Event" label={`${d.tenant} — ${d.type} · ${d.space}, ${d.sf.toLocaleString()} sf · ${d.date} (${fmtMonths(d.monthsOut)} out)`} onClick={e => e.stopPropagation()} />
+                  </TableCell>
+                </TableRow>
+              )
+            })}
+          </TableBody>
+        </Table>
       </div>
     )
   }

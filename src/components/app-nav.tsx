@@ -227,8 +227,9 @@ function DesktopNav({ className, collapsed: collapsedProp, onCollapsedChange, as
     const isPortfolioOrAll = selectedAssetId === "all" || (portfolios ?? []).some(p => p.id === selectedAssetId)
     const base = navStructure.filter(item => !isPortfolioOrAll || item.id !== "stacking")
     if (!isPortfolioOrAll) return base
+    const spacesItem: NavItem = { id: "spaces", label: "Spaces", icon: SquareStack }
     const dashIdx = base.findIndex(i => i.id === "dashboard")
-    return [...base.slice(0, dashIdx + 1), ...portfolioItems, ...base.slice(dashIdx + 1)]
+    return [...base.slice(0, dashIdx + 1), ...portfolioItems, spacesItem, ...base.slice(dashIdx + 1)]
   }, [selectedAssetId, portfolios])
 
   return (
@@ -619,8 +620,9 @@ function MobileNav({ onLogoClick, onNavItemClick, activePage, assets, portfolios
     const isPortfolioOrAll = selectedAssetId === "all" || (portfolios ?? []).some(p => p.id === selectedAssetId)
     const base = navStructure.filter(item => !isPortfolioOrAll || item.id !== "stacking")
     if (!isPortfolioOrAll) return base
+    const spacesItem: NavItem = { id: "spaces", label: "Spaces", icon: SquareStack }
     const dashIdx = base.findIndex(i => i.id === "dashboard")
-    return [...base.slice(0, dashIdx + 1), ...portfolioItems, ...base.slice(dashIdx + 1)]
+    return [...base.slice(0, dashIdx + 1), ...portfolioItems, spacesItem, ...base.slice(dashIdx + 1)]
   }, [selectedAssetId, portfolios])
 
   const VTSLogo = () => (

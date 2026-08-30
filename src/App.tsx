@@ -20,10 +20,13 @@ import { DealProfile, TenantLogoImage, StatusBadge, type DealStatus } from "@/co
 import { ThemeShowcase } from "@/components/theme-showcase"
 import { AgentPrinciples } from "@/components/agent-principles"
 import { StackingPlan } from "@/components/stacking-plan"
+import { SpacesPage } from "@/components/spaces-page"
 import { EmailFlow } from "@/components/email-flow"
 import { AskVTSPage } from "@/components/ask-vts"
 import { DocumentAgentPage } from "@/components/document-agent-page"
 import { ProposalBuilderPage } from "@/components/proposal-builder-page"
+import { DealStewardPage } from "@/components/deal-steward-page"
+import { AmPipelineEmailPage, BrokerActionEmailPage, TenantFollowupEmailPage, LawyerLeaseEmailPage, OwnerUpdateEmailPage } from "@/components/deal-steward-emails"
 import { ChatPatternProvider } from "@/contexts/chat-pattern"
 import { ChatSideOver } from "@/components/chat-side-over"
 import { ChatSidePush, SIDE_PUSH_WIDTH } from "@/components/chat-side-push"
@@ -256,7 +259,7 @@ export default function App() {
   const [isDark, setIsDark] = React.useState(() => document.documentElement.classList.contains("dark"))
 
   React.useEffect(() => {
-    const globalPages = ["theme", "principles", "activity", "reminders", "avatar", "inquiry-email", "inquiry-email-forward", "inquiry-email-confirm", "ask-vts", "document-agent", "proposal-builder"]
+    const globalPages = ["theme", "principles", "activity", "reminders", "avatar", "inquiry-email", "inquiry-email-forward", "inquiry-email-confirm", "ask-vts", "document-agent", "proposal-builder", "deal-steward", "deal-steward-email-am", "deal-steward-email-broker", "deal-steward-email-tenant", "deal-steward-email-lawyer", "deal-steward-email-owner"]
     let base = globalPages.includes(currentPage)
       ? `/${currentPage}`
       : `/${currentPage}/${selectedAssetId}`
@@ -518,6 +521,19 @@ export default function App() {
         </div>
       )
     }
+    if (page === "spaces") {
+      const spacesAssets = selectedAssetId === "all"
+        ? ASSETS
+        : selectedPortfolio
+          ? ASSETS.filter(a => selectedPortfolio.assetIds.includes(a.id))
+          : selectedAsset ? [selectedAsset] : ASSETS
+      return (
+        <div className="space-y-4">
+          <BuildingHeader {...pagedHeaderProps} onAskVts={goAskVts} />
+          <SpacesPage assets={spacesAssets} />
+        </div>
+      )
+    }
     if (page === "stacking") {
       return (
         <div className="flex flex-col" style={{ minHeight: "calc(100vh - 2rem)" }}>
@@ -572,6 +588,20 @@ export default function App() {
   if (currentPage === "proposal-builder") {
     return <ProposalBuilderPage isDark={isDark} onToggleDark={toggleDark} />
   }
+
+  if (currentPage === "deal-steward") {
+    return (
+      <ChatPatternProvider onOpenChat={goAskVts}>
+        <DealStewardPage isDark={isDark} onToggleDark={toggleDark} />
+      </ChatPatternProvider>
+    )
+  }
+
+  if (currentPage === "deal-steward-email-am")     return <AmPipelineEmailPage />
+  if (currentPage === "deal-steward-email-broker")  return <BrokerActionEmailPage />
+  if (currentPage === "deal-steward-email-tenant")  return <TenantFollowupEmailPage />
+  if (currentPage === "deal-steward-email-lawyer")  return <LawyerLeaseEmailPage />
+  if (currentPage === "deal-steward-email-owner")   return <OwnerUpdateEmailPage />
 
   const standalonePages = ["theme", "principles", "inquiry-email", "inquiry-email-forward", "inquiry-email-confirm"]
   if (standalonePages.includes(currentPage)) {
