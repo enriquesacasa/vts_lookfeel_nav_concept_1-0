@@ -27,6 +27,7 @@ import { DocumentAgentPage } from "@/components/document-agent-page"
 import { ProposalBuilderPage } from "@/components/proposal-builder-page"
 import { DealStewardPage } from "@/components/deal-steward-page"
 import { AmPipelineEmailPage, BrokerActionEmailPage, TenantFollowupEmailPage, LawyerLeaseEmailPage, OwnerUpdateEmailPage } from "@/components/deal-steward-emails"
+import { OptionsRightsPage } from "@/components/options-rights-page"
 import { ChatPatternProvider } from "@/contexts/chat-pattern"
 import { ChatSideOver } from "@/components/chat-side-over"
 import { ChatSidePush, SIDE_PUSH_WIDTH } from "@/components/chat-side-push"
@@ -531,6 +532,19 @@ export default function App() {
         <div className="space-y-4">
           <BuildingHeader {...pagedHeaderProps} onAskVts={goAskVts} />
           <SpacesPage assets={spacesAssets} />
+        </div>
+      )
+    }
+    if (page === "options-rights") {
+      const optionsAssets = selectedAssetId === "all"
+        ? ASSETS
+        : selectedPortfolio
+          ? ASSETS.filter(a => selectedPortfolio.assetIds.includes(a.id))
+          : selectedAsset ? [selectedAsset] : ASSETS
+      return (
+        <div className="space-y-4">
+          <BuildingHeader {...pagedHeaderProps} onAskVts={goAskVts} />
+          <OptionsRightsPage assets={optionsAssets} />
         </div>
       )
     }
