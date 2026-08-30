@@ -62,6 +62,7 @@ export const AGENTS: AgentDef[] = [
     ],
     icon: Activity,
     available: true,
+    active: true,
   },
   {
     id: "deal-capture",
@@ -99,6 +100,7 @@ export const AGENTS: AgentDef[] = [
     ],
     icon: HeartPulse,
     available: true,
+    active: true,
   },
   {
     id: "doc-drafting",
@@ -116,6 +118,25 @@ export const AGENTS: AgentDef[] = [
       "Export to Word, PDF, Google Docs, or Word Online",
     ],
     icon: PenLine,
+    available: true,
+    active: true,
+  },
+  {
+    id: "proposal-builder",
+    name: "Proposal Builder",
+    tagline: "Build the proposal from everything VTS already knows",
+    description:
+      "Pull from active deals, executed leases, and market data to assemble a proposal and supporting context automatically.",
+    impact:
+      "Less time assembling documents, more time on strategy — proposals built from real data without starting from scratch.",
+    category: "Cross-Cutting",
+    capabilities: [
+      "Pull deal terms, space details, and market comps into a proposal automatically",
+      "Reference executed leases and precedent to support proposed economics",
+      "Assemble supporting context including availability, market positioning, and tenant profile",
+      "Update the proposal as deal terms evolve",
+    ],
+    icon: FileText,
     available: true,
     active: true,
   },
@@ -153,24 +174,6 @@ export const AGENTS: AgentDef[] = [
       "Log the tour and generate an engagement summary afterward",
     ],
     icon: CalendarCheck,
-    available: true,
-  },
-  {
-    id: "proposal-builder",
-    name: "Proposal Builder",
-    tagline: "Build the proposal from everything VTS already knows",
-    description:
-      "Pull from active deals, executed leases, and market data to assemble a proposal and supporting context automatically.",
-    impact:
-      "Less time assembling documents, more time on strategy — proposals built from real data without starting from scratch.",
-    category: "Cross-Cutting",
-    capabilities: [
-      "Pull deal terms, space details, and market comps into a proposal automatically",
-      "Reference executed leases and precedent to support proposed economics",
-      "Assemble supporting context including availability, market positioning, and tenant profile",
-      "Update the proposal as deal terms evolve",
-    ],
-    icon: FileText,
     available: true,
   },
   {

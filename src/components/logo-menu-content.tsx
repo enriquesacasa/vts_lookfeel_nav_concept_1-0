@@ -11,12 +11,11 @@ interface LogoMenuContentProps {
   onClose?: () => void
 }
 
-const PROTOTYPE_LINKS = [
-  { label: "Main view",        hash: "#/dashboard" },
-  { label: "Inquiry email",    hash: "#/inquiry-email" },
-  { label: "Doc drafting",     hash: "#/document-agent" },
-  { label: "Proposal builder", hash: "#/proposal-builder" },
-  { label: "Deal monitor",    hash: "#/deal-steward" },
+const AGENT_LINKS = [
+  { label: "Deal Monitor",     hash: "#/deal-monitor" },
+  { label: "Deal Capture",     hash: "#/inquiry-email" },
+  { label: "Doc Drafting",     hash: "#/document-agent" },
+  { label: "Proposal Builder", hash: "#/proposal-builder" },
 ]
 
 const DOC_LINKS = [
@@ -49,7 +48,7 @@ export function LogoMenuContent({ isDark = false, onToggleDark, onNavigate, onCl
       {/* Appearance */}
       <div className="px-3 py-2.5 border-b border-border">
         <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-2">Appearance</p>
-        <div className="flex gap-2">
+        <div className="flex gap-2 mb-2">
           <Button variant={isDark ? "ghost" : "default"} size="sm" className="flex-1 gap-1.5"
             onClick={() => { if (isDark) { onToggleDark?.(); onClose?.() } }}>
             <Sun className="h-3.5 w-3.5" /> Light
@@ -59,6 +58,12 @@ export function LogoMenuContent({ isDark = false, onToggleDark, onNavigate, onCl
             <Moon className="h-3.5 w-3.5" /> Dark
           </Button>
         </div>
+        <div className="border-t border-border my-2 -mx-3" />
+        <button onClick={() => navigate("#/dashboard")}
+          className="flex items-center justify-between w-full px-2.5 py-1.5 rounded-lg bg-primary hover:bg-primary/90 transition-colors text-left">
+          <span className="text-sm font-semibold text-primary-foreground">Asset overview</span>
+          <ChevronRight className="h-3.5 w-3.5 text-primary-foreground" />
+        </button>
       </div>
       {/* Agents */}
       <div className="px-3 py-2.5 border-b border-border">
@@ -97,11 +102,11 @@ export function LogoMenuContent({ isDark = false, onToggleDark, onNavigate, onCl
           ))}
         </div>
       </div>
-      {/* Prototype */}
+      {/* Agents */}
       <div className="px-3 py-2.5 border-b border-border">
-        <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-2">Prototype</p>
+        <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-2">Agents</p>
         <div className="flex flex-col gap-0.5">
-          {PROTOTYPE_LINKS.map(link => (
+          {AGENT_LINKS.map(link => (
             <button key={link.hash} onClick={() => navigate(link.hash)}
               className="flex items-center justify-between w-full px-2.5 py-1.5 rounded-lg text-sm text-foreground hover:bg-muted/60 transition-colors text-left">
               {link.label}

@@ -1,5 +1,6 @@
 import * as React from "react"
 import { cn, cardBase } from "@/lib/utils"
+import { getSpaceEncumbranceCount } from "@/components/deal-profile"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -41,7 +42,7 @@ export interface Space {
 }
 
 type SortKey = "status" | "floor" | "space" | "sf" | "listingSf" | "availability" |
-               "listingStatus" | "onMarketDate" | "askingRent" | "term" | "condition" | "days" | "docs" | "asset"
+               "listingStatus" | "onMarketDate" | "askingRent" | "term" | "condition" | "days" | "docs" | "asset" | "encumbrances"
 
 // ── Mock data ─────────────────────────────────────────────────────────────────
 
@@ -90,7 +91,7 @@ const PAGE_SIZE = 10
 // ── Column definitions ────────────────────────────────────────────────────────
 
 interface ColDef {
-  id: SortKey | "docs" | "archivedDate"
+  id: SortKey | "archivedDate"
   label: string
   sortable: boolean
   right?: boolean
@@ -112,6 +113,7 @@ const ALL_COLUMNS: ColDef[] = [
   { id:"term",          label:"Term",            sortable:true,  defaultVisible:true  },
   { id:"condition",     label:"Condition",       sortable:true,  defaultVisible:true  },
   { id:"days",          label:"Days",            sortable:true,  right:true, defaultVisible:true  },
+  { id:"encumbrances",  label:"Encumbrances",    sortable:true,  defaultVisible:true  },
   { id:"docs",          label:"Docs",            sortable:false, right:true, defaultVisible:true  },
   { id:"archivedDate",  label:"Archived date",   sortable:false, defaultVisible:false },
 ] as ColDef[]
@@ -326,6 +328,7 @@ export function SpacesPage({ assets }: { assets?: AssetRef[] }) {
       else if (sortKey === "askingRent")    { av = a.askingRent ?? 0; bv = b.askingRent ?? 0 }
       else if (sortKey === "days")          { av = a.days; bv = b.days }
       else if (sortKey === "docs")          { av = a.docs; bv = b.docs }
+      else if (sortKey === "encumbrances")  { av = getSpaceEncumbranceCount(a.id); bv = getSpaceEncumbranceCount(b.id) }
       else { av = (a[sortKey as keyof Space] as string ?? "").toString().toLowerCase(); bv = (b[sortKey as keyof Space] as string ?? "").toString().toLowerCase() }
       const cmp = av < bv ? -1 : av > bv ? 1 : 0
       return sortDir === "asc" ? cmp : -cmp
@@ -464,6 +467,19 @@ export function SpacesPage({ assets }: { assets?: AssetRef[] }) {
                           ) : <span className="text-muted-foreground/40 text-sm">—</span>}
                         </TableCell>
                       )
+                    case "encumbrances": {
+                      const count = getSpaceEncumbranceCount(s.id)
+                      return (
+                        <TableCell key="encumbrances" className="py-2.5 whitespace-nowrap">
+                          <div className="flex items-center justify-center">
+                            {count === 0
+                              ? <span className="text-muted-foreground/40 text-xs">—</span>
+                              : <span className="inline-flex items-center justify-center min-w-6 h-6 px-2 rounded-full text-sm font-bold bg-destructive text-white tabular-nums">{count}</span>
+                            }
+                          </div>
+                        </TableCell>
+                      )
+                    }
                     case "docs":
                       return (
                         <TableCell key="docs" className="py-2.5 text-right whitespace-nowrap">

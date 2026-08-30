@@ -809,6 +809,22 @@ export function getEncumbranceCount(dealId: string): number {
   return (DEAL_ENCUMBRANCES[dealId] ?? []).length
 }
 
+// Encumbrances that affect a specific space (keyed by space ID from spaces-page)
+const SPACE_ENCUMBRANCES: Record<string, number> = {
+  "s26": 2, // Suite 0800 Floor 8 — ROFO + expansion option (d00)
+  "s27": 1, // Suite 0700 Floor 7 — ROFO held by Starbucks (d01)
+  "s03": 1, // Suite 0900 Floor 9 — expansion option held by Starbucks (d01)
+  "s24": 1, // Suite 1100 Floor 11 — ROFO held by Apex Capital (d02)
+  "s23": 1, // Suite 1200 Floor 12 — contraction option held by Apex Capital (d02)
+  "s29": 3, // Suite 0400 Floors 4-5 — ROFO + expansion option + ROFR (d04)
+  "s28": 1, // Suite 0500 Floor 5 — covered by Atlas Group expansion (d04)
+  "s04": 1, // Suite 0600 Floor 6 — expansion option held by Vertex Studios (d05)
+}
+
+export function getSpaceEncumbranceCount(spaceId: string): number {
+  return SPACE_ENCUMBRANCES[spaceId] ?? 0
+}
+
 export function getLatestHumanUpdate(dealId: string, stage: string): { message: string; name: string; timestamp: string } | null {
   const feed = DEAL_FEEDS[dealId] ?? getStageFeeds(stage as StageValue)
   const entry = feed.find(e => e.kind === "comment")
