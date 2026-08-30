@@ -1,6 +1,6 @@
 import * as React from "react"
 import { cn, cardBase } from "@/lib/utils"
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/sortable-table"
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
@@ -11,10 +11,13 @@ import {
   ChevronDown, Check, FileText, Download, Send,
   Building2, User, MapPin, Ruler, Tag, Calendar,
   CheckCircle2, Clock, AlertTriangle, HeartPulse, Zap,
-  Bot,
+  Bot, MoreHorizontal, LayoutGrid, Table2, ArrowUpDown,
   Briefcase, Globe, Mail, DollarSign, Layers, Target,
-  Star, Home, SquareStack, Scale, Trophy,
+  Star, Home, SquareStack, Scale, Trophy, Plus,
 } from "lucide-react"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Checkbox } from "@/components/ui/checkbox"
 import { AGENT_ICON_MAP, AGENTS } from "@/components/agents-page"
 import { TENANT_LOGO, type Deal } from "@/components/deals-page"
 
@@ -136,11 +139,10 @@ function StageJourneyBar({ currentStage, onChange }: { currentStage: StageValue;
         {ALL_STAGES.map((stage, i) => {
           const isPast   = i < currentIdx
           const isActive = stage === currentStage
-          const isFuture = i > currentIdx
           return (
             <React.Fragment key={stage}>
               {i > 0 && (
-                <div className={cn("flex-1 h-px min-w-3 mx-1.5", isPast ? "bg-primary-foreground/50" : "bg-primary-foreground/20")} />
+                <div className={cn("flex-1 h-px min-w-3 mx-1.5", isPast || isActive ? "bg-primary-foreground" : "bg-primary-foreground/40")} />
               )}
               <button
                 onClick={() => { if (i > currentIdx) onChange(stage) }}
@@ -148,17 +150,14 @@ function StageJourneyBar({ currentStage, onChange }: { currentStage: StageValue;
               >
                 <div className={cn(
                   "h-5 w-5 rounded-full flex items-center justify-center transition-all",
-                  isActive && "bg-primary-foreground",
-                  isPast   && "bg-primary-foreground/50",
-                  isFuture && "bg-transparent border border-primary-foreground/40 group-hover:border-primary-foreground/70",
+                  isPast || isActive ? "bg-primary-foreground" : "bg-transparent border-2 border-primary-foreground/40",
                 )}>
                   {isPast   && <Check className="h-2.5 w-2.5 text-primary" />}
+                  {isActive && <div className="h-2 w-2 rounded-full bg-primary" />}
                 </div>
                 <span className={cn(
-                  "text-xs whitespace-nowrap transition-colors",
-                  isActive && "text-primary-foreground font-semibold",
-                  isPast   && "text-primary-foreground/85 font-medium",
-                  isFuture && "text-primary-foreground/55 group-hover:text-primary-foreground/80",
+                  "text-xs font-semibold whitespace-nowrap transition-colors",
+                  isPast || isActive ? "text-primary-foreground" : "text-primary-foreground/50",
                 )}>
                   {stage}
                 </span>
@@ -359,30 +358,229 @@ function buildProposals(deal: Deal): ProposalRound[] {
   ]
 }
 
-const PARTY_STYLE: Record<ProposalRound["party"], string> = {
-  landlord: "text-primary bg-primary/5 border-primary/20",
-  tenant:   "text-foreground bg-muted/50 border-border",
-  agreed:   "text-success bg-success/5 border-success/20",
-  prior:    "text-muted-foreground bg-muted/40 border-border",
+
+// Financial statement lines per proposal card
+type FinLine = {
+  label: string
+  value: string
+  prefix?: "$"
+  bold?: boolean
+  dividerAbove?: "single" | "double"
+  color?: "success"
 }
 
-function DeltaCell({ value, base, fmt = "dollar" }: { value: number; base: number; fmt?: "dollar" | "months" | "years" }) {
-  if (!base) return <TableCell className="px-3 py-2.5 text-sm font-medium text-foreground">{fmt === "dollar" ? `$${value.toFixed(2)}` : `${value}${fmt === "months" ? " mo" : " yr"}`}</TableCell>
-  const pct = ((value - base) / base) * 100
-  const up = pct > 0
-  const flat = Math.abs(pct) < 0.5
-  const cls = flat ? "text-muted-foreground" : up ? "text-success" : "text-destructive"
-  const sign = flat ? "" : up ? "+" : ""
-  const formatted = fmt === "dollar" ? `$${value.toFixed(2)}` : fmt === "months" ? `${value} mo` : `${value} yr`
+function buildLines(r: ProposalRound, sf: number, measure: ProposalMeasure): FinLine[] {
+  const yrs = r.term / 12
+
+  // All figures computed on a total-term basis first
+  const baseRentTotal = r.rent * sf * yrs
+  const abated = -(r.rent * sf * r.freeRent / 12)
+  const opex = sf * 18.5 * yrs
+  const retax = sf * 6.0 * yrs
+  const grossRev = baseRentTotal + abated + opex + retax
+  const totalExp = -(opex + retax)
+  const noi = grossRev + totalExp
+  const ti = -(r.ti * sf)
+  const commission = -(r.rent * sf * yrs * 0.03)
+  const capital = ti + commission
+  const ncf = noi + capital
+
+  // Scale factor to selected measure
+  const scale = measure === "psf-yr" ? 1 / (sf * yrs)
+              : measure === "annual"  ? 1 / yrs
+              : measure === "monthly" ? 1 / (yrs * 12)
+              : 1 // total
+
+  const fmt = (n: number) => {
+    const v = n * scale
+    const abs = Math.abs(v)
+    const s = abs >= 1_000_000
+      ? `${(abs / 1_000_000).toFixed(2)}M`
+      : abs >= 1_000
+      ? abs.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+      : abs.toFixed(2)
+    return v < 0 ? `(${s})` : s
+  }
+
+  return [
+    { label: "Base rent",            value: fmt(baseRentTotal), prefix: "$" },
+    { label: "Abated base rent",     value: fmt(abated) },
+    { label: "Opex recovery",        value: fmt(opex) },
+    { label: "RE tax recovery",      value: fmt(retax) },
+    { label: "Abated recoveries",    value: fmt(0) },
+    { label: "Gross revenue",        value: fmt(grossRev),  bold: true, dividerAbove: "single" },
+    { label: "Opex",                 value: fmt(-opex) },
+    { label: "Real estate taxes",    value: fmt(-retax) },
+    { label: "Total expenses",       value: fmt(totalExp),  bold: true, dividerAbove: "single" },
+    { label: "Net operating income", value: fmt(noi),       bold: true, dividerAbove: "double", prefix: "$" },
+    { label: "Tenant improvements",  value: fmt(ti) },
+    { label: "Commissions",          value: fmt(commission) },
+    { label: "Capital",              value: fmt(capital),   bold: true, dividerAbove: "single" },
+    { label: "Net cash flow",        value: fmt(ncf),       bold: true, dividerAbove: "single", prefix: "$", color: ncf > 0 ? "success" : undefined },
+  ]
+}
+
+const PARTY_CONFIG: Record<ProposalRound["party"], { divider: string; pill: string; pillText: string }> = {
+  prior:    { divider: "border-b-2 border-b-border",           pill: "bg-muted text-muted-foreground",  pillText: "Budget" },
+  landlord: { divider: "border-b-2 border-b-primary",          pill: "bg-primary/10 text-primary",      pillText: "Landlord"        },
+  tenant:   { divider: "border-b-2 border-b-foreground/30",    pill: "bg-muted text-foreground",        pillText: "Tenant"          },
+  agreed:   { divider: "border-b-2 border-b-success",          pill: "bg-success/10 text-success",      pillText: "Agreed"          },
+}
+
+function fmtDate(d: string): string {
+  // Handle label-style values like "Budget" that aren't dates
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) return d
+  const [y, m, mo] = d.split("-").map(Number)
+  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+  return `${months[m - 1]} ${mo}, ${y}`
+}
+
+const MEASURE_SUBLABEL: Record<ProposalMeasure, string> = {
+  "psf-yr":  "/sf/yr",
+  "annual":  "/yr",
+  "total":   "total",
+  "monthly": "/mo",
+}
+
+function ProposalCard({ round, sf, base, measure }: { round: ProposalRound; sf: number; base: ProposalRound | null; measure: ProposalMeasure }) {
+  const lines = buildLines(round, sf, measure)
+  const cfg = PARTY_CONFIG[round.party]
+
+  const rentDiff = base ? ((round.rent - base.rent) / base.rent) * 100 : null
+  const termYrs = round.term / 12
+  const termLabel = Number.isInteger(termYrs) ? `${termYrs} yr` : `${round.term} mo`
+
   return (
-    <TableCell className="px-3 py-2.5">
-      <div className="text-sm font-medium text-foreground">{formatted}</div>
-      {!flat && <div className={cn("text-xs font-medium", cls)}>{sign}{pct.toFixed(1)}%</div>}
-    </TableCell>
+    <div className="rounded-xl border border-border bg-card overflow-hidden shrink-0 w-[240px] flex flex-col">
+      {/* Header */}
+      <div className={cn("px-4 pt-4 pb-3 space-y-2.5", cfg.divider)}>
+        <div className="flex items-center justify-between gap-2">
+          <span className={cn("text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wide", cfg.pill)}>
+            {cfg.pillText}
+          </span>
+          <span className="text-xs text-muted-foreground">{fmtDate(round.date)}</span>
+        </div>
+        <p className="text-sm font-semibold text-foreground leading-tight">{round.label}</p>
+        <div className="flex items-end justify-between gap-1">
+          <div>
+            <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">NER</p>
+            <p className="text-2xl font-bold text-foreground tabular-nums">${round.rent.toFixed(2)}</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{MEASURE_SUBLABEL[measure]} · {termLabel}</p>
+          </div>
+          {rentDiff !== null && (
+            <p className={cn("text-sm font-bold pb-0.5 tabular-nums", rentDiff >= 0 ? "text-success" : "text-destructive")}>
+              {rentDiff >= 0 ? "+" : ""}{rentDiff.toFixed(1)}%
+            </p>
+          )}
+        </div>
+      </div>
+
+      {/* Actions */}
+      <div className="pt-2 pb-2 flex items-center border-b border-border/40">
+        <Button variant="link" size="sm" className="flex-1 h-auto text-sm text-primary">Details</Button>
+        <div className="w-px h-4 bg-border/60" />
+        <Button variant="link" size="sm" className="flex-1 h-auto text-sm text-primary">Cash flow</Button>
+      </div>
+
+      {/* Financial statement */}
+      <div className="px-4 py-3 flex flex-col flex-1">
+        {lines.map((line, i) => {
+          const valueColor = line.color === "success" ? "text-success" : line.bold ? "text-foreground" : "text-foreground/80"
+          const labelColor = line.bold ? "text-foreground" : "text-muted-foreground"
+          return (
+            <div key={i}>
+              {line.dividerAbove === "double" && (
+                <div className="mt-1.5 mb-0.5 space-y-px">
+                  <div className="border-t border-border/60" />
+                  <div className="border-t border-border/60" />
+                </div>
+              )}
+              {line.dividerAbove === "single" && (
+                <div className="border-t border-border/40 mt-1.5 mb-0.5" />
+              )}
+              <div className="flex items-baseline gap-2 py-[3px]">
+                {/* Label */}
+                <span className={cn("text-xs flex-1 leading-snug", labelColor, line.bold && "font-semibold")}>
+                  {line.label}
+                </span>
+                {/* $ column — fixed width, only shown if prefix present */}
+                <span className={cn("text-xs w-3 text-left shrink-0 tabular-nums", line.prefix ? valueColor : "", line.bold && "font-semibold")}>
+                  {line.prefix ?? ""}
+                </span>
+                {/* Value column — right-aligned */}
+                <span className={cn("text-xs tabular-nums text-right whitespace-nowrap w-20 shrink-0", valueColor, line.bold && "font-semibold")}>
+                  {line.value}
+                </span>
+              </div>
+              {line.dividerAbove === "single" && i === lines.length - 1 && (
+                <div className="border-t border-border/40 mt-0.5" />
+              )}
+            </div>
+          )
+        })}
+      </div>
+
+    </div>
   )
 }
 
+type ProposalMeasure = "psf-yr" | "annual" | "total" | "monthly"
+type ProposalSort = "asc" | "desc"
+type ProposalView = "cards" | "table"
+
+const MEASURE_LABELS: Record<ProposalMeasure, string> = {
+  "psf-yr":  "$/sf/yr",
+  "annual":  "Annual",
+  "total":   "Total term",
+  "monthly": "Monthly",
+}
+
+type ReferenceCardDef = { id: string; group: string; label: string; round: ProposalRound }
+
+const REFERENCE_POOL: ReferenceCardDef[] = [
+  {
+    id: "budget-2025", group: "Budget", label: "FY 2025 Budget",
+    round: { label: "FY 2025 Budget", party: "prior", date: "FY 2025", rent: 68.50, ti: 65, freeRent: 3, term: 84, escalation: "3.0% fixed", options: "None" },
+  },
+  {
+    id: "budget-2024", group: "Budget", label: "FY 2024 Budget",
+    round: { label: "FY 2024 Budget", party: "prior", date: "FY 2024", rent: 64.00, ti: 60, freeRent: 2, term: 84, escalation: "3.0% fixed", options: "None" },
+  },
+  {
+    id: "prev-lease-2019", group: "Prior lease", label: "Prior lease (2019)",
+    round: { label: "Prior lease (2019)", party: "prior", date: "2019-06-01", rent: 52.00, ti: 45, freeRent: 6, term: 120, escalation: "2.5% fixed", options: "1x5yr @ FMV" },
+  },
+  {
+    id: "prev-lease-2012", group: "Prior lease", label: "Prior lease (2012)",
+    round: { label: "Prior lease (2012)", party: "prior", date: "2012-01-15", rent: 38.50, ti: 30, freeRent: 4, term: 120, escalation: "2.0% fixed", options: "None" },
+  },
+  {
+    id: "comp-1", group: "Market comp", label: "Comp: 250 Park Ave",
+    round: { label: "250 Park Ave", party: "prior", date: "2025-03-10", rent: 76.00, ti: 80, freeRent: 5, term: 96, escalation: "3.0% fixed", options: "None" },
+  },
+  {
+    id: "comp-2", group: "Market comp", label: "Comp: 1 Vanderbilt",
+    round: { label: "1 Vanderbilt", party: "prior", date: "2025-01-20", rent: 88.50, ti: 90, freeRent: 6, term: 120, escalation: "3.5% fixed", options: "1x5yr @ FMV" },
+  },
+  {
+    id: "appraisal-2025", group: "Appraisal", label: "Appraisal (Q1 2025)",
+    round: { label: "Appraisal Q1 2025", party: "prior", date: "2025-02-01", rent: 74.00, ti: 75, freeRent: 4, term: 96, escalation: "3.0% fixed", options: "None" },
+  },
+  {
+    id: "appraisal-2023", group: "Appraisal", label: "Appraisal (Q2 2023)",
+    round: { label: "Appraisal Q2 2023", party: "prior", date: "2023-05-15", rent: 67.50, ti: 68, freeRent: 3, term: 96, escalation: "2.75% fixed", options: "None" },
+  },
+]
+
+const REF_GROUPS = Array.from(new Set(REFERENCE_POOL.map(r => r.group)))
+
 function ProposalsTab({ deal, stageIdx }: { deal: Deal; stageIdx: number }) {
+  const [measure, setMeasure] = React.useState<ProposalMeasure>("psf-yr")
+  const [sortOrder, setSortOrder] = React.useState<ProposalSort>("asc")
+  const [view, setView] = React.useState<ProposalView>("cards")
+  const [selectedRefs, setSelectedRefs] = React.useState<Set<string>>(new Set())
+  const [refOpen, setRefOpen] = React.useState(false)
+
   if (stageIdx < 2) {
     return (
       <div className="flex flex-col items-center justify-center py-12 gap-2 text-center">
@@ -394,143 +592,366 @@ function ProposalsTab({ deal, stageIdx }: { deal: Deal; stageIdx: number }) {
   }
 
   const rounds = buildProposals(deal)
-  const cols = ["Rent PSF", "TI PSF", "Free rent", "Term", "Escalation", "Options"]
+
+  const budget: ProposalRound = {
+    label: "Budget",
+    party: "prior",
+    date: "FY 2026",
+    rent: deal.budgetNer,
+    ti: 70,
+    freeRent: 3,
+    term: deal.term ?? 84,
+    escalation: "3.5% fixed",
+    options: "None",
+  }
+
+  const sorted = sortOrder === "asc" ? rounds : [...rounds].reverse()
+  const refCards = REFERENCE_POOL.filter(r => selectedRefs.has(r.id)).map(r => r.round)
+  const cards = [...refCards, budget, ...sorted]
+
+  function toggleRef(id: string) {
+    setSelectedRefs(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id); else next.add(id)
+      return next
+    })
+  }
 
   return (
     <div className="flex flex-col gap-5">
-      {/* Negotiation tracker */}
-      <div>
-        <p className="text-sm font-semibold text-foreground mb-3">Negotiation history</p>
-        <div className="overflow-x-auto rounded-xl border border-border">
-          <Table className="min-w-[600px]">
-            <TableHeader>
-              <TableRow className="border-b border-border bg-muted/40 hover:bg-muted/40">
-                <TableHead className="px-3 py-2.5 text-xs font-semibold text-muted-foreground w-36">Round</TableHead>
-                {cols.map(c => <TableHead key={c} className="px-3 py-2.5 text-xs font-semibold text-muted-foreground">{c}</TableHead>)}
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {rounds.map((r, i) => {
-                const base = i === 0 ? null : rounds[0]
-                return (
-                  <TableRow key={i} className={cn("border-b border-border/50 last:border-0 hover:bg-transparent", r.party === "agreed" && "bg-success/5")}>
-                    <TableCell className="px-3 py-2.5">
-                      <div className="text-xs font-semibold text-foreground">{r.label}</div>
-                      <div className={cn("inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-semibold border mt-0.5", PARTY_STYLE[r.party])}>
-                        {r.party === "prior" ? "Prior" : r.party === "agreed" ? "Agreed" : r.party === "landlord" ? "Landlord" : "Tenant"}
-                      </div>
-                    </TableCell>
-                    <DeltaCell value={r.rent}     base={base?.rent ?? 0}     fmt="dollar"  />
-                    <DeltaCell value={r.ti}       base={base?.ti ?? 0}       fmt="dollar"  />
-                    <DeltaCell value={r.freeRent} base={base?.freeRent ?? 0} fmt="months"  />
-                    <DeltaCell value={r.term}     base={base?.term ?? 0}     fmt="years"   />
-                    <TableCell className="px-3 py-2.5 text-sm text-foreground/80">{r.escalation}</TableCell>
-                    <TableCell className="px-3 py-2.5 text-sm text-foreground/80">{r.options}</TableCell>
-                  </TableRow>
-                )
-              })}
-            </TableBody>
-          </Table>
+      {/* Filter bar */}
+      <div className="flex items-center gap-2 flex-wrap">
+        {/* Measure chips */}
+        {(Object.keys(MEASURE_LABELS) as ProposalMeasure[]).map(m => (
+          <Button key={m} variant="outline" size="sm"
+            onClick={() => setMeasure(m)}
+            className={cn("gap-1 font-normal", measure === m && "border-primary bg-primary/10 text-primary font-medium")}>
+            {MEASURE_LABELS[m]}
+          </Button>
+        ))}
+
+        <div className="w-px h-4 bg-border mx-0.5" />
+
+        {/* Sort chip */}
+        <Button variant="outline" size="sm"
+          onClick={() => setSortOrder(o => o === "asc" ? "desc" : "asc")}
+          className="gap-1.5 font-normal">
+          <ArrowUpDown className="h-3 w-3" />
+          {sortOrder === "asc" ? "Oldest first" : "Newest first"}
+        </Button>
+
+        <div className="w-px h-4 bg-border mx-0.5" />
+
+        {/* Compare chip — add reference cards */}
+        <Popover open={refOpen} onOpenChange={setRefOpen}>
+          <PopoverTrigger render={<Button
+            variant="outline" size="sm"
+            className={cn("gap-1.5 font-normal", selectedRefs.size > 0 && "border-primary bg-primary/10 text-primary font-medium")}
+          />}>
+            <Plus className="h-3 w-3" />
+            Compare
+            {selectedRefs.size > 0 && (
+              <span className="inline-flex items-center justify-center size-4 rounded-full text-[10px] font-bold bg-primary text-primary-foreground">
+                {selectedRefs.size}
+              </span>
+            )}
+          </PopoverTrigger>
+          <PopoverContent align="start" className="w-60 p-2">
+            <div className="flex items-center justify-between mb-1.5 px-1">
+              <span className="text-xs font-semibold text-foreground">Add reference cards</span>
+              {selectedRefs.size > 0 && (
+                <button
+                  onClick={() => setSelectedRefs(new Set())}
+                  className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Clear all
+                </button>
+              )}
+            </div>
+            {REF_GROUPS.map(group => (
+              <div key={group} className="mb-2">
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground px-2 pb-1">{group}</p>
+                {REFERENCE_POOL.filter(r => r.group === group).map(ref => (
+                  <label key={ref.id} className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-muted cursor-pointer text-sm">
+                    <Checkbox
+                      checked={selectedRefs.has(ref.id)}
+                      onCheckedChange={() => toggleRef(ref.id)}
+                      className="size-3.5"
+                    />
+                    {ref.label}
+                  </label>
+                ))}
+              </div>
+            ))}
+          </PopoverContent>
+        </Popover>
+
+        <div className="ml-auto flex items-center gap-1">
+          <Button variant="outline" size="icon" onClick={() => setView("cards")}
+            className={cn("h-7 w-7", view === "cards" && "border-primary bg-primary/10 text-primary")}>
+            <LayoutGrid className="h-3.5 w-3.5" />
+          </Button>
+          <Button variant="outline" size="icon" onClick={() => setView("table")}
+            className={cn("h-7 w-7", view === "table" && "border-primary bg-primary/10 text-primary")}>
+            <Table2 className="h-3.5 w-3.5" />
+          </Button>
         </div>
       </div>
 
-      {/* vs. Prior lease (Renewals) */}
-      {deal.dealType === "Renewal" && rounds[0]?.party === "prior" && (() => {
-        const prior = rounds[0]
-        const current = rounds[rounds.length - 1]
-        const items: { label: string; prior: string; current: string; delta: string; up: boolean }[] = [
-          { label: "Base rent",  prior: `$${prior.rent.toFixed(2)}/sf`, current: `$${current.rent.toFixed(2)}/sf`, delta: `+${(((current.rent - prior.rent) / prior.rent) * 100).toFixed(1)}%`, up: true },
-          { label: "TI",        prior: `$${prior.ti}/sf`,              current: `$${current.ti}/sf`,              delta: `+${(((current.ti - prior.ti) / prior.ti) * 100).toFixed(1)}%`,        up: true },
-          { label: "Free rent", prior: `${prior.freeRent} mo`,         current: `${current.freeRent} mo`,         delta: `+${current.freeRent - prior.freeRent} mo`,                             up: true },
-          { label: "Term",      prior: `${prior.term} mo`,             current: `${current.term} mo`,             delta: `${current.term - prior.term > 0 ? "+" : ""}${current.term - prior.term} mo`, up: current.term >= prior.term },
-        ]
+      {view === "cards" && (
+        <div className="flex flex-wrap gap-3">
+          {cards.map((r, i) => (
+            <ProposalCard key={i} round={r} sf={deal.sf} base={i === 0 ? null : cards[0]} measure={measure} />
+          ))}
+        </div>
+      )}
+
+      {view === "table" && (() => {
+        const rows = ["Base rent","Abated base rent","Opex recovery","RE tax recovery","Abated recoveries","Gross revenue","Opex","Real estate taxes","Total expenses","Net operating income","Tenant improvements","Commissions","Capital","Net cash flow"]
+        const allLines = cards.map(r => buildLines(r, deal.sf, measure))
         return (
-          <div>
-            <p className="text-sm font-semibold text-foreground mb-3">Vs. prior lease</p>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {items.map(item => (
-                <div key={item.label} className={cn(cardBase, "flex flex-col gap-1 py-3")}>
-                  <p className="text-xs text-muted-foreground">{item.label}</p>
-                  <p className="text-sm font-semibold text-foreground">{item.current}</p>
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-xs text-muted-foreground line-through">{item.prior}</span>
-                    <span className={cn("text-xs font-semibold", item.up ? "text-success" : "text-destructive")}>{item.delta}</span>
-                  </div>
-                </div>
-              ))}
+          <div className="rounded-xl border border-border overflow-hidden">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/40 hover:bg-muted/40">
+                    <TableHead className="w-44 py-4">Line item</TableHead>
+                    {cards.map((r, i) => {
+                      const cfg = PARTY_CONFIG[r.party]
+                      const textCls = cfg.pill.includes("primary") ? "text-primary" : cfg.pill.includes("success") ? "text-success" : "text-muted-foreground"
+                      return (
+                        <TableHead key={i} className="text-right whitespace-nowrap py-4">
+                          <div className="font-semibold text-foreground">{r.label}</div>
+                          <div className={cn("text-[10px] font-medium", textCls)}>{cfg.pillText}</div>
+                        </TableHead>
+                      )
+                    })}
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {rows.map((row, ri) => {
+                    const isBold = ["Gross revenue","Total expenses","Net operating income","Capital","Net cash flow"].includes(row)
+                    const isNcf = row === "Net cash flow"
+                    return (
+                      <TableRow key={ri} className={ri % 2 === 0 ? "bg-background" : "bg-muted/20"}>
+                        <TableCell className={cn(isBold ? "font-semibold text-foreground" : "text-muted-foreground")}>
+                          {row.charAt(0).toUpperCase() + row.slice(1)}
+                        </TableCell>
+                        {allLines.map((lines, ci) => {
+                          const line = lines[ri]
+                          return (
+                            <TableCell key={ci} className={cn(
+                              "text-right tabular-nums whitespace-nowrap",
+                              isBold ? "font-semibold text-foreground" : "text-foreground/80",
+                              isNcf && "text-success font-bold"
+                            )}>
+                              {line?.prefix}{line?.value}
+                            </TableCell>
+                          )
+                        })}
+                      </TableRow>
+                    )
+                  })}
+                </TableBody>
+              </Table>
             </div>
           </div>
         )
       })()}
-
-      {/* Scenario summary */}
-      {deal.ner > 0 && (
-        <div>
-          <p className="text-sm font-semibold text-foreground mb-3">Economic summary</p>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {[
-              { label: "Net effective rent",   value: `$${deal.ner.toFixed(2)}/sf` },
-              { label: "Annual NOI",            value: deal.noi ? `$${(deal.noi / 1_000_000).toFixed(2)}M` : "—" },
-              { label: "Total lease value",     value: deal.term ? `$${((deal.ner * deal.sf * deal.term / 12) / 1_000_000).toFixed(1)}M` : "—" },
-              { label: "TI investment",         value: `$${((deal.sf * 80) / 1_000_000).toFixed(2)}M` },
-              { label: "TI payback (est.)",     value: deal.ner ? `${((deal.sf * 80) / (deal.ner * deal.sf) * 12).toFixed(1)} mo` : "—" },
-              { label: "NER vs budget",         value: deal.budgetNer ? `${(((deal.ner - deal.budgetNer) / deal.budgetNer) * 100).toFixed(1)}%` : "—" },
-            ].map(item => (
-              <div key={item.label} className={cn(cardBase, "py-3")}>
-                <p className="text-xs text-muted-foreground">{item.label}</p>
-                <p className="text-base font-semibold text-foreground mt-0.5">{item.value}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   )
 }
 
 // ─── Tasks tab ────────────────────────────────────────────────────────────────
 
-type TaskItem = { id: number; label: string; done: boolean; due?: string; assignee?: string }
+type TaskItem = { id: number; label: string; done: boolean; required?: boolean; due?: string; assignee?: string }
 
 const STAGE_TASKS: Record<StageValue, TaskItem[]> = {
-  "Inquiry":    [{ id: 1, label: "Qualify tenant requirements", done: false, due: "This week", assignee: "You" }, { id: 2, label: "Schedule intro call", done: false, due: "Fri", assignee: "You" }, { id: 3, label: "Add to deal pipeline", done: true, assignee: "You" }],
-  "Touring":    [{ id: 1, label: "Prepare tour itinerary", done: true, assignee: "You" }, { id: 2, label: "Collect tenant feedback", done: false, due: "After tour", assignee: "You" }, { id: 3, label: "Shortlist top 2 suites", done: false, due: "This week", assignee: "You" }, { id: 4, label: "Schedule follow-up tour", done: false, due: "Next week", assignee: "You" }],
-  "Proposal":   [{ id: 1, label: "Draft initial proposal", done: true, assignee: "You" }, { id: 2, label: "Review proposal with landlord", done: false, due: "Wed", assignee: "You" }, { id: 3, label: "Send proposal to tenant", done: false, due: "Thu", assignee: "You" }],
-  "LOI":        [{ id: 1, label: "Counter lease terms", done: false, due: "Mon", assignee: "You" }, { id: 2, label: "Align on TI allowance", done: false, due: "This week", assignee: "You" }, { id: 3, label: "Confirm free rent period", done: true, assignee: "You" }, { id: 4, label: "Get legal review of redlines", done: false, due: "Next week", assignee: "Legal" }],
-  "Legal":      [{ id: 1, label: "Review redlines with counsel", done: false, due: "Mon", assignee: "Legal" }, { id: 2, label: "Resolve subleasing rights flag", done: false, due: "This week", assignee: "You" }, { id: 3, label: "Confirm TI escalation clause", done: true, assignee: "Legal" }],
-  "Lease Out":  [{ id: 1, label: "Collect signatures - tenant", done: false, due: "This week", assignee: "You" }, { id: 2, label: "Collect signatures - landlord", done: false, due: "This week", assignee: "You" }, { id: 3, label: "File executed lease", done: false, due: "After signing", assignee: "You" }],
-  "Executed":   [{ id: 1, label: "Archive deal documents", done: true, assignee: "You" }, { id: 2, label: "Send close announcement", done: false, due: "This week", assignee: "You" }, { id: 3, label: "Log commission details", done: false, assignee: "You" }],
+  "Inquiry":   [
+    { id: 1,  label: "Qualify tenant requirements",      done: false, required: true },
+    { id: 2,  label: "Schedule intro call",              done: false, required: true },
+    { id: 3,  label: "Add to deal pipeline",             done: true },
+  ],
+  "Touring":   [
+    { id: 4,  label: "Prepare tour itinerary",           done: true,  required: true },
+    { id: 5,  label: "Collect tenant feedback",          done: false, required: true },
+    { id: 6,  label: "Shortlist top 2 suites",           done: false },
+    { id: 7,  label: "Schedule follow-up tour",          done: false },
+  ],
+  "Proposal":  [
+    { id: 8,  label: "Draft initial proposal",           done: true,  required: true },
+    { id: 9,  label: "Review proposal with landlord",    done: false, required: true },
+    { id: 10, label: "Send proposal to tenant",          done: false, required: true },
+  ],
+  "LOI":       [
+    { id: 11, label: "Counter lease terms",              done: false, required: true },
+    { id: 12, label: "Align on TI allowance",            done: false, required: true },
+    { id: 13, label: "Confirm free rent period",         done: true },
+    { id: 14, label: "Get legal review of redlines",     done: false },
+  ],
+  "Legal":     [
+    { id: 15, label: "Review redlines with counsel",     done: false, required: true },
+    { id: 16, label: "Resolve subleasing rights flag",   done: false, required: true },
+    { id: 17, label: "Confirm TI escalation clause",     done: true },
+  ],
+  "Lease Out": [
+    { id: 18, label: "Collect signatures from tenant",   done: false, required: true },
+    { id: 19, label: "Collect signatures from landlord", done: false, required: true },
+    { id: 20, label: "File executed lease",              done: false },
+  ],
+  "Executed":  [
+    { id: 21, label: "Archive deal documents",           done: true },
+    { id: 22, label: "Send close announcement",          done: false },
+    { id: 23, label: "Log commission details",           done: false },
+  ],
 }
 
-function TasksTab({ stage }: { stage: StageValue }) {
-  const [tasks, setTasks] = React.useState<TaskItem[]>(() => STAGE_TASKS[stage] ?? [])
-  React.useEffect(() => { setTasks(STAGE_TASKS[stage] ?? []) }, [stage])
+const TASKS_SHOW_STAGES: StageValue[] = ["Proposal", "LOI", "Legal", "Lease Out"]
 
-  const toggle = (id: number) => setTasks(ts => ts.map(t => t.id === id ? { ...t, done: !t.done } : t))
+function TasksTab({ stage, status, dealId }: { stage: StageValue; status: DealStatus; dealId?: string }) {
+  const [doneMap, setDoneMap] = React.useState<Record<number, boolean>>(() => {
+    const m: Record<number, boolean> = {}
+    ALL_STAGES.forEach(s => STAGE_TASKS[s].forEach(t => { m[t.id] = t.done }))
+    return m
+  })
+  const [showCompleted, setShowCompleted] = React.useState(true)
+
+  const toggle = (id: number) => setDoneMap(prev => ({ ...prev, [id]: !prev[id] }))
+  const reset = () => {
+    const m: Record<number, boolean> = {}
+    ALL_STAGES.forEach(s => STAGE_TASKS[s].forEach(t => { m[t.id] = t.done }))
+    setDoneMap(m)
+  }
+
+  const currentIdx = ALL_STAGES.indexOf(stage)
+  const visibleStages = TASKS_SHOW_STAGES.filter(s => ALL_STAGES.indexOf(s) >= currentIdx - 1)
+
+  // Pull deal-health recs for the current stage/status
+  const stageHealth = HEALTH_BY_STAGE[stage]
+  const baseCfg = stageHealth?.[status] ?? stageHealth?.active
+  const override = dealId ? HEALTH_REC_OVERRIDES[dealId] : undefined
+  const healthRecs = (override?.recs ?? baseCfg?.recs ?? [])
 
   return (
-    <div className="flex flex-col gap-1">
-      {tasks.map(task => (
-        <button key={task.id} onClick={() => toggle(task.id)}
-          className="flex items-start gap-3 px-3 py-2.5 rounded-lg hover:bg-sidebar-accent/50 transition-colors text-left w-full group">
-          <div className={cn(
-            "mt-0.5 shrink-0 w-4 h-4 rounded border flex items-center justify-center transition-colors",
-            task.done ? "bg-primary border-primary" : "border-border group-hover:border-primary/60"
-          )}>
-            {task.done && <svg className="w-2.5 h-2.5 text-primary-foreground" fill="none" viewBox="0 0 10 8"><path d="M1 4l3 3 5-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
-          </div>
-          <div className="flex-1 min-w-0">
-            <span className={cn("text-sm", task.done ? "line-through text-muted-foreground" : "text-foreground")}>{task.label}</span>
-            {(task.due || task.assignee) && (
-              <div className="flex gap-2 mt-0.5">
-                {task.due && <span className="text-xs text-muted-foreground">{task.due}</span>}
-                {task.assignee && <span className="text-xs text-muted-foreground/60">{task.assignee}</span>}
+    <TooltipProvider>
+      <div className="flex flex-col gap-0">
+        {/* Toolbar */}
+        <div className="flex items-center justify-between px-3 py-2.5 border-b border-border">
+          <label className="flex items-center gap-2 cursor-pointer select-none">
+            <Checkbox checked={showCompleted} onCheckedChange={v => setShowCompleted(!!v)} className="h-3.5 w-3.5" />
+            <span className="text-xs text-muted-foreground">Show completed</span>
+          </label>
+          <DropdownMenu>
+            <DropdownMenuTrigger render={<Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground" />}>
+              <MoreHorizontal className="h-3.5 w-3.5" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={reset}>Reset all tasks</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+
+        <div className="flex flex-col gap-3 pt-3">
+          {/* Deal Health suggestions — styled as agent card, matching UpdateCard agent style */}
+          {healthRecs.length > 0 && (
+            <div className="mx-0 rounded-xl border border-primary/20 bg-primary/5 p-4 flex flex-col gap-2.5">
+              <div className="flex items-center gap-2.5">
+                <div className="h-8 w-8 rounded-full bg-primary/15 text-primary flex items-center justify-center shrink-0">
+                  <HeartPulse className="h-4 w-4" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-primary leading-none">Deal Health</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{baseCfg?.label ?? "On track"}</p>
+                </div>
+                <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20">
+                  <Zap className="h-2.5 w-2.5 text-primary" />
+                  <span className="text-xs font-medium text-primary">Agent</span>
+                </div>
               </div>
-            )}
-          </div>
-        </button>
-      ))}
-    </div>
+              <div className="flex flex-col gap-1.5 pl-[42px]">
+                {healthRecs.map(r => {
+                  const agent = AGENTS.find(a => a.id === r.agentId)
+                  const AgentIcon = agent ? (AGENT_ICON_MAP[agent.name] ?? Bot) : Bot
+                  return (
+                    <div key={r.action} className="flex items-center gap-2">
+                      <p className="text-sm text-foreground/80 flex-1 leading-snug">{r.action}</p>
+                      {agent && (
+                        <Button variant="outline" size="sm" className="gap-1.5 shrink-0 h-7 text-xs">
+                          <AgentIcon className="h-3 w-3" />
+                          {agent.name}
+                        </Button>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Stage sections */}
+          {visibleStages.map(s => {
+            const tasks = STAGE_TASKS[s]
+            const filtered = showCompleted ? tasks : tasks.filter(t => !doneMap[t.id])
+            if (filtered.length === 0) return null
+            const isCurrent = s === stage
+            return (
+              <div key={s} className="flex flex-col gap-1">
+                <div className="flex items-center gap-2 px-0.5 pb-1">
+                  <span className={cn("text-sm font-semibold", isCurrent ? "text-foreground" : "text-muted-foreground")}>{s}</span>
+                  {isCurrent && (
+                    <span className="text-[10px] font-medium bg-primary/10 text-primary px-1.5 py-0.5 rounded-full">Current</span>
+                  )}
+                </div>
+                {filtered.map(task => {
+                  const done = doneMap[task.id]
+                  return (
+                    <div
+                      key={task.id}
+                      onClick={() => toggle(task.id)}
+                      className={cn(
+                        "flex items-start gap-3 px-3 py-2.5 rounded-xl border bg-card cursor-pointer transition-colors hover:bg-muted/40 group",
+                        done ? "border-border/50" : "border-border"
+                      )}
+                    >
+                      {/* Circle checkbox */}
+                      <div className={cn(
+                        "mt-0.5 shrink-0 h-4 w-4 rounded-full border-2 flex items-center justify-center transition-colors",
+                        done ? "bg-primary border-primary" : "border-border group-hover:border-primary/60"
+                      )}>
+                        {done && <Check className="h-2.5 w-2.5 text-primary-foreground" strokeWidth={3} />}
+                      </div>
+
+                      {/* Label + subtext */}
+                      <div className="flex-1 min-w-0">
+                        <p className={cn("text-sm font-medium leading-snug", done ? "line-through text-muted-foreground" : "text-foreground")}>
+                          {task.label}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-0.5">Assign task</p>
+                      </div>
+
+                      {/* Required indicator */}
+                      {task.required && !done && (
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <div className="shrink-0 mt-0.5 flex items-center gap-1">
+                              <span className="text-sm font-bold text-warning leading-none">*</span>
+                              <span className="text-xs font-medium text-warning">Required</span>
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent side="left" className="max-w-[200px] text-xs">
+                            Must be complete to advance to the next stage
+                          </TooltipContent>
+                        </Tooltip>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            )
+          })}
+        </div>
+      </div>
+    </TooltipProvider>
   )
 }
 
@@ -598,7 +1019,7 @@ function EncumbrancesTab({ deal }: { deal: Deal }) {
       {items.map((enc, i) => (
         <div key={i} className={cn("py-4", i === 0 ? "pt-0" : "")}>
           <div className="flex items-start gap-3 mb-3">
-            <span className="mt-0.5 size-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 text-primary-foreground bg-primary">{enc.priority}</span>
+            <span className="mt-0.5 size-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 text-primary-foreground bg-destructive">{enc.priority}</span>
             <div className="flex-1 min-w-0">
               <p className="text-base font-semibold leading-tight text-foreground">{enc.optionType}</p>
               <p className="text-sm text-muted-foreground mt-0.5">{enc.holder} · {enc.suite}</p>
@@ -1004,27 +1425,7 @@ const HEALTH_BY_STAGE: Record<StageValue, Partial<Record<DealStatus, HealthEntry
   },
 }
 
-function RecRow({ action, urgency, agentId }: { action: string; urgency: string; agentId: string }) {
-  const agent = AGENTS.find(a => a.id === agentId)
-  const AgentIcon = agent ? (AGENT_ICON_MAP[agent.name] ?? Bot) : Bot
 
-  return (
-    <div className="flex items-center gap-2.5 rounded-lg px-3 py-2 border border-primary/25 bg-primary/15">
-      <Zap className="h-3.5 w-3.5 shrink-0 text-sidebar-primary" />
-      <div className="flex-1 min-w-0">
-        <p className="text-xs font-medium text-sidebar-foreground/90">{action}</p>
-        <p className="text-xs text-sidebar-foreground/55">{urgency}</p>
-      </div>
-      {agent && (
-        <Button variant="outline" size="sm" onClick={() => {}}
-          className="gap-1.5 shrink-0 text-sidebar-foreground/85 border-current bg-transparent hover:bg-sidebar-foreground/10">
-          <AgentIcon className="h-3 w-3" />
-          {agent.name}
-        </Button>
-      )}
-    </div>
-  )
-}
 
 function DealHealthCard({ status, stage, dealId }: { status: DealStatus; stage: StageValue; dealId?: string }) {
   const stageHealth = HEALTH_BY_STAGE[stage]
@@ -1062,11 +1463,6 @@ function DealHealthCard({ status, stage, dealId }: { status: DealStatus; stage: 
         </Popover>
       </div>
 
-      <div className="flex flex-col gap-2">
-        {cfg.recs.map(r => (
-          <RecRow key={r.action} action={r.action} urgency={r.urgency} agentId={r.agentId} />
-        ))}
-      </div>
     </div>
   )
 }
@@ -1102,9 +1498,8 @@ export function DealProfile({ deal, onBack: _onBack, status: statusProp, onStatu
       {/* Main content grid */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 items-stretch">
 
-        {/* Left col: Deal Health + tabbed content */}
+        {/* Left col: tabbed content */}
         <div className="lg:col-span-3 flex flex-col gap-4 h-full">
-          <DealHealthCard status={status} stage={stage} dealId={deal.id} />
 
           <div className={cn(cardBase, "flex-1")}>
             <ToggleGroup type="single" value={tab} onValueChange={v => v && setTab(v as string)}
@@ -1114,7 +1509,7 @@ export function DealProfile({ deal, onBack: _onBack, status: statusProp, onStatu
               <ToggleGroupItem value="encumbrances" size="sm" className={cn(FILTER_TAB_ITEM_CLS, "flex-1 text-sm")}>
                 Encumbrances
                 {(DEAL_ENCUMBRANCES[deal.id]?.length ?? 0) > 0 && (
-                  <span className="ml-0.5 inline-flex items-center justify-center min-w-4 h-4 px-1 rounded-full text-[10px] font-bold bg-destructive text-white">{DEAL_ENCUMBRANCES[deal.id].length}</span>
+                  <span className="ml-0.5 inline-flex items-center justify-center min-w-4 h-4 px-1 rounded-full text-[10px] font-bold bg-destructive text-primary-foreground">{DEAL_ENCUMBRANCES[deal.id].length}</span>
                 )}
               </ToggleGroupItem>
               <ToggleGroupItem value="tours"        size="sm" className={cn(FILTER_TAB_ITEM_CLS, "flex-1 text-sm")}>Tours</ToggleGroupItem>
@@ -1123,7 +1518,7 @@ export function DealProfile({ deal, onBack: _onBack, status: statusProp, onStatu
               <ToggleGroupItem value="documents"    size="sm" className={cn(FILTER_TAB_ITEM_CLS, "flex-1 text-sm")}>Docs</ToggleGroupItem>
             </ToggleGroup>
             {tab === "updates"      && <ActivityFeed deal={deal} stage={stage} />}
-            {tab === "tasks"        && <TasksTab stage={stage} />}
+            {tab === "tasks"        && <TasksTab stage={stage} status={status} dealId={deal.id} />}
             {tab === "tours"        && <p className="text-sm text-muted-foreground py-8 text-center">No tours scheduled.</p>}
             {tab === "proposals"    && <ProposalsTab deal={deal} stageIdx={stageIdx} />}
             {tab === "leases"       && <p className="text-sm text-muted-foreground py-8 text-center">No leases on file.</p>}
@@ -1132,10 +1527,13 @@ export function DealProfile({ deal, onBack: _onBack, status: statusProp, onStatu
           </div>
         </div>
 
-        {/* Right: info */}
-        <div className={cn(cardBase, "lg:col-span-1 overflow-y-auto max-h-[80vh] lg:max-h-none")}>
-          <p className="text-sm font-semibold text-foreground mb-4">Info</p>
-          <OverviewTab deal={deal} stageIdx={stageIdx} />
+        {/* Right: Deal Health + info */}
+        <div className="lg:col-span-1 flex flex-col gap-4">
+          <DealHealthCard status={status} stage={stage} dealId={deal.id} />
+          <div className={cn(cardBase, "overflow-y-auto max-h-[80vh] lg:max-h-none")}>
+            <p className="text-sm font-semibold text-foreground mb-4">Info</p>
+            <OverviewTab deal={deal} stageIdx={stageIdx} />
+          </div>
         </div>
 
       </div>
