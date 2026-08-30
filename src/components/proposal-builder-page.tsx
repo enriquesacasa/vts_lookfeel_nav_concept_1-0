@@ -249,15 +249,11 @@ export function ProposalBuilderPage({ className, isDark = false, onToggleDark }:
 }) {
   const [activeTab, setActiveTab] = React.useState<TabId>("term1")
   const [aiOpen, setAiOpen] = React.useState(true)
+  const [proposalAiVisible, setProposalAiVisible] = React.useState(true)
   const [viewMode, setViewMode] = React.useState<ViewMode>("table")
   const [logoOpen, setLogoOpen] = React.useState(false)
   const [chatInput, setChatInput] = React.useState("")
-  const [messages, setMessages] = React.useState<{ role: "user" | "assistant"; content: string }[]>([
-    {
-      role: "assistant",
-      content: "I've loaded Round 2 for Amazon Inc. at VTS Tower. This is an active negotiation: Amazon countered Round 1 asking for more free rent and TIA. I can help you evaluate competitiveness, compare rounds, check against Amazon's requirements, or model alternatives. What would you like to explore?",
-    },
-  ])
+  const [messages, setMessages] = React.useState<{ role: "user" | "assistant"; content: string }[]>([])
   const bottomRef = React.useRef<HTMLDivElement>(null)
 
   React.useEffect(() => {
@@ -317,26 +313,29 @@ export function ProposalBuilderPage({ className, isDark = false, onToggleDark }:
           </div>
 
           {/* Proposal AI card */}
-          <div className="mx-4 mb-3 rounded-xl border border-primary/25 bg-primary/5 p-3 shrink-0 space-y-2">
-            <div className="flex items-center gap-2">
-              <Sparkle className="h-4 w-4 text-primary" />
-              <span className="text-sm font-semibold text-foreground">Proposal AI</span>
+          {proposalAiVisible && (
+            <div className="mx-4 mb-3 rounded-xl border border-primary/25 bg-primary/5 p-3 shrink-0 space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Sparkle className="h-4 w-4 text-primary" />
+                  <span className="text-sm font-semibold text-foreground">Proposal AI</span>
+                </div>
+                <Button variant="ghost" size="icon" className="h-5 w-5 text-muted-foreground" onClick={() => setProposalAiVisible(false)}>
+                  <X className="h-3.5 w-3.5" />
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground">Upload an LOI to auto-fill the proposal.</p>
+              <Button variant="default" size="sm" className="w-full gap-2">
+                <Upload className="h-3.5 w-3.5" />Upload
+              </Button>
             </div>
-            <p className="text-xs text-muted-foreground">Upload an LOI to auto-fill the proposal.</p>
-            <Button variant="default" size="sm" className="w-full gap-2">
-              <Upload className="h-3.5 w-3.5" />Upload
-            </Button>
-          </div>
+          )}
 
           {/* Messages */}
           <div className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-3">
-            {messages.length <= 1 ? (
+            {messages.length === 0 ? (
               <div className="flex flex-col justify-end h-full pb-1">
-                <div className="flex flex-col gap-2">
-                  <div className="rounded-xl px-3 py-2.5 text-sm text-foreground leading-relaxed bg-muted/40 max-w-[85%]">
-                    {messages[0]?.content ?? "How can I help with this proposal?"}
-                  </div>
-                  <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2">
                     {SUGGESTED_PROMPTS.map(p => (
                       <Button key={p} variant="outline" size="sm"
                         className="rounded-full shrink-0 whitespace-nowrap"
@@ -344,7 +343,6 @@ export function ProposalBuilderPage({ className, isDark = false, onToggleDark }:
                         {p}
                       </Button>
                     ))}
-                  </div>
                 </div>
               </div>
             ) : (
