@@ -486,7 +486,7 @@ function AgentSettingsPanel({
   const typeId   = agentId.startsWith("type:") ? agentId.slice(5) : null
   const typeData = typeId ? AGENT_TYPES.find(t => t.id === typeId) : null
   const agent    = ACTIVE_AGENTS.find(a => a.id === agentId)
-  const d        = typeData?.defaults ?? { trigger: "Scheduled", frequency: "Weekly", tone: "Concise", rcpAssetMgr: true, rcpBroker: true, rcpTenantRep: true, rcpLawyer: true, rcpOwner: false, subject: "{Asset} — {Agent name} | {Date}", chatPrompt: "" }
+  const d        = typeData?.defaults ?? { trigger: "Scheduled", frequency: "Weekly", tone: "Concise", rcpAssetMgr: true, rcpBroker: true, rcpTenantRep: true, rcpLawyer: true, rcpOwner: false, subject: "{Asset}: {Agent name} | {Date}", chatPrompt: "" }
 
   const [agentName, setAgentName]   = React.useState(isNew ? "" : (typeData?.name ?? agent?.name ?? ""))
   const [scope, setScope]           = React.useState("All assets")
@@ -728,7 +728,7 @@ function AgentSettingsPanel({
           </ToggleGroup>
           {tone === "Other" && (
             <Textarea
-              placeholder="Describe the tone you want — e.g. friendly but authoritative, brief bullet points only…"
+              placeholder="Describe the tone you want, e.g. friendly but authoritative, brief bullet points only…"
               className="text-sm resize-none min-h-[80px]"
             />
           )}
@@ -741,7 +741,7 @@ function AgentSettingsPanel({
           <Input
             value={subject}
             onChange={e => setSubject(e.target.value)}
-            placeholder="e.g. Pipeline update — {Asset} | {Date}"
+            placeholder="e.g. Pipeline update: {Asset} | {Date}"
             className="text-sm h-8"
           />
           <div className="flex flex-wrap gap-1.5">
@@ -798,33 +798,33 @@ function AgentSettingsPanel({
             </p>
             <div className="flex flex-col gap-0.5">
               <Button variant="ghost" size="sm" className="w-full justify-start gap-2 h-8 text-sm"
-                onClick={() => { window.location.hash = "#/deal-steward-email-am" }}>
+                onClick={() => { window.location.hash = "#/deal-monitor-email-am" }}>
                 <Mail className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                <span className="truncate">Asset manager — pipeline velocity</span>
+                <span className="truncate">Asset manager: pipeline velocity</span>
                 <ExternalLink className="h-3.5 w-3.5 text-muted-foreground ml-auto shrink-0" />
               </Button>
               <Button variant="ghost" size="sm" className="w-full justify-start gap-2 h-8 text-sm"
-                onClick={() => { window.location.hash = "#/deal-steward-email-broker" }}>
+                onClick={() => { window.location.hash = "#/deal-monitor-email-broker" }}>
                 <Mail className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                <span className="truncate">Broker — action required</span>
+                <span className="truncate">Broker: action required</span>
                 <ExternalLink className="h-3.5 w-3.5 text-muted-foreground ml-auto shrink-0" />
               </Button>
               <Button variant="ghost" size="sm" className="w-full justify-start gap-2 h-8 text-sm"
-                onClick={() => { window.location.hash = "#/deal-steward-email-tenant" }}>
+                onClick={() => { window.location.hash = "#/deal-monitor-email-tenant" }}>
                 <Mail className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                <span className="truncate">Tenant rep — follow up</span>
+                <span className="truncate">Tenant rep: follow up</span>
                 <ExternalLink className="h-3.5 w-3.5 text-muted-foreground ml-auto shrink-0" />
               </Button>
               <Button variant="ghost" size="sm" className="w-full justify-start gap-2 h-8 text-sm"
-                onClick={() => { window.location.hash = "#/deal-steward-email-lawyer" }}>
+                onClick={() => { window.location.hash = "#/deal-monitor-email-lawyer" }}>
                 <Mail className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                <span className="truncate">Lawyer — lease status</span>
+                <span className="truncate">Lawyer: lease status</span>
                 <ExternalLink className="h-3.5 w-3.5 text-muted-foreground ml-auto shrink-0" />
               </Button>
               <Button variant="ghost" size="sm" className="w-full justify-start gap-2 h-8 text-sm"
-                onClick={() => { window.location.hash = "#/deal-steward-email-owner" }}>
+                onClick={() => { window.location.hash = "#/deal-monitor-email-owner" }}>
                 <Mail className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                <span className="truncate">Owner — portfolio update</span>
+                <span className="truncate">Owner: portfolio update</span>
                 <ExternalLink className="h-3.5 w-3.5 text-muted-foreground ml-auto shrink-0" />
               </Button>
             </div>
