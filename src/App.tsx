@@ -263,7 +263,7 @@ export default function App() {
   const [isDark, setIsDark] = React.useState(() => document.documentElement.classList.contains("dark"))
 
   React.useEffect(() => {
-    const globalPages = ["theme", "principles", "activity", "reminders", "avatar", "inquiry-email", "inquiry-email-forward", "inquiry-email-confirm", "ask-vts", "document-agent", "proposal-builder", "deal-steward", "deal-steward-email-am", "deal-steward-email-broker", "deal-steward-email-tenant", "deal-steward-email-lawyer", "deal-steward-email-owner"]
+    const globalPages = ["theme", "principles", "activity", "reminders", "avatar", "inquiry-email", "inquiry-email-forward", "inquiry-email-confirm", "ask-vts", "document-agent", "proposal-builder", "deal-monitor", "deal-monitor-email-am", "deal-monitor-email-broker", "deal-monitor-email-tenant", "deal-monitor-email-lawyer", "deal-monitor-email-owner"]
     let base = globalPages.includes(currentPage)
       ? `/${currentPage}`
       : `/${currentPage}/${selectedAssetId}`
@@ -634,7 +634,7 @@ export default function App() {
     return <ProposalBuilderPage isDark={isDark} onToggleDark={toggleDark} />
   }
 
-  if (currentPage === "deal-steward") {
+  if (currentPage === "deal-monitor") {
     return (
       <ChatPatternProvider onOpenChat={goAskVts}>
         <DealStewardPage isDark={isDark} onToggleDark={toggleDark} />
@@ -642,11 +642,11 @@ export default function App() {
     )
   }
 
-  if (currentPage === "deal-steward-email-am")     return <AmPipelineEmailPage />
-  if (currentPage === "deal-steward-email-broker")  return <BrokerActionEmailPage />
-  if (currentPage === "deal-steward-email-tenant")  return <TenantFollowupEmailPage />
-  if (currentPage === "deal-steward-email-lawyer")  return <LawyerLeaseEmailPage />
-  if (currentPage === "deal-steward-email-owner")   return <OwnerUpdateEmailPage />
+  if (currentPage === "deal-monitor-email-am")     return <AmPipelineEmailPage />
+  if (currentPage === "deal-monitor-email-broker")  return <BrokerActionEmailPage />
+  if (currentPage === "deal-monitor-email-tenant")  return <TenantFollowupEmailPage />
+  if (currentPage === "deal-monitor-email-lawyer")  return <LawyerLeaseEmailPage />
+  if (currentPage === "deal-monitor-email-owner")   return <OwnerUpdateEmailPage />
 
   const standalonePages = ["theme", "principles", "inquiry-email", "inquiry-email-forward", "inquiry-email-confirm"]
   if (standalonePages.includes(currentPage)) {
