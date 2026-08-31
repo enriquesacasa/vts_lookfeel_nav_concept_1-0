@@ -1474,14 +1474,15 @@ interface DealProfileProps {
   onBack: () => void
   status?: DealStatus
   onStatusChange?: (s: DealStatus) => void
+  initialTab?: string
 }
 
-export function DealProfile({ deal, onBack: _onBack, status: statusProp, onStatusChange }: DealProfileProps) {
+export function DealProfile({ deal, onBack: _onBack, status: statusProp, onStatusChange, initialTab }: DealProfileProps) {
   const [stage, setStage]           = React.useState<StageValue>(deal.stage as StageValue)
   const [internalStatus, setInternalStatus] = React.useState<DealStatus>(deal.status as DealStatus)
   const status    = statusProp ?? internalStatus
   const _setStatus = onStatusChange ?? setInternalStatus; void _setStatus
-  const [tab, setTab]               = React.useState("updates")
+  const [tab, setTab]               = React.useState(initialTab ?? "updates")
   const stageIdx = ALL_STAGES.indexOf(stage)
 
   return (

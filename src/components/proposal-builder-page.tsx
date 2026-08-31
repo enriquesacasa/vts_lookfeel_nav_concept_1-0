@@ -114,7 +114,7 @@ function FormRow({
   return (
     <div className="flex items-start gap-3 min-h-[32px]">
       <span className="text-sm text-muted-foreground w-36 shrink-0 pt-1.5">
-        {label}{required && <span className="text-primary ml-0.5">*</span>}
+        {label}{required && <span className="text-warning ml-0.5">*</span>}
       </span>
       <div className="flex-1 space-y-0.5">
         <div className={cn(
@@ -703,6 +703,7 @@ function ProposalHistoryCard() {
 function InfoTab() {
   return (
     <div className="space-y-5">
+      <p className="text-xs text-muted-foreground"><span className="text-warning font-bold">*</span> Required</p>
       <div className="space-y-2">
         <p className="text-xs font-semibold text-muted-foreground">Proposal template</p>
         <FormRow label="Template" placeholder="Select template" />

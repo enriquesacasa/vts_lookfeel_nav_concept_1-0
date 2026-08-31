@@ -28,6 +28,8 @@ import { ProposalBuilderPage } from "@/components/proposal-builder-page"
 import { DealStewardPage } from "@/components/deal-steward-page"
 import { AmPipelineEmailPage, BrokerActionEmailPage, TenantFollowupEmailPage, LawyerLeaseEmailPage, OwnerUpdateEmailPage } from "@/components/deal-steward-emails"
 import { OptionsRightsPage } from "@/components/options-rights-page"
+import { CriticalDatesPage } from "@/components/critical-dates-page"
+import { DealTasksPage } from "@/components/deal-tasks-page"
 import { ChatPatternProvider } from "@/contexts/chat-pattern"
 import { ChatSideOver } from "@/components/chat-side-over"
 import { ChatSidePush, SIDE_PUSH_WIDTH } from "@/components/chat-side-push"
@@ -252,6 +254,7 @@ export default function App() {
     return dealId ? (DEALS.find(d => d.id === dealId) ?? null) : null
   })
   const [selectedDealStatus, setSelectedDealStatus] = React.useState<DealStatus>("active")
+  const [selectedDealInitialTab, setSelectedDealInitialTab] = React.useState<string | undefined>(undefined)
   React.useEffect(() => {
     if (selectedDeal) setSelectedDealStatus(selectedDeal.status as DealStatus)
   }, [selectedDeal])
@@ -438,7 +441,7 @@ export default function App() {
           )}
           <BuildingHeader {...dealHeaderProps} />
           {selectedDeal
-            ? <DealProfile deal={selectedDeal} onBack={() => setSelectedDeal(null)} status={selectedDealStatus} onStatusChange={setSelectedDealStatus} />
+            ? <DealProfile deal={selectedDeal} onBack={() => { setSelectedDeal(null); setSelectedDealInitialTab(undefined) }} status={selectedDealStatus} onStatusChange={setSelectedDealStatus} initialTab={selectedDealInitialTab} />
             : <DealsPage onDealClick={deal => setSelectedDeal(deal)} />
           }
         </div>
@@ -532,6 +535,34 @@ export default function App() {
         <div className="space-y-4">
           <BuildingHeader {...pagedHeaderProps} onAskVts={goAskVts} />
           <SpacesPage assets={spacesAssets} />
+        </div>
+      )
+    }
+    if (page === "deal-tasks") {
+      return (
+        <div className="space-y-4">
+          <BuildingHeader {...pagedHeaderProps} onAskVts={goAskVts} />
+          <DealTasksPage onTaskClick={dealId => {
+            const deal = DEALS.find(d => d.id === dealId) ?? null
+            if (deal) {
+              setSelectedDeal(deal)
+              setSelectedDealInitialTab("tasks")
+              setCurrentPage("deals")
+            }
+          }} />
+        </div>
+      )
+    }
+    if (page === "critical-dates") {
+      const cdAssets = selectedAssetId === "all"
+        ? ASSETS
+        : selectedPortfolio
+          ? ASSETS.filter(a => selectedPortfolio.assetIds.includes(a.id))
+          : selectedAsset ? [selectedAsset] : ASSETS
+      return (
+        <div className="space-y-4">
+          <BuildingHeader {...pagedHeaderProps} onAskVts={goAskVts} />
+          <CriticalDatesPage assets={cdAssets} />
         </div>
       )
     }
