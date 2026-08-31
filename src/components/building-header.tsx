@@ -6,25 +6,18 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { useChatPattern, type TransferMessage } from "@/contexts/chat-pattern"
 import { ChatPopoverContent } from "@/components/chat-popover"
 
-interface BuildingStat {
-  label: string
-  value: string
-  accent?: boolean
-}
-
 interface BuildingHeaderProps {
   image?: string | React.ReactNode
   name: React.ReactNode
   address: string
   city: string
-  stats: BuildingStat[]
   badges?: React.ReactNode
   actions?: React.ReactNode
   className?: string
   onAskVts?: () => void
 }
 
-function BuildingHeader({ image, name, address, city, stats, badges, actions, className }: BuildingHeaderProps) {
+function BuildingHeader({ image, name, address, city, badges, actions, className }: BuildingHeaderProps) {
   const { pattern, openChat } = useChatPattern()
   const [popoverOpen, setPopoverOpen] = React.useState(false)
 
@@ -45,11 +38,10 @@ function BuildingHeader({ image, name, address, city, stats, badges, actions, cl
 
   return (
     <div className={cn(className)}>
-      {/* Hero section */}
       <div className="flex items-stretch gap-4 py-3">
         {image && (
           typeof image === "string"
-            ? <div className="relative shrink-0 w-16 h-16 sm:w-32 sm:h-24 rounded-xl overflow-hidden self-start">
+            ? <div className="relative shrink-0 w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-xl overflow-hidden self-start">
                 <img src={image as string} alt="" className="w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/30" />
               </div>
@@ -62,7 +54,7 @@ function BuildingHeader({ image, name, address, city, stats, badges, actions, cl
             </p>
           )}
           <div className="flex items-center gap-6 flex-wrap">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-medium text-foreground leading-tight">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-medium text-foreground leading-tight">
               {name}
             </h1>
             {actions}
@@ -96,27 +88,10 @@ function BuildingHeader({ image, name, address, city, stats, badges, actions, cl
           </Button>
         </div>
       </div>
-
-      {/* Stats row */}
-      <div className="flex flex-wrap divide-x divide-border/60 bg-card/70 backdrop-blur-md">
-        {stats.map(({ label, value, accent }) => (
-          <div key={label} className="flex-1 min-w-[110px] px-4 py-4">
-            <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">
-              {label}
-            </p>
-            <p className={cn(
-              "text-lg font-medium truncate",
-              accent ? "text-primary" : "text-foreground"
-            )}>
-              {value}
-            </p>
-          </div>
-        ))}
-      </div>
     </div>
   )
 }
 BuildingHeader.displayName = "BuildingHeader"
 
 export { BuildingHeader }
-export type { BuildingHeaderProps, BuildingStat }
+export type { BuildingHeaderProps }

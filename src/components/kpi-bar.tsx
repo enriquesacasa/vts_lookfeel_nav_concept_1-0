@@ -5,6 +5,7 @@ export interface Kpi {
   label: string
   value: string
   subtitle?: string
+  subtitleNode?: React.ReactNode
   trend?: "up" | "down"
 }
 
@@ -17,19 +18,21 @@ const KpiBar = React.forwardRef<HTMLDivElement, KpiBarProps>(
   ({ kpis, className }, ref) => (
     <div ref={ref} className={cn(cardBase, "flex flex-wrap divide-x divide-border/60 !p-0 overflow-hidden", className)}>
       {kpis.map((kpi) => (
-        <div key={kpi.label} className="flex-1 min-w-[120px] px-5 py-4">
+        <div key={kpi.label} className="flex-1 min-w-[120px] px-5 py-3">
           <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">
             {kpi.label}
           </p>
-          <p className="text-2xl font-medium text-foreground">{kpi.value}</p>
-          {kpi.subtitle && (
+          <p className="text-xl font-medium text-foreground">{kpi.value}</p>
+          {kpi.subtitleNode ? (
+            <div className="mt-1">{kpi.subtitleNode}</div>
+          ) : kpi.subtitle ? (
             <p className={cn(
               "text-xs font-medium mt-1",
               kpi.trend === "up" ? "text-success" : kpi.trend === "down" ? "text-destructive" : "text-muted-foreground"
             )}>
               {kpi.subtitle}
             </p>
-          )}
+          ) : null}
         </div>
       ))}
     </div>

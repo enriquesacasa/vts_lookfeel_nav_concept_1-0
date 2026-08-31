@@ -18,6 +18,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Checkbox } from "@/components/ui/checkbox"
 import { AGENT_ICON_MAP, AGENTS } from "@/components/agents-page"
 import { TENANT_LOGO, type Deal } from "@/components/deals-page"
+import { KpiBar } from "@/components/kpi-bar"
 
 // ─── Tenant logo ──────────────────────────────────────────────────────────────
 
@@ -177,17 +178,6 @@ function delta(actual: number, budget: number): { dir: "up" | "down" | "flat"; p
   return { dir: p > 0 ? "up" : "down", pct: `${p > 0 ? "+" : ""}${p.toFixed(1)}%` }
 }
 
-function KpiCell({ label, value, sub, trend }: { label: string; value: string; sub?: string; trend?: "up" | "down" | "flat" }) {
-  const cls = trend === "up" ? "text-success" : trend === "down" ? "text-destructive" : "text-muted-foreground"
-  return (
-    <div className="flex-1 min-w-[120px] px-5 py-4 flex flex-col gap-0.5">
-      <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground mb-1">{label}</p>
-      <p className="text-2xl font-medium text-foreground leading-none">{value}</p>
-      {sub && <p className={cn("text-xs font-medium mt-1", cls)}>{sub}</p>}
-    </div>
-  )
-}
-
 function FinancialBar({ deal, stageIdx }: { deal: Deal; stageIdx: number }) {
   const nerDelta = delta(deal.ner, deal.budgetNer)
   const noiDelta = delta(deal.noi, deal.budgetNoi)
@@ -195,34 +185,26 @@ function FinancialBar({ deal, stageIdx }: { deal: Deal; stageIdx: number }) {
   const daysOpen = Math.floor((Date.now() - new Date(deal.lastUpdated).getTime()) / 86_400_000)
   const tiCost = stageIdx >= 2 ? deal.sf * 80 : null
 
-  return (
-    <div className={cn(cardBase, "flex flex-wrap divide-x divide-border/60 !p-0 overflow-hidden")}>
-      {deal.budgetNer > 0 && (
-        <KpiCell
-          label="NER"
-          value={deal.ner ? `$${deal.ner.toFixed(2)}` : "—"}
-          sub={deal.ner ? `${nerDelta.pct} vs budget` : `Budget $${deal.budgetNer.toFixed(2)}`}
-          trend={deal.ner ? nerDelta.dir : undefined}
-        />
-      )}
-      {deal.budgetNoi > 0 && (
-        <KpiCell
-          label="Annual NOI"
-          value={deal.noi ? `$${(deal.noi / 1_000_000).toFixed(2)}M` : "—"}
-          sub={deal.noi ? `${noiDelta.pct} vs budget` : `Budget $${(deal.budgetNoi / 1_000_000).toFixed(2)}M`}
-          trend={deal.noi ? noiDelta.dir : undefined}
-        />
-      )}
-      {tlv && (
-        <KpiCell label="Total lease value" value={`$${tlv.toFixed(1)}M`} sub={`${deal.term} months`} />
-      )}
-      {tiCost && (
-        <KpiCell label="TI investment" value={`$${(tiCost / 1_000_000).toFixed(2)}M`} sub="$80/sf est." />
-      )}
-      <KpiCell label="Days open" value={`${daysOpen}d`} sub={`Last update ${deal.lastUpdated}`} />
-      {deal.sf && <KpiCell label="Size" value={`${deal.sf.toLocaleString()} sf`} sub={deal.dealType} />}
-    </div>
-  )
+  const kpis = [
+    ...(deal.budgetNer > 0 ? [{
+      label: "NER",
+      value: deal.ner ? `$${deal.ner.toFixed(2)}` : "—",
+      subtitle: deal.ner ? `${nerDelta.pct} vs budget` : `Budget $${deal.budgetNer.toFixed(2)}`,
+      trend: deal.ner && nerDelta.dir !== "flat" ? nerDelta.dir : undefined,
+    }] : []),
+    ...(deal.budgetNoi > 0 ? [{
+      label: "Annual NOI",
+      value: deal.noi ? `$${(deal.noi / 1_000_000).toFixed(2)}M` : "—",
+      subtitle: deal.noi ? `${noiDelta.pct} vs budget` : `Budget $${(deal.budgetNoi / 1_000_000).toFixed(2)}M`,
+      trend: deal.noi && noiDelta.dir !== "flat" ? noiDelta.dir : undefined,
+    }] : []),
+    ...(tlv ? [{ label: "Total lease value", value: `$${tlv.toFixed(1)}M`, subtitle: `${deal.term} months` }] : []),
+    ...(tiCost ? [{ label: "TI investment", value: `$${(tiCost / 1_000_000).toFixed(2)}M`, subtitle: "$80/sf est." }] : []),
+    { label: "Days open", value: `${daysOpen}d`, subtitle: `Last update ${deal.lastUpdated}` },
+    ...(deal.sf ? [{ label: "Size", value: `${deal.sf.toLocaleString()} sf`, subtitle: deal.dealType }] : []),
+  ]
+
+  return <KpiBar kpis={kpis} />
 }
 
 // ─── Agent strip ──────────────────────────────────────────────────────────────

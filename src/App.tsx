@@ -135,7 +135,7 @@ function HeaderPill({ label, items, onItemClick }: {
 function MultiImage({ assetIds }: { assetIds: string[] }) {
   const ids = assetIds.slice(0, 4)
   return (
-    <div className="shrink-0 w-20 h-16 sm:w-32 sm:h-24 grid grid-cols-2 gap-px rounded-xl overflow-hidden">
+    <div className="shrink-0 w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 grid grid-cols-2 gap-px rounded-xl overflow-hidden">
       {ids.map(id => (
         <img key={id} src={ASSET_DETAILS[id]?.image} alt="" className="w-full h-full object-cover" />
       ))}
@@ -358,7 +358,6 @@ export default function App() {
             city="Assist · Automate · Accelerate"
             name={<span><span className="font-semibold">VTS Agents</span></span>}
             address="Improve decisions, remove manual work, and move everything forward faster."
-            stats={[]}
           />
           <AgentsPage className="flex-1 min-h-0" defaultAgentId={defaultAgentId} />
         </div>
@@ -376,7 +375,6 @@ export default function App() {
           name: "All assets",
           address: "",
           image: <MultiImage assetIds={ASSETS.map(a => a.id)} />,
-          stats: [] as { label: string; value: string; accent?: boolean }[],
           badges: <>
             <HeaderPill label={`${ASSETS.length} Assets`} items={ASSETS.map(a => a.name)} onItemClick={i => { setSelectedAssetId(ASSETS[i].id); setCurrentPage("dashboard") }} />
             <HeaderPill label={`${allMarkets.length} Markets`} items={allMarkets} />
@@ -391,7 +389,6 @@ export default function App() {
           name: selectedPortfolio.name,
           address: "",
           image: <MultiImage assetIds={selectedPortfolio.assetIds} />,
-          stats: [] as { label: string; value: string; accent?: boolean }[],
           badges: <>
             <HeaderPill label={`${selectedPortfolio.assetIds.length} Assets`} items={portfolioAssets.map(a => a.name)} onItemClick={i => { setSelectedAssetId(portfolioAssets[i].id); setCurrentPage("dashboard") }} />
             <HeaderPill label={`${portfolioMarkets.length} Market${portfolioMarkets.length !== 1 ? "s" : ""}`} items={portfolioMarkets} />
@@ -403,7 +400,6 @@ export default function App() {
         name: selectedAsset?.name ?? "VTS Tower Headquarters",
         address: selectedAsset?.address ?? "114 West 41st Street, New York, NY 10036",
         image: assetDetail?.image ?? buildingImg,
-        stats: [] as { label: string; value: string; accent?: boolean }[],
       }
     })()
 
@@ -413,7 +409,7 @@ export default function App() {
       ? { ...headerProps, name: (
           <span>
             <span className="font-semibold">{headerProps.name}</span>{" "}
-            <span className="text-primary font-semibold whitespace-nowrap">| {pageLabel}</span>
+            <span className="text-muted-foreground font-light whitespace-nowrap">| {pageLabel}</span>
           </span>
         )}
       : headerProps
@@ -430,7 +426,6 @@ export default function App() {
             <AgentBtn className="!size-9" entity="Deal" label={`${selectedDeal.tenant} — ${selectedDeal.stage} — ${selectedDealStatus}`} />
           </div>
         ),
-        stats: [],
       } : pagedHeaderProps
       return (
         <div className="space-y-4">
