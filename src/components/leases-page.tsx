@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Search, Settings2, ChevronLeft, ChevronRight } from "lucide-react"
 import { AgentBtn } from "@/components/agent-btn"
+import { TenantAvatar } from "@/components/tenant-avatar"
 import {
   Table, TableHeader, TableBody, TableRow, TableCell, TableHead,
   SortableHead, useSortState,
@@ -36,158 +37,39 @@ type SortKey =
   | "tenant" | "asset" | "suite" | "sf" | "baseRent" | "annualRent"
   | "lcd" | "lxd" | "term" | "remaining" | "status" | "type"
 
-// ── Tenant logos ──────────────────────────────────────────────────────────────
-
-const TENANT_LOGO: Record<string, string> = {
-  "Amazon.com":        "/vts_lookfeel_nav_concept_1-0/logos/amazon.png",
-  "Salesforce":        "/vts_lookfeel_nav_concept_1-0/logos/salesforce.png",
-  "Google LLC":        "/vts_lookfeel_nav_concept_1-0/logos/google.png",
-  "JP Morgan Chase":   "/vts_lookfeel_nav_concept_1-0/logos/jpmorgan.png",
-  "Morgan Stanley":    "/vts_lookfeel_nav_concept_1-0/logos/morganstanley.png",
-  "Stripe Inc":        "/vts_lookfeel_nav_concept_1-0/logos/stripe.png",
-  "Twitter Inc":       "/vts_lookfeel_nav_concept_1-0/logos/x.png",
-  "Microsoft":         "/vts_lookfeel_nav_concept_1-0/logos/microsoft.png",
-  "Spotify":           "/vts_lookfeel_nav_concept_1-0/logos/spotify.png",
-  "Airbnb":            "/vts_lookfeel_nav_concept_1-0/logos/airbnb.png",
-  "Meta Platforms":    "/vts_lookfeel_nav_concept_1-0/logos/meta.png",
-  "Uber Technologies": "/vts_lookfeel_nav_concept_1-0/logos/uber.png",
-  "Cisco Systems":     "/vts_lookfeel_nav_concept_1-0/logos/cisco.png",
-  "BlackRock":         "/vts_lookfeel_nav_concept_1-0/logos/blackrock.png",
-  "Goldman Sachs":     "/vts_lookfeel_nav_concept_1-0/logos/goldmansachs.png",
-}
-
-function TenantAvatar({ name }: { name: string }) {
-  const [failed, setFailed] = React.useState(false)
-  const src = TENANT_LOGO[name]
-  const initials = name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()
-  if (src && !failed) {
-    return (
-      <img src={src} alt={name} onError={() => setFailed(true)}
-        className="h-7 w-7 rounded-full object-contain bg-background ring-1 ring-border/30 shrink-0" />
-    )
-  }
-  return (
-    <div className="h-7 w-7 rounded-full flex items-center justify-center text-[10px] font-medium text-primary-foreground shrink-0 ring-1 ring-border/30 bg-primary/80">
-      {initials}
-    </div>
-  )
-}
-
 // ── Mock data ─────────────────────────────────────────────────────────────────
 
-const LEASES: Lease[] = [
-  {
-    id: "l01", tenant: "Amazon.com", asset: "VTS Tower Headquarters",
-    floor: "Floor 8", suite: "0800", sf: 20000,
-    baseRent: 72.00, annualRent: 1440000,
-    lcd: "05/01/2019", lxd: "04/30/2029", term: 120, remaining: 32,
-    status: "Active", type: "Direct",
-    options: ["Renewal Option"],
-  },
-  {
-    id: "l02", tenant: "Salesforce", asset: "VTS Tower Headquarters",
-    floor: "Floor 7", suite: "0700", sf: 20000,
-    baseRent: 68.00, annualRent: 1360000,
-    lcd: "05/01/2019", lxd: "04/30/2029", term: 120, remaining: 32,
-    status: "Active", type: "Direct",
-    options: ["Renewal Option", "Expansion Option"],
-  },
-  {
-    id: "l03", tenant: "Google LLC", asset: "VTS Tower Headquarters",
-    floor: "Floors 12-13", suite: "1200/1300", sf: 36000,
-    baseRent: 78.00, annualRent: 2808000,
-    lcd: "07/01/2020", lxd: "06/30/2030", term: 120, remaining: 46,
-    status: "Active", type: "Direct",
-    options: ["Renewal Option", "Right of First Offer"],
-  },
-  {
-    id: "l04", tenant: "JP Morgan Chase", asset: "VTS Tower Headquarters",
-    floor: "Floor 10", suite: "1000", sf: 18000,
-    baseRent: 75.00, annualRent: 1350000,
-    lcd: "10/01/2020", lxd: "09/30/2030", term: 120, remaining: 49,
-    status: "Active", type: "Direct",
-    options: [],
-  },
-  {
-    id: "l05", tenant: "Microsoft", asset: "VTS Tower Headquarters",
-    floor: "Floor 4", suite: "0400", sf: 20000,
-    baseRent: 62.00, annualRent: 1240000,
-    lcd: "01/01/2020", lxd: "12/31/2029", term: 120, remaining: 40,
-    status: "Active", type: "Direct",
-    options: ["Renewal Option"],
-  },
-  {
-    id: "l06", tenant: "Cisco Systems", asset: "VTS Tower Headquarters",
-    floor: "Floor 5", suite: "0500", sf: 20000,
-    baseRent: 65.00, annualRent: 1300000,
-    lcd: "12/01/2021", lxd: "11/30/2028", term: 84, remaining: 27,
-    status: "Active", type: "Direct",
-    options: [],
-  },
-  {
-    id: "l07", tenant: "Morgan Stanley", asset: "VTS Tower Headquarters",
-    floor: "Floor 11", suite: "1100", sf: 18000,
-    baseRent: 80.00, annualRent: 1440000,
-    lcd: "10/01/2022", lxd: "09/30/2029", term: 84, remaining: 37,
-    status: "Active", type: "Direct",
-    options: ["Renewal Option"],
-  },
-  {
-    id: "l08", tenant: "Twitter Inc", asset: "VTS Tower Headquarters",
-    floor: "Floor 2", suite: "0200", sf: 20000,
-    baseRent: 58.00, annualRent: 1160000,
-    lcd: "07/01/2018", lxd: "06/30/2028", term: 120, remaining: 22,
-    status: "Active", type: "Direct",
-    options: [],
-  },
-  {
-    id: "l09", tenant: "Stripe Inc", asset: "VTS Tower Headquarters",
-    floor: "Floor 3", suite: "0300", sf: 12000,
-    baseRent: 66.00, annualRent: 792000,
-    lcd: "04/01/2018", lxd: "03/31/2027", term: 108, remaining: 7,
-    status: "Expiring soon", type: "Direct",
-    options: ["Renewal Option"],
-  },
-  {
-    id: "l10", tenant: "Spotify", asset: "VTS Tower Headquarters",
-    floor: "Floor 14", suite: "1400", sf: 10000,
-    baseRent: 70.00, annualRent: 700000,
-    lcd: "07/01/2020", lxd: "06/30/2027", term: 84, remaining: 10,
-    status: "Expiring soon", type: "Sublease",
-    options: [],
-  },
-  {
-    id: "l11", tenant: "Airbnb", asset: "VTS Tower Headquarters",
-    floor: "Floor 1", suite: "0100", sf: 5000,
-    baseRent: 55.00, annualRent: 275000,
-    lcd: "01/01/2018", lxd: "12/31/2025", term: 96, remaining: -8,
-    status: "Expired", type: "Direct",
-    options: [],
-  },
-  {
-    id: "l12", tenant: "BlackRock", asset: "One Financial Plaza",
-    floor: "Floor 12", suite: "1200", sf: 34200,
-    baseRent: 85.00, annualRent: 2907000,
-    lcd: "10/01/2026", lxd: "09/30/2036", term: 120, remaining: 121,
-    status: "Pending", type: "Direct",
-    options: ["Renewal Option", "Expansion Option"],
-  },
-  {
-    id: "l13", tenant: "Goldman Sachs", asset: "One Financial Plaza",
-    floor: "Floor 11", suite: "1100", sf: 28000,
-    baseRent: 90.00, annualRent: 2520000,
-    lcd: "03/01/2021", lxd: "02/28/2031", term: 120, remaining: 54,
-    status: "Active", type: "Direct",
-    options: ["Right of First Offer"],
-  },
-  {
-    id: "l14", tenant: "Uber Technologies", asset: "Salesforce Tower",
-    floor: "Floor 18", suite: "1800A", sf: 28000,
-    baseRent: 98.00, annualRent: 2744000,
-    lcd: "09/01/2022", lxd: "08/31/2027", term: 60, remaining: 12,
-    status: "Expiring soon", type: "Direct",
-    options: [],
-  },
+export const LEASES: Lease[] = [
+  // ── VTS Tower Headquarters — matches stacking plan exactly ──────────────────
+  { id: "l01", tenant: "Blackstone Inc.",           asset: "VTS Tower Headquarters", floor: "Floor 14", suite: "1400", sf: 10000, baseRent: 102.50, annualRent: 1025000, lcd: "07/01/2020", lxd: "06/30/2030", term: 120, remaining: 46, status: "Active",        type: "Direct",   options: ["Renewal Option", "ROFO"] },
+  { id: "l02", tenant: "Blackstone Inc.",           asset: "VTS Tower Headquarters", floor: "Floor 13", suite: "1300", sf: 18000, baseRent: 102.50, annualRent: 1845000, lcd: "07/01/2020", lxd: "06/30/2030", term: 120, remaining: 46, status: "Active",        type: "Direct",   options: ["Renewal Option", "Expansion Option", "ROFO"] },
+  { id: "l03", tenant: "Vantage Point Capital LP",  asset: "VTS Tower Headquarters", floor: "Floor 12", suite: "1200", sf: 18000, baseRent: 98.35,  annualRent: 1770300, lcd: "01/01/2023", lxd: "12/31/2029", term: 84,  remaining: 40, status: "Active",        type: "Direct",   options: ["Renewal Option"] },
+  { id: "l04", tenant: "Amazon.com Inc.",           asset: "VTS Tower Headquarters", floor: "Floor 11", suite: "1100", sf: 18000, baseRent: 89.12,  annualRent: 1604160, lcd: "10/01/2022", lxd: "09/30/2029", term: 84,  remaining: 37, status: "Active",        type: "Direct",   options: ["Renewal Option", "Expansion Option"] },
+  { id: "l05", tenant: "Amazon.com Inc.",           asset: "VTS Tower Headquarters", floor: "Floor 10", suite: "1000", sf: 18000, baseRent: 89.12,  annualRent: 1604160, lcd: "10/01/2020", lxd: "09/30/2030", term: 120, remaining: 49, status: "Active",        type: "Direct",   options: [] },
+  { id: "l06", tenant: "Sullivan & Cromwell LLP",   asset: "VTS Tower Headquarters", floor: "Floor 8",  suite: "0800", sf: 20000, baseRent: 93.14,  annualRent: 1862800, lcd: "05/01/2019", lxd: "04/30/2029", term: 120, remaining: 32, status: "Active",        type: "Direct",   options: ["Renewal Option", "Termination Option"] },
+  { id: "l07", tenant: "Sullivan & Cromwell LLP",   asset: "VTS Tower Headquarters", floor: "Floor 7",  suite: "0700", sf: 20000, baseRent: 93.14,  annualRent: 1862800, lcd: "05/01/2019", lxd: "04/30/2029", term: 120, remaining: 32, status: "Active",        type: "Direct",   options: ["Renewal Option", "ROFR"] },
+  { id: "l08", tenant: "Pacific Wealth Management LLC", asset: "VTS Tower Headquarters", floor: "Floor 5", suite: "0500", sf: 20000, baseRent: 89.60, annualRent: 1792000, lcd: "12/01/2021", lxd: "11/30/2028", term: 84, remaining: 27, status: "Active",       type: "Direct",   options: ["Renewal Option", "ROFO"] },
+  { id: "l09", tenant: "Arthur & Brennan LLP",      asset: "VTS Tower Headquarters", floor: "Floor 4",  suite: "0400", sf: 20000, baseRent: 87.00,  annualRent: 1740000, lcd: "01/01/2020", lxd: "12/31/2029", term: 120, remaining: 40, status: "Active",        type: "Direct",   options: ["Renewal Option", "ROFO"] },
+  { id: "l10", tenant: "Meridian Health Partners Inc.", asset: "VTS Tower Headquarters", floor: "Floor 3", suite: "0300", sf: 12000, baseRent: 85.50, annualRent: 1026000, lcd: "04/01/2018", lxd: "03/31/2028", term: 120, remaining: 19, status: "Active",      type: "Direct",   options: ["Renewal Option", "Expansion Option"] },
+  { id: "l11", tenant: "The Carlyle Group Inc.",    asset: "VTS Tower Headquarters", floor: "Floor 2",  suite: "0200", sf: 20000, baseRent: 91.00,  annualRent: 1820000, lcd: "07/01/2018", lxd: "06/30/2028", term: 120, remaining: 22, status: "Active",        type: "Sublease", options: ["Renewal Option", "Termination Option", "ROFR"] },
+  { id: "l12", tenant: "CVS Health Corporation",    asset: "VTS Tower Headquarters", floor: "Floor 1",  suite: "0100", sf: 5000,  baseRent: 72.00,  annualRent: 360000,  lcd: "01/01/2018", lxd: "12/31/2027", term: 120, remaining: 16, status: "Expiring soon", type: "Direct",   options: ["Renewal Option"] },
+  // ── Critical dates tenants ──────────────────────────────────────────────────
+  { id: "l13", tenant: "Pfizer",                    asset: "VTS Tower Headquarters", floor: "Floor 12", suite: "1200", sf: 117000, baseRent: 78.00, annualRent: 9126000, lcd: "09/15/2016", lxd: "09/15/2026", term: 120, remaining: 1,  status: "Expiring soon", type: "Direct",   options: ["Renewal Option"] },
+  { id: "l14", tenant: "Morgan Stanley",            asset: "VTS Tower Headquarters", floor: "Floors 8-11", suite: "0800-1100", sf: 116000, baseRent: 95.00, annualRent: 11020000, lcd: "11/01/2016", lxd: "11/01/2026", term: 120, remaining: 2, status: "Expiring soon", type: "Direct", options: ["Renewal Option"] },
+  { id: "l15", tenant: "Deloitte LLP",              asset: "VTS Tower Headquarters", floor: "Floor 5",  suite: "0500", sf: 43000, baseRent: 88.00,  annualRent: 3784000, lcd: "12/01/2026", lxd: "11/30/2036", term: 120, remaining: 123, status: "Pending",       type: "Direct",   options: [] },
+  { id: "l16", tenant: "KPMG",                      asset: "VTS Tower Headquarters", floor: "Floor 34", suite: "3400", sf: 117000, baseRent: 92.00, annualRent: 10764000, lcd: "01/31/2017", lxd: "01/31/2027", term: 120, remaining: 5, status: "Active",        type: "Direct",   options: ["Renewal Option"] },
+  { id: "l17", tenant: "Ernst & Young",             asset: "VTS Tower Headquarters", floor: "Floor 22", suite: "2200", sf: 80100,  baseRent: 94.00, annualRent: 7529400, lcd: "03/01/2017", lxd: "03/01/2027", term: 120, remaining: 7, status: "Active",        type: "Direct",   options: ["Contraction Option"] },
+  { id: "l18", tenant: "HSBC Holdings",             asset: "VTS Tower Headquarters", floor: "Floor 9",  suite: "0900", sf: 69300,  baseRent: 85.00, annualRent: 5890500, lcd: "04/15/2017", lxd: "04/15/2030", term: 156, remaining: 44, status: "Active",       type: "Direct",   options: ["ROFO"] },
+  { id: "l19", tenant: "Latham & Watkins",          asset: "VTS Tower Headquarters", floor: "Floors 14-15", suite: "1400-1500", sf: 119000, baseRent: 98.00, annualRent: 11662000, lcd: "05/01/2017", lxd: "05/01/2027", term: 120, remaining: 8, status: "Active", type: "Direct", options: ["Renewal Option"] },
+  { id: "l20", tenant: "JPMorgan Chase",            asset: "VTS Tower Headquarters", floor: "Floor 6",  suite: "0600", sf: 55800,  baseRent: 82.00, annualRent: 4575600, lcd: "06/30/2017", lxd: "06/30/2030", term: 156, remaining: 46, status: "Active",       type: "Direct",   options: ["Expansion Option"] },
+  { id: "l21", tenant: "Skadden Arps",              asset: "VTS Tower Headquarters", floor: "Floor 18", suite: "1800", sf: 91200,  baseRent: 96.00, annualRent: 8755200, lcd: "10/01/2021", lxd: "09/30/2031", term: 120, remaining: 61, status: "Active",       type: "Direct",   options: [] },
+  { id: "l22", tenant: "Citigroup",                 asset: "VTS Tower Headquarters", floor: "Floors 20-22", suite: "2000-2200", sf: 134000, baseRent: 91.00, annualRent: 12194000, lcd: "03/31/2018", lxd: "03/31/2028", term: 120, remaining: 19, status: "Active", type: "Direct", options: ["Renewal Option"] },
+  { id: "l23", tenant: "McKinsey & Co.",            asset: "VTS Tower Headquarters", floor: "Floor 29", suite: "2900", sf: 48600,  baseRent: 99.00, annualRent: 4811400, lcd: "11/15/2021", lxd: "11/15/2031", term: 120, remaining: 63, status: "Active",       type: "Direct",   options: [] },
+  { id: "l24", tenant: "Blackrock",                 asset: "VTS Tower Headquarters", floor: "Floor 30", suite: "3000", sf: 52000,  baseRent: 97.00, annualRent: 5044000, lcd: "01/01/2022", lxd: "12/31/2031", term: 120, remaining: 65, status: "Active",       type: "Direct",   options: ["Renewal Option"] },
+  { id: "l25", tenant: "Verizon Media",             asset: "VTS Tower Headquarters", floor: "Floor 25", suite: "2500", sf: 44000,  baseRent: 88.00, annualRent: 3872000, lcd: "06/01/2019", lxd: "05/31/2027", term: 96, remaining: 9, status: "Active",         type: "Direct",   options: [] },
+  // ── Other assets ────────────────────────────────────────────────────────────
+  { id: "l26", tenant: "Goldman Sachs",             asset: "One Financial Plaza",    floor: "Floor 11", suite: "1100", sf: 28000,  baseRent: 90.00, annualRent: 2520000, lcd: "03/01/2021", lxd: "02/28/2031", term: 120, remaining: 54, status: "Active",       type: "Direct",   options: ["ROFO"] },
+  { id: "l27", tenant: "Uber Technologies",         asset: "Salesforce Tower",       floor: "Floor 18", suite: "1800A", sf: 28000, baseRent: 98.00, annualRent: 2744000, lcd: "09/01/2022", lxd: "08/31/2027", term: 60,  remaining: 12, status: "Expiring soon", type: "Direct",  options: [] },
 ]
 
 // ── Helpers ───────────────────────────────────────────────────────────────────

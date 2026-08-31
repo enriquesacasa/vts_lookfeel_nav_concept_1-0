@@ -9,6 +9,7 @@ import {
   AlertTriangle,
 } from "lucide-react"
 import { AgentBtn } from "@/components/agent-btn"
+import { TenantAvatar } from "@/components/tenant-avatar"
 import {
   Table, TableHeader, TableBody, TableRow, TableCell, TableHead,
   SortableHead, useSortState,
@@ -249,7 +250,7 @@ const BASE_FILTER_DEFS = [
 
 // ── Main page ─────────────────────────────────────────────────────────────────
 
-export function OptionsRightsPage({ assets }: { assets?: AssetRef[] }) {
+export function OptionsRightsPage({ assets, onRowClick }: { assets?: AssetRef[]; onRowClick?: (tenant: string) => void }) {
   const isMultiAsset = (assets?.length ?? 0) > 1
   const { sortKey, sortDir, handleSort: _handleSort } = useSortState<SortKey>("tenant")
   const [page, setPage]   = React.useState(1)
@@ -367,8 +368,9 @@ export function OptionsRightsPage({ assets }: { assets?: AssetRef[] }) {
               </TableRow>
             )}
             {paginated.map((r, i) => (
-              <TableRow key={r.id} className={cn(
-                "hover:bg-muted/40 transition-colors",
+              <TableRow key={r.id} onClick={() => onRowClick?.(r.tenant)} className={cn(
+                "transition-colors",
+                onRowClick ? "cursor-pointer hover:bg-muted/60" : "hover:bg-muted/40",
                 i > 0 ? "border-t border-border/40" : "border-0",
               )}>
                 {orderedCols.map(col => {
@@ -376,7 +378,7 @@ export function OptionsRightsPage({ assets }: { assets?: AssetRef[] }) {
                     case "asset":
                       return <TableCell key="asset" className="py-2.5 text-sm font-medium text-foreground whitespace-nowrap">{r.asset}</TableCell>
                     case "tenant":
-                      return <TableCell key="tenant" className="py-2.5 text-sm font-medium text-foreground whitespace-nowrap">{r.tenant}</TableCell>
+                      return <TableCell key="tenant" className="py-2.5 whitespace-nowrap"><div className="flex items-center gap-2.5"><TenantAvatar name={r.tenant} /><span className="text-sm font-medium text-foreground">{r.tenant}</span></div></TableCell>
                     case "floor":
                       return <TableCell key="floor" className="py-2.5 text-sm text-foreground whitespace-nowrap">{r.floor}</TableCell>
                     case "suite":

@@ -23,7 +23,8 @@ import { StackingPlan, type StackingPlanSpaceRef } from "@/components/stacking-p
 import { SpacesPage, type Space as SpacesPageSpace } from "@/components/spaces-page"
 import { SpaceDetailPage, SpaceStatusBadge, type SpaceRef, type SpaceStatus } from "@/components/space-detail-page"
 import { PageBreadcrumb } from "@/components/page-breadcrumb"
-import { LeasesPage } from "@/components/leases-page"
+import { LeasesPage, LEASES, type Lease } from "@/components/leases-page"
+import { LeaseDetailPage, LeaseStatusBadge, type LeaseStatus } from "@/components/lease-detail-page"
 import { EmailFlow } from "@/components/email-flow"
 import { AskVTSPage } from "@/components/ask-vts"
 import { DocumentAgentPage } from "@/components/document-agent-page"
@@ -37,6 +38,22 @@ import { ChatPatternProvider } from "@/contexts/chat-pattern"
 import { ChatSideOver } from "@/components/chat-side-over"
 import { ChatSidePush, SIDE_PUSH_WIDTH } from "@/components/chat-side-push"
 import { useChatPattern } from "@/contexts/chat-pattern"
+
+// Maps stacking-plan display names → standardized LEASES tenant names
+const TENANT_ALIAS: Record<string, string> = {
+  "Blackstone Group":         "Blackstone Inc.",
+  "Vantage Point Capital":    "Vantage Point Capital LP",
+  "Amazon MGM Studios":       "Amazon.com Inc.",
+  "Sullivan & Cromwell":      "Sullivan & Cromwell LLP",
+  "Pacific Wealth Mngt.":     "Pacific Wealth Management LLC",
+  "Meridian Health Partners": "Meridian Health Partners Inc.",
+  "Carlyle & Associates":     "The Carlyle Group Inc.",
+  "CVS Health":               "CVS Health Corporation",
+}
+function findLease(tenant: string) {
+  const key = TENANT_ALIAS[tenant] ?? tenant
+  return LEASES.find(x => x.tenant === key)
+}
 
 function AgentsViewAwareNav(props: React.ComponentProps<typeof AppNav>) {
   const { agentsView } = useChatPattern()
@@ -249,6 +266,7 @@ export default function App() {
     return { page, asset, dealId: params.get("deal"), agentId: params.get("agent") }
   }
 
+  const programmaticNav = React.useRef(false)
   const [selectedAssetId, setSelectedAssetId] = React.useState(() => parseHash().asset)
   const [currentPage, setCurrentPage] = React.useState(() => parseHash().page)
   const [defaultAgentId, setDefaultAgentId] = React.useState(() => parseHash().agentId ?? undefined)
@@ -264,6 +282,8 @@ export default function App() {
   const [pipelineToast, setPipelineToast] = React.useState(() => parseHash().dealId === "d00")
   const [selectedSpace, setSelectedSpace] = React.useState<SpaceRef | null>(null)
   const [selectedSpaceStatus, setSelectedSpaceStatus] = React.useState<SpaceStatus>("Available")
+  const [selectedLease, setSelectedLease] = React.useState<Lease | null>(null)
+  const [selectedLeaseStatus, setSelectedLeaseStatus] = React.useState<LeaseStatus>("Active")
   const [askVtsKey, setAskVtsKey] = React.useState(0)
   const [isDark, setIsDark] = React.useState(() => document.documentElement.classList.contains("dark"))
 
@@ -273,7 +293,10 @@ export default function App() {
       ? `/${currentPage}`
       : `/${currentPage}/${selectedAssetId}`
     if (selectedDeal) base += `?deal=${selectedDeal.id}`
-    if (window.location.hash !== `#${base}`) window.location.hash = base
+    if (window.location.hash !== `#${base}`) {
+      programmaticNav.current = true
+      window.location.hash = base
+    }
   }, [currentPage, selectedAssetId, selectedDeal])
 
   React.useEffect(() => {
@@ -285,9 +308,11 @@ export default function App() {
 
   React.useEffect(() => {
     const onHashChange = () => {
+      if (programmaticNav.current) { programmaticNav.current = false; return }
       const { page, asset, dealId, agentId } = parseHash()
       setCurrentPage(page)
       if (page === "spaces") setSelectedSpace(null)
+      if (page === "leases") setSelectedLease(null)
       setSelectedAssetId(asset)
       setDefaultAgentId(agentId ?? undefined)
       if (dealId) {
@@ -583,10 +608,34 @@ export default function App() {
       )
     }
     if (page === "leases") {
+      if (selectedLease) {
+        const leaseHeader = {
+          ...pagedHeaderProps,
+          name: (
+            <span>
+              <span className="font-semibold">{headerProps.name}</span>{" "}
+              <span className="text-muted-foreground font-light whitespace-nowrap">| {selectedLease.tenant}</span>
+            </span>
+          ),
+          actions: (
+            <LeaseStatusBadge status={selectedLeaseStatus} onChange={setSelectedLeaseStatus} />
+          ),
+        }
+        return (
+          <div className="flex flex-col gap-4" style={{ minHeight: "calc(100vh - 2rem)" }}>
+            <BuildingHeader {...leaseHeader} onAskVts={goAskVts} />
+            <PageBreadcrumb crumbs={[
+              { label: "Leases", onClick: () => setSelectedLease(null) },
+              { label: selectedLease.tenant },
+            ]} />
+            <LeaseDetailPage lease={selectedLease} />
+          </div>
+        )
+      }
       return (
         <div className="space-y-4">
           <BuildingHeader {...pagedHeaderProps} onAskVts={goAskVts} />
-          <LeasesPage />
+          <LeasesPage onLeaseClick={l => { setSelectedLease(l); setSelectedLeaseStatus(l.status as LeaseStatus) }} />
         </div>
       )
     }
@@ -599,7 +648,7 @@ export default function App() {
       return (
         <div className="space-y-4">
           <BuildingHeader {...pagedHeaderProps} onAskVts={goAskVts} />
-          <CriticalDatesPage assets={cdAssets} />
+          <CriticalDatesPage assets={cdAssets} onRowClick={tenant => { const l = findLease(tenant); if (l) { setSelectedLease(l); setSelectedLeaseStatus(l.status as LeaseStatus); setCurrentPage("leases") } }} />
         </div>
       )
     }
@@ -612,7 +661,7 @@ export default function App() {
       return (
         <div className="space-y-4">
           <BuildingHeader {...pagedHeaderProps} onAskVts={goAskVts} />
-          <OptionsRightsPage assets={optionsAssets} />
+          <OptionsRightsPage assets={optionsAssets} onRowClick={tenant => { const l = findLease(tenant); if (l) { setSelectedLease(l); setSelectedLeaseStatus(l.status as LeaseStatus); setCurrentPage("leases") } }} />
         </div>
       )
     }
@@ -712,6 +761,7 @@ export default function App() {
         setCurrentPage={setCurrentPage}
         setSelectedDeal={setSelectedDeal}
         onSpacesNav={() => setSelectedSpace(null)}
+        onLeasesNav={() => setSelectedLease(null)}
         setAskVtsKey={setAskVtsKey}
         isDark={isDark}
         toggleDark={toggleDark}
@@ -730,13 +780,14 @@ interface AppShellProps {
   setCurrentPage: (p: string) => void
   setSelectedDeal: (d: null) => void
   onSpacesNav: () => void
+  onLeasesNav: () => void
   setAskVtsKey: (fn: (k: number) => number) => void
   isDark: boolean
   toggleDark: () => void
   renderPage: (page: string) => React.ReactNode
 }
 
-function AppShell({ navCollapsed, setNavCollapsed, selectedAssetId, setSelectedAssetId, currentPage, setCurrentPage, setSelectedDeal, onSpacesNav, setAskVtsKey, isDark, toggleDark, renderPage }: AppShellProps) {
+function AppShell({ navCollapsed, setNavCollapsed, selectedAssetId, setSelectedAssetId, currentPage, setCurrentPage, setSelectedDeal, onSpacesNav, onLeasesNav, setAskVtsKey, isDark, toggleDark, renderPage }: AppShellProps) {
   const { closeSideOver, closeSidePush, sidePushOpen } = useChatPattern()
   React.useEffect(() => {
     closeSideOver()
@@ -755,6 +806,7 @@ function AppShell({ navCollapsed, setNavCollapsed, selectedAssetId, setSelectedA
     setCurrentPage(id)
     setSelectedDeal(null)
     if (id === "spaces") onSpacesNav()
+    if (id === "leases") onLeasesNav()
     if (id === "ask-vts") setAskVtsKey(k => k + 1)
   }
   return (
