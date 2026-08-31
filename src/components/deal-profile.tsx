@@ -1516,7 +1516,7 @@ export function DealProfile({ deal, onBack: _onBack, status: statusProp, onStatu
                   { value: "leases", label: "Legal" },
                   { value: "documents", label: "Docs" },
                 ].map(({ value, label, badge, badgeCls }) => (
-                  <TabsTrigger key={value} value={value} className="rounded-none !bg-transparent border-b-2 border-transparent data-active:border-primary data-active:!text-primary data-active:font-medium hover:!bg-transparent hover:text-foreground !shadow-none px-4 pb-2.5 pt-0 text-base flex-none -mb-px">
+                  <TabsTrigger key={value} value={value} className="rounded-none !bg-transparent border-b-2 border-transparent data-active:border-primary data-active:!text-primary data-active:font-medium hover:!bg-transparent hover:text-foreground !shadow-none px-4 pb-2.5 pt-0 text-sm flex-none -mb-px">
                     {label}
                     {badge ? <span className={cn("ml-1 inline-flex items-center justify-center min-w-4 h-4 px-1 rounded-full text-[10px] font-bold", badgeCls ?? "bg-destructive text-primary-foreground")}>{badge}</span> : null}
                   </TabsTrigger>
