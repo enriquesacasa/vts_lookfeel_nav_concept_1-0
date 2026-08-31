@@ -1475,10 +1475,12 @@ export function AgentsPage({ className, defaultAgentId }: { className?: string; 
             Agents
           </Button>
         )}
-        <TabsList variant="line" className={cn("border-b border-border rounded-none bg-transparent p-0 h-auto gap-0 justify-start", mobileShowDetail && "hidden md:flex")}>
-          <TabsTrigger value="catalog"  onClick={() => setTab("catalog")}  data-active={tab === "catalog"  || undefined} className="rounded-none !bg-transparent border-b-2 border-transparent data-active:border-primary data-active:!text-primary data-active:font-medium hover:!bg-transparent hover:text-foreground !shadow-none px-4 pb-2.5 pt-0 text-sm flex-none -mb-px">Agents</TabsTrigger>
-          <TabsTrigger value="activity" onClick={() => setTab("activity")} data-active={tab === "activity" || undefined} className="rounded-none !bg-transparent border-b-2 border-transparent data-active:border-primary data-active:!text-primary data-active:font-medium hover:!bg-transparent hover:text-foreground !shadow-none px-4 pb-2.5 pt-0 text-sm flex-none -mb-px">Activity</TabsTrigger>
-        </TabsList>
+        <Tabs value={tab} onValueChange={v => setTab(v as typeof tab)} className={cn("w-full", mobileShowDetail && "hidden md:flex")}>
+          <TabsList variant="line" className="border-b border-border rounded-none bg-transparent p-0 h-auto gap-0 justify-start w-full">
+            <TabsTrigger value="catalog"  className="rounded-none !bg-transparent border-b-2 border-transparent data-active:border-primary data-active:!text-primary data-active:font-medium hover:!bg-transparent hover:text-foreground !shadow-none px-4 pb-2.5 pt-0 text-sm flex-none -mb-px">Agents</TabsTrigger>
+            <TabsTrigger value="activity" className="rounded-none !bg-transparent border-b-2 border-transparent data-active:border-primary data-active:!text-primary data-active:font-medium hover:!bg-transparent hover:text-foreground !shadow-none px-4 pb-2.5 pt-0 text-sm flex-none -mb-px">Activity</TabsTrigger>
+          </TabsList>
+        </Tabs>
       </div>
 
       {tab === "activity" && <FullActivityTab />}

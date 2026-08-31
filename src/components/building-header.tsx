@@ -9,8 +9,8 @@ import { ChatPopoverContent } from "@/components/chat-popover"
 interface BuildingHeaderProps {
   image?: string | React.ReactNode
   name: React.ReactNode
-  address: string
-  city: string
+  address?: string
+  city?: string
   badges?: React.ReactNode
   actions?: React.ReactNode
   className?: string
@@ -47,7 +47,7 @@ function BuildingHeader({ image, name, address, city, badges, actions, className
               </div>
             : <>{image}</>
         )}
-        <div className="flex-1 flex flex-col justify-between">
+        <div className={cn("flex-1 flex flex-col", (city || address) ? "justify-between" : "justify-center")}>
           {city && (
             <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
               {city}

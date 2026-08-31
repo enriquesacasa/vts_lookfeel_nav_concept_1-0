@@ -1,5 +1,5 @@
 import * as React from "react"
-import { } from "lucide-react"
+import { Wand } from "lucide-react"
 import { AgentBtn } from "@/components/agent-btn"
 import { AppNav } from "@/components/app-nav"
 import { BuildingHeader } from "@/components/building-header"
@@ -428,9 +428,20 @@ export default function App() {
       : headerProps
 
     if (page === "ai") {
+      const agentsHeaderProps = {
+        ...headerProps,
+        image: (
+          <div className="shrink-0 w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-xl bg-primary/10 flex items-center justify-center self-center">
+            <Wand className="h-7 w-7 text-primary" />
+          </div>
+        ),
+        name: "VTS Agents",
+        address: undefined,
+        city: undefined,
+      }
       return (
         <div className="flex flex-col gap-4 h-[calc(100vh-2rem)]">
-          <BuildingHeader {...pagedHeaderProps} onAskVts={goAskVts} />
+          <BuildingHeader {...agentsHeaderProps} onAskVts={goAskVts} />
           <AgentsPage className="flex-1 min-h-0" defaultAgentId={defaultAgentId} />
         </div>
       )
