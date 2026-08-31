@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Wand } from "lucide-react"
+import { } from "lucide-react"
 import { AgentBtn } from "@/components/agent-btn"
 import { AppNav } from "@/components/app-nav"
 import { BuildingHeader } from "@/components/building-header"
@@ -65,7 +65,7 @@ function GlobalPlaceholderPage({ icon: Icon, title, description }: {
   description?: string
 }) {
   return (
-    <div className="flex flex-col items-center justify-center text-center px-4 rounded-2xl bg-card/70 backdrop-blur-md min-h-[calc(100vh-1rem)]">
+    <div className="flex flex-col items-center justify-center text-center px-4 rounded-2xl bg-card/70 backdrop-blur-md border border-border/70 min-h-[calc(100vh-1rem)]">
       <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-5">
         <Icon className="h-7 w-7 text-primary" strokeWidth={1.5} />
       </div>
@@ -345,24 +345,6 @@ export default function App() {
     if (page === "inquiry-email-forward") return <EmailFlow step="forward" />
     if (page === "inquiry-email-confirm") return <EmailFlow step="confirm" />
 
-    if (page === "ai") {
-      const aiImage = (
-        <div className="shrink-0 w-16 h-16 sm:w-24 sm:h-24 rounded-xl overflow-hidden bg-primary/10 flex items-center justify-center">
-          <Wand className="h-7 w-7 sm:h-10 sm:w-10 text-primary" />
-        </div>
-      )
-      return (
-        <div className="flex flex-col gap-4 h-[calc(100vh-2rem)]">
-          <BuildingHeader
-            image={aiImage}
-            city="Assist · Automate · Accelerate"
-            name={<span><span className="font-semibold">VTS Agents</span></span>}
-            address="Improve decisions, remove manual work, and move everything forward faster."
-          />
-          <AgentsPage className="flex-1 min-h-0" defaultAgentId={defaultAgentId} />
-        </div>
-      )
-    }
 
     const assetDetail = ASSET_DETAILS[selectedAssetId]
 
@@ -414,6 +396,15 @@ export default function App() {
         )}
       : headerProps
 
+    if (page === "ai") {
+      return (
+        <div className="flex flex-col gap-4 h-[calc(100vh-2rem)]">
+          <BuildingHeader {...pagedHeaderProps} onAskVts={goAskVts} />
+          <AgentsPage className="flex-1 min-h-0" defaultAgentId={defaultAgentId} />
+        </div>
+      )
+    }
+
     if (page === "deals") {
       const dealHeaderProps = selectedDeal ? {
         city: selectedDeal.asset,
@@ -464,7 +455,7 @@ export default function App() {
               return (
                 <div
                   key={asset.id}
-                  className="group cursor-pointer rounded-2xl overflow-hidden bg-white/70 dark:bg-white/8 backdrop-blur-md hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200"
+                  className="group cursor-pointer rounded-2xl overflow-hidden bg-white/70 dark:bg-white/8 backdrop-blur-md border border-border/70 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200"
                   onClick={() => { setSelectedAssetId(asset.id); setCurrentPage("dashboard") }}
                 >
                   <div className="relative h-44 overflow-hidden">
@@ -587,7 +578,7 @@ export default function App() {
       return (
         <div className="flex flex-col" style={{minHeight: 'calc(100vh - 2rem)'}}>
           <BuildingHeader {...pagedHeaderProps} onAskVts={goAskVts} />
-          <div className="flex flex-col items-center justify-center flex-1 text-center px-4 rounded-2xl bg-white/70 dark:bg-white/8 backdrop-blur-md mt-4">
+          <div className="flex flex-col items-center justify-center flex-1 text-center px-4 rounded-2xl bg-white/70 dark:bg-white/8 backdrop-blur-md border border-border/70 mt-4">
             <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center mb-5">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-primary opacity-60"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 21V9"/></svg>
             </div>

@@ -207,10 +207,11 @@
     body {
         @apply text-foreground;
         background:
-            radial-gradient(ellipse 160% 45% at 50% 0%, oklch(0.99 0.01 275) 0%, transparent 100%),
-            radial-gradient(ellipse 130% 130% at 0% 0%, oklch(0.97 0.02 270) 0%, transparent 70%),
-            radial-gradient(ellipse 90% 80% at 100% 10%, oklch(0.91 0.06 295) 0%, transparent 65%),
-            oklch(0.93 0.08 280);
+            radial-gradient(ellipse 80% 60% at 100% 0%, oklch(0.96 0.02 295) 0%, transparent 70%),
+            radial-gradient(ellipse 160% 45% at 50% 100%, oklch(0.94 0.02 275) 0%, transparent 100%),
+            radial-gradient(ellipse 130% 130% at 0% 100%, oklch(0.92 0.04 270) 0%, transparent 70%),
+            radial-gradient(ellipse 90% 80% at 100% 90%, oklch(0.88 0.10 295) 0%, transparent 65%),
+            oklch(1 0 0);
     }
     .dark body {
         background:

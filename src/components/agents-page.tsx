@@ -1408,7 +1408,7 @@ function FullActivityTab() {
   React.useEffect(() => { setPage(0) }, [activeFilters])
 
   return (
-    <div className="rounded-2xl bg-card/70 backdrop-blur-md p-5">
+    <div className="rounded-2xl bg-card/70 backdrop-blur-md border border-border/70 p-5">
       {/* Header */}
       <div className="mb-5">
         <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">Activity</p>
@@ -1494,7 +1494,7 @@ export function AgentsPage({ className, defaultAgentId }: { className?: string; 
 
           {/* ── Left: Agent list (hidden on mobile when detail is showing) ── */}
           <div className={cn(
-            "rounded-2xl bg-card/70 backdrop-blur-md p-4 flex flex-col gap-1 min-h-0 overflow-y-auto",
+            "rounded-2xl bg-card/70 backdrop-blur-md border border-border/70 p-4 flex flex-col gap-1 min-h-0 overflow-y-auto",
             mobileShowDetail ? "hidden md:flex" : "flex"
           )}>
             {AGENTS.map(agent => (
@@ -1509,7 +1509,7 @@ export function AgentsPage({ className, defaultAgentId }: { className?: string; 
 
           {/* ── Right: Agent detail (hidden on mobile when list is showing) ── */}
           <div className={cn(
-            "rounded-2xl bg-card/70 backdrop-blur-md p-5 overflow-y-auto min-h-0",
+            "rounded-2xl bg-card/70 backdrop-blur-md border border-border/70 p-5 overflow-y-auto min-h-0",
             mobileShowDetail ? "flex flex-col" : "hidden md:flex md:flex-col"
           )}>
             <AgentDetailPanel key={selectedAgent?.id} agent={selectedAgent!} />

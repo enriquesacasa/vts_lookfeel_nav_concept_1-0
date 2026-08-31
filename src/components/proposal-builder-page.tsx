@@ -284,7 +284,7 @@ export function ProposalBuilderPage({ className, isDark = false, onToggleDark }:
 
   return (
     <div className={cn("flex flex-col h-screen overflow-hidden gap-4 p-4", className)}>
-      <div className="flex flex-1 min-h-0 rounded-2xl overflow-hidden bg-background divide-x divide-border/40">
+      <div className="flex flex-1 min-h-0 rounded-2xl overflow-hidden bg-background border border-border/70 divide-x divide-border/40">
 
         {/* ── Left: AI chat ────────────────────────────────────────────────── */}
         <div className="w-[340px] shrink-0 flex flex-col overflow-hidden min-h-0 bg-card">

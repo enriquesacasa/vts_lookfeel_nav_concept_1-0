@@ -946,7 +946,7 @@ export function DocumentAgentPage({ className, isDark = false, onToggleDark }: {
       )}
 
       {/* Desktop + mobile panels */}
-      <div className="flex flex-1 min-h-0 rounded-2xl overflow-hidden bg-card/70 backdrop-blur-md divide-x divide-border/40">
+      <div className="flex flex-1 min-h-0 rounded-2xl overflow-hidden bg-card/70 backdrop-blur-md border border-border/70 divide-x divide-border/40">
 
       {/* ── 1: File rail (templates + recents) ── */}
       <div className={cn(

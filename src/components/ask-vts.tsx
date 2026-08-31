@@ -480,7 +480,7 @@ export function AskVTSPage({ className, newChatKey }: { className?: string; newC
 
         {/* Left: rail */}
         <div className={cn(
-          "rounded-2xl bg-card/70 backdrop-blur-md flex flex-col min-h-0 overflow-hidden",
+          "rounded-2xl bg-card/70 backdrop-blur-md border border-border/70 flex flex-col min-h-0 overflow-hidden",
           mobileShowChat ? "hidden md:flex" : "flex"
         )}>
           {railCollapsed ? (
@@ -586,7 +586,7 @@ export function AskVTSPage({ className, newChatKey }: { className?: string; newC
         {/* Right: agent detail or chat panel */}
         {selectedAgentId ? (
           <div className={cn(
-            "rounded-2xl backdrop-blur-md min-h-0 overflow-y-auto p-5 w-full",
+            "rounded-2xl backdrop-blur-md border border-border/70 min-h-0 overflow-y-auto p-5 w-full",
             "bg-card/70",
             mobileShowChat ? "block" : "hidden md:block"
           )}>
@@ -594,7 +594,7 @@ export function AskVTSPage({ className, newChatKey }: { className?: string; newC
           </div>
         ) : (
         <div className={cn(
-          "rounded-2xl backdrop-blur-md p-5 min-h-0 flex flex-col",
+          "rounded-2xl backdrop-blur-md border border-border/70 p-5 min-h-0 flex flex-col",
           "bg-card/70",
           mobileShowChat ? "flex" : "hidden md:flex"
         )}>

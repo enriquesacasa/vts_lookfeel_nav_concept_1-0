@@ -610,7 +610,7 @@ export const StackingPlan = forwardRef<StackingPlanHandle>(function StackingPlan
   })
 
   return (
-    <div className="flex flex-col flex-1 bg-card/70 dark:bg-card/80 backdrop-blur-md rounded-xl overflow-hidden mt-4 mb-6">
+    <div className="flex flex-col flex-1 bg-card/70 dark:bg-card/80 backdrop-blur-md border border-border/70 rounded-xl overflow-hidden mt-4 mb-6">
 
       {/* Filter bar */}
       <div className="px-3 py-3 border-b border-border">

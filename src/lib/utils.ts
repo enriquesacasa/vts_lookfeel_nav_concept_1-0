@@ -5,7 +5,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export const cardBase = "rounded-2xl bg-card/70 backdrop-blur-md p-5"
+export const cardBase = "rounded-2xl bg-card/70 backdrop-blur-md border border-border/70 p-5"
 
 export const sidebarBtn = "text-sidebar-foreground/85 border-current bg-transparent hover:bg-white/10"
 
