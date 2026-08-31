@@ -19,8 +19,11 @@ import type { Deal as DealsPageDeal } from "@/components/deals-page"
 import { DealProfile, TenantLogoImage, StatusBadge, type DealStatus } from "@/components/deal-profile"
 import { ThemeShowcase } from "@/components/theme-showcase"
 import { AgentPrinciples } from "@/components/agent-principles"
-import { StackingPlan } from "@/components/stacking-plan"
-import { SpacesPage } from "@/components/spaces-page"
+import { StackingPlan, type StackingPlanSpaceRef } from "@/components/stacking-plan"
+import { SpacesPage, type Space as SpacesPageSpace } from "@/components/spaces-page"
+import { SpaceDetailPage, SpaceStatusBadge, type SpaceRef, type SpaceStatus } from "@/components/space-detail-page"
+import { PageBreadcrumb } from "@/components/page-breadcrumb"
+import { LeasesPage } from "@/components/leases-page"
 import { EmailFlow } from "@/components/email-flow"
 import { AskVTSPage } from "@/components/ask-vts"
 import { DocumentAgentPage } from "@/components/document-agent-page"
@@ -259,6 +262,8 @@ export default function App() {
     if (selectedDeal) setSelectedDealStatus(selectedDeal.status as DealStatus)
   }, [selectedDeal])
   const [pipelineToast, setPipelineToast] = React.useState(() => parseHash().dealId === "d00")
+  const [selectedSpace, setSelectedSpace] = React.useState<SpaceRef | null>(null)
+  const [selectedSpaceStatus, setSelectedSpaceStatus] = React.useState<SpaceStatus>("Available")
   const [askVtsKey, setAskVtsKey] = React.useState(0)
   const [isDark, setIsDark] = React.useState(() => document.documentElement.classList.contains("dark"))
 
@@ -282,6 +287,7 @@ export default function App() {
     const onHashChange = () => {
       const { page, asset, dealId, agentId } = parseHash()
       setCurrentPage(page)
+      if (page === "spaces") setSelectedSpace(null)
       setSelectedAssetId(asset)
       setDefaultAgentId(agentId ?? undefined)
       if (dealId) {
@@ -426,6 +432,12 @@ export default function App() {
             </div>
           )}
           <BuildingHeader {...dealHeaderProps} />
+          {selectedDeal && (
+            <PageBreadcrumb crumbs={[
+              { label: "Deals", onClick: () => { setSelectedDeal(null); setSelectedDealInitialTab(undefined) } },
+              { label: selectedDeal.tenant },
+            ]} />
+          )}
           {selectedDeal
             ? <DealProfile deal={selectedDeal} onBack={() => { setSelectedDeal(null); setSelectedDealInitialTab(undefined) }} status={selectedDealStatus} onStatusChange={setSelectedDealStatus} initialTab={selectedDealInitialTab} />
             : <DealsPage onDealClick={deal => setSelectedDeal(deal)} />
@@ -517,10 +529,41 @@ export default function App() {
         : selectedPortfolio
           ? ASSETS.filter(a => selectedPortfolio.assetIds.includes(a.id))
           : selectedAsset ? [selectedAsset] : ASSETS
+
+      const handleSpacesPageClick = (s: SpacesPageSpace) => {
+        setSelectedSpace({ suite: s.space, floor: s.floor, sf: s.sf, status: s.status, rent: s.askingRent ?? undefined, condition: s.condition, assetName: selectedAsset?.name })
+        setSelectedSpaceStatus((s.status as SpaceStatus) ?? "Available")
+      }
+
+      if (selectedSpace) {
+        const spaceHeader = {
+          ...pagedHeaderProps,
+          name: (
+            <span>
+              <span className="font-semibold">{headerProps.name}</span>{" "}
+              <span className="text-muted-foreground font-light whitespace-nowrap">| {selectedSpace.suite}</span>
+            </span>
+          ),
+          actions: (
+            <SpaceStatusBadge status={selectedSpaceStatus} onChange={setSelectedSpaceStatus} />
+          ),
+        }
+        return (
+          <div className="flex flex-col gap-4" style={{ minHeight: "calc(100vh - 2rem)" }}>
+            <BuildingHeader {...spaceHeader} onAskVts={goAskVts} />
+            <PageBreadcrumb crumbs={[
+              { label: "Spaces", onClick: () => setSelectedSpace(null) },
+              { label: selectedSpace.suite },
+            ]} />
+            <SpaceDetailPage space={selectedSpace} onBack={() => setSelectedSpace(null)} />
+          </div>
+        )
+      }
+
       return (
         <div className="space-y-4">
           <BuildingHeader {...pagedHeaderProps} onAskVts={goAskVts} />
-          <SpacesPage assets={spacesAssets} />
+          <SpacesPage assets={spacesAssets} onSpaceClick={handleSpacesPageClick} />
         </div>
       )
     }
@@ -536,6 +579,14 @@ export default function App() {
               setCurrentPage("deals")
             }
           }} />
+        </div>
+      )
+    }
+    if (page === "leases") {
+      return (
+        <div className="space-y-4">
+          <BuildingHeader {...pagedHeaderProps} onAskVts={goAskVts} />
+          <LeasesPage />
         </div>
       )
     }
@@ -566,10 +617,16 @@ export default function App() {
       )
     }
     if (page === "stacking") {
+      const handleStackingSpaceClick = (s: StackingPlanSpaceRef) => {
+        setSelectedSpace({ suite: s.suite, floor: `Floor ${s.floor}`, sf: s.sf, status: s.status, tenant: s.tenant, rent: s.rent, expiry: s.expiry, assetName: selectedAsset?.name })
+        setSelectedSpaceStatus((s.status as SpaceStatus) ?? "Available")
+        setCurrentPage("spaces")
+      }
+
       return (
         <div className="flex flex-col" style={{ minHeight: "calc(100vh - 2rem)" }}>
           <BuildingHeader {...pagedHeaderProps} onAskVts={goAskVts} />
-          <StackingPlan />
+          <StackingPlan onSpaceClick={handleStackingSpaceClick} />
         </div>
       )
     }
@@ -654,6 +711,7 @@ export default function App() {
         currentPage={currentPage}
         setCurrentPage={setCurrentPage}
         setSelectedDeal={setSelectedDeal}
+        onSpacesNav={() => setSelectedSpace(null)}
         setAskVtsKey={setAskVtsKey}
         isDark={isDark}
         toggleDark={toggleDark}
@@ -671,13 +729,14 @@ interface AppShellProps {
   currentPage: string
   setCurrentPage: (p: string) => void
   setSelectedDeal: (d: null) => void
+  onSpacesNav: () => void
   setAskVtsKey: (fn: (k: number) => number) => void
   isDark: boolean
   toggleDark: () => void
   renderPage: (page: string) => React.ReactNode
 }
 
-function AppShell({ navCollapsed, setNavCollapsed, selectedAssetId, setSelectedAssetId, currentPage, setCurrentPage, setSelectedDeal, setAskVtsKey, isDark, toggleDark, renderPage }: AppShellProps) {
+function AppShell({ navCollapsed, setNavCollapsed, selectedAssetId, setSelectedAssetId, currentPage, setCurrentPage, setSelectedDeal, onSpacesNav, setAskVtsKey, isDark, toggleDark, renderPage }: AppShellProps) {
   const { closeSideOver, closeSidePush, sidePushOpen } = useChatPattern()
   React.useEffect(() => {
     closeSideOver()
@@ -695,6 +754,7 @@ function AppShell({ navCollapsed, setNavCollapsed, selectedAssetId, setSelectedA
   const handleNavItemClick = (id: string) => {
     setCurrentPage(id)
     setSelectedDeal(null)
+    if (id === "spaces") onSpacesNav()
     if (id === "ask-vts") setAskVtsKey(k => k + 1)
   }
   return (

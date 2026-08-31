@@ -525,9 +525,10 @@ export type StackingPlanCommand =
   | { type: "setViewType"; viewType: ViewType }
 
 export type StackingPlanHandle = { applyCommand: (cmd: StackingPlanCommand) => void }
+export interface StackingPlanSpaceRef { suite: string; floor: string; sf: number; status: string; tenant?: string; rent?: number; expiry?: string }
 
 // --- Main Component ---
-export const StackingPlan = forwardRef<StackingPlanHandle>(function StackingPlan(_, ref) {
+export const StackingPlan = forwardRef<StackingPlanHandle, { onSpaceClick?: (s: StackingPlanSpaceRef) => void }>(function StackingPlan({ onSpaceClick }, ref) {
   const [activeFilters, setActiveFilters] = useState<Record<string, string[]>>({})
   const [viewType, setViewType] = useState<ViewType>("Standard")
   const [enabledOptions, setEnabledOptions] = useState<Set<string>>(new Set(DEFAULT_VIEW_OPTIONS))
@@ -734,7 +735,8 @@ export const StackingPlan = forwardRef<StackingPlanHandle>(function StackingPlan
                   const spaceLabel = buildSpaceLabel(space, floor.number)
                   return (
                     <div key={space.suite}
-                      className="group/space relative flex flex-col justify-between border-r border-foreground/10 dark:border-foreground/5 last:border-r-0 cursor-default transition-all overflow-hidden"
+                      className={cn("group/space relative flex flex-col justify-between border-r border-foreground/10 dark:border-foreground/5 last:border-r-0 transition-all overflow-hidden", onSpaceClick ? "cursor-pointer" : "cursor-default")}
+                      onClick={onSpaceClick ? () => onSpaceClick({ suite: space.suite, floor: String(floor.number), sf: space.sf, status: space.tenant ? "Occupied" : "Vacant", tenant: space.tenant || undefined, rent: space.baseRent || undefined, expiry: space.lxd || undefined }) : undefined}
                       style={{
                         width: `${widthPct}%`,
                         flexShrink: 0,
@@ -843,7 +845,7 @@ export const StackingPlan = forwardRef<StackingPlanHandle>(function StackingPlan
                             const totalCount = (hasRenewal ? 1 : 0) + encs.length
                             return (
                               <Popover onOpenChange={(open) => setActiveHighlight(open ? buildHighlight(space) : null)}>
-                                <PopoverTrigger className={cn("cursor-pointer flex items-center gap-1 font-medium px-1.5 py-0.5 rounded whitespace-nowrap transition-all bg-primary hover:bg-primary/90 border border-primary text-primary-foreground", cfg.metaCls)}>
+                                <PopoverTrigger onClick={e => e.stopPropagation()} className={cn("cursor-pointer flex items-center gap-1 font-medium px-1.5 py-0.5 rounded whitespace-nowrap transition-all bg-primary hover:bg-primary/90 border border-primary text-primary-foreground", cfg.metaCls)}>
                                   <ConstructionIcon className="size-3 shrink-0 text-primary-foreground" />
                                   <span className="hidden sm:inline">{totalCount} {totalCount === 1 ? "Encumbrance" : "Encumbrances"}</span>
                                   <span className="sm:hidden">{totalCount}</span>

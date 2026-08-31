@@ -265,7 +265,7 @@ const BASE_FILTER_DEFS = [
 
 interface AssetRef { id: string; name: string }
 
-export function SpacesPage({ assets }: { assets?: AssetRef[] }) {
+export function SpacesPage({ assets, onSpaceClick }: { assets?: AssetRef[], onSpaceClick?: (s: Space) => void }) {
   const isMultiAsset = (assets?.length ?? 0) > 1
   const { sortKey, sortDir, handleSort: _handleSort } = useSortState<SortKey>("floor")
   const [page, setPage] = React.useState(1)
@@ -407,10 +407,11 @@ export function SpacesPage({ assets }: { assets?: AssetRef[] }) {
             )}
             {paginated.map((s, i) => (
               <TableRow key={s.id} className={cn(
-                "hover:bg-muted/40 transition-colors",
+                "transition-colors",
+                onSpaceClick ? "cursor-pointer hover:bg-muted/60" : "hover:bg-muted/40",
                 i > 0 ? "border-t border-border/40" : "border-0",
                 s.status === "Archived" && "opacity-60"
-              )}>
+              )} onClick={() => onSpaceClick?.(s)}>
                 {orderedCols.map(col => {
                   switch (col.id) {
                     case "asset":
