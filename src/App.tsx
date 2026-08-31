@@ -135,7 +135,7 @@ function HeaderPill({ label, items, onItemClick }: {
 function MultiImage({ assetIds }: { assetIds: string[] }) {
   const ids = assetIds.slice(0, 4)
   return (
-    <div className="shrink-0 w-16 h-16 sm:w-24 sm:h-24 grid grid-cols-2 gap-px rounded-xl overflow-hidden">
+    <div className="shrink-0 w-20 h-16 sm:w-32 sm:h-24 grid grid-cols-2 gap-px rounded-xl overflow-hidden">
       {ids.map(id => (
         <img key={id} src={ASSET_DETAILS[id]?.image} alt="" className="w-full h-full object-cover" />
       ))}
@@ -164,7 +164,7 @@ export const PORTFOLIOS = [
 ]
 
 export const ASSET_DETAILS: Record<string, { city: string; image: string }> = {
-  "vts-tower":     { city: "Built 2017 · 52 floors · Office",   image: "https://images.unsplash.com/photo-1612174139409-33cf406d3833?w=800&h=500&fit=crop&auto=format" },
+  "vts-tower":     { city: "Built 2017 · 52 floors · Office",   image: "https://images.unsplash.com/photo-1763121379548-2fae8be2ab7b?w=600&h=400&fit=crop&crop=top&auto=format" },
   "one-financial": { city: "Built 1992 · 36 floors · Office",   image: "https://images.unsplash.com/photo-1554435493-93422e8220c8?w=800&h=500&fit=crop&auto=format" },
   "empire-state":  { city: "Built 1931 · 102 floors · Office",  image: "https://images.unsplash.com/photo-1499092346589-b9b6be3e94b2?w=800&h=500&fit=crop&auto=format" },
   "salesforce":    { city: "Built 2018 · 61 floors · Office",   image: "https://images.unsplash.com/photo-1464938050520-ef2270bb8ce8?w=800&h=500&fit=crop&auto=format" },

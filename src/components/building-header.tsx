@@ -46,29 +46,31 @@ function BuildingHeader({ image, name, address, city, stats, badges, actions, cl
   return (
     <div className={cn(className)}>
       {/* Hero section */}
-      <div className="flex items-center gap-4 py-3">
+      <div className="flex items-stretch gap-4 py-3">
         {image && (
           typeof image === "string"
-            ? <div className="relative shrink-0 w-16 h-16 sm:w-24 sm:h-24 rounded-xl overflow-hidden">
+            ? <div className="relative shrink-0 w-16 h-16 sm:w-32 sm:h-24 rounded-xl overflow-hidden self-start">
                 <img src={image as string} alt="" className="w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/30" />
               </div>
             : <>{image}</>
         )}
-        <div className="flex-1">
+        <div className="flex-1 flex flex-col justify-between">
           {city && (
-            <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground mb-1">
+            <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
               {city}
             </p>
           )}
-          <div className="flex items-center gap-6 mb-1.5 flex-wrap">
+          <div className="flex items-center gap-6 flex-wrap">
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-medium text-foreground leading-tight">
               {name}
             </h1>
             {actions}
           </div>
-          <p className="text-sm text-foreground">{address}</p>
-          {badges && <div className="flex flex-wrap gap-1.5 mt-2">{badges}</div>}
+          <div>
+            <p className="text-sm text-foreground">{address}</p>
+            {badges && <div className="flex flex-wrap gap-1.5 mt-1">{badges}</div>}
+          </div>
         </div>
         <div className="flex items-center gap-2 shrink-0">
           {pattern === "popover" ? (

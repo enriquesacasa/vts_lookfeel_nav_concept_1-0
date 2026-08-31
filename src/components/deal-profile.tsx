@@ -5,18 +5,16 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
-import { FILTER_TAB_GROUP_CLS, FILTER_TAB_ITEM_CLS } from "@/components/filter-chip"
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import {
   ChevronDown, Check, FileText, Download, Send,
   Building2, User, MapPin, Ruler, Tag, Calendar,
   CheckCircle2, Clock, AlertTriangle, HeartPulse, Zap,
-  Bot, MoreHorizontal, LayoutGrid, Table2, ArrowUpDown,
+  Bot, LayoutGrid, Table2, ArrowUpDown,
   Briefcase, Globe, Mail, DollarSign, Layers, Target,
   Star, Home, SquareStack, Scale, Trophy, Plus,
 } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Checkbox } from "@/components/ui/checkbox"
 import { AGENT_ICON_MAP, AGENTS } from "@/components/agents-page"
 import { TENANT_LOGO, type Deal } from "@/components/deals-page"
@@ -836,19 +834,23 @@ function TasksTab({ stage, status, dealId }: { stage: StageValue; status: DealSt
     <TooltipProvider>
       <div className="flex flex-col gap-0">
         {/* Toolbar */}
-        <div className="flex items-center justify-between px-3 py-2.5 border-b border-border">
-          <label className="flex items-center gap-2 cursor-pointer select-none">
-            <Checkbox checked={showCompleted} onCheckedChange={v => setShowCompleted(!!v)} className="h-3.5 w-3.5" />
-            <span className="text-xs text-muted-foreground">Show completed</span>
-          </label>
-          <DropdownMenu>
-            <DropdownMenuTrigger render={<Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground" />}>
-              <MoreHorizontal className="h-3.5 w-3.5" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={reset}>Reset all tasks</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+        <div className="flex items-center gap-2 mb-3 flex-wrap">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowCompleted(v => !v)}
+            className={cn("gap-1 font-normal", showCompleted && "border-primary bg-primary/10 text-primary font-medium")}
+          >
+            Show completed
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={reset}
+            className="gap-1 font-normal ml-auto"
+          >
+            Reset all tasks
+          </Button>
         </div>
 
         <div className="flex flex-col gap-3 pt-3">
@@ -1503,28 +1505,31 @@ export function DealProfile({ deal, onBack: _onBack, status: statusProp, onStatu
         <div className="lg:col-span-3 flex flex-col gap-4 h-full">
 
           <div className={cn(cardBase, "flex-1")}>
-            <ToggleGroup type="single" value={tab} onValueChange={v => v && setTab(v as string)}
-              className={cn(FILTER_TAB_GROUP_CLS, "w-full mb-5")}>
-              <ToggleGroupItem value="updates"   size="sm" className={cn(FILTER_TAB_ITEM_CLS, "flex-1 text-sm")}>Updates</ToggleGroupItem>
-              <ToggleGroupItem value="tasks"        size="sm" className={cn(FILTER_TAB_ITEM_CLS, "flex-1 text-sm")}>Tasks</ToggleGroupItem>
-              <ToggleGroupItem value="encumbrances" size="sm" className={cn(FILTER_TAB_ITEM_CLS, "flex-1 text-sm")}>
-                Encumbrances
-                {(DEAL_ENCUMBRANCES[deal.id]?.length ?? 0) > 0 && (
-                  <span className="ml-0.5 inline-flex items-center justify-center min-w-4 h-4 px-1 rounded-full text-[10px] font-bold bg-destructive text-primary-foreground">{DEAL_ENCUMBRANCES[deal.id].length}</span>
-                )}
-              </ToggleGroupItem>
-              <ToggleGroupItem value="tours"        size="sm" className={cn(FILTER_TAB_ITEM_CLS, "flex-1 text-sm")}>Tours</ToggleGroupItem>
-              <ToggleGroupItem value="proposals"    size="sm" className={cn(FILTER_TAB_ITEM_CLS, "flex-1 text-sm")}>Proposals</ToggleGroupItem>
-              <ToggleGroupItem value="leases"       size="sm" className={cn(FILTER_TAB_ITEM_CLS, "flex-1 text-sm")}>Legal</ToggleGroupItem>
-              <ToggleGroupItem value="documents"    size="sm" className={cn(FILTER_TAB_ITEM_CLS, "flex-1 text-sm")}>Docs</ToggleGroupItem>
-            </ToggleGroup>
-            {tab === "updates"      && <ActivityFeed deal={deal} stage={stage} />}
-            {tab === "tasks"        && <TasksTab stage={stage} status={status} dealId={deal.id} />}
-            {tab === "tours"        && <p className="text-sm text-muted-foreground py-8 text-center">No tours scheduled.</p>}
-            {tab === "proposals"    && <ProposalsTab deal={deal} stageIdx={stageIdx} />}
-            {tab === "leases"       && <p className="text-sm text-muted-foreground py-8 text-center">No leases on file.</p>}
-            {tab === "encumbrances" && <EncumbrancesTab deal={deal} />}
-            {tab === "documents"    && <DocumentsTab stage={stage} />}
+            <Tabs value={tab} onValueChange={v => setTab(v)} className="w-full">
+              <TabsList variant="line" className="w-full mb-5 border-b border-border rounded-none bg-transparent p-0 h-auto gap-0 justify-start">
+                {[
+                  { value: "updates", label: "Updates" },
+                  { value: "tasks", label: "Tasks", badge: STAGE_TASKS[stage]?.filter(t => !t.done).length || undefined, badgeCls: "bg-primary/15 text-primary" },
+                  { value: "encumbrances", label: "Encumbrances", badge: DEAL_ENCUMBRANCES[deal.id]?.length, badgeCls: "bg-destructive text-primary-foreground" },
+                  { value: "tours", label: "Tours" },
+                  { value: "proposals", label: "Proposals" },
+                  { value: "leases", label: "Legal" },
+                  { value: "documents", label: "Docs" },
+                ].map(({ value, label, badge, badgeCls }) => (
+                  <TabsTrigger key={value} value={value} className="rounded-none !bg-transparent border-b-2 border-transparent data-active:border-primary data-active:!text-primary data-active:font-medium hover:!bg-transparent hover:text-foreground !shadow-none px-4 pb-2.5 pt-0 text-base flex-none -mb-px">
+                    {label}
+                    {badge ? <span className={cn("ml-1 inline-flex items-center justify-center min-w-4 h-4 px-1 rounded-full text-[10px] font-bold", badgeCls ?? "bg-destructive text-primary-foreground")}>{badge}</span> : null}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+              <TabsContent value="updates"><ActivityFeed deal={deal} stage={stage} /></TabsContent>
+              <TabsContent value="tasks"><TasksTab stage={stage} status={status} dealId={deal.id} /></TabsContent>
+              <TabsContent value="encumbrances"><EncumbrancesTab deal={deal} /></TabsContent>
+              <TabsContent value="tours"><p className="text-sm text-muted-foreground py-8 text-center">No tours scheduled.</p></TabsContent>
+              <TabsContent value="proposals"><ProposalsTab deal={deal} stageIdx={stageIdx} /></TabsContent>
+              <TabsContent value="leases"><p className="text-sm text-muted-foreground py-8 text-center">No leases on file.</p></TabsContent>
+              <TabsContent value="documents"><DocumentsTab stage={stage} /></TabsContent>
+            </Tabs>
           </div>
         </div>
 
