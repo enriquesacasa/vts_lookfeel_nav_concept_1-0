@@ -12,27 +12,27 @@ import { AgentBtn } from "@/components/agent-btn"
 // vacant/available use theme-aware values; year buckets are fixed semantic colors
 export const COLORS: Record<string, { bg: string; text: string; dashed?: boolean; darkBg?: string }> = {
   vacant:    { bg: "oklch(0.26 0.006 258)", text: "oklch(0.72 0.018 278)" },
-  m2m:       { bg: "var(--color-destructive)", text: "#fff" },
-  "2026":    { bg: "var(--color-chart-1)",     text: "#fff" },
-  "2027":    { bg: "var(--color-chart-2)",     text: "#fff" },
-  "2028":    { bg: "var(--color-chart-3)",     text: "#fff" },
-  "2029":    { bg: "var(--color-chart-4)",     text: "#fff" },
-  "2030":    { bg: "var(--color-chart-5)",     text: "#fff" },
+  m2m:       { bg: "oklch(0.55 0.10 15)",  text: "#fff" }, // red — most urgent
+  "2026":    { bg: "oklch(0.57 0.10 45)",  text: "#fff" }, // orange
+  "2027":    { bg: "oklch(0.57 0.10 75)",  text: "#fff" }, // amber
+  "2028":    { bg: "oklch(0.57 0.10 140)", text: "#fff" }, // yellow-green
+  "2029":    { bg: "oklch(0.57 0.10 185)", text: "#fff" }, // teal
+  "2030":    { bg: "oklch(0.55 0.10 250)", text: "#fff" }, // blue — safest
   available: { bg: "transparent", text: "oklch(0.60 0.02 258)", dashed: true },
 }
 
 // Perceptually distinct colors — spread across hue wheel, consistent chroma/lightness
 const TENANT_PALETTE: { bg: string; text: string }[] = [
-  { bg: "oklch(0.52 0.20 250)",  text: "#fff" }, // blue
-  { bg: "oklch(0.54 0.18 145)",  text: "#fff" }, // green
-  { bg: "oklch(0.54 0.22 30)",   text: "#fff" }, // orange
-  { bg: "oklch(0.52 0.20 310)",  text: "#fff" }, // purple
-  { bg: "oklch(0.54 0.18 195)",  text: "#fff" }, // teal
-  { bg: "oklch(0.54 0.22 65)",   text: "#fff" }, // amber
-  { bg: "oklch(0.52 0.20 0)",    text: "#fff" }, // red
-  { bg: "oklch(0.54 0.18 270)",  text: "#fff" }, // indigo
-  { bg: "oklch(0.54 0.18 165)",  text: "#fff" }, // cyan-green
-  { bg: "oklch(0.52 0.20 340)",  text: "#fff" }, // pink
+  { bg: "oklch(0.55 0.10 250)",  text: "#fff" }, // blue
+  { bg: "oklch(0.57 0.09 145)",  text: "#fff" }, // green
+  { bg: "oklch(0.57 0.11 30)",   text: "#fff" }, // orange
+  { bg: "oklch(0.55 0.10 310)",  text: "#fff" }, // purple
+  { bg: "oklch(0.57 0.09 195)",  text: "#fff" }, // teal
+  { bg: "oklch(0.57 0.11 65)",   text: "#fff" }, // amber
+  { bg: "oklch(0.55 0.10 0)",    text: "#fff" }, // red
+  { bg: "oklch(0.57 0.09 270)",  text: "#fff" }, // indigo
+  { bg: "oklch(0.57 0.09 165)",  text: "#fff" }, // cyan-green
+  { bg: "oklch(0.55 0.10 340)",  text: "#fff" }, // pink
 ]
 
 function getTenantColor(tenant: string, allTenants: string[]): { bg: string; text: string } {
