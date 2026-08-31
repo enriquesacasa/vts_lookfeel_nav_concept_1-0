@@ -9,8 +9,8 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
-import { FilterBar, toggleFilterValue, clearFilterKey, type FilterDef, FILTER_TAB_GROUP_CLS, FILTER_TAB_ITEM_CLS } from "@/components/filter-chip"
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
+import { FilterBar, toggleFilterValue, clearFilterKey, type FilterDef } from "@/components/filter-chip"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -1343,21 +1343,16 @@ export function AgentDetailPanel({ agent }: { agent: AgentDef }) {
         </div>
       )}
 
-      {/* Tabs */}
-      <ToggleGroup
-        type="single"
-        value={tab}
-        onValueChange={v => v && setTab(v as string)}
-        className={cn(FILTER_TAB_GROUP_CLS, "w-full mb-5")}
-      >
-        <ToggleGroupItem value="about"    size="sm" className={cn(FILTER_TAB_ITEM_CLS, "flex-1 text-sm")}>About</ToggleGroupItem>
-        <ToggleGroupItem value="activity" size="sm" className={cn(FILTER_TAB_ITEM_CLS, "flex-1 text-sm")}>Activity</ToggleGroupItem>
-      </ToggleGroup>
-
-      <div className="flex-1 overflow-y-auto">
-        {tab === "activity" && <ActivityDetailTab agentId={agent.id} />}
-        {tab === "about"    && <AboutTab agent={agent} />}
-      </div>
+      <Tabs value={tab} onValueChange={setTab} className="w-full flex flex-col flex-1 min-h-0">
+        <TabsList variant="line" className="w-full mb-5 border-b border-border rounded-none bg-transparent p-0 h-auto gap-0 justify-start shrink-0">
+          <TabsTrigger value="about"    className="rounded-none !bg-transparent border-b-2 border-transparent data-active:border-primary data-active:!text-primary data-active:font-medium hover:!bg-transparent hover:text-foreground !shadow-none px-4 pb-2.5 pt-0 text-sm flex-none -mb-px">About</TabsTrigger>
+          <TabsTrigger value="activity" className="rounded-none !bg-transparent border-b-2 border-transparent data-active:border-primary data-active:!text-primary data-active:font-medium hover:!bg-transparent hover:text-foreground !shadow-none px-4 pb-2.5 pt-0 text-sm flex-none -mb-px">Activity</TabsTrigger>
+        </TabsList>
+        <div className="flex-1 overflow-y-auto">
+          <TabsContent value="about"    className="mt-0"><AboutTab agent={agent} /></TabsContent>
+          <TabsContent value="activity" className="mt-0"><ActivityDetailTab agentId={agent.id} /></TabsContent>
+        </div>
+      </Tabs>
     </div>
   )
 }
@@ -1480,11 +1475,10 @@ export function AgentsPage({ className, defaultAgentId }: { className?: string; 
             Agents
           </Button>
         )}
-        <ToggleGroup type="single" value={tab} onValueChange={v => v && setTab(v as string)}
-          className={cn(FILTER_TAB_GROUP_CLS, mobileShowDetail && "hidden md:flex")}>
-          <ToggleGroupItem value="catalog"  size="sm" className={cn(FILTER_TAB_ITEM_CLS, "text-sm")}>Agents</ToggleGroupItem>
-          <ToggleGroupItem value="activity" size="sm" className={cn(FILTER_TAB_ITEM_CLS, "text-sm")}>Activity</ToggleGroupItem>
-        </ToggleGroup>
+        <TabsList variant="line" className={cn("border-b border-border rounded-none bg-transparent p-0 h-auto gap-0 justify-start", mobileShowDetail && "hidden md:flex")}>
+          <TabsTrigger value="catalog"  onClick={() => setTab("catalog")}  data-active={tab === "catalog"  || undefined} className="rounded-none !bg-transparent border-b-2 border-transparent data-active:border-primary data-active:!text-primary data-active:font-medium hover:!bg-transparent hover:text-foreground !shadow-none px-4 pb-2.5 pt-0 text-sm flex-none -mb-px">Agents</TabsTrigger>
+          <TabsTrigger value="activity" onClick={() => setTab("activity")} data-active={tab === "activity" || undefined} className="rounded-none !bg-transparent border-b-2 border-transparent data-active:border-primary data-active:!text-primary data-active:font-medium hover:!bg-transparent hover:text-foreground !shadow-none px-4 pb-2.5 pt-0 text-sm flex-none -mb-px">Activity</TabsTrigger>
+        </TabsList>
       </div>
 
       {tab === "activity" && <FullActivityTab />}
