@@ -2,7 +2,7 @@ import * as React from "react"
 
 const BASE = "/vts_lookfeel_nav_concept_1-0/logos/"
 
-const TENANT_LOGO: Record<string, string> = {
+export const TENANT_LOGO: Record<string, string> = {
   // Stacking plan tenants
   "Blackstone Inc.":               `${BASE}blackrock.png`,
   "Vantage Point Capital LP":      `${BASE}salesforce.png`,

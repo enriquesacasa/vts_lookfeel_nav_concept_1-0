@@ -33,6 +33,10 @@ import { DealStewardPage } from "@/components/deal-steward-page"
 import { AmPipelineEmailPage, BrokerActionEmailPage, TenantFollowupEmailPage, LawyerLeaseEmailPage, OwnerUpdateEmailPage } from "@/components/deal-steward-emails"
 import { OptionsRightsPage } from "@/components/options-rights-page"
 import { CriticalDatesPage } from "@/components/critical-dates-page"
+import { BudgetsPage } from "@/components/budgets-page"
+import { AppraisalsPage } from "@/components/appraisals-page"
+import { CompsPage } from "@/components/comps-page"
+import { PlanningPage } from "@/components/planning-page"
 import { DealTasksPage } from "@/components/deal-tasks-page"
 import { ChatPatternProvider } from "@/contexts/chat-pattern"
 import { ChatSideOver } from "@/components/chat-side-over"
@@ -622,18 +626,19 @@ export default function App() {
       if (selectedLease) {
         const leaseHeader = {
           ...pagedHeaderProps,
-          name: (
-            <span>
-              <span className="font-semibold">{headerProps.name}</span>{" "}
-              <span className="text-muted-foreground font-light whitespace-nowrap">| {selectedLease.tenant}</span>
-            </span>
-          ),
+          city: selectedLease.asset,
+          name: (<span><span className="font-semibold">{selectedLease.tenant}</span>{" "}<span className="text-muted-foreground font-light">| Lease</span></span>),
+          address: `Suite ${selectedLease.suite} · ${selectedLease.floor} · ${selectedLease.sf.toLocaleString()} sf`,
+          image: <div className="relative shrink-0 w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-full overflow-hidden border border-border/30 shadow-sm"><TenantLogoImage name={selectedLease.tenant} /></div>,
           actions: (
-            <LeaseStatusBadge status={selectedLeaseStatus} onChange={setSelectedLeaseStatus} />
+            <div className="flex items-center gap-2">
+              <LeaseStatusBadge status={selectedLeaseStatus} onChange={setSelectedLeaseStatus} />
+              <AgentBtn className="!size-9" entity="Lease" label={`${selectedLease.tenant} · ${selectedLease.asset} · Suite ${selectedLease.suite}`} />
+            </div>
           ),
         }
         return (
-          <div className="flex flex-col gap-4" style={{ minHeight: "calc(100vh - 2rem)" }}>
+          <div className="flex flex-col gap-4 min-h-[calc(100vh-2rem)]">
             <BuildingHeader {...leaseHeader} onAskVts={goAskVts} />
             <PageBreadcrumb crumbs={[
               { label: "Leases", onClick: () => setSelectedLease(null) },
@@ -687,6 +692,43 @@ export default function App() {
         <div className="flex flex-col" style={{ minHeight: "calc(100vh - 2rem)" }}>
           <BuildingHeader {...pagedHeaderProps} onAskVts={goAskVts} />
           <StackingPlan onSpaceClick={handleStackingSpaceClick} />
+        </div>
+      )
+    }
+
+    if (page === "planning") {
+      return (
+        <div className="space-y-4">
+          <BuildingHeader {...pagedHeaderProps} onAskVts={goAskVts} />
+          <PlanningPage
+            onViewBudgets={() => setCurrentPage("budgets")}
+            onViewAppraisals={() => setCurrentPage("appraisals")}
+            onViewComps={() => setCurrentPage("comps")}
+          />
+        </div>
+      )
+    }
+    if (page === "budgets") {
+      return (
+        <div className="space-y-4">
+          <BuildingHeader {...pagedHeaderProps} onAskVts={goAskVts} />
+          <BudgetsPage />
+        </div>
+      )
+    }
+    if (page === "appraisals") {
+      return (
+        <div className="space-y-4">
+          <BuildingHeader {...pagedHeaderProps} onAskVts={goAskVts} />
+          <AppraisalsPage />
+        </div>
+      )
+    }
+    if (page === "comps") {
+      return (
+        <div className="space-y-4">
+          <BuildingHeader {...pagedHeaderProps} onAskVts={goAskVts} />
+          <CompsPage />
         </div>
       )
     }
