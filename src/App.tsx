@@ -1,5 +1,4 @@
 import * as React from "react"
-import { Wand } from "lucide-react"
 import { AgentBtn } from "@/components/agent-btn"
 import { AppNav } from "@/components/app-nav"
 import { BuildingHeader } from "@/components/building-header"
@@ -438,12 +437,19 @@ export default function App() {
     if (page === "ai") {
       const agentsHeaderProps = {
         ...headerProps,
-        image: (
-          <div className="shrink-0 w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-xl bg-primary/10 flex items-center justify-center self-center">
-            <Wand className="h-7 w-7 text-primary" />
-          </div>
+        image: undefined,
+        name: (
+          <span className="flex items-center gap-2">
+            <svg width="555" height="160" viewBox="0 0 555 160" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-10 w-auto shrink-0">
+              <path d="M262.948 37.923L282.271 99.5913L301.591 37.923H321.723L293.26 121.804H270.12L241.889 37.923H262.948Z" fill="currentColor"/>
+              <path d="M378.745 55.2793H351.903V37.923H425.601V55.2793H398.645V121.804H378.745V55.2793Z" fill="currentColor"/>
+              <path d="M491.06 52.3862C483.422 52.3862 477.756 55.2794 477.756 60.4835C477.756 64.6518 481.688 67.6581 487.475 68.9305L498.928 71.2439C512.464 74.021 529.588 78.1862 529.588 95.7721C529.588 113.358 511.885 123.31 494.416 123.31C472.895 123.31 458.78 112.549 455.771 94.4997H475.441C477.639 103.293 484.581 107.342 494.879 107.342C501.588 107.342 509.224 105.144 509.224 98.2023C509.224 92.7658 502.747 90.1023 493.604 88.1371L483.422 86.0533C469.77 83.1633 457.392 76.6841 457.392 61.6418C457.392 44.519 475.788 36.5351 492.217 36.5351C508.646 36.5351 524.265 43.7095 527.158 62.2215H507.604C505.636 55.9721 499.506 52.3862 491.06 52.3862Z" fill="currentColor"/>
+              <path d="M108.553 46.9088L136.165 65.2593L156.596 51.7396L108.553 19.812L108.485 19.8573L60.427 51.7926L80.8551 65.3125L108.485 46.953L108.553 46.9088Z" fill="currentColor"/>
+              <path d="M108.47 105.303L25.0786 53.0043V87.8887L108.47 140.187L108.485 140.179L191.889 87.8741V52.9871L108.485 105.293L108.47 105.303Z" fill="currentColor"/>
+            </svg>
+            <span className="font-light text-muted-foreground">| Agents</span>
+          </span>
         ),
-        name: "VTS Agents",
         address: undefined,
         city: undefined,
       }
