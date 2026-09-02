@@ -267,13 +267,14 @@ export default function App() {
     const page = parts[0] || "dashboard"
     const asset = parts[1] || "vts-tower"
     const params = new URLSearchParams(queryPart ?? "")
-    return { page, asset, dealId: params.get("deal"), agentId: params.get("agent") }
+    return { page, asset, dealId: params.get("deal"), agentId: params.get("agent"), view: params.get("view") }
   }
 
   const programmaticNav = React.useRef(false)
   const [selectedAssetId, setSelectedAssetId] = React.useState(() => parseHash().asset)
   const [currentPage, setCurrentPage] = React.useState(() => parseHash().page)
   const [defaultAgentId, setDefaultAgentId] = React.useState(() => parseHash().agentId ?? undefined)
+  const [agentView, setAgentView] = React.useState<"list" | "grid">(() => parseHash().view === "grid" ? "grid" : "list")
   const [selectedDeal, setSelectedDeal] = React.useState<DealsPageDeal | null>(() => {
     const { dealId } = parseHash()
     return dealId ? (DEALS.find(d => d.id === dealId) ?? null) : null
@@ -296,12 +297,15 @@ export default function App() {
     let base = globalPages.includes(currentPage)
       ? `/${currentPage}`
       : `/${currentPage}/${selectedAssetId}`
-    if (selectedDeal) base += `?deal=${selectedDeal.id}`
+    const params: string[] = []
+    if (selectedDeal) params.push(`deal=${selectedDeal.id}`)
+    if (currentPage === "ai" && agentView === "grid") params.push("view=grid")
+    if (params.length) base += `?${params.join("&")}`
     if (window.location.hash !== `#${base}`) {
       programmaticNav.current = true
       window.location.hash = base
     }
-  }, [currentPage, selectedAssetId, selectedDeal])
+  }, [currentPage, selectedAssetId, selectedDeal, agentView])
 
   React.useEffect(() => {
     if (pipelineToast) {
@@ -446,7 +450,7 @@ export default function App() {
       return (
         <div className="flex flex-col gap-4 h-[calc(100vh-2rem)]">
           <BuildingHeader {...agentsHeaderProps} onAskVts={goAskVts} />
-          <AgentsPage className="flex-1 min-h-0" defaultAgentId={defaultAgentId} />
+          <AgentsPage className="flex-1 min-h-0" defaultAgentId={defaultAgentId} defaultView={agentView} onViewChange={setAgentView} />
         </div>
       )
     }

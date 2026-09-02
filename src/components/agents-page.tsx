@@ -1872,9 +1872,14 @@ function AgentModal({ agent, onClose }: { agent: AgentDef; onClose: () => void }
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
-export function AgentsPage({ className, defaultAgentId }: { className?: string; defaultAgentId?: string }) {
+export function AgentsPage({ className, defaultAgentId, defaultView, onViewChange }: { className?: string; defaultAgentId?: string; defaultView?: "list" | "grid"; onViewChange?: (v: "list" | "grid") => void }) {
   const [tab, setTab] = React.useState("catalog")
-  const [viewMode, setViewMode] = React.useState<"list" | "grid">("list")
+  const [viewMode, setViewMode] = React.useState<"list" | "grid">(defaultView ?? "list")
+
+  function setView(v: "list" | "grid") {
+    setViewMode(v)
+    onViewChange?.(v)
+  }
   const [listOpen, setListOpen] = React.useState(true)
   const [pmListOpen, setPmListOpen] = React.useState(true)
   const [selectedId, setSelectedId] = React.useState<string | null>(defaultAgentId ?? null)
@@ -1911,10 +1916,10 @@ export function AgentsPage({ className, defaultAgentId }: { className?: string; 
         </Tabs>
         {tab === "catalog" && (
           <div className="flex items-center gap-1 shrink-0 ml-auto">
-            <Button variant={viewMode === "list" ? "secondary" : "ghost"} size="sm" className="h-7 w-7 p-0" onClick={() => setViewMode("list")}>
+            <Button variant={viewMode === "list" ? "secondary" : "ghost"} size="sm" className="h-7 w-7 p-0" onClick={() => setView("list")}>
               <List className="h-3.5 w-3.5" />
             </Button>
-            <Button variant={viewMode === "grid" ? "secondary" : "ghost"} size="sm" className="h-7 w-7 p-0" onClick={() => setViewMode("grid")}>
+            <Button variant={viewMode === "grid" ? "secondary" : "ghost"} size="sm" className="h-7 w-7 p-0" onClick={() => setView("grid")}>
               <LayoutGrid className="h-3.5 w-3.5" />
             </Button>
           </div>
