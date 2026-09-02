@@ -292,7 +292,7 @@ export default function App() {
   const [isDark, setIsDark] = React.useState(() => document.documentElement.classList.contains("dark"))
 
   React.useEffect(() => {
-    const globalPages = ["theme", "principles", "activity", "reminders", "avatar", "inquiry-email", "inquiry-email-forward", "inquiry-email-confirm", "ask-vts", "document-agent", "proposal-builder", "deal-monitor", "deal-monitor-email-am", "deal-monitor-email-broker", "deal-monitor-email-tenant", "deal-monitor-email-lawyer", "deal-monitor-email-owner"]
+    const globalPages = ["ai", "theme", "principles", "activity", "reminders", "avatar", "inquiry-email", "inquiry-email-forward", "inquiry-email-confirm", "ask-vts", "document-agent", "proposal-builder", "deal-monitor", "deal-monitor-email-am", "deal-monitor-email-broker", "deal-monitor-email-tenant", "deal-monitor-email-lawyer", "deal-monitor-email-owner"]
     let base = globalPages.includes(currentPage)
       ? `/${currentPage}`
       : `/${currentPage}/${selectedAssetId}`

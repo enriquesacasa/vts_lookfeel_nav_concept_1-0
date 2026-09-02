@@ -15,7 +15,7 @@ import {
   MoreHorizontal, Share2, Pencil, Pin, Archive, Trash2, ThumbsUp, ThumbsDown, Copy, RefreshCw, ChevronRight,
 } from "lucide-react"
 import { useChatPattern } from "@/contexts/chat-pattern"
-import { AGENTS, AgentDetailPanel } from "@/components/agents-page"
+import { AGENTS, PM_AGENTS, AgentDetailPanel } from "@/components/agents-page"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -373,6 +373,7 @@ export function AskVTSPage({ className, newChatKey }: { className?: string; newC
   const [railCollapsed, setRailCollapsed]   = React.useState(false)
   const [recentsOpen, setRecentsOpen]       = React.useState(true)
   const [agentsOpen, setAgentsOpen]         = React.useState(true)
+  const [pmAgentsOpen, setPmAgentsOpen]     = React.useState(true)
   const [selectedAgentId, setSelectedAgentId] = React.useState<string | null>(null)
   const [contextSuggestions, setContextSuggestions] = React.useState<string[]>([])
   const bottomRef = React.useRef<HTMLDivElement>(null)
@@ -555,29 +556,57 @@ export function AskVTSPage({ className, newChatKey }: { className?: string; newC
                   </CollapsibleContent>
                 </Collapsible>
 
-                {agentsView === "ask-vts" && <Collapsible open={agentsOpen} onOpenChange={setAgentsOpen}>
-                  <CollapsibleTrigger className="flex items-center justify-between w-full mb-2">
-                    <span className="text-sm font-medium text-foreground">Agents</span>
-                    <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform", !agentsOpen && "-rotate-90")} />
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="flex flex-col gap-0.5">
-                    {AGENTS.map(agent => (
-                      <button
-                        key={agent.id}
-                        onClick={() => { setSelectedAgentId(agent.id); setMobileShowChat(true) }}
-                        className="flex items-center gap-2.5 w-full px-2.5 py-2 rounded-xl text-left hover:bg-muted/60 transition-colors group"
-                      >
-                        <div className="h-7 w-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                          <agent.icon className="h-3.5 w-3.5 text-primary" />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-sm font-medium text-foreground truncate">{agent.name}</p>
-                          <p className="text-[11px] text-muted-foreground truncate">{agent.tagline}</p>
-                        </div>
-                      </button>
-                    ))}
-                  </CollapsibleContent>
-                </Collapsible>}
+                {agentsView === "ask-vts" && (
+                  <div className="flex flex-col gap-3">
+                    <Collapsible open={agentsOpen} onOpenChange={setAgentsOpen}>
+                      <CollapsibleTrigger className="flex items-center justify-between w-full mb-2">
+                        <span className="text-sm font-medium text-foreground">LAM Agents</span>
+                        <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform", !agentsOpen && "-rotate-90")} />
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="flex flex-col gap-0.5">
+                        {AGENTS.map(agent => (
+                          <button
+                            key={agent.id}
+                            onClick={() => { setSelectedAgentId(agent.id); setMobileShowChat(true) }}
+                            className="flex items-center gap-2.5 w-full px-2.5 py-2 rounded-xl text-left hover:bg-muted/60 transition-colors group"
+                          >
+                            <div className="h-7 w-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                              <agent.icon className="h-3.5 w-3.5 text-primary" />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-sm font-medium text-foreground truncate">{agent.name}</p>
+                              <p className="text-[11px] text-muted-foreground truncate">{agent.tagline}</p>
+                            </div>
+                          </button>
+                        ))}
+                      </CollapsibleContent>
+                    </Collapsible>
+
+                    <Collapsible open={pmAgentsOpen} onOpenChange={setPmAgentsOpen}>
+                      <CollapsibleTrigger className="flex items-center justify-between w-full mb-2">
+                        <span className="text-sm font-medium text-foreground">PM Agents</span>
+                        <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform", !pmAgentsOpen && "-rotate-90")} />
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="flex flex-col gap-0.5">
+                        {PM_AGENTS.map(agent => (
+                          <button
+                            key={agent.id}
+                            onClick={() => { setSelectedAgentId(agent.id); setMobileShowChat(true) }}
+                            className="flex items-center gap-2.5 w-full px-2.5 py-2 rounded-xl text-left hover:bg-muted/60 transition-colors group"
+                          >
+                            <div className="h-7 w-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                              <agent.icon className="h-3.5 w-3.5 text-primary" />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-sm font-medium text-foreground truncate">{agent.name}</p>
+                              <p className="text-[11px] text-muted-foreground truncate">{agent.tagline}</p>
+                            </div>
+                          </button>
+                        ))}
+                      </CollapsibleContent>
+                    </Collapsible>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -590,7 +619,7 @@ export function AskVTSPage({ className, newChatKey }: { className?: string; newC
             "bg-card/70",
             mobileShowChat ? "block" : "hidden md:block"
           )}>
-            <AgentDetailPanel agent={AGENTS.find(a => a.id === selectedAgentId)!} />
+            <AgentDetailPanel agent={[...AGENTS, ...PM_AGENTS].find(a => a.id === selectedAgentId)!} />
           </div>
         ) : (
         <div className={cn(

@@ -1,15 +1,18 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 import {
-  CheckCircle2, Loader2, Clock,
-  Lock, Zap, Activity, ArrowLeft,
+  CheckCircle2, Loader2, Clock, Copy, Check,
+  Lock, Zap, Activity, ArrowLeft, LayoutGrid, List, X, ChevronDown,
   Database, SlidersHorizontal, ChevronRight, HeartPulse, CalendarCheck,
   FileText, BarChart2, ClipboardCheck,
   BrainCircuit, Scale, GitMerge, FileCheck2, Building2, DatabaseZap, PenLine,
+  Inbox, Truck, SmilePlus, FileWarning, TrendingUp, Wrench, UserCheck, Leaf,
+  BookOpen, BadgeCheck, Radio, Users,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible"
 import { FilterBar, toggleFilterValue, clearFilterKey, type FilterDef } from "@/components/filter-chip"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -48,17 +51,17 @@ export const AGENTS: AgentDef[] = [
   {
     id: "deal-momentum",
     name: "Deal Monitor",
-    tagline: "Keep stalled deals moving",
+    tagline: "Automated deal alerts and pipeline digests",
     description:
-      "Identify what is stuck, who has the ball, what the delay is costing, and draft the next follow-up or escalation automatically.",
+      "Configure and automate deal monitoring across your pipeline. Set up velocity digests, stall alerts, action required digests, and milestone notifications that run on schedule and go to the right people automatically.",
     impact:
-      "Fewer deals lost to inertia, faster cycle times, and a clear action for every stalled deal.",
+      "No deal slips through the cracks — every stall, expiration, and action item surfaces automatically before it becomes a problem.",
     category: "Cross-Cutting",
     capabilities: [
-      "Identify deals with no activity and score the cost of continued delay",
-      "Pinpoint who holds the ball and how long they have had it",
-      "Draft targeted follow-up messages and escalation notes",
-      "Recommend the next best action for each stalled deal",
+      "Pipeline velocity digest — weekly summary of deal stage movement, velocity trends, and stall risks",
+      "Deal stall alert — triggered when a deal goes idle past a configurable threshold",
+      "Action required digest — consolidates open action items by party before they fall through the cracks",
+      "Milestone alert — proactive notifications for lease expirations, option windows, and key deal milestones",
     ],
     icon: Activity,
     available: true,
@@ -324,6 +327,225 @@ export const AGENTS: AgentDef[] = [
 
 export const AGENT_ICON_MAP: Record<string, React.ElementType> =
   Object.fromEntries(AGENTS.map(a => [a.name, a.icon]))
+
+export const PM_AGENTS: AgentDef[] = [
+  {
+    id: "pm-triage",
+    name: "Triage",
+    tagline: "Intake and classify every inbound work order automatically",
+    description:
+      "Parse inbound requests from tenants, vendors, and staff across email, portal, and phone logs. Classify by type and urgency, extract space and asset context, and generate clean work orders ready for dispatch — without PM involvement.",
+    impact:
+      "PMs stop triaging tickets. Structured work orders flow to dispatch from day one, and nothing gets lost in an inbox.",
+    category: "Operations",
+    capabilities: [
+      "Parse inbound requests from email, tenant portal, and voicemail transcripts",
+      "Classify by category (HVAC, electrical, janitorial, structural) and urgency",
+      "Extract asset, floor, suite, and contact context automatically",
+      "Generate clean, structured work orders ready for dispatch",
+    ],
+    icon: Inbox,
+    available: true,
+  },
+  {
+    id: "pm-dispatch",
+    name: "Dispatch",
+    tagline: "Route work orders to the right vendor and keep tenants informed",
+    description:
+      "Assign work orders to preferred vendors based on trade, availability, and asset preference lists. Confirm arrival windows, notify affected tenants, and track job status through to completion.",
+    impact:
+      "Faster vendor assignment, fewer missed notifications, and a complete audit trail from intake to close.",
+    category: "Operations",
+    capabilities: [
+      "Match work orders to preferred vendors by trade and asset",
+      "Confirm estimated arrival windows and alert tenants automatically",
+      "Track job status and escalate if a vendor goes unresponsive",
+      "Close out work orders and log completion notes",
+    ],
+    icon: Truck,
+    available: true,
+  },
+  {
+    id: "pm-aria",
+    name: "Aria",
+    tagline: "Monitor tenant satisfaction and surface issues before they escalate",
+    description:
+      "Continuously track satisfaction scores, open work order aging, and service level trends across every tenant. Flag sudden drops, identify root causes, and surface the context needed to act before a tenant relationship deteriorates.",
+    impact:
+      "Tenant issues surface days earlier, with context attached — so teams can respond before a complaint becomes a retention problem.",
+    category: "Operations",
+    capabilities: [
+      "Monitor satisfaction scores by tenant, floor, and asset on a rolling basis",
+      "Detect sudden drops and correlate with open work orders or lease events",
+      "Surface a prioritized list of at-risk tenants with root cause context",
+      "Draft outreach or escalation summaries for PM review",
+    ],
+    icon: SmilePlus,
+    available: true,
+  },
+  {
+    id: "pm-clause",
+    name: "Clause",
+    tagline: "Track landlord obligations and flag SLA breaches before they become defaults",
+    description:
+      "Parse executed leases for landlord obligations, service windows, and HVAC commitments. Monitor open work orders against contracted SLAs and flag any breach — with a draft response or remedy ready for PM review.",
+    impact:
+      "Lease obligation breaches surface the moment they happen, with a remedy draft attached — before a tenant has grounds to escalate.",
+    category: "Operations",
+    capabilities: [
+      "Extract service obligations and response windows from executed leases",
+      "Monitor open work orders against each tenant's contracted SLA",
+      "Flag breaches with time elapsed, tenant context, and obligation detail",
+      "Draft notice responses or remedy summaries for PM review",
+    ],
+    icon: FileWarning,
+    available: true,
+  },
+  {
+    id: "pm-sentinel",
+    name: "Sentinel",
+    tagline: "Identify renewal risks and surface market context before it is too late",
+    description:
+      "Score every lease for renewal probability using space utilization, satisfaction trends, co-tenancy changes, and lease economics. Alert the leasing team when risk crosses a threshold and package the full operating context alongside the alert.",
+    impact:
+      "Renewal risks surface months earlier — with the utilization data, satisfaction history, and market comps already assembled.",
+    category: "Operations",
+    capabilities: [
+      "Score each lease for renewal probability on a rolling basis",
+      "Detect risk triggers: satisfaction drops, utilization decline, co-tenancy changes",
+      "Alert the leasing team when probability falls below a configurable threshold",
+      "Package operating context, market comps, and recommended next actions",
+    ],
+    icon: TrendingUp,
+    available: true,
+  },
+  {
+    id: "pm-scout",
+    name: "Scout",
+    tagline: "Turn occupancy and badge data into utilization insights",
+    description:
+      "Aggregate sensor, badge, and access data to produce weekly utilization reports by floor and suite. Identify space that is consistently underused relative to lease capacity and surface findings to the property and leasing teams.",
+    impact:
+      "Underutilized floors surface on a schedule instead of at lease renewal — early enough to inform retention, reconfiguration, or re-leasing decisions.",
+    category: "Operations",
+    capabilities: [
+      "Aggregate badge, sensor, and access data by floor and suite",
+      "Calculate utilization relative to lease capacity on a weekly basis",
+      "Flag floors and suites consistently below occupancy thresholds",
+      "Deliver structured weekly reports to PM and leasing teams",
+    ],
+    icon: Users,
+    available: true,
+  },
+  {
+    id: "pm-groundskeeper",
+    name: "Groundskeeper",
+    tagline: "Plan and schedule preventive maintenance without PM coordination",
+    description:
+      "Build and maintain a rolling 90-day preventive maintenance calendar across all systems and floors. Coordinate vendor schedules, confirm availability, and create work orders in advance — so scheduled servicing happens without reactive PM involvement.",
+    impact:
+      "Preventive maintenance runs on schedule without PM coordination overhead, and reactive repairs drop as a result.",
+    category: "Operations",
+    capabilities: [
+      "Build a 90-day PM calendar from system type, age, and service history",
+      "Coordinate vendor availability and confirm scheduling in advance",
+      "Create structured work orders ahead of each scheduled service",
+      "Track completion and reschedule missed appointments automatically",
+    ],
+    icon: Wrench,
+    available: true,
+  },
+  {
+    id: "pm-lobby",
+    name: "Lobby",
+    tagline: "Pre-clear visitors, issue credentials, and coordinate access automatically",
+    description:
+      "Process visitor pre-clearance requests from tenants, issue building credentials, reserve parking, and notify the lobby and security teams — all before the visitor arrives. Handles recurring vendor access and one-time guest registration.",
+    impact:
+      "Visitors arrive to a prepared building, credentials are issued before they park, and the security desk has the list before the front door opens.",
+    category: "Operations",
+    capabilities: [
+      "Process pre-clearance requests and issue visitor credentials",
+      "Reserve parking and notify lobby and security in advance",
+      "Handle recurring vendor access and one-time guest registration",
+      "Log access events and flag unregistered arrivals",
+    ],
+    icon: UserCheck,
+    available: true,
+  },
+  {
+    id: "pm-pulse",
+    name: "Pulse",
+    tagline: "Suggest programming and activations based on occupancy patterns",
+    description:
+      "Analyze occupancy patterns across the week and identify low-engagement windows where programming could drive traffic and tenant satisfaction. Generate activation ideas, draft the PM communication for approval, and track engagement after each event.",
+    impact:
+      "Community programming decisions are driven by data rather than intuition — and tenant engagement rises as a result.",
+    category: "Operations",
+    capabilities: [
+      "Identify occupancy dips that suggest programming opportunity",
+      "Suggest activation types aligned to tenant demographics and historical response",
+      "Draft PM communication for review before distribution",
+      "Track event attendance and satisfaction lift after each activation",
+    ],
+    icon: Radio,
+    available: true,
+  },
+  {
+    id: "pm-ledger",
+    name: "Ledger",
+    tagline: "Generate owner reports and custom analytics without manual data pulls",
+    description:
+      "Automate monthly and quarterly owner reporting by pulling financials, occupancy, work order activity, and key events directly from VTS and connected systems. Build custom reports on request and handle month-end billing by consolidating charges, exceptions, and adjustments automatically.",
+    impact:
+      "Owner reports go out on schedule without analyst hours, and month-end billing closes faster with fewer manual reconciliations.",
+    category: "Operations",
+    capabilities: [
+      "Automate monthly and quarterly owner report generation from live data",
+      "Build custom reports from natural-language requests",
+      "Consolidate month-end billing charges, adjustments, and exceptions",
+      "Flag discrepancies and surface items requiring PM sign-off before distribution",
+    ],
+    icon: BookOpen,
+    available: true,
+  },
+  {
+    id: "pm-carbon",
+    name: "Carbon",
+    tagline: "Automate ESG data collection and energy reporting across the portfolio",
+    description:
+      "Pull energy, water, and waste data from building systems and utility accounts on a scheduled basis. Generate ESG reports, benchmark assets against portfolio and market averages, and flag consumption anomalies before they affect scores.",
+    impact:
+      "ESG reporting becomes a scheduled output rather than a quarterly sprint, and consumption anomalies surface early enough to fix.",
+    category: "Operations",
+    capabilities: [
+      "Pull energy, water, and waste data from building systems and utilities",
+      "Benchmark assets against portfolio averages and market peers",
+      "Generate ESG disclosure reports on a scheduled basis",
+      "Flag anomalies and equipment inefficiencies before they affect scores",
+    ],
+    icon: Leaf,
+    available: true,
+  },
+  {
+    id: "pm-coi",
+    name: "Certificate",
+    tagline: "Chase COI renewals and keep compliance current without manual follow-up",
+    description:
+      "Track certificate of insurance expiration dates across all tenants and vendors. Send automated renewal requests, follow up on non-responses, and log received certificates — so the compliance record stays current without PM involvement.",
+    impact:
+      "No expired COIs slip through. Renewals are requested on schedule and followed up automatically until the certificate is on file.",
+    category: "Operations",
+    capabilities: [
+      "Track COI expiration dates across tenants and vendors in real time",
+      "Send renewal requests 30, 14, and 7 days before expiration",
+      "Follow up via email conversation until a compliant certificate is received",
+      "Log received certificates and flag non-compliant submissions",
+    ],
+    icon: BadgeCheck,
+    available: true,
+  },
+]
 
 const ALL_RUNS: AgentRun[] = [
   // Deal Capture
@@ -934,6 +1156,13 @@ const STATUS_CONFIG = {
 }
 
 const WORKFLOW_STEPS: Record<string, string[]> = {
+  "deal-monitor": [
+    "Choose a monitor type and define its scope — all assets, a portfolio, or a specific asset",
+    "Set the trigger — run on a schedule, on threshold breach, or both",
+    "Configure recipients per role: asset manager, broker, tenant rep, lawyer, or owner",
+    "Set tone and customize the subject line with dynamic variables like asset name and date",
+    "Monitor runs automatically and sends tailored emails to each recipient",
+  ],
   "deal-capture": [
     "Monitor email, calendar, texts, and calls for deal signals",
     "Create or match deal records from inbound activity",
@@ -1038,6 +1267,90 @@ const WORKFLOW_STEPS: Record<string, string[]> = {
     "Sync data to reporting, financial models, and downstream systems",
     "Flag any discrepancies between agreed terms and what was captured",
     "Confirm sync completion and surface items that need manual review",
+  ],
+  "pm-triage": [
+    "Monitor inbound channels — email, tenant portal, and voicemail transcripts",
+    "Parse each request and extract asset, suite, contact, and issue context",
+    "Classify by trade category and urgency using property-specific rules",
+    "Generate a clean, structured work order and pass it to Dispatch",
+    "Log the original request and classification for PM audit and review",
+  ],
+  "pm-dispatch": [
+    "Receive structured work orders from Triage or PM intake",
+    "Match to preferred vendors by trade, asset, and availability",
+    "Confirm estimated arrival window and send tenant notification",
+    "Track job status and escalate if the vendor goes unresponsive",
+    "Close out the work order and log completion notes automatically",
+  ],
+  "pm-aria": [
+    "Pull satisfaction scores and open work order counts by tenant each cycle",
+    "Detect score drops above a configured threshold within a rolling window",
+    "Correlate drops with open tickets, aging work orders, or recent lease events",
+    "Surface at-risk tenants with root cause context and days since last contact",
+    "Draft outreach or PM escalation summaries ready for review",
+  ],
+  "pm-clause": [
+    "Parse executed leases for landlord obligations, response windows, and SLAs",
+    "Monitor open work orders against each tenant's contracted service terms",
+    "Detect breaches the moment the contracted window is exceeded",
+    "Generate a breach alert with time elapsed, tenant info, and obligation text",
+    "Draft a remedy summary or notice response for PM sign-off",
+  ],
+  "pm-sentinel": [
+    "Score each lease for renewal probability using utilization, satisfaction, and lease economics",
+    "Detect risk triggers — satisfaction drops, utilization decline, co-tenancy changes",
+    "Alert the leasing team when probability falls below the configured threshold",
+    "Package operating context: satisfaction history, utilization data, and market comps",
+    "Refresh scores every 6 hours and surface changes in the risk leaderboard",
+  ],
+  "pm-scout": [
+    "Ingest badge, sensor, and access data by floor and suite on a weekly schedule",
+    "Calculate utilization as a percentage of lease capacity for each space",
+    "Identify floors and suites averaging below the configured threshold",
+    "Generate the weekly utilization report and deliver to PM and leasing teams",
+    "Flag significant week-over-week changes for immediate review",
+  ],
+  "pm-groundskeeper": [
+    "Build the 90-day PM calendar from system type, age, and service history",
+    "Identify vendor availability and send scheduling requests in advance",
+    "Create structured work orders for each scheduled service before it is due",
+    "Track completion and flag any missed appointments for rescheduling",
+    "Surface the upcoming 30-day schedule in a weekly PM digest",
+  ],
+  "pm-lobby": [
+    "Receive pre-clearance requests from tenants via email or portal",
+    "Issue visitor credentials and send building access instructions",
+    "Reserve parking and notify the lobby and security desk",
+    "Log all pre-cleared visitors for same-day security briefing",
+    "Flag unregistered arrivals and alert the PM or security team",
+  ],
+  "pm-pulse": [
+    "Analyze occupancy patterns by day and time across the current week",
+    "Identify low-engagement windows where programming could drive traffic",
+    "Generate activation suggestions aligned to tenant demographics",
+    "Draft the PM communication and queue it for review before distribution",
+    "Track event attendance and satisfaction lift after each activation",
+  ],
+  "pm-ledger": [
+    "Pull financials, occupancy, and work order activity from VTS and connected systems",
+    "Assemble the owner report using the configured template and delivery schedule",
+    "Process month-end billing by consolidating charges, credits, and adjustments",
+    "Flag exceptions and discrepancies requiring PM review before distribution",
+    "Deliver the final report or invoice package on schedule without manual intervention",
+  ],
+  "pm-carbon": [
+    "Connect to building systems and utility accounts to pull energy, water, and waste data",
+    "Calculate consumption benchmarks against portfolio and market peers",
+    "Flag anomalies — consumption spikes or equipment inefficiencies",
+    "Assemble the ESG disclosure report on the configured schedule",
+    "Deliver the report to the sustainability team and flag items requiring action",
+  ],
+  "pm-coi": [
+    "Track COI expiration dates across all tenants and vendors in real time",
+    "Send renewal requests 30, 14, and 7 days before each expiration",
+    "Follow up by email until a compliant certificate is received or the PM escalates",
+    "Log received certificates and flag submissions that fail coverage requirements",
+    "Generate a compliance summary showing current, pending, and expired COIs",
   ],
 }
 
@@ -1168,13 +1481,35 @@ const AGENT_STATS: Record<string, { label: string; value: string }[]> = {
   ],
 }
 
-function AboutTab({ agent }: { agent: AgentDef }) {
+function buildAboutText(agent: AgentDef, steps: string[]) {
+  const parts: string[] = [agent.name, agent.tagline, "", agent.description]
+  if (agent.impact) parts.push("", agent.impact)
+  if (agent.capabilities.length) {
+    parts.push("", "Capabilities")
+    agent.capabilities.forEach((c, i) => parts.push(`${i + 1}. ${c}`))
+  }
+  if (steps.length) {
+    parts.push("", "How it works")
+    steps.forEach((s, i) => parts.push(`${i + 1}. ${s}`))
+  }
+  return parts.join("\n")
+}
+
+function AboutTab({ agent, onCopy, copied }: { agent: AgentDef; onCopy?: () => void; copied?: boolean }) {
   const steps = WORKFLOW_STEPS[agent.id] ?? []
   return (
     <div className="space-y-6">
       {/* Description + impact */}
       <div className="space-y-3">
-        <p className="text-lg font-semibold text-foreground mb-3">About</p>
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-lg font-semibold text-foreground">About</p>
+          {onCopy && (
+            <Button variant="outline" size="sm" className="h-7 gap-1.5 text-xs" onClick={onCopy}>
+              {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+              {copied ? "Copied" : "Copy"}
+            </Button>
+          )}
+        </div>
         <p className="text-sm text-foreground leading-relaxed">{agent.description}</p>
         {agent.impact && (
           <div className="flex items-start gap-2.5 rounded-xl bg-primary/5 border border-primary/15 px-4 py-3">
@@ -1293,7 +1628,14 @@ function ActivityDetailTab({ agentId }: { agentId: string }) {
 
 export function AgentDetailPanel({ agent }: { agent: AgentDef }) {
   const [tab, setTab] = React.useState("about")
+  const [copied, setCopied] = React.useState(false)
   const Icon = agent.icon
+  function handleCopy() {
+    const steps = WORKFLOW_STEPS[agent.id] ?? []
+    navigator.clipboard.writeText(buildAboutText(agent, steps))
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
 
   if (!agent.available) {
     return (
@@ -1349,7 +1691,7 @@ export function AgentDetailPanel({ agent }: { agent: AgentDef }) {
           <TabsTrigger value="activity" className="rounded-none !bg-transparent border-b-2 border-transparent data-active:border-primary data-active:!text-primary data-active:font-medium hover:!bg-transparent hover:text-foreground !shadow-none px-4 pb-2.5 pt-0 text-sm flex-none -mb-px">Activity</TabsTrigger>
         </TabsList>
         <div className="flex-1 overflow-y-auto">
-          <TabsContent value="about"    className="mt-0"><AboutTab agent={agent} /></TabsContent>
+          <TabsContent value="about"    className="mt-0"><AboutTab agent={agent} onCopy={handleCopy} copied={copied} /></TabsContent>
           <TabsContent value="activity" className="mt-0"><ActivityDetailTab agentId={agent.id} /></TabsContent>
         </div>
       </Tabs>
@@ -1448,14 +1790,100 @@ function FullActivityTab() {
   )
 }
 
+// ─── Grid card ───────────────────────────────────────────────────────────────
+
+function AgentGridCard({ agent, onClick }: { agent: AgentDef; onClick: () => void }) {
+  const Icon = agent.icon
+  return (
+    <button
+      onClick={onClick}
+      className="group text-left rounded-2xl bg-card/70 backdrop-blur-md border border-border/70 p-5 flex flex-col gap-3 hover:border-primary/40 hover:bg-card transition-colors"
+    >
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 border border-primary/20 shrink-0">
+          <Icon className="h-5 w-5 text-primary" />
+        </div>
+        {agent.active && (
+          <Badge className="bg-success/15 text-success border-success/20 text-xs h-5 px-2 shrink-0">Active</Badge>
+        )}
+        {!agent.available && (
+          <Badge variant="secondary" className="text-xs h-5 px-2 shrink-0 gap-1">
+            <Lock className="h-3 w-3" />
+            Soon
+          </Badge>
+        )}
+      </div>
+      <div className="flex-1">
+        <p className="text-sm font-semibold text-foreground leading-snug">{agent.name}</p>
+        <p className="text-xs text-muted-foreground mt-1 leading-relaxed line-clamp-2">{agent.tagline}</p>
+      </div>
+    </button>
+  )
+}
+
+// ─── Agent modal ─────────────────────────────────────────────────────────────
+
+function AgentModal({ agent, onClose }: { agent: AgentDef; onClose: () => void }) {
+  const [copied, setCopied] = React.useState(false)
+  React.useEffect(() => {
+    function onKey(e: KeyboardEvent) { if (e.key === "Escape") onClose() }
+    window.addEventListener("keydown", onKey)
+    return () => window.removeEventListener("keydown", onKey)
+  }, [onClose])
+  function handleCopy() {
+    const steps = WORKFLOW_STEPS[agent.id] ?? []
+    navigator.clipboard.writeText(buildAboutText(agent, steps))
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
+      <div className="absolute inset-0 bg-background/60 backdrop-blur-sm" />
+      <div
+        className="relative z-10 w-full max-w-lg max-h-[85vh] rounded-2xl bg-card border border-border/70 shadow-2xl flex flex-col overflow-hidden"
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="flex items-start justify-between p-5 pb-4 border-b border-border/50 shrink-0">
+          <div className="flex items-start gap-3 flex-1 min-w-0">
+            {(() => { const Icon = agent.icon; return (
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 border border-primary/20 shrink-0">
+                <Icon className="h-5 w-5 text-primary" />
+              </div>
+            )})()}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <p className="text-base font-semibold text-foreground">{agent.name}</p>
+                {agent.active && <Badge className="bg-success/15 text-success border-success/20 text-xs h-5 px-2">Active</Badge>}
+              </div>
+              <p className="text-xs text-muted-foreground mt-0.5">{agent.tagline}</p>
+            </div>
+          </div>
+          <Button variant="ghost" size="sm" className="h-7 w-7 p-0 shrink-0" onClick={onClose}>
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+        <div className="overflow-y-auto p-5">
+          <AboutTab agent={agent} onCopy={handleCopy} copied={copied} />
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export function AgentsPage({ className, defaultAgentId }: { className?: string; defaultAgentId?: string }) {
   const [tab, setTab] = React.useState("catalog")
+  const [viewMode, setViewMode] = React.useState<"list" | "grid">("list")
+  const [listOpen, setListOpen] = React.useState(true)
+  const [pmListOpen, setPmListOpen] = React.useState(true)
   const [selectedId, setSelectedId] = React.useState<string | null>(defaultAgentId ?? null)
   const [mobileShowDetail, setMobileShowDetail] = React.useState(false)
+  const [modalAgentId, setModalAgentId] = React.useState<string | null>(null)
 
-  const selectedAgent = AGENTS.find(a => a.id === selectedId) ?? AGENTS[0]
+  const ALL_AGENT_DEFS = [...AGENTS, ...PM_AGENTS]
+  const selectedAgent = ALL_AGENT_DEFS.find(a => a.id === selectedId) ?? AGENTS[0]
+  const modalAgent = ALL_AGENT_DEFS.find(a => a.id === modalAgentId) ?? null
 
   function selectAgent(id: string) {
     setSelectedId(id)
@@ -1468,39 +1896,76 @@ export function AgentsPage({ className, defaultAgentId }: { className?: string; 
       {/* Top bar */}
       <div className="flex items-center gap-3">
         {/* Mobile back button */}
-        {mobileShowDetail && tab === "catalog" && (
+        {mobileShowDetail && tab === "catalog" && viewMode === "list" && (
           <Button variant="ghost" size="sm" className="md:hidden gap-1.5 -ml-1 shrink-0"
             onClick={() => setMobileShowDetail(false)}>
             <ArrowLeft className="h-4 w-4" />
             Agents
           </Button>
         )}
-        <Tabs value={tab} onValueChange={v => setTab(v as typeof tab)} className={cn("w-full", mobileShowDetail && "hidden md:flex")}>
+        <Tabs value={tab} onValueChange={v => setTab(v as typeof tab)} className={cn("w-full", mobileShowDetail && viewMode === "list" && "hidden md:flex")}>
           <TabsList variant="line" className="border-b border-border rounded-none bg-transparent p-0 h-auto gap-0 justify-start w-full">
             <TabsTrigger value="catalog"  className="rounded-none !bg-transparent border-b-2 border-transparent data-active:border-primary data-active:!text-primary data-active:font-medium hover:!bg-transparent hover:text-foreground !shadow-none px-4 pb-2.5 pt-0 text-sm flex-none -mb-px">Agents</TabsTrigger>
             <TabsTrigger value="activity" className="rounded-none !bg-transparent border-b-2 border-transparent data-active:border-primary data-active:!text-primary data-active:font-medium hover:!bg-transparent hover:text-foreground !shadow-none px-4 pb-2.5 pt-0 text-sm flex-none -mb-px">Activity</TabsTrigger>
           </TabsList>
         </Tabs>
+        {tab === "catalog" && (
+          <div className="flex items-center gap-1 shrink-0 ml-auto">
+            <Button variant={viewMode === "list" ? "secondary" : "ghost"} size="sm" className="h-7 w-7 p-0" onClick={() => setViewMode("list")}>
+              <List className="h-3.5 w-3.5" />
+            </Button>
+            <Button variant={viewMode === "grid" ? "secondary" : "ghost"} size="sm" className="h-7 w-7 p-0" onClick={() => setViewMode("grid")}>
+              <LayoutGrid className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+        )}
       </div>
 
       {tab === "activity" && <FullActivityTab />}
 
-      {tab === "catalog" && (
+      {tab === "catalog" && viewMode === "list" && (
         <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] grid-rows-[1fr] gap-4 flex-1 min-h-0">
 
           {/* ── Left: Agent list (hidden on mobile when detail is showing) ── */}
           <div className={cn(
-            "rounded-2xl bg-card/70 backdrop-blur-md border border-border/70 p-4 flex flex-col gap-1 min-h-0 overflow-y-auto",
+            "rounded-2xl bg-card/70 backdrop-blur-md border border-border/70 p-4 flex flex-col gap-2 min-h-0 overflow-y-auto",
             mobileShowDetail ? "hidden md:flex" : "flex"
           )}>
-            {AGENTS.map(agent => (
-              <AgentListItem
-                key={agent.id}
-                agent={agent}
-                selected={selectedAgent?.id === agent.id}
-                onSelect={() => selectAgent(agent.id)}
-              />
-            ))}
+            <Collapsible open={listOpen} onOpenChange={setListOpen}>
+              <CollapsibleTrigger className="flex items-center justify-between w-full mb-1 shrink-0">
+                <span className="text-sm font-medium text-foreground">LAM Agents</span>
+                <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform", !listOpen && "-rotate-90")} />
+              </CollapsibleTrigger>
+              <CollapsibleContent className="flex flex-col gap-1">
+                {AGENTS.map(agent => (
+                  <AgentListItem
+                    key={agent.id}
+                    agent={agent}
+                    selected={selectedAgent?.id === agent.id}
+                    onSelect={() => selectAgent(agent.id)}
+                  />
+                ))}
+              </CollapsibleContent>
+            </Collapsible>
+
+            <div>
+              <Collapsible open={pmListOpen} onOpenChange={setPmListOpen}>
+                <CollapsibleTrigger className="flex items-center justify-between w-full mb-1 shrink-0">
+                  <span className="text-sm font-medium text-foreground">PM Agents</span>
+                  <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform", !pmListOpen && "-rotate-90")} />
+                </CollapsibleTrigger>
+                <CollapsibleContent className="flex flex-col gap-1">
+                  {PM_AGENTS.map(agent => (
+                    <AgentListItem
+                      key={agent.id}
+                      agent={agent}
+                      selected={selectedAgent?.id === agent.id}
+                      onSelect={() => selectAgent(agent.id)}
+                    />
+                  ))}
+                </CollapsibleContent>
+              </Collapsible>
+            </div>
           </div>
 
           {/* ── Right: Agent detail (hidden on mobile when list is showing) ── */}
@@ -1513,6 +1978,29 @@ export function AgentsPage({ className, defaultAgentId }: { className?: string; 
 
         </div>
       )}
+
+      {tab === "catalog" && viewMode === "grid" && (
+        <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-3">
+            <p className="text-base font-semibold text-foreground">LAM Agents</p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+              {AGENTS.map(agent => (
+                <AgentGridCard key={agent.id} agent={agent} onClick={() => setModalAgentId(agent.id)} />
+              ))}
+            </div>
+          </div>
+          <div className="flex flex-col gap-3">
+            <p className="text-base font-semibold text-foreground">PM Agents</p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+              {PM_AGENTS.map(agent => (
+                <AgentGridCard key={agent.id} agent={agent} onClick={() => setModalAgentId(agent.id)} />
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {modalAgent && <AgentModal agent={modalAgent} onClose={() => setModalAgentId(null)} />}
     </div>
   )
 }
