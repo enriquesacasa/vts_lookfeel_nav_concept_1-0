@@ -14,6 +14,8 @@ interface AvailabilityOverviewProps {
   occupiedSf: number
   vacantSf: number
   vacantSpaces?: VacantSpace[]
+  onViewStackingPlan?: () => void
+  onSpaceClick?: (space: VacantSpace) => void
   className?: string
 }
 
@@ -23,7 +25,7 @@ function fmtM(n: number) { return (n / 1_000_000).toFixed(1) + "M" }
 function fmtK(n: number) { return n >= 1000 ? `${(n / 1000).toFixed(0)}K` : n.toLocaleString() }
 
 const AvailabilityOverview = React.forwardRef<HTMLDivElement, AvailabilityOverviewProps>(
-  ({ occupiedSf, vacantSf, vacantSpaces, className }, ref) => {
+  ({ occupiedSf, vacantSf, vacantSpaces, onViewStackingPlan, onSpaceClick, className }, ref) => {
     const totalSf = occupiedSf + vacantSf
     const occupiedPct = Math.round((occupiedSf / totalSf) * 100)
     const vacantPct = 100 - occupiedPct
@@ -42,7 +44,7 @@ const AvailabilityOverview = React.forwardRef<HTMLDivElement, AvailabilityOvervi
             <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">Overview</p>
             <h2 className="text-xl font-semibold text-foreground">Occupancy</h2>
           </div>
-          <Button variant="outline" size="sm" className="shrink-0">
+          <Button variant="outline" size="sm" className="shrink-0" onClick={onViewStackingPlan}>
             View stacking plan
           </Button>
         </div>
@@ -99,7 +101,7 @@ const AvailabilityOverview = React.forwardRef<HTMLDivElement, AvailabilityOvervi
               <p className="text-sm font-semibold text-foreground mb-3">Vacant Spaces</p>
               <div className="flex flex-col gap-2">
                 {vacantSpaces.map((v, i) => (
-                  <div key={i} className="flex items-center justify-between gap-2 rounded-md px-2 py-1 -mx-2 cursor-pointer hover:bg-muted/40 dark:hover:bg-white/4 transition-colors group/space">
+                  <div key={i} className="flex items-center justify-between gap-2 rounded-md px-2 py-1 -mx-2 cursor-pointer hover:bg-muted/40 dark:hover:bg-white/4 transition-colors group/space" onClick={() => onSpaceClick?.(v)}>
                     <div className="flex items-center gap-2 min-w-0">
                       <span className="text-sm font-medium text-foreground truncate">{v.space}</span>
                       <span className="text-sm text-muted-foreground shrink-0">{fmtK(v.sf)} sf</span>

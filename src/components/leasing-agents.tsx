@@ -1,17 +1,16 @@
 import * as React from "react"
 import { cn, cardBase } from "@/lib/utils"
-import { AlertTriangle, Clock, Sparkle } from "lucide-react"
+import { AlertTriangle, Sparkle } from "lucide-react"
 import { AgentBtn } from "@/components/agent-btn"
-import type { Deal, DecisionItem } from "@/components/leasing-activity"
+import type { Deal } from "@/components/leasing-activity"
 
 interface LeasingAgentsProps {
   deals: Deal[]
-  decisions: DecisionItem[]
   className?: string
 }
 
 const LeasingAgents = React.forwardRef<HTMLDivElement, LeasingAgentsProps>(
-  ({ deals, decisions, className }, ref) => {
+  ({ deals, className }, ref) => {
     const atRisk = deals.filter(d => d.status === "stalled" || d.status === "at-risk")
 
     return (
@@ -22,8 +21,8 @@ const LeasingAgents = React.forwardRef<HTMLDivElement, LeasingAgentsProps>(
         {/* Header */}
         <div className="flex items-start justify-between gap-2">
           <div>
-            <p className="text-[10px] font-medium uppercase tracking-widest mb-1 text-sidebar-foreground/70">VTS agents</p>
-            <h2 className="text-xl font-semibold text-sidebar-foreground">Leasing actions</h2>
+            <p className="text-[10px] font-medium uppercase tracking-widest mb-1 text-sidebar-foreground/70">Pipeline</p>
+            <h2 className="text-xl font-semibold text-sidebar-foreground">Deal actions</h2>
           </div>
         </div>
 
@@ -31,8 +30,7 @@ const LeasingAgents = React.forwardRef<HTMLDivElement, LeasingAgentsProps>(
         <div className="rounded-lg px-3 py-2 flex items-center gap-2 bg-sidebar-foreground/10">
           <Sparkle className="h-4 w-4 shrink-0 text-sidebar-primary" />
           <p className="text-sm leading-snug text-sidebar-foreground/70">
-            {atRisk.length} deal{atRisk.length !== 1 ? "s" : ""} need attention +{" "}
-            <span className="text-sidebar-primary font-medium">{decisions.length} approval{decisions.length !== 1 ? "s" : ""} pending</span>
+            <span className="text-sidebar-primary font-medium">{atRisk.length} deal{atRisk.length !== 1 ? "s" : ""}</span> need attention
           </p>
         </div>
 
@@ -64,29 +62,6 @@ const LeasingAgents = React.forwardRef<HTMLDivElement, LeasingAgentsProps>(
           )}
         </div>
 
-        {/* Approvals needed */}
-        <div>
-          <p className="text-[10px] font-medium uppercase tracking-widest mb-2 text-sidebar-foreground/50">Approvals needed</p>
-          {decisions.length === 0 ? (
-            <p className="text-sm text-sidebar-foreground/40">No approvals pending</p>
-          ) : (
-            <div className="flex flex-col gap-2">
-              {decisions.map((item, i) => (
-                <div key={i} className="flex items-start gap-2.5 rounded-lg border border-primary/25 bg-primary/15 p-3 group/row agent-row">
-                  <Clock className="h-4 w-4 mt-0.5 shrink-0 text-sidebar-primary" />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-2">
-                      <p className="text-sm font-medium text-sidebar-foreground/90">{item.tenant}</p>
-                      <AgentBtn variant="run" entity="Approval" label={`${item.tenant} — ${item.action} · in approval for ${item.inApprovalFor}`} className="opacity-0 group-hover/row:opacity-100" />
-                    </div>
-                    <p className="text-sm text-sidebar-foreground/55">{item.action}</p>
-                    <p className="text-sm font-medium text-sidebar-primary mt-0.5">In approval for {item.inApprovalFor}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
       </div>
     )
   }

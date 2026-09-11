@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Sparkle, ArrowUp, X, Maximize2 } from "lucide-react"
 import { SUGGESTED } from "@/components/ask-vts"
+import type { ChatCommand } from "@/contexts/chat-pattern"
 
 interface Message {
   id: string
@@ -20,6 +21,8 @@ interface PopoverMessage {
 interface ChatPopoverContentProps {
   initialMessage: string
   suggestions?: string[]
+  commandSuggestions?: ChatCommand[]
+  onCommand?: (cmd: unknown) => void
   onClose: () => void
   onOpenFullScreen: (messages: PopoverMessage[]) => void
 }
@@ -53,13 +56,14 @@ function generateQuickResponse(text: string): string {
   return `I've pulled context on **${tenant}**. What would you like to do — draft an outreach, run a scenario, or surface related activity?`
 }
 
-export function ChatPopoverContent({ initialMessage, suggestions, onClose, onOpenFullScreen }: ChatPopoverContentProps) {
+export function ChatPopoverContent({ initialMessage, suggestions, commandSuggestions, onCommand, onClose, onOpenFullScreen }: ChatPopoverContentProps) {
   const [messages, setMessages] = React.useState<Message[]>([])
   const [input, setInput] = React.useState("")
   const [suggestionsVisible, setSuggestionsVisible] = React.useState(false)
   const bottomRef = React.useRef<HTMLDivElement>(null)
   const inputRef = React.useRef<HTMLTextAreaElement>(null)
   const hasSentRef = React.useRef(false)
+  const commandSuggsRef = React.useRef<ChatCommand[]>(commandSuggestions ?? [])
 
   React.useEffect(() => {
     if (hasSentRef.current) return
@@ -78,6 +82,24 @@ export function ChatPopoverContent({ initialMessage, suggestions, onClose, onOpe
   React.useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages.length])
+
+  const sendCommand = (cs: ChatCommand) => {
+    setSuggestionsVisible(false)
+    const id = `u${Date.now()}`
+    const thinkId = `t${Date.now()}`
+    setMessages(prev => [...prev,
+      { id, role: "user", content: cs.label },
+      { id: thinkId, role: "assistant", content: "Thinking…" },
+    ])
+    if (cs.cmd !== undefined && onCommand) onCommand(cs.cmd)
+    setTimeout(() => {
+      setMessages(prev => {
+        const filtered = prev.filter(m => m.id !== thinkId)
+        return [...filtered, { id: `r${Date.now()}`, role: "assistant", content: cs.reply }]
+      })
+      setSuggestionsVisible(true)
+    }, 700)
+  }
 
   const sendText = (text: string) => {
     setSuggestionsVisible(false)
@@ -127,12 +149,20 @@ export function ChatPopoverContent({ initialMessage, suggestions, onClose, onOpe
       {messages.length === 0 && (
         <div className="flex-1 flex flex-col gap-2 px-3 py-4 overflow-y-auto">
           <p className="text-xs font-semibold text-foreground mb-1">What do you want to tackle?</p>
-          {SUGGESTED.slice(0, 4).map((s) => (
-            <button key={s.label} onClick={() => sendText(s.prompt)}
-              className="text-left text-xs px-3 py-2 rounded-md border border-primary text-primary bg-transparent hover:bg-primary/10 transition-colors leading-snug w-full">
-              {s.label}
-            </button>
-          ))}
+          {commandSuggsRef.current.length > 0
+            ? commandSuggsRef.current.map((cs) => (
+                <button key={cs.label} onClick={() => sendCommand(cs)}
+                  className="text-left text-xs px-3 py-2 rounded-md border border-primary text-primary bg-transparent hover:bg-primary/10 transition-colors leading-snug w-full">
+                  {cs.label}
+                </button>
+              ))
+            : SUGGESTED.slice(0, 4).map((s) => (
+                <button key={s.label} onClick={() => sendText(s.prompt)}
+                  className="text-left text-xs px-3 py-2 rounded-md border border-primary text-primary bg-transparent hover:bg-primary/10 transition-colors leading-snug w-full">
+                  {s.label}
+                </button>
+              ))
+          }
         </div>
       )}
 
@@ -158,18 +188,23 @@ export function ChatPopoverContent({ initialMessage, suggestions, onClose, onOpe
         <div ref={bottomRef} />
       </div>
 
-      {/* Suggestion pills — always in DOM to avoid layout shift */}
-      {suggestions && suggestions.length > 0 && (
+      {/* Suggestion pills */}
+      {(commandSuggsRef.current.length > 0 || (suggestions && suggestions.length > 0)) && (
         <div className={cn("shrink-0 px-3 flex flex-col gap-1.5 transition-all duration-200 overflow-hidden", suggestionsVisible ? "opacity-100 pb-2 max-h-48" : "opacity-0 pointer-events-none pb-0 max-h-0")}>
-          {suggestions.map((s, i) => (
-            <button
-              key={i}
-              onClick={() => sendText(s)}
-              className="text-left text-xs px-3 py-2 rounded-md border border-primary text-primary bg-transparent hover:bg-primary/10 transition-colors leading-snug w-full"
-            >
-              {s}
-            </button>
-          ))}
+          {commandSuggsRef.current.length > 0
+            ? commandSuggsRef.current.slice(0, 4).map((cs) => (
+                <button key={cs.label} onClick={() => sendCommand(cs)}
+                  className="text-left text-xs px-3 py-2 rounded-md border border-primary text-primary bg-transparent hover:bg-primary/10 transition-colors leading-snug w-full">
+                  {cs.label}
+                </button>
+              ))
+            : suggestions?.map((s, i) => (
+                <button key={i} onClick={() => sendText(s)}
+                  className="text-left text-xs px-3 py-2 rounded-md border border-primary text-primary bg-transparent hover:bg-primary/10 transition-colors leading-snug w-full">
+                  {s}
+                </button>
+              ))
+          }
         </div>
       )}
 

@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils"
 import { Search, Sparkle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { useChatPattern, type TransferMessage } from "@/contexts/chat-pattern"
+import { useChatPattern, type TransferMessage, type ChatCommand } from "@/contexts/chat-pattern"
 import { ChatPopoverContent } from "@/components/chat-popover"
 
 interface BuildingHeaderProps {
@@ -15,9 +15,11 @@ interface BuildingHeaderProps {
   actions?: React.ReactNode
   className?: string
   onAskVts?: () => void
+  onCommand?: (cmd: unknown) => void
+  commandSuggestions?: ChatCommand[]
 }
 
-function BuildingHeader({ image, name, address, city, badges, actions, className }: BuildingHeaderProps) {
+function BuildingHeader({ image, name, address, city, badges, actions, className, onCommand, commandSuggestions }: BuildingHeaderProps) {
   const { pattern, openChat } = useChatPattern()
   const [popoverOpen, setPopoverOpen] = React.useState(false)
 
@@ -25,7 +27,7 @@ function BuildingHeader({ image, name, address, city, badges, actions, className
     if (pattern === "popover") {
       setPopoverOpen(true)
     } else {
-      openChat({})
+      openChat({ onCommand, commandSuggestions })
     }
   }
 
@@ -74,6 +76,8 @@ function BuildingHeader({ image, name, address, city, badges, actions, className
                 <ChatPopoverContent
                   initialMessage=""
                   suggestions={[]}
+                  commandSuggestions={commandSuggestions}
+                  onCommand={onCommand}
                   onClose={() => setPopoverOpen(false)}
                   onOpenFullScreen={(messages: TransferMessage[]) => {
                     setPopoverOpen(false)

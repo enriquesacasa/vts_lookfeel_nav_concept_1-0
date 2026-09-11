@@ -174,7 +174,20 @@ function DesktopNav({ className, collapsed: collapsedProp, onCollapsedChange, as
   const [logoOpen, setLogoOpen] = React.useState(false)
 
   React.useEffect(() => {
-    if (activePage) setActive(activePage)
+    if (!activePage) return
+    setActive(activePage)
+    // Auto-expand the section that owns this page
+    const parentSection = navStructure.find(item =>
+      item.children?.some(c => c.id === activePage)
+    )
+    if (parentSection) {
+      setOpenSections(prev => {
+        if (prev.has(parentSection.id)) return prev
+        const next = new Set(prev)
+        next.add(parentSection.id)
+        return next
+      })
+    }
   }, [activePage])
   const [openSections, setOpenSections] = React.useState<Set<string>>(new Set())
   const [dropdownOpen, setDropdownOpen] = React.useState(false)

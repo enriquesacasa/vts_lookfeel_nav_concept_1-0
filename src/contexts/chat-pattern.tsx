@@ -9,10 +9,18 @@ export interface TransferMessage {
   content: string
 }
 
+export interface ChatCommand {
+  label: string
+  reply: string
+  cmd?: unknown
+}
+
 export interface ChatContext {
   message?: string
   suggestions?: string[]
+  commandSuggestions?: ChatCommand[]
   transferMessages?: TransferMessage[]
+  onCommand?: (cmd: unknown) => void
 }
 
 interface ChatPatternContextValue {

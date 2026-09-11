@@ -16,14 +16,14 @@ const ACTIONS: ActionItem[] = [
     type: "risk",
     text: "Leases expiring in < 12 mo",
     value: "$234K/mo",
-    impact: "−$2.8M NOI at risk",
+    impact: "−$14.4M revenue at risk",
     detail: "Pfizer · Morgan Stanley · Deloitte LLP",
   },
   {
     type: "upside",
-    text: "LOI+ deals → NOI upside if executed",
+    text: "LOI+ deals — revenue upside if executed",
     value: "+$89K/mo",
-    impact: "+$1.1M projected NOI",
+    impact: "+$3.7M projected revenue",
     detail: "NovaTech · Vertex Studios · Bluewave LLC",
   },
   {
@@ -41,10 +41,10 @@ const CONFIG = {
   ops:    { icon: AlertTriangle },
 }
 
-function ActionRow({ item, onRun }: { item: ActionItem; onRun: () => void }) {
+function ActionRow({ item, onRun, onNavigate }: { item: ActionItem; onRun: () => void; onNavigate?: () => void }) {
   const cfg = CONFIG[item.type]
   return (
-    <div className="rounded-lg border border-primary/25 bg-primary/15 p-3 group/row agent-row">
+    <div className="rounded-lg border border-primary/25 bg-primary/15 p-3 group/row agent-row cursor-pointer" onClick={onNavigate}>
       <div className="flex items-start gap-2.5">
         <cfg.icon className="h-4 w-4 mt-0.5 shrink-0 text-sidebar-primary" />
         <div className="flex-1 min-w-0">
@@ -57,7 +57,7 @@ function ActionRow({ item, onRun }: { item: ActionItem; onRun: () => void }) {
               <TrendingUp className="h-3 w-3 shrink-0 text-sidebar-foreground/50" />
               <span className="text-sm text-sidebar-foreground/60">{item.impact}</span>
             </div>
-            <AgentBtn variant="run" label={`${item.text} · ${item.value} · ${item.impact}${item.detail ? ` · ${item.detail}` : ""}`} onClick={onRun} className="opacity-0 group-hover/row:opacity-100" />
+            <AgentBtn variant="run" label={`${item.text} · ${item.value} · ${item.impact}${item.detail ? ` · ${item.detail}` : ""}`} onClick={e => { e.stopPropagation(); onRun() }} className="opacity-0 group-hover/row:opacity-100" />
           </div>
           {item.detail && (
             <p className="text-sm mt-0.5 text-sidebar-foreground/50">{item.detail}</p>
@@ -69,11 +69,17 @@ function ActionRow({ item, onRun }: { item: ActionItem; onRun: () => void }) {
 }
 
 interface ActionLeversProps {
+  onNavigate?: (page: string) => void
   className?: string
 }
 
 const ActionLevers = React.forwardRef<HTMLDivElement, ActionLeversProps>(
-  ({ className }, ref) => {
+  ({ onNavigate, className }, ref) => {
+    const PAGE_MAP: Record<ActionItem["type"], string> = {
+      risk: "leases",
+      upside: "deals",
+      ops: "leases",
+    }
     return (
       <div
         ref={ref}
@@ -91,14 +97,14 @@ const ActionLevers = React.forwardRef<HTMLDivElement, ActionLeversProps>(
         <div className="rounded-lg px-3 py-2 flex items-center gap-2 bg-sidebar-foreground/10">
           <Sparkle className="h-4 w-4 shrink-0 text-sidebar-primary" />
           <p className="text-sm leading-snug text-sidebar-foreground/70">
-            3 financial improvements identified: <span className="text-sidebar-primary font-medium">$1.1M upside</span>
+            3 financial improvements identified: <span className="text-sidebar-primary font-medium">$3.7M upside</span>
           </p>
         </div>
 
         {/* Action items */}
         <div className="flex flex-col gap-2">
           {ACTIONS.map((item, i) => (
-            <ActionRow key={i} item={item} onRun={() => {}} />
+            <ActionRow key={i} item={item} onRun={() => {}} onNavigate={onNavigate ? () => onNavigate(PAGE_MAP[item.type]) : undefined} />
           ))}
         </div>
 

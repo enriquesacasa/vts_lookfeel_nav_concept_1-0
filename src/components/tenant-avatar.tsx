@@ -36,9 +36,27 @@ export const TENANT_LOGO: Record<string, string> = {
   "Citigroup":                     `${BASE}stripe.png`,
   "Verizon Media":                 `${BASE}microsoft.png`,
   "Blackrock":                     `${BASE}blackrock.png`,
-  // Other assets
+  // Other assets / deals page tenants
   "Goldman Sachs":                 `${BASE}goldmansachs.png`,
   "Uber Technologies":             `${BASE}uber.png`,
+  "Uber Technologies Inc.":        `${BASE}uber.png`,
+  "Amazon.com":                    `${BASE}amazon.png`,
+  "Starbucks Corporation":         `${BASE}starbucks.png`,
+  "Meridian Health":               `${BASE}pfizer.png`,
+  "Vertex Studios":                `${BASE}spotify.png`,
+  "Bluewave LLC":                  `${BASE}stripe.png`,
+  "Pfizer Inc.":                   `${BASE}pfizer.png`,
+  "BlackRock":                     `${BASE}blackrock.png`,
+  "WeWork":                        `${BASE}wework.png`,
+  "Google LLC":                    `${BASE}google.png`,
+  "Tesla Inc.":                    `${BASE}tesla.png`,
+  "Cisco Systems":                 `${BASE}cisco.png`,
+  "Salesforce Inc.":               `${BASE}salesforce.png`,
+  "Microsoft":                     `${BASE}microsoft.png`,
+  "Meta":                          `${BASE}meta.png`,
+  "Stripe":                        `${BASE}stripe.png`,
+  "Twitter/X":                     `${BASE}x.png`,
+  "Airbnb":                        `${BASE}airbnb.png`,
 }
 
 export function TenantAvatar({ name }: { name: string }) {

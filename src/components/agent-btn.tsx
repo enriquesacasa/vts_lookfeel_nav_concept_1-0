@@ -132,6 +132,7 @@ export function AgentBtn({ label, entity, onClick, variant = "icon", className }
   if (variant === "run") {
     const runMsg = label || "Ask VTS"
     const handleRun = (e: React.MouseEvent) => {
+      e.stopPropagation()
       openChat({ message: runMsg, suggestions: getSuggestions(runMsg) })
       onClick?.(e)
     }

@@ -5,7 +5,6 @@ import { BuildingHeader } from "@/components/building-header"
 import { AvailabilityOverview } from "@/components/availability-overview"
 import type { VacantSpace } from "@/components/availability-overview"
 import { LeasingActivity } from "@/components/leasing-activity"
-import type { Deal, DecisionItem } from "@/components/leasing-activity"
 import { CriticalDates } from "@/components/critical-dates"
 import type { CriticalDate } from "@/components/critical-dates"
 import { FinancialPerformance } from "@/components/financial-performance"
@@ -18,7 +17,7 @@ import type { Deal as DealsPageDeal } from "@/components/deals-page"
 import { DealProfile, TenantLogoImage, StatusBadge, type DealStatus } from "@/components/deal-profile"
 import { ThemeShowcase } from "@/components/theme-showcase"
 import { AgentPrinciples } from "@/components/agent-principles"
-import { StackingPlan, type StackingPlanSpaceRef } from "@/components/stacking-plan"
+import { StackingPlan, type StackingPlanSpaceRef, type StackingPlanHandle, type StackingPlanCommand } from "@/components/stacking-plan"
 import { SpacesPage, type Space as SpacesPageSpace } from "@/components/spaces-page"
 import { SpaceDetailPage, SpaceStatusBadge, type SpaceRef, type SpaceStatus } from "@/components/space-detail-page"
 import { PageBreadcrumb } from "@/components/page-breadcrumb"
@@ -37,10 +36,17 @@ import { AppraisalsPage } from "@/components/appraisals-page"
 import { CompsPage } from "@/components/comps-page"
 import { PlanningPage } from "@/components/planning-page"
 import { DealTasksPage } from "@/components/deal-tasks-page"
-import { ChatPatternProvider } from "@/contexts/chat-pattern"
+import { ChatPatternProvider, type ChatCommand } from "@/contexts/chat-pattern"
 import { ChatSideOver } from "@/components/chat-side-over"
 import { ChatSidePush, SIDE_PUSH_WIDTH } from "@/components/chat-side-push"
 import { useChatPattern } from "@/contexts/chat-pattern"
+
+const STACKING_COMMANDS: ChatCommand[] = [
+  { label: "Fast-forward 18 months", reply: "Showing the stacking plan 18 months from now. Several leases expire in this window.", cmd: { type: "setSliderMonths", months: 18 } },
+  { label: "Show 2028 expirations", reply: "Filtered to spaces expiring in 2028. Three tenants are in their renewal windows.", cmd: { type: "replaceFilters", filters: { expBucket: ["2028"] } } },
+  { label: "Show vacant spaces", reply: "Filtered to all currently vacant spaces across the building.", cmd: { type: "replaceFilters", filters: { occupancy: ["vacant"] } } },
+  { label: "Show near-term renewal risks", reply: "Filtered to leases expiring in 2027 and 2028. Five tenants are within their renewal windows — I'd recommend initiating outreach for Pacific Wealth, Meridian Health, and Carlyle first given their encumbrance positions.", cmd: { type: "replaceFilters", filters: { expBucket: ["2027", "2028"] } } },
+]
 
 // Maps stacking-plan display names → standardized LEASES tenant names
 const TENANT_ALIAS: Record<string, string> = {
@@ -68,7 +74,7 @@ function SidePushMain({ children, navCollapsed }: { children: React.ReactNode; n
   return (
     <main
       className={cn(
-        "transition-all duration-300 ease-in-out pr-4 pb-4 overflow-x-hidden",
+        "transition-all duration-300 ease-in-out pr-4 pb-4 overflow-x-hidden flex-1 flex flex-col overflow-y-auto",
         "pt-[72px] pl-4",
         navCollapsed ? "md:pt-4 md:pl-[104px]" : "md:pt-4 md:pl-[264px]"
       )}
@@ -187,7 +193,7 @@ export const PORTFOLIOS = [
 ]
 
 export const ASSET_DETAILS: Record<string, { city: string; image: string }> = {
-  "vts-tower":     { city: "Built 2017 · 52 floors · Office",   image: "https://images.unsplash.com/photo-1763121379548-2fae8be2ab7b?w=600&h=400&fit=crop&crop=top&auto=format" },
+  "vts-tower":     { city: "Built 2017 · 52 floors · Office",   image: "https://images.unsplash.com/photo-1631085474949-d8a367d9d26d?w=800&h=500&fit=crop&crop=top&auto=format" },
   "one-financial": { city: "Built 1992 · 36 floors · Office",   image: "https://images.unsplash.com/photo-1554435493-93422e8220c8?w=800&h=500&fit=crop&auto=format" },
   "empire-state":  { city: "Built 1931 · 102 floors · Office",  image: "https://images.unsplash.com/photo-1499092346589-b9b6be3e94b2?w=800&h=500&fit=crop&auto=format" },
   "salesforce":    { city: "Built 2018 · 61 floors · Office",   image: "https://images.unsplash.com/photo-1464938050520-ef2270bb8ce8?w=800&h=500&fit=crop&auto=format" },
@@ -224,19 +230,7 @@ const KPIS = [
   { label: "WALT",                   value: "4.2 yrs",   subtitle: "Weighted avg lease" },
 ]
 
-const ACTIVE_DEALS: Deal[] = [
-  { tenant: "NovaTech Inc.",   space: "Suite 800",   sf: 28500,  stage: "LOI",       status: "active",   baseRent: 52.00, budgetRent: 50.00 },
-  { tenant: "Apex Capital",    space: "Floor 12",    sf: 45000,  stage: "Proposal",  status: "active",   baseRent: 48.00, budgetRent: 52.00, note: "Counter awaiting response" },
-  { tenant: "Meridian Health", space: "Suite 1800",  sf: 33000,  stage: "Lease Out", status: "stalled",  baseRent: 55.00, budgetRent: 55.00, stalledDays: 18 },
-  { tenant: "Atlas Group",     space: "Floors 2–3",  sf: 61000,  stage: "Proposal",  status: "at-risk",  baseRent: 44.00, budgetRent: 50.00, note: "Considering competitor building" },
-  { tenant: "Vertex Studios",  space: "Suite 600",   sf: 19800,  stage: "LOI",       status: "active",   baseRent: 58.00, budgetRent: 56.00 },
-  { tenant: "Bluewave LLC",    space: "Suite 300",   sf: 12400,  stage: "Lease Out", status: "active",   baseRent: 51.00, budgetRent: 51.00 },
-]
 
-const DECISIONS_TODAY: DecisionItem[] = [
-  { tenant: "NovaTech Inc.",   action: "Counter-proposal signature deadline",  inApprovalFor: "2 days" },
-  { tenant: "Apex Capital",    action: "Board approval needed for rent concession", inApprovalFor: "5 days" },
-]
 
 
 const CRITICAL_DATES: CriticalDate[] = [
@@ -289,6 +283,8 @@ export default function App() {
   const [selectedLease, setSelectedLease] = React.useState<Lease | null>(null)
   const [selectedLeaseStatus, setSelectedLeaseStatus] = React.useState<LeaseStatus>("Active")
   const [askVtsKey, setAskVtsKey] = React.useState(0)
+  const stackingPlanRef = React.useRef<StackingPlanHandle>(null)
+  useChatPattern()
   const [isDark, setIsDark] = React.useState(() => document.documentElement.classList.contains("dark"))
 
   React.useEffect(() => {
@@ -455,7 +451,7 @@ export default function App() {
       }
       return (
         <div className="flex flex-col gap-4 h-[calc(100vh-2rem)]">
-          <BuildingHeader {...agentsHeaderProps} onAskVts={goAskVts} />
+          <BuildingHeader {...agentsHeaderProps} />
           <AgentsPage className="flex-1 min-h-0" defaultAgentId={defaultAgentId} defaultView={agentView} onViewChange={setAgentView} />
         </div>
       )
@@ -502,7 +498,7 @@ export default function App() {
         : ASSETS
       return (
         <div className="space-y-4">
-          <BuildingHeader {...pagedHeaderProps} onAskVts={goAskVts} />
+          <BuildingHeader {...pagedHeaderProps} />
           <KpiBar kpis={[
             { label: "Total portfolio NOI", value: "$312M",   subtitle: "+4.2% vs budget",  trend: "up"   as const },
             { label: "Occupancy",           value: "91.4%",  subtitle: "+0.8% vs budget",  trend: "up"   as const },
@@ -600,7 +596,7 @@ export default function App() {
         }
         return (
           <div className="flex flex-col gap-4" style={{ minHeight: "calc(100vh - 2rem)" }}>
-            <BuildingHeader {...spaceHeader} onAskVts={goAskVts} />
+            <BuildingHeader {...spaceHeader} />
             <PageBreadcrumb crumbs={[
               { label: "Spaces", onClick: () => setSelectedSpace(null) },
               { label: selectedSpace.suite },
@@ -612,7 +608,7 @@ export default function App() {
 
       return (
         <div className="space-y-4">
-          <BuildingHeader {...pagedHeaderProps} onAskVts={goAskVts} />
+          <BuildingHeader {...pagedHeaderProps} />
           <SpacesPage assets={spacesAssets} onSpaceClick={handleSpacesPageClick} />
         </div>
       )
@@ -620,7 +616,7 @@ export default function App() {
     if (page === "deal-tasks") {
       return (
         <div className="space-y-4">
-          <BuildingHeader {...pagedHeaderProps} onAskVts={goAskVts} />
+          <BuildingHeader {...pagedHeaderProps} />
           <DealTasksPage onTaskClick={dealId => {
             const deal = DEALS.find(d => d.id === dealId) ?? null
             if (deal) {
@@ -649,7 +645,7 @@ export default function App() {
         }
         return (
           <div className="flex flex-col gap-4 min-h-[calc(100vh-2rem)]">
-            <BuildingHeader {...leaseHeader} onAskVts={goAskVts} />
+            <BuildingHeader {...leaseHeader} />
             <PageBreadcrumb crumbs={[
               { label: "Leases", onClick: () => setSelectedLease(null) },
               { label: selectedLease.tenant },
@@ -660,7 +656,7 @@ export default function App() {
       }
       return (
         <div className="space-y-4">
-          <BuildingHeader {...pagedHeaderProps} onAskVts={goAskVts} />
+          <BuildingHeader {...pagedHeaderProps} />
           <LeasesPage onLeaseClick={l => { setSelectedLease(l); setSelectedLeaseStatus(l.status as LeaseStatus) }} />
         </div>
       )
@@ -673,7 +669,7 @@ export default function App() {
           : selectedAsset ? [selectedAsset] : ASSETS
       return (
         <div className="space-y-4">
-          <BuildingHeader {...pagedHeaderProps} onAskVts={goAskVts} />
+          <BuildingHeader {...pagedHeaderProps} />
           <CriticalDatesPage assets={cdAssets} onRowClick={tenant => { const l = findLease(tenant); if (l) { setSelectedLease(l); setSelectedLeaseStatus(l.status as LeaseStatus); setCurrentPage("leases") } }} />
         </div>
       )
@@ -686,7 +682,7 @@ export default function App() {
           : selectedAsset ? [selectedAsset] : ASSETS
       return (
         <div className="space-y-4">
-          <BuildingHeader {...pagedHeaderProps} onAskVts={goAskVts} />
+          <BuildingHeader {...pagedHeaderProps} />
           <OptionsRightsPage assets={optionsAssets} onRowClick={tenant => { const l = findLease(tenant); if (l) { setSelectedLease(l); setSelectedLeaseStatus(l.status as LeaseStatus); setCurrentPage("leases") } }} />
         </div>
       )
@@ -697,11 +693,10 @@ export default function App() {
         setSelectedSpaceStatus((s.status as SpaceStatus) ?? "Available")
         setCurrentPage("spaces")
       }
-
       return (
-        <div className="flex flex-col" style={{ minHeight: "calc(100vh - 2rem)" }}>
-          <BuildingHeader {...pagedHeaderProps} onAskVts={goAskVts} />
-          <StackingPlan onSpaceClick={handleStackingSpaceClick} />
+        <div className="flex flex-col flex-1 min-h-0">
+          <BuildingHeader {...pagedHeaderProps} onCommand={(cmd) => stackingPlanRef.current?.applyCommand(cmd as StackingPlanCommand)} commandSuggestions={STACKING_COMMANDS} />
+          <StackingPlan ref={stackingPlanRef} onSpaceClick={handleStackingSpaceClick} />
         </div>
       )
     }
@@ -709,7 +704,7 @@ export default function App() {
     if (page === "planning") {
       return (
         <div className="space-y-4">
-          <BuildingHeader {...pagedHeaderProps} onAskVts={goAskVts} />
+          <BuildingHeader {...pagedHeaderProps} />
           <PlanningPage
             onViewBudgets={() => setCurrentPage("budgets")}
             onViewAppraisals={() => setCurrentPage("appraisals")}
@@ -721,7 +716,7 @@ export default function App() {
     if (page === "budgets") {
       return (
         <div className="space-y-4">
-          <BuildingHeader {...pagedHeaderProps} onAskVts={goAskVts} />
+          <BuildingHeader {...pagedHeaderProps} />
           <BudgetsPage />
         </div>
       )
@@ -729,7 +724,7 @@ export default function App() {
     if (page === "appraisals") {
       return (
         <div className="space-y-4">
-          <BuildingHeader {...pagedHeaderProps} onAskVts={goAskVts} />
+          <BuildingHeader {...pagedHeaderProps} />
           <AppraisalsPage />
         </div>
       )
@@ -737,7 +732,7 @@ export default function App() {
     if (page === "comps") {
       return (
         <div className="space-y-4">
-          <BuildingHeader {...pagedHeaderProps} onAskVts={goAskVts} />
+          <BuildingHeader {...pagedHeaderProps} />
           <CompsPage />
         </div>
       )
@@ -746,7 +741,7 @@ export default function App() {
     if (PAGE_LABELS[page] && page !== "dashboard") {
       return (
         <div className="flex flex-col" style={{minHeight: 'calc(100vh - 2rem)'}}>
-          <BuildingHeader {...pagedHeaderProps} onAskVts={goAskVts} />
+          <BuildingHeader {...pagedHeaderProps} />
           <div className="flex flex-col items-center justify-center flex-1 text-center px-4 rounded-2xl bg-white/70 dark:bg-white/8 backdrop-blur-md border border-border/70 mt-4">
             <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center mb-5">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-primary opacity-60"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 21V9"/></svg>
@@ -759,19 +754,20 @@ export default function App() {
     }
     return (
       <div className="space-y-4">
-        <BuildingHeader {...pagedHeaderProps} onAskVts={goAskVts} />
+        <BuildingHeader {...pagedHeaderProps} />
         <KpiBar kpis={KPIS} />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <AvailabilityOverview occupiedSf={957638} vacantSf={410416} vacantSpaces={VACANT_SPACES} />
-          <CriticalDates dates={CRITICAL_DATES} className="md:col-span-2" />
+          <AvailabilityOverview occupiedSf={957638} vacantSf={410416} vacantSpaces={VACANT_SPACES} onViewStackingPlan={() => setCurrentPage("stacking")} onSpaceClick={v => { setSelectedSpace({ suite: v.space, floor: "–", sf: v.sf, status: "Available", assetName: selectedAsset?.name }); setSelectedSpaceStatus("Available"); setCurrentPage("spaces") }} />
+          <CriticalDates dates={CRITICAL_DATES} className="md:col-span-2" onViewAll={() => setCurrentPage("critical-dates")} onRowClick={tenant => { const l = findLease(tenant); if (l) { setSelectedLease(l); setSelectedLeaseStatus(l.status as LeaseStatus); setCurrentPage("leases") } }} />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <FinancialPerformance className="md:col-span-2" />
-          <ActionLevers />
+          <FinancialPerformance className="md:col-span-2" criticalDates={CRITICAL_DATES} deals={DEALS} onViewReport={() => setCurrentPage("leases")} onNavigate={setCurrentPage} />
+          <ActionLevers onNavigate={setCurrentPage} />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <LeasingActivity deals={ACTIVE_DEALS} className="md:col-span-2" />
-          <LeasingAgents deals={ACTIVE_DEALS} decisions={DECISIONS_TODAY} />
+          <LeasingActivity deals={DEALS} className="md:col-span-2" onViewAll={() => setCurrentPage("deals")}
+            onDealClick={d => { setSelectedDeal(d); setSelectedDealStatus(d.status as DealStatus); setCurrentPage("deals") }} />
+          <LeasingAgents deals={DEALS} />
         </div>
       </div>
     )
@@ -873,7 +869,7 @@ function AppShell({ navCollapsed, setNavCollapsed, selectedAssetId, setSelectedA
     if (id === "ask-vts") setAskVtsKey(k => k + 1)
   }
   return (
-    <div className="min-h-screen">
+    <div className="h-screen flex flex-col overflow-hidden">
       <AgentsViewAwareNav
         collapsed={navCollapsed}
         onCollapsedChange={setNavCollapsed}
@@ -882,7 +878,7 @@ function AppShell({ navCollapsed, setNavCollapsed, selectedAssetId, setSelectedA
         selectedAssetId={selectedAssetId}
         onAssetChange={id => {
           const newIsPortfolioOrAll = id === "all" || PORTFOLIOS.some(p => p.id === id)
-          if (newIsPortfolioOrAll && (currentPage === "stacking" || currentPage === "spaces")) {
+          if (newIsPortfolioOrAll && currentPage === "stacking") {
             setCurrentPage("dashboard")
           }
           setSelectedAssetId(id)

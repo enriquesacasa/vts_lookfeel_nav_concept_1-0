@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { AgentBtn } from "@/components/agent-btn"
 import { FILTER_TAB_GROUP_CLS, FILTER_TAB_ITEM_CLS } from "@/components/filter-chip"
+import { TenantAvatar } from "@/components/tenant-avatar"
 import {
   Table, TableHeader, TableBody, TableRow, TableCell, TableHead,
   SortableHead, useSortState,
@@ -24,6 +25,8 @@ export interface CriticalDate {
 
 interface CriticalDatesProps {
   dates: CriticalDate[]
+  onViewAll?: () => void
+  onRowClick?: (tenant: string) => void
   className?: string
 }
 
@@ -52,7 +55,7 @@ function fmtMonths(n: number) {
 }
 
 const CriticalDates = React.forwardRef<HTMLDivElement, CriticalDatesProps>(
-  ({ dates, className }, ref) => {
+  ({ dates, onViewAll, onRowClick, className }, ref) => {
     const [active, setActive] = React.useState<DateCategory>("all")
     const { sortKey, sortDir, handleSort } = useSortState<SortKey>("monthsOut")
 
@@ -75,7 +78,7 @@ const CriticalDates = React.forwardRef<HTMLDivElement, CriticalDatesProps>(
             <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">Upcoming 12 mo</p>
             <h2 className="text-xl font-semibold text-foreground">Critical dates</h2>
           </div>
-          <Button variant="outline" size="sm" className="shrink-0">
+          <Button variant="outline" size="sm" className="shrink-0" onClick={onViewAll}>
             View critical dates
           </Button>
         </div>
@@ -114,9 +117,12 @@ const CriticalDates = React.forwardRef<HTMLDivElement, CriticalDatesProps>(
             {sorted.map((d, i) => {
               const u = urgency(d.monthsOut)
               return (
-                <TableRow key={i} title="View Lease" className={cn("cursor-pointer hover:bg-muted/40 transition-colors", i > 0 ? "border-t border-border/40" : "border-0")}>
-                  <TableCell className="py-2.5 text-sm font-medium text-foreground whitespace-nowrap">
-                    {d.tenant}
+                <TableRow key={i} title="View Lease" className={cn("cursor-pointer hover:bg-muted/40 transition-colors", i > 0 ? "border-t border-border/40" : "border-0")} onClick={() => onRowClick?.(d.tenant)}>
+                  <TableCell className="py-2.5 whitespace-nowrap">
+                    <div className="flex items-center gap-2">
+                      <TenantAvatar name={d.tenant} />
+                      <span className="text-sm font-medium text-foreground">{d.tenant}</span>
+                    </div>
                   </TableCell>
                   <TableCell className="py-2.5 pl-3 text-sm font-medium text-muted-foreground whitespace-nowrap">
                     {d.space}

@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Sparkle, ArrowUp, X, Maximize2 } from "lucide-react"
-import { useChatPattern, type TransferMessage } from "@/contexts/chat-pattern"
+import { useChatPattern, type TransferMessage, type ChatCommand } from "@/contexts/chat-pattern"
 import { SUGGESTED } from "@/components/ask-vts"
 
 interface Message {
@@ -53,15 +53,20 @@ export function ChatSidePush() {
   const hasSentRef = React.useRef<string | null>(null)
   const initialMsgRef = React.useRef<string>("")
   const initialSuggsRef = React.useRef<string[]>([])
+  const onCommandRef = React.useRef<((cmd: unknown) => void) | null>(null)
+  const commandSuggsRef = React.useRef<ChatCommand[]>([])
 
   React.useEffect(() => {
-    if (!sidePushOpen || !pending?.message) return
+    if (!sidePushOpen || !pending) return
+    onCommandRef.current = pending.onCommand ?? null
+    commandSuggsRef.current = pending.commandSuggestions ?? []
+    initialSuggsRef.current = pending.suggestions ?? []
+    setSuggestions(pending.suggestions ?? [])
+    if (!pending.message) { clearPending(); return }
     const msg = pending.message
     if (hasSentRef.current === msg) return
     hasSentRef.current = msg
     initialMsgRef.current = msg
-    initialSuggsRef.current = pending.suggestions ?? []
-    setSuggestions(pending.suggestions ?? [])
     setSuggestionsVisible(false)
     const userMsg: Message = { id: "u0", role: "user", content: msg }
     setMessages([userMsg, { id: "t0", role: "assistant", content: "Thinking…" }])
@@ -79,12 +84,32 @@ export function ChatSidePush() {
       setInput("")
       setSuggestionsVisible(false)
       hasSentRef.current = null
+      onCommandRef.current = null
+      commandSuggsRef.current = []
     }
   }, [sidePushOpen])
 
   React.useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages.length])
+
+  const sendCommand = (cs: ChatCommand) => {
+    setSuggestionsVisible(false)
+    const id = `u${Date.now()}`
+    const thinkId = `t${Date.now()}`
+    setMessages(prev => [...prev,
+      { id, role: "user", content: cs.label },
+      { id: thinkId, role: "assistant", content: "Thinking…" },
+    ])
+    if (cs.cmd !== undefined && onCommandRef.current) onCommandRef.current(cs.cmd)
+    setTimeout(() => {
+      setMessages(prev => {
+        const filtered = prev.filter(m => m.id !== thinkId)
+        return [...filtered, { id: `r${Date.now()}`, role: "assistant", content: cs.reply }]
+      })
+      setSuggestionsVisible(true)
+    }, 700)
+  }
 
   const sendText = (text: string) => {
     setSuggestionsVisible(false)
@@ -97,11 +122,9 @@ export function ChatSidePush() {
     setTimeout(() => {
       setMessages(prev => {
         const filtered = prev.filter(m => m.id !== thinkId)
-        return [...filtered, {
-          id: `r${Date.now()}`, role: "assistant",
-          content: "I'm analyzing your request in context of this deal. In production, this draws from live deal data, agent outputs, and portfolio intelligence.",
-        }]
+        return [...filtered, { id: `r${Date.now()}`, role: "assistant", content: generateResponse(text) }]
       })
+      setSuggestionsVisible(true)
     }, 1000)
   }
 
@@ -146,12 +169,20 @@ export function ChatSidePush() {
           <div className="flex-1 flex flex-col items-center justify-center gap-6 px-5 pb-4">
             <p className="text-lg font-semibold text-foreground text-center">What do you want to tackle?</p>
             <div className="flex flex-col gap-2 w-full">
-              {SUGGESTED.slice(0, 4).map((s) => (
-                <button key={s.label} onClick={() => sendText(s.prompt)}
-                  className="text-left text-xs px-3 py-2 rounded-md border border-primary text-primary bg-transparent hover:bg-primary/10 transition-colors leading-snug w-full">
-                  {s.label}
-                </button>
-              ))}
+              {commandSuggsRef.current.length > 0
+                ? commandSuggsRef.current.map((cs) => (
+                    <button key={cs.label} onClick={() => sendCommand(cs)}
+                      className="text-left text-xs px-3 py-2 rounded-md border border-primary text-primary bg-transparent hover:bg-primary/10 transition-colors leading-snug w-full">
+                      {cs.label}
+                    </button>
+                  ))
+                : SUGGESTED.slice(0, 4).map((s) => (
+                    <button key={s.label} onClick={() => sendText(s.prompt)}
+                      className="text-left text-xs px-3 py-2 rounded-md border border-primary text-primary bg-transparent hover:bg-primary/10 transition-colors leading-snug w-full">
+                      {s.label}
+                    </button>
+                  ))
+              }
             </div>
           </div>
         )}
@@ -179,17 +210,22 @@ export function ChatSidePush() {
         </div>
 
         {/* Suggestion pills */}
-        {suggestionsVisible && suggestions.length > 0 && (
+        {suggestionsVisible && (commandSuggsRef.current.length > 0 || suggestions.length > 0) && (
           <div className="shrink-0 px-4 pb-3 flex flex-col gap-1.5">
-            {suggestions.map((s, i) => (
-              <button
-                key={i}
-                onClick={() => sendText(s)}
-                className="text-left text-xs px-3 py-2 rounded-md border border-primary text-primary bg-transparent hover:bg-primary/10 transition-colors leading-snug w-full"
-              >
-                {s}
-              </button>
-            ))}
+            {commandSuggsRef.current.length > 0
+              ? commandSuggsRef.current.slice(0, 4).map((cs) => (
+                  <button key={cs.label} onClick={() => sendCommand(cs)}
+                    className="text-left text-xs px-3 py-2 rounded-md border border-primary text-primary bg-transparent hover:bg-primary/10 transition-colors leading-snug w-full">
+                    {cs.label}
+                  </button>
+                ))
+              : suggestions.map((s, i) => (
+                  <button key={i} onClick={() => sendText(s)}
+                    className="text-left text-xs px-3 py-2 rounded-md border border-primary text-primary bg-transparent hover:bg-primary/10 transition-colors leading-snug w-full">
+                    {s}
+                  </button>
+                ))
+            }
           </div>
         )}
 

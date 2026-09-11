@@ -519,6 +519,7 @@ function ViewSettingsPopover({ viewType, onViewTypeChange, enabledOptions, onTog
 
 export type StackingPlanCommand =
   | { type: "setFilters"; filters: Record<string, string[]> }
+  | { type: "replaceFilters"; filters: Record<string, string[]> }
   | { type: "clearFilters" }
   | { type: "setExpirationMode"; mode: ExpirationMode }
   | { type: "setSliderMonths"; months: number }
@@ -557,9 +558,10 @@ export const StackingPlan = forwardRef<StackingPlanHandle, { onSpaceClick?: (s: 
   useImperativeHandle(ref, () => ({
     applyCommand(cmd: StackingPlanCommand) {
       if (cmd.type === "setFilters") setActiveFilters(cmd.filters)
-      else if (cmd.type === "clearFilters") setActiveFilters({})
+      else if (cmd.type === "replaceFilters") { setActiveFilters(cmd.filters); setSliderMonths(0); setShowSlider(false) }
+      else if (cmd.type === "clearFilters") { setActiveFilters({}); setSliderMonths(0); setShowSlider(false) }
       else if (cmd.type === "setExpirationMode") setExpirationMode(cmd.mode)
-      else if (cmd.type === "setSliderMonths") setSliderMonths(cmd.months)
+      else if (cmd.type === "setSliderMonths") { setSliderMonths(cmd.months); setShowSlider(true) }
       else if (cmd.type === "setViewType") setViewType(cmd.viewType)
     },
   }))
@@ -590,14 +592,21 @@ export const StackingPlan = forwardRef<StackingPlanHandle, { onSpaceClick?: (s: 
     return { ...floor, spaces: spaces.filter((s): s is Space => s !== null) }
   })
 
-  const filteredFloors = resolvedFloors
+  const hasActiveFilters = Object.values(activeFilters).some((v) => v.length > 0)
+
+  const displayFloors = resolvedFloors
     .map((floor) => {
-      let spaces = floor.spaces.filter((s) => matchesFilters(s, activeFilters))
-      if (!show("0sf spaces")) spaces = spaces.filter((s) => s.sf > 0)
-      const totalSf = spaces.reduce((sum, s) => sum + s.sf, 0)
-      return { ...floor, spaces, totalSf }
+      const show0sf = show("0sf spaces")
+      const spaces = floor.spaces
+        .filter((s) => show0sf || s.sf > 0)
+        .map((s) => ({ ...s, _visible: matchesFilters(s, activeFilters) }))
+      const visibleSf = spaces.filter((s) => s._visible).reduce((sum, s) => sum + s.sf, 0)
+      const totalSf = floor.spaces.filter((s) => show0sf || s.sf > 0).reduce((sum, s) => sum + s.sf, 0)
+      return { ...floor, spaces, totalSf, visibleSf }
     })
-    .filter((floor) => floor.spaces.length > 0)
+    .filter((floor) => !hasActiveFilters || floor.spaces.some((s) => s._visible))
+
+  const filteredFloors = displayFloors
 
   const allTenants = [...new Set(
     resolvedFloors.flatMap((f) => f.spaces).map((s) => s.tenant).filter(Boolean) as string[]
@@ -611,7 +620,7 @@ export const StackingPlan = forwardRef<StackingPlanHandle, { onSpaceClick?: (s: 
   })
 
   return (
-    <div className="flex flex-col flex-1 bg-card/70 dark:bg-card/80 backdrop-blur-md border border-border/70 rounded-xl overflow-hidden mt-4 mb-6">
+    <div className="flex flex-col flex-1 bg-card/70 dark:bg-card/80 backdrop-blur-md border border-border/70 rounded-xl overflow-hidden mt-4">
 
       {/* Filter bar */}
       <div className="px-3 py-3 border-b border-border">
@@ -725,6 +734,7 @@ export const StackingPlan = forwardRef<StackingPlanHandle, { onSpaceClick?: (s: 
                   const c = (colorMode === "tenant" && space.tenant && !isVacant && !isAvailable)
                     ? getTenantColor(space.tenant, allTenants)
                     : COLORS[space.expBucket]
+                  const isVisible = (space as typeof space & { _visible?: boolean })._visible !== false
                   const widthPct = floor.totalSf > 0 ? (space.sf / floor.totalSf) * 100 : 100
 
                   const isActive = activeHighlight?.active === space.suite
@@ -735,22 +745,22 @@ export const StackingPlan = forwardRef<StackingPlanHandle, { onSpaceClick?: (s: 
                   const spaceLabel = buildSpaceLabel(space, floor.number)
                   return (
                     <div key={space.suite}
-                      className={cn("group/space relative flex flex-col justify-between border-r border-foreground/10 dark:border-foreground/5 last:border-r-0 transition-all overflow-hidden", onSpaceClick ? "cursor-pointer" : "cursor-default")}
-                      onClick={onSpaceClick ? () => onSpaceClick({ suite: space.suite, floor: String(floor.number), sf: space.sf, status: space.tenant ? "Occupied" : "Vacant", tenant: space.tenant || undefined, rent: space.baseRent || undefined, expiry: space.lxd || undefined }) : undefined}
+                      className={cn("group/space relative flex flex-col justify-between border-r border-foreground/10 dark:border-foreground/5 last:border-r-0 overflow-hidden", onSpaceClick ? "cursor-pointer" : "cursor-default")}
+                      onClick={isVisible && onSpaceClick ? () => onSpaceClick({ suite: space.suite, floor: String(floor.number), sf: space.sf, status: space.tenant ? "Occupied" : "Vacant", tenant: space.tenant || undefined, rent: space.baseRent || undefined, expiry: space.lxd || undefined }) : undefined}
                       style={{
-                        width: `${widthPct}%`,
+                        width: isVisible ? `${widthPct}%` : "0%",
                         flexShrink: 0,
                         background: c.bg,
                         color: c.text,
                         border: (c as { dashed?: boolean }).dashed ? "2px dashed var(--color-border)" : undefined,
-                        padding: cfg.padding,
+                        padding: isVisible ? cfg.padding : "0",
                         boxShadow: isActive
                           ? `inset 0 0 0 2.5px var(--color-chart-1)`
                           : isRelated
                             ? `inset 0 0 0 2px color-mix(in oklch, var(--color-chart-1) 40%, transparent)`
                             : undefined,
-                        opacity: isDimmed ? 0.45 : undefined,
-                        transition: "box-shadow 0.15s ease",
+                        opacity: isDimmed ? 0.45 : isVisible ? 1 : 0,
+                        transition: "width 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.25s ease, padding 0.35s ease, box-shadow 0.15s ease",
                       }}>
 
                       {/* hover overlay — avoids CSS filter which breaks popover z-index */}
