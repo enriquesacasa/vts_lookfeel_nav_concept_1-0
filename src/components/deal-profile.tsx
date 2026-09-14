@@ -1553,6 +1553,7 @@ export function DealProfile({ deal, onBack: _onBack, status: statusProp, onStatu
                   { value: "updates",   label: "Updates" },
                   { value: "tasks",     label: "Tasks", badge: STAGE_TASKS[stage]?.filter(t => !t.done).length || undefined, badgeCls: "bg-primary/15 text-primary" },
                   { value: "documents", label: "Docs" },
+                  { value: "reminders", label: "Reminders" },
                 ].map(({ value, label, badge, badgeCls }) => (
                   <TabsTrigger key={value} value={value} className="rounded-none !bg-transparent border-b-2 border-transparent data-active:border-primary data-active:!text-primary data-active:font-medium hover:!bg-transparent hover:text-foreground !shadow-none px-3 pb-2.5 pt-0 text-sm flex-none -mb-px">
                     {label}
@@ -1563,6 +1564,7 @@ export function DealProfile({ deal, onBack: _onBack, status: statusProp, onStatu
               <TabsContent value="updates"><ActivityFeed deal={deal} stage={stage} /></TabsContent>
               <TabsContent value="tasks"><TasksTab stage={stage} status={status} dealId={deal.id} /></TabsContent>
 <TabsContent value="documents"><DocumentsTab stage={stage} /></TabsContent>
+              <TabsContent value="reminders"><p className="text-sm text-muted-foreground py-8 text-center">No reminders set.</p></TabsContent>
             </Tabs>
           </div>
         </div>
