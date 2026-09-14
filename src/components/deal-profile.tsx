@@ -12,7 +12,7 @@ import {
   CheckCircle2, Clock, AlertTriangle, HeartPulse, Zap,
   Bot, LayoutGrid, Table2, ArrowUpDown,
   Briefcase, Globe, Mail, DollarSign, Layers, Target,
-  Star, Home, SquareStack, Scale, Trophy, Plus,
+  Star, Home, SquareStack, Scale, Trophy, Plus, Paperclip,
 } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -569,7 +569,7 @@ const REF_GROUPS = Array.from(new Set(REFERENCE_POOL.map(r => r.group)))
 
 function ProposalsTab({ deal, stageIdx }: { deal: Deal; stageIdx: number }) {
   const [measure, setMeasure] = React.useState<ProposalMeasure>("psf-yr")
-  const [sortOrder, setSortOrder] = React.useState<ProposalSort>("asc")
+  const [sortOrder, setSortOrder] = React.useState<ProposalSort>("desc")
   const [view, setView] = React.useState<ProposalView>("cards")
   const [selectedRefs, setSelectedRefs] = React.useState<Set<string>>(new Set())
   const [refOpen, setRefOpen] = React.useState(false)
@@ -623,17 +623,13 @@ function ProposalsTab({ deal, stageIdx }: { deal: Deal; stageIdx: number }) {
           </Button>
         ))}
 
-        <div className="w-px h-4 bg-border mx-0.5" />
-
         {/* Sort chip */}
         <Button variant="outline" size="sm"
           onClick={() => setSortOrder(o => o === "asc" ? "desc" : "asc")}
           className="gap-1.5 font-normal">
           <ArrowUpDown className="h-3 w-3" />
-          {sortOrder === "asc" ? "Oldest first" : "Newest first"}
+          {sortOrder === "asc" ? "Oldest" : "Newest"}
         </Button>
-
-        <div className="w-px h-4 bg-border mx-0.5" />
 
         {/* Compare chip — add reference cards */}
         <Popover open={refOpen} onOpenChange={setRefOpen}>
@@ -678,6 +674,11 @@ function ProposalsTab({ deal, stageIdx }: { deal: Deal; stageIdx: number }) {
             ))}
           </PopoverContent>
         </Popover>
+
+        <Button size="sm" className="gap-1.5">
+          <Plus className="h-3 w-3" />
+          Proposal
+        </Button>
 
         <div className="ml-auto flex items-center gap-1">
           <Button variant="outline" size="icon" onClick={() => setView("cards")}
@@ -1335,6 +1336,11 @@ function UpdateCard({ entry }: { entry: FeedEntry }) {
 
 function ActivityFeed({ deal, stage }: { deal: Deal; stage: StageValue }) {
   const [draft, setDraft] = React.useState("")
+  const [logAsTour, setLogAsTour] = React.useState(false)
+  const today = new Date().toISOString().slice(0, 10)
+  const [updateDate, setUpdateDate] = React.useState(today)
+  const fileRef = React.useRef<HTMLInputElement>(null)
+  const dateRef = React.useRef<HTMLInputElement>(null)
   const stageFeed = getStageFeeds(stage)
   const dealFeed = DEAL_FEEDS[deal.id] ?? []
   const seen = new Set(stageFeed.map(e => e.message))
@@ -1346,17 +1352,34 @@ function ActivityFeed({ deal, stage }: { deal: Deal; stage: StageValue }) {
         {/* Composer */}
         <div className="rounded-xl border border-border bg-card p-3 flex flex-col gap-2">
           <Textarea value={draft} onChange={e => setDraft(e.target.value)}
-            placeholder="Post an update…"
+            placeholder={logAsTour ? "Describe the tour…" : "Post an update…"}
             className="resize-none text-sm min-h-[60px] border-0 bg-transparent p-0 focus-visible:ring-0 shadow-none"
             rows={2}
           />
-          <div className="flex items-center justify-between gap-2">
+          {/* Toolbar: draft + attach + date + tour toggle + post */}
+          <div className="flex items-center gap-1.5">
             <Button size="sm" variant="outline" className="gap-1.5 text-primary border-primary/30 hover:bg-primary/5"
               onClick={() => setDraft("Draft a deal update for Amazon.com summarizing current stage, recent activity, and next steps.")}>
               <Zap className="h-3.5 w-3.5" />
               Draft with VTS
             </Button>
-            <Button size="sm" disabled={!draft.trim()} className="gap-1.5" onClick={() => setDraft("")}>
+            <Button size="sm" variant="outline" className="text-primary border-primary/30 hover:bg-primary/5 h-8 w-8 p-0 rounded-full"
+              onClick={() => fileRef.current?.click()}>
+              <Paperclip className="h-3.5 w-3.5" />
+              <input ref={fileRef} type="file" className="sr-only" />
+            </Button>
+            <Button size="sm" variant="outline" className="text-primary border-primary/30 hover:bg-primary/5 h-8 w-8 p-0 rounded-full"
+              onClick={() => (dateRef.current as any)?.showPicker?.()}>
+              <Calendar className="h-3.5 w-3.5" />
+              <input ref={dateRef} type="date" value={updateDate} onChange={e => setUpdateDate(e.target.value)} className="sr-only" />
+            </Button>
+            <Button size="sm" variant="outline"
+              onClick={() => setLogAsTour(v => !v)}
+              className={cn("gap-1.5 text-primary border-primary/30 hover:bg-primary/5", logAsTour && "bg-primary/10")}>
+              <MapPin className="h-3.5 w-3.5" />
+              Log tour
+            </Button>
+            <Button size="sm" disabled={!draft.trim()} className="gap-1.5 ml-auto" onClick={() => setDraft("")}>
               <Send className="h-3.5 w-3.5" />
               Post
             </Button>
@@ -1479,7 +1502,8 @@ export function DealProfile({ deal, onBack: _onBack, status: statusProp, onStatu
   const [internalStatus, setInternalStatus] = React.useState<DealStatus>(deal.status as DealStatus)
   const status    = statusProp ?? internalStatus
   const _setStatus = onStatusChange ?? setInternalStatus; void _setStatus
-  const [tab, setTab]               = React.useState(initialTab ?? "updates")
+  const [tab, setTab]               = React.useState(initialTab ?? "info")
+  const [rightTab, setRightTab]     = React.useState("updates")
   const stageIdx = ALL_STAGES.indexOf(stage)
 
   return (
@@ -1489,27 +1513,22 @@ export function DealProfile({ deal, onBack: _onBack, status: statusProp, onStatu
       <FinancialBar deal={deal} stageIdx={stageIdx} />
 
       {/* Stage journey */}
-      <StageJourneyBar currentStage={stage} onChange={s => { setStage(s); setTab("updates") }} />
+      <StageJourneyBar currentStage={stage} onChange={s => { setStage(s); setRightTab("updates") }} />
 
       {/* Agent strip */}
 
       {/* Main content grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 items-stretch">
+      <div className="grid grid-cols-1 lg:grid-cols-8 gap-4 items-start">
 
-        {/* Left col: tabbed content */}
-        <div className="lg:col-span-3 flex flex-col gap-4 h-full">
-
+        {/* Left col: Info / Proposals / Encumbrances */}
+        <div className="lg:col-span-5 flex flex-col gap-4">
           <div className={cn(cardBase, "flex-1")}>
             <Tabs value={tab} onValueChange={v => setTab(v)} className="w-full">
               <TabsList variant="line" className="w-full mb-5 border-b border-border rounded-none bg-transparent p-0 h-auto gap-0 justify-start">
                 {[
-                  { value: "updates", label: "Updates" },
-                  { value: "tasks", label: "Tasks", badge: STAGE_TASKS[stage]?.filter(t => !t.done).length || undefined, badgeCls: "bg-primary/15 text-primary" },
+                  { value: "info",         label: "Info" },
+                  { value: "proposals",    label: "Proposals" },
                   { value: "encumbrances", label: "Encumbrances", badge: DEAL_ENCUMBRANCES[deal.id]?.length, badgeCls: "bg-destructive text-primary-foreground" },
-                  { value: "tours", label: "Tours" },
-                  { value: "proposals", label: "Proposals" },
-                  { value: "leases", label: "Legal" },
-                  { value: "documents", label: "Docs" },
                 ].map(({ value, label, badge, badgeCls }) => (
                   <TabsTrigger key={value} value={value} className="rounded-none !bg-transparent border-b-2 border-transparent data-active:border-primary data-active:!text-primary data-active:font-medium hover:!bg-transparent hover:text-foreground !shadow-none px-4 pb-2.5 pt-0 text-sm flex-none -mb-px">
                     {label}
@@ -1517,23 +1536,34 @@ export function DealProfile({ deal, onBack: _onBack, status: statusProp, onStatu
                   </TabsTrigger>
                 ))}
               </TabsList>
-              <TabsContent value="updates"><ActivityFeed deal={deal} stage={stage} /></TabsContent>
-              <TabsContent value="tasks"><TasksTab stage={stage} status={status} dealId={deal.id} /></TabsContent>
-              <TabsContent value="encumbrances"><EncumbrancesTab deal={deal} /></TabsContent>
-              <TabsContent value="tours"><p className="text-sm text-muted-foreground py-8 text-center">No tours scheduled.</p></TabsContent>
+              <TabsContent value="info"><OverviewTab deal={deal} stageIdx={stageIdx} /></TabsContent>
               <TabsContent value="proposals"><ProposalsTab deal={deal} stageIdx={stageIdx} /></TabsContent>
-              <TabsContent value="leases"><p className="text-sm text-muted-foreground py-8 text-center">No leases on file.</p></TabsContent>
-              <TabsContent value="documents"><DocumentsTab stage={stage} /></TabsContent>
+              <TabsContent value="encumbrances"><EncumbrancesTab deal={deal} /></TabsContent>
             </Tabs>
           </div>
         </div>
 
-        {/* Right: Deal Health + info */}
-        <div className="lg:col-span-1 flex flex-col gap-4">
+        {/* Right col: Deal Health + Updates / Tasks / Tours / Docs */}
+        <div className="lg:col-span-3 flex flex-col gap-4">
           <DealHealthCard status={status} stage={stage} dealId={deal.id} />
-          <div className={cn(cardBase, "overflow-y-auto max-h-[80vh] lg:max-h-none")}>
-            <p className="text-sm font-semibold text-foreground mb-4">Info</p>
-            <OverviewTab deal={deal} stageIdx={stageIdx} />
+          <div className={cn(cardBase)}>
+            <Tabs value={rightTab} onValueChange={v => setRightTab(v)} className="w-full">
+              <TabsList variant="line" className="w-full mb-4 border-b border-border rounded-none bg-transparent p-0 h-auto gap-0 justify-start">
+                {[
+                  { value: "updates",   label: "Updates" },
+                  { value: "tasks",     label: "Tasks", badge: STAGE_TASKS[stage]?.filter(t => !t.done).length || undefined, badgeCls: "bg-primary/15 text-primary" },
+                  { value: "documents", label: "Docs" },
+                ].map(({ value, label, badge, badgeCls }) => (
+                  <TabsTrigger key={value} value={value} className="rounded-none !bg-transparent border-b-2 border-transparent data-active:border-primary data-active:!text-primary data-active:font-medium hover:!bg-transparent hover:text-foreground !shadow-none px-3 pb-2.5 pt-0 text-sm flex-none -mb-px">
+                    {label}
+                    {badge ? <span className={cn("ml-1 inline-flex items-center justify-center min-w-4 h-4 px-1 rounded-full text-[10px] font-bold", badgeCls ?? "bg-destructive text-primary-foreground")}>{badge}</span> : null}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+              <TabsContent value="updates"><ActivityFeed deal={deal} stage={stage} /></TabsContent>
+              <TabsContent value="tasks"><TasksTab stage={stage} status={status} dealId={deal.id} /></TabsContent>
+<TabsContent value="documents"><DocumentsTab stage={stage} /></TabsContent>
+            </Tabs>
           </div>
         </div>
 
