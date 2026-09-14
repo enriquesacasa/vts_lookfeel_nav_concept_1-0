@@ -59,16 +59,16 @@ const navStructure: NavItem[] = [
   { id: "stacking",     label: "Stacking plan", icon: Layers, children: [
     { id: "spaces",     label: "Spaces",        icon: SquareStack },
   ]},
+  { id: "deals",        label: "Deals",         icon: Handshake, children: [
+    { id: "deal-tasks",        label: "Deal tasks",        icon: ClipboardList },
+    { id: "tenant-coord",      label: "Tenant coordination", icon: UsersRound },
+  ]},
   { id: "leases",       label: "Leases",        icon: FileText, children: [
     { id: "critical-dates",    label: "Critical dates",    icon: CalendarDays },
     { id: "options-rights",    label: "Options & rights",  icon: ShieldCheck },
   ]},
   { id: "tenants",      label: "Tenants",       icon: Users },
   { id: "requirements", label: "Requirements",  icon: ListChecks },
-  { id: "deals",        label: "Deals",         icon: Handshake, children: [
-    { id: "deal-tasks",        label: "Deal tasks",        icon: ClipboardList },
-    { id: "tenant-coord",      label: "Tenant coordination", icon: UsersRound },
-  ]},
   { id: "planning",     label: "Planning",      icon: Calculator, children: [
     { id: "budgets",    label: "Budgets",       icon: Wallet },
     { id: "appraisals", label: "Appraisals",    icon: Scale },
