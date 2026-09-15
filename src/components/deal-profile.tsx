@@ -6,13 +6,15 @@ import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
+import { Dialog as DialogPrimitive } from "@base-ui/react/dialog"
 import {
   ChevronDown, Check, FileText, Download, Send,
   Building2, User, MapPin, Ruler, Tag, Calendar,
-  CheckCircle2, Clock, AlertTriangle, HeartPulse, Zap,
+  CheckCircle2, Clock, AlertTriangle, HeartPulse, Zap, Dot,
   Bot, LayoutGrid, Table2, ArrowUpDown,
   Briefcase, Globe, Mail, DollarSign, Layers, Target,
-  Star, Home, SquareStack, Scale, Trophy, Plus, Paperclip,
+  Star, Home, SquareStack, Scale, Trophy, Plus, Paperclip, X,
+  ChevronRight,
 } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -147,37 +149,51 @@ function StageJourneyBar({ currentStage, onChange }: { currentStage: StageValue;
   const currentIdx = ALL_STAGES.indexOf(currentStage)
   return (
     <div className="rounded-xl bg-primary px-4 py-3">
-      <div className="flex items-center flex-wrap gap-y-2">
-        {ALL_STAGES.map((stage, i) => {
-          const isPast   = i < currentIdx
-          const isActive = stage === currentStage
-          return (
-            <React.Fragment key={stage}>
-              {i > 0 && (
-                <div className={cn("flex-1 h-px min-w-3 mx-1.5", isPast || isActive ? "bg-primary-foreground" : "bg-primary-foreground/40")} />
-              )}
-              <button
-                onClick={() => { if (i > currentIdx) onChange(stage) }}
-                className={cn("flex items-center gap-1.5 shrink-0 group", isPast && "cursor-default")}
-              >
-                <div className={cn(
-                  "h-5 w-5 rounded-full flex items-center justify-center transition-all",
-                  isPast || isActive ? "bg-primary-foreground" : "bg-transparent border-2 border-primary-foreground/40",
-                )}>
-                  {isPast   && <Check className="h-2.5 w-2.5 text-primary" />}
-                  {isActive && <div className="h-2 w-2 rounded-full bg-primary" />}
-                </div>
-                <span className={cn(
-                  "text-xs font-semibold whitespace-nowrap transition-colors",
-                  isPast || isActive ? "text-primary-foreground" : "text-primary-foreground/50",
-                )}>
-                  {stage}
-                </span>
-              </button>
-            </React.Fragment>
-          )
-        })}
-      </div>
+      <TooltipProvider>
+        <div className="flex items-center flex-wrap gap-y-2">
+          {ALL_STAGES.map((stage, i) => {
+            const isPast   = i < currentIdx
+            const isActive = stage === currentStage
+            const tooltipLabel = isPast ? `Back to ${stage}` : isActive ? "Current stage" : `Advance to ${stage}`
+            return (
+              <React.Fragment key={stage}>
+                {i > 0 && (
+                  <div className={cn("flex-1 h-px min-w-3 mx-1.5 transition-colors duration-150", isPast || isActive ? "bg-primary-foreground" : "bg-primary-foreground/30")} />
+                )}
+                <Tooltip>
+                  <TooltipTrigger render={
+                    <button
+                      onClick={() => onChange(stage)}
+                      className="flex items-center gap-1.5 shrink-0 group cursor-pointer"
+                    >
+                      <div className={cn(
+                        "h-5 w-5 rounded-full flex items-center justify-center transition-all duration-150",
+                        isPast || isActive
+                          ? "bg-primary-foreground group-hover:scale-110 group-hover:bg-primary-foreground/80"
+                          : "bg-transparent border-2 border-primary-foreground/30 group-hover:border-primary-foreground/70 group-hover:bg-primary-foreground/15",
+                      )}>
+                        {isPast   && <Check className="h-2.5 w-2.5 text-primary" />}
+                        {isActive && <div className="h-2 w-2 rounded-full bg-primary" />}
+                      </div>
+                      <span className={cn(
+                        "text-xs font-semibold whitespace-nowrap transition-colors duration-150",
+                        isPast || isActive
+                          ? "text-primary-foreground group-hover:text-primary-foreground/80"
+                          : "text-primary-foreground/40 group-hover:text-primary-foreground/75",
+                      )}>
+                        {stage}
+                      </span>
+                    </button>
+                  } />
+                  <TooltipContent side="bottom" className="text-xs font-medium">
+                    {tooltipLabel}
+                  </TooltipContent>
+                </Tooltip>
+              </React.Fragment>
+            )
+          })}
+        </div>
+      </TooltipProvider>
     </div>
   )
 }
@@ -191,12 +207,13 @@ function delta(actual: number, budget: number): { dir: "up" | "down" | "flat"; p
   return { dir: p > 0 ? "up" : "down", pct: `${p > 0 ? "+" : ""}${p.toFixed(1)}%` }
 }
 
-function FinancialBar({ deal, stageIdx }: { deal: Deal; stageIdx: number }) {
+function FinancialBar({ deal, stageIdx, onHealthClick }: { deal: Deal; stageIdx: number; onHealthClick: () => void }) {
   const nerDelta = delta(deal.ner, deal.budgetNer)
   const noiDelta = delta(deal.noi, deal.budgetNoi)
   const tlv = deal.ner && deal.term ? (deal.ner * deal.sf * (deal.term / 12) / 1_000_000) : null
-  const daysOpen = Math.floor((Date.now() - new Date(deal.lastUpdated).getTime()) / 86_400_000)
   const tiCost = stageIdx >= 2 ? deal.sf * 80 : null
+  const stage = ALL_STAGES[stageIdx] ?? "Inquiry"
+  const health = getDealHealth(deal.id, stage)
 
   const kpis = [
     ...(deal.budgetNer > 0 ? [{
@@ -213,8 +230,20 @@ function FinancialBar({ deal, stageIdx }: { deal: Deal; stageIdx: number }) {
     }] : []),
     ...(tlv ? [{ label: "Total lease value", value: `$${tlv.toFixed(1)}M`, subtitle: `${deal.term} months` }] : []),
     ...(tiCost ? [{ label: "TI investment", value: `$${(tiCost / 1_000_000).toFixed(2)}M`, subtitle: "$80/sf est." }] : []),
-    { label: "Days open", value: `${daysOpen}d`, subtitle: `Last update ${deal.lastUpdated}` },
-    ...(deal.sf ? [{ label: "Size", value: `${deal.sf.toLocaleString()} sf`, subtitle: deal.dealType }] : []),
+    {
+      label: "Deal health",
+      value: health.label,
+      valueNode: (
+        <div className="flex items-center gap-1.5">
+          {(health.score === "caution" || health.score === "at-risk") && (
+            <AlertTriangle className={cn("h-4 w-4 shrink-0", health.textCls)} />
+          )}
+          <p className={cn("text-xl font-medium", health.textCls)}>{health.label}</p>
+        </div>
+      ),
+      subtitle: health.context,
+      onClick: onHealthClick,
+    },
   ]
 
   return <KpiBar kpis={kpis} />
@@ -280,7 +309,7 @@ function OverviewTab({ deal, stageIdx }: { deal: Deal; stageIdx: number }) {
         {stageIdx >= 1 && (<>
           <div className="mt-4 mb-1"><p className="text-sm font-semibold text-foreground">Tour</p></div>
           <FieldRow icon={Calendar}   label="Tour date">Sep 3, 2026 · 10:00 AM</FieldRow>
-          <FieldRow icon={MapPin}     label="Spaces toured">Suite 0800 – Floor 8 · Suite 0900 – Floor 9</FieldRow>
+          <FieldRow icon={MapPin}     label="Spaces toured">Space 0800 – Floor 8 · Space 0900 – Floor 9</FieldRow>
         </>)}
         {stageIdx >= 2 && (<>
           <div className="mt-4 mb-1"><p className="text-sm font-semibold text-foreground">Proposal</p></div>
@@ -618,7 +647,7 @@ function ProposalsTab({ deal, stageIdx }: { deal: Deal; stageIdx: number }) {
         {(Object.keys(MEASURE_LABELS) as ProposalMeasure[]).map(m => (
           <Button key={m} variant="outline" size="sm"
             onClick={() => setMeasure(m)}
-            className={cn("gap-1 font-normal", measure === m && "border-primary bg-primary/10 text-primary font-medium")}>
+            className={cn("gap-1 font-normal text-primary border-primary/30 hover:bg-primary/5", measure === m && "bg-primary/10 font-medium")}>
             {MEASURE_LABELS[m]}
           </Button>
         ))}
@@ -626,7 +655,7 @@ function ProposalsTab({ deal, stageIdx }: { deal: Deal; stageIdx: number }) {
         {/* Sort chip */}
         <Button variant="outline" size="sm"
           onClick={() => setSortOrder(o => o === "asc" ? "desc" : "asc")}
-          className="gap-1.5 font-normal">
+          className="gap-1.5 font-normal text-primary border-primary/30 hover:bg-primary/5">
           <ArrowUpDown className="h-3 w-3" />
           {sortOrder === "asc" ? "Oldest" : "Newest"}
         </Button>
@@ -635,7 +664,7 @@ function ProposalsTab({ deal, stageIdx }: { deal: Deal; stageIdx: number }) {
         <Popover open={refOpen} onOpenChange={setRefOpen}>
           <PopoverTrigger render={<Button
             variant="outline" size="sm"
-            className={cn("gap-1.5 font-normal", selectedRefs.size > 0 && "border-primary bg-primary/10 text-primary font-medium")}
+            className={cn("gap-1.5 font-normal text-primary border-primary/30 hover:bg-primary/5", selectedRefs.size > 0 && "bg-primary/10 font-medium")}
           />}>
             <Plus className="h-3 w-3" />
             Compare
@@ -682,11 +711,11 @@ function ProposalsTab({ deal, stageIdx }: { deal: Deal; stageIdx: number }) {
 
         <div className="ml-auto flex items-center gap-1">
           <Button variant="outline" size="icon" onClick={() => setView("cards")}
-            className={cn("h-7 w-7", view === "cards" && "border-primary bg-primary/10 text-primary")}>
+            className={cn("h-7 w-7 text-primary border-primary/30 hover:bg-primary/5", view === "cards" && "bg-primary/10")}>
             <LayoutGrid className="h-3.5 w-3.5" />
           </Button>
           <Button variant="outline" size="icon" onClick={() => setView("table")}
-            className={cn("h-7 w-7", view === "table" && "border-primary bg-primary/10 text-primary")}>
+            className={cn("h-7 w-7 text-primary border-primary/30 hover:bg-primary/5", view === "table" && "bg-primary/10")}>
             <Table2 className="h-3.5 w-3.5" />
           </Button>
         </div>
@@ -769,7 +798,7 @@ const STAGE_TASKS: Record<StageValue, TaskItem[]> = {
   "Touring":   [
     { id: 4,  label: "Prepare tour itinerary",           done: true,  required: true },
     { id: 5,  label: "Collect tenant feedback",          done: false, required: true },
-    { id: 6,  label: "Shortlist top 2 suites",           done: false },
+    { id: 6,  label: "Shortlist top 2 spaces",            done: false },
     { id: 7,  label: "Schedule follow-up tour",          done: false },
   ],
   "Proposal":  [
@@ -802,13 +831,13 @@ const STAGE_TASKS: Record<StageValue, TaskItem[]> = {
 
 const TASKS_SHOW_STAGES: StageValue[] = ["Proposal", "LOI", "Legal", "Lease Out"]
 
-function TasksTab({ stage, status, dealId }: { stage: StageValue; status: DealStatus; dealId?: string }) {
+function TasksTab({ stage, dealId }: { stage: StageValue; status?: DealStatus; dealId?: string }) {
   const [doneMap, setDoneMap] = React.useState<Record<number, boolean>>(() => {
     const m: Record<number, boolean> = {}
     ALL_STAGES.forEach(s => STAGE_TASKS[s].forEach(t => { m[t.id] = t.done }))
     return m
   })
-  const [showCompleted, setShowCompleted] = React.useState(true)
+  const [showCompleted, setShowCompleted] = React.useState(false)
 
   const toggle = (id: number) => setDoneMap(prev => ({ ...prev, [id]: !prev[id] }))
   const reset = () => {
@@ -820,11 +849,8 @@ function TasksTab({ stage, status, dealId }: { stage: StageValue; status: DealSt
   const currentIdx = ALL_STAGES.indexOf(stage)
   const visibleStages = TASKS_SHOW_STAGES.filter(s => ALL_STAGES.indexOf(s) >= currentIdx - 1)
 
-  // Pull deal-health recs for the current stage/status
-  const stageHealth = HEALTH_BY_STAGE[stage]
-  const baseCfg = stageHealth?.[status] ?? stageHealth?.active
-  const override = dealId ? HEALTH_REC_OVERRIDES[dealId] : undefined
-  const healthRecs = (override?.recs ?? baseCfg?.recs ?? [])
+  const health = getDealHealth(dealId, stage)
+  const healthRecs = health.recs
 
   return (
     <TooltipProvider>
@@ -835,7 +861,7 @@ function TasksTab({ stage, status, dealId }: { stage: StageValue; status: DealSt
             variant="outline"
             size="sm"
             onClick={() => setShowCompleted(v => !v)}
-            className={cn("gap-1 font-normal", showCompleted && "border-primary bg-primary/10 text-primary font-medium")}
+            className={cn("h-7 px-2.5 text-xs gap-1 font-normal text-primary border-primary/30 hover:bg-primary/5", showCompleted && "bg-primary/10 font-medium")}
           >
             Show completed
           </Button>
@@ -843,7 +869,7 @@ function TasksTab({ stage, status, dealId }: { stage: StageValue; status: DealSt
             variant="outline"
             size="sm"
             onClick={reset}
-            className="gap-1 font-normal ml-auto"
+            className="h-7 px-2.5 text-xs gap-1 font-normal text-primary border-primary/30 hover:bg-primary/5 ml-auto"
           >
             Reset all tasks
           </Button>
@@ -852,14 +878,14 @@ function TasksTab({ stage, status, dealId }: { stage: StageValue; status: DealSt
         <div className="flex flex-col gap-3 pt-3">
           {/* Deal Health suggestions — styled as agent card, matching UpdateCard agent style */}
           {healthRecs.length > 0 && (
-            <div className="mx-0 rounded-xl border border-primary/20 bg-primary/5 p-4 flex flex-col gap-2.5">
+            <div className="mx-0 rounded-xl border border-border bg-card p-4 flex flex-col gap-2.5">
               <div className="flex items-center gap-2.5">
                 <div className="h-8 w-8 rounded-full bg-primary/15 text-primary flex items-center justify-center shrink-0">
                   <HeartPulse className="h-4 w-4" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-primary leading-none">Deal Health</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">{baseCfg?.label ?? "On track"}</p>
+                  <p className="text-sm font-semibold text-foreground leading-none">Deal Health</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{health.label}</p>
                 </div>
                 <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20">
                   <Zap className="h-2.5 w-2.5 text-primary" />
@@ -874,7 +900,7 @@ function TasksTab({ stage, status, dealId }: { stage: StageValue; status: DealSt
                     <div key={r.action} className="flex items-center gap-2">
                       <p className="text-sm text-foreground/80 flex-1 leading-snug">{r.action}</p>
                       {agent && (
-                        <Button variant="outline" size="sm" className="gap-1.5 shrink-0 h-7 text-xs">
+                        <Button variant="outline" size="sm" className="gap-1.5 shrink-0 h-7 text-xs text-primary border-primary/30 hover:bg-primary/5">
                           <AgentIcon className="h-3 w-3" />
                           {agent.name}
                         </Button>
@@ -968,12 +994,12 @@ type EncumbranceItem = {
 
 const DEAL_ENCUMBRANCES: Record<string, EncumbranceItem[]> = {
   "d00": [
-    { optionType: "ROFO", holder: "Sullivan & Cromwell", suite: "Suite 0800", floor: "Floor 8", sf: 18000, priority: 1, expiry: "Apr 30, 2029", notes: "Must be exercised within 30 days of landlord offering the space to market" },
-    { optionType: "Expansion Option", holder: "Meridian Health Partners", suite: "Suite 0800", floor: "Floor 8", sf: 18000, priority: 2, expiry: "Mar 31, 2028", notes: "One-time right; exercisable during the 6-month window before the triggering event" },
+    { optionType: "ROFO", holder: "Sullivan & Cromwell", suite: "Space 0800", floor: "Floor 8", sf: 18000, priority: 1, expiry: "Apr 30, 2029", notes: "Must be exercised within 30 days of landlord offering the space to market" },
+    { optionType: "Expansion Option", holder: "Meridian Health Partners", suite: "Space 0800", floor: "Floor 8", sf: 18000, priority: 2, expiry: "Mar 31, 2028", notes: "One-time right; exercisable during the 6-month window before the triggering event" },
   ],
   "d01": [
-    { optionType: "ROFO", holder: "Starbucks Corporation", suite: "Suite 750", floor: "Floor 7", sf: 8200, priority: 1, expiry: "Dec 31, 2027", notes: "Must exercise within 30 days of landlord notice" },
-    { optionType: "Expansion Option", holder: "Starbucks Corporation", suite: "Suite 900", floor: "Floor 9", sf: 12000, priority: 1, expiry: "Jun 30, 2028" },
+    { optionType: "ROFO", holder: "Starbucks Corporation", suite: "Space 750", floor: "Floor 7", sf: 8200, priority: 1, expiry: "Dec 31, 2027", notes: "Must exercise within 30 days of landlord notice" },
+    { optionType: "Expansion Option", holder: "Starbucks Corporation", suite: "Space 900", floor: "Floor 9", sf: 12000, priority: 1, expiry: "Jun 30, 2028" },
   ],
   "d02": [
     { optionType: "ROFO", holder: "Apex Capital", suite: "Floor 11", floor: "Floor 11", sf: 45000, priority: 1, expiry: "Mar 15, 2027" },
@@ -985,24 +1011,10 @@ const DEAL_ENCUMBRANCES: Record<string, EncumbranceItem[]> = {
     { optionType: "ROFR", holder: "Third-party tenant", suite: "Floor 4", floor: "Floor 4", sf: 30500, priority: 1, notes: "Existing ROFR from Horizon Ventures; may conflict" },
   ],
   "d05": [
-    { optionType: "Expansion Option", holder: "Vertex Studios", suite: "Suite 650", floor: "Floor 6", sf: 9800, priority: 1, expiry: "Sep 30, 2027" },
+    { optionType: "Expansion Option", holder: "Vertex Studios", suite: "Space 650", floor: "Floor 6", sf: 9800, priority: 1, expiry: "Sep 30, 2027" },
   ],
 }
 
-const HEALTH_REC_OVERRIDES: Record<string, { summary?: string; signals?: string[]; recs: { action: string; urgency: string; agentId: string }[] }> = {
-  "d00": {
-    summary: "2 encumbrances detected on Suite 0800. Rights holders must be notified before the space can be offered to Amazon.",
-    signals: [
-      "ROFO held by Sullivan & Cromwell — 1st priority, expires Apr 30, 2029",
-      "Expansion Option held by Meridian Health Partners — 2nd priority, expires Mar 31, 2028",
-      "Both rights encumber Suite 0800 · 18,000 sf — Amazon's target space",
-    ],
-    recs: [
-      { action: "Draft ROFO notice to Sullivan & Cromwell for Suite 0800", urgency: "Before proceeding", agentId: "doc-drafting" },
-      { action: "Draft expansion option notice to Meridian Health Partners for Suite 0800", urgency: "This week", agentId: "doc-drafting" },
-    ],
-  },
-}
 
 
 function EncumbrancesTab({ deal }: { deal: Deal }) {
@@ -1065,7 +1077,7 @@ function getDocuments(stage: StageValue): DocItem[] {
   ]
   if (stageIdx >= 1) {
     docs.push({ name: "Tour confirmation – Sep 3.pdf", type: "Correspondence", date: "Aug 28, 2026" })
-    docs.push({ name: "Suite 0800 space plan.pdf",     type: "Floor plan",     date: "Sep 3, 2026"  })
+    docs.push({ name: "Space 0800 space plan.pdf",     type: "Floor plan",     date: "Sep 3, 2026"  })
   }
   if (stageIdx >= 2) {
     docs.push({ name: "Proposal 1 – VTS Tower.pdf",   type: "Proposal",   date: "Sep 18, 2026" })
@@ -1144,8 +1156,8 @@ const DEAL_FEEDS: Record<string, FeedEntry[]> = {
     { initials: "JL",  name: "Jessica Lee",    timestamp: "Today · 8:47 AM", message: "Received inbound inquiry from Amazon.com. 18,000 sf request on Floor 8, VTS Tower.", kind: "comment" },
   ],
   "d08": [
-    { initials: "AI",  name: "Space Match",    timestamp: "Today · 2:05 PM", message: "Ranked 14 available floors. Suite 2100 flagged as best fit — 54,000 sf uninterrupted, open plan, no column interference.", kind: "agent"  },
-    { initials: "DC",  name: "Derek Chan",     timestamp: "Today · 1:40 PM", message: "Morgan Stanley team confirmed tour interest. Coordinating schedule with facilities for Suite 2100 and 2200.", kind: "comment" },
+    { initials: "AI",  name: "Space Match",    timestamp: "Today · 2:05 PM", message: "Ranked 14 available floors. Space 2100 flagged as best fit — 54,000 sf uninterrupted, open plan, no column interference.", kind: "agent"  },
+    { initials: "DC",  name: "Derek Chan",     timestamp: "Today · 1:40 PM", message: "Morgan Stanley team confirmed tour interest. Coordinating schedule with facilities for Space 2100 and 2200.", kind: "comment" },
     { initials: "AI",  name: "Tour Coordinator", timestamp: "Today · 1:45 PM", message: "Tour scheduled Sep 10 · 10:00 AM. Confirmation sent to Derek Chan and Morgan Stanley facilities team.", kind: "agent"  },
     { initials: "VTS", name: "VTS system",     timestamp: "Yesterday · 4:12 PM", message: "Stage updated: Inquiry → Touring.", kind: "update" },
   ],
@@ -1187,13 +1199,13 @@ const STAGE_FEEDS: Record<StageValue, FeedEntry[]> = {
     { initials: "RC",  name: "Ryan Chen",        timestamp: "Today · 8:55 AM",  message: "Forwarded the inquiry to Sarah Okonkwo at CBRE.", kind: "comment" },
   ],
   "Touring": [
-    { initials: "AI",  name: "Space Match",      timestamp: "Today · 2:05 PM",  message: "Ranked 14 available floors. Suite 2100 flagged as best fit — 54,000 sf uninterrupted, open plan, no column interference.", kind: "agent" },
+    { initials: "AI",  name: "Space Match",      timestamp: "Today · 2:05 PM",  message: "Ranked 14 available floors. Space 2100 flagged as best fit — 54,000 sf uninterrupted, open plan, no column interference.", kind: "agent" },
     { initials: "AI",  name: "Tour Coordinator", timestamp: "Today · 1:45 PM",  message: "Tour scheduled Sep 10 · 10:00 AM. Confirmation sent to Derek Chan and Morgan Stanley facilities team.", kind: "agent" },
-    { initials: "DC",  name: "Derek Chan",       timestamp: "Today · 1:40 PM",  message: "Morgan Stanley team confirmed tour interest. Coordinating schedule with facilities for Suite 2100 and 2200.", kind: "comment" },
+    { initials: "DC",  name: "Derek Chan",       timestamp: "Today · 1:40 PM",  message: "Morgan Stanley team confirmed tour interest. Coordinating schedule with facilities for Space 2100 and 2200.", kind: "comment" },
     { initials: "VTS", name: "VTS system",       timestamp: "Yesterday · 4:12 PM", message: "Stage updated: Inquiry → Touring.", kind: "update" },
   ],
   "Proposal": [
-    { initials: "AI",  name: "Proposal Builder", timestamp: "Today · 11:00 AM", message: "Proposal assembled for Suite 2100: 54,000 sf · $98 NER · 10-year term · $120 TI allowance. Ready for review.", kind: "agent" },
+    { initials: "AI",  name: "Proposal Builder", timestamp: "Today · 11:00 AM", message: "Proposal assembled for Space 2100: 54,000 sf · $98 NER · 10-year term · $120 TI allowance. Ready for review.", kind: "agent" },
     { initials: "SO",  name: "Sarah Okonkwo",    timestamp: "Today · 9:14 AM",  message: "Confirmed with the Amazon team — they want to move forward. Initial proposal request submitted.", kind: "comment" },
     { initials: "VTS", name: "VTS system",       timestamp: "Yesterday · 8:00 AM", message: "Stage updated: Touring → Proposal.", kind: "update" },
   ],
@@ -1230,7 +1242,7 @@ export function getEncumbranceCount(dealId: string): number {
 
 // Encumbrances that affect a specific space (keyed by space ID from spaces-page)
 const SPACE_ENCUMBRANCES: Record<string, number> = {
-  "s26": 2, // Suite 0800 Floor 8 — ROFO + expansion option (d00)
+  "s26": 2, // Space 0800 Floor 8 — ROFO + expansion option (d00)
   "s27": 1, // Suite 0700 Floor 7 — ROFO held by Starbucks (d01)
   "s03": 1, // Suite 0900 Floor 9 — expansion option held by Starbucks (d01)
   "s24": 1, // Suite 1100 Floor 11 — ROFO held by Apex Capital (d02)
@@ -1272,13 +1284,13 @@ function UpdateCard({ entry }: { entry: FeedEntry }) {
   if (entry.kind === "agent") {
     const AgentIcon = AGENT_ICON_MAP[entry.name] ?? Bot
     return (
-      <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 flex flex-col gap-2.5">
+      <div className="rounded-xl border border-border bg-card p-4 flex flex-col gap-2.5">
         <div className="flex items-center gap-2.5">
           <div className="h-8 w-8 rounded-full bg-primary/15 text-primary flex items-center justify-center shrink-0">
             <AgentIcon className="h-4 w-4" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-primary leading-none">{entry.name}</p>
+            <p className="text-sm font-semibold text-foreground leading-none">{entry.name}</p>
             <p className="text-xs text-muted-foreground mt-0.5">{entry.timestamp}</p>
           </div>
           <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20">
@@ -1350,11 +1362,11 @@ function ActivityFeed({ deal, stage }: { deal: Deal; stage: StageValue }) {
     <div className="flex flex-col gap-0">
       <div className="flex flex-col gap-3">
         {/* Composer */}
-        <div className="rounded-xl border border-border bg-card p-3 flex flex-col gap-2">
+        <div className="rounded-xl border border-primary/30 bg-card p-3 flex flex-col gap-2">
           <Textarea value={draft} onChange={e => setDraft(e.target.value)}
             placeholder={logAsTour ? "Describe the tour…" : "Post an update…"}
-            className="resize-none text-sm min-h-[60px] border-0 bg-transparent p-0 focus-visible:ring-0 shadow-none"
-            rows={2}
+            className="resize-none text-sm min-h-[90px] border-0 bg-transparent p-0 focus-visible:ring-0 shadow-none"
+            rows={3}
           />
           {/* Toolbar: draft + attach + date + tour toggle + post */}
           <div className="flex items-center gap-1.5">
@@ -1395,96 +1407,92 @@ function ActivityFeed({ deal, stage }: { deal: Deal; stage: StageValue }) {
   )
 }
 
-// ─── Deal Health card ─────────────────────────────────────────────────────────
+// ─── Deal Health system ───────────────────────────────────────────────────────
 
-const HEALTH_TIERS = {
-  1: { cls: "text-success bg-success/10 border-success/20",             dot: "bg-success"         },
-  2: { cls: "text-warning bg-warning/10 border-warning/20",             dot: "bg-warning"         },
-  3: { cls: "text-destructive bg-destructive/10 border-destructive/20", dot: "bg-destructive"     },
-  4: { cls: "text-muted-foreground bg-muted/60 border-border",          dot: "bg-muted-foreground"},
-} as const
-type HealthTier = keyof typeof HEALTH_TIERS
+type HealthScore = "strong" | "on-track" | "caution" | "at-risk"
 
-type HealthEntry = { tier: HealthTier; label: string; summary: string; signals: string[]; recs: { action: string; urgency: string; agentId: string }[] }
+const HEALTH_SCORE_CONFIG: Record<HealthScore, { label: string; cls: string; textCls: string; bgCls: string }> = {
+  "strong":   { label: "Strong",   cls: "text-success bg-success/10 border-success/20",             textCls: "text-success",     bgCls: "bg-success/8"      },
+  "on-track": { label: "On track", cls: "text-primary bg-primary/10 border-primary/20",             textCls: "text-primary",     bgCls: ""                  },
+  "caution":  { label: "Caution",  cls: "text-warning bg-warning/10 border-warning/20",             textCls: "text-warning",     bgCls: "bg-warning/8"      },
+  "at-risk":  { label: "At risk",  cls: "text-destructive bg-destructive/10 border-destructive/20", textCls: "text-destructive", bgCls: "bg-destructive/8"  },
+}
 
-const HEALTH_BY_STAGE: Record<StageValue, Partial<Record<DealStatus, HealthEntry>>> = {
+type HealthEntry = {
+  score: HealthScore
+  context: string
+  summary: string
+  signals: string[]
+  recs: { action: string; urgency: string; agentId: string }[]
+}
+
+const HEALTH_BY_STAGE: Record<StageValue, Record<HealthScore, HealthEntry>> = {
   "Inquiry": {
-    active: { tier: 1, label: "On track", summary: "Requirement captured. Coordinating tour schedule with the tenant team.", signals: ["Inbound inquiry parsed and logged", "Tenant rep identified: Sarah Okonkwo at CBRE", "Space requirement matched to 3 available suites"], recs: [{ action: "Schedule initial tours", urgency: "This week", agentId: "tour-agent" }] },
-    stalled: { tier: 2, label: "Stalled", summary: "No tour scheduled yet. Inquiry risks going cold.", signals: ["Requirement captured 8 days ago", "No tour date confirmed", "Competing buildings may be scheduling faster"], recs: [{ action: "Re-engage tenant rep", urgency: "Today", agentId: "deal-momentum" }, { action: "Schedule tour", urgency: "Today", agentId: "tour-agent" }] },
-    "at-risk": { tier: 3, label: "At risk", summary: "Inquiry has not progressed. Tenant may be disengaging.", signals: ["12 days since inquiry", "No response to outreach", "Competitor tour detected"], recs: [{ action: "Send urgent re-engagement", urgency: "Today", agentId: "deal-momentum" }, { action: "Analyze deal intelligence", urgency: "Today", agentId: "deal-intelligence" }] },
+    "strong":   { score: "strong",   context: "3 spaces matched, tour confirmed", summary: "Requirement captured and acted on immediately. Tour confirmed and spaces matched to requirements.", signals: ["Inquiry parsed and logged within 1 hour", "Tenant rep identified: Sarah Okonkwo at CBRE", "3 spaces matched to requirement", "Tour confirmed Sep 18 · 10:00 AM"], recs: [{ action: "Prepare space shortlist for tour", urgency: "Before tour", agentId: "tour-agent" }] },
+    "on-track": { score: "on-track", context: "3 spaces matched, tours pending", summary: "Requirement captured. Coordinating tour schedule with the tenant team.", signals: ["Inbound inquiry parsed and logged", "Tenant rep identified: Sarah Okonkwo at CBRE", "Space requirement matched to 3 available spaces"], recs: [{ action: "Schedule initial tours", urgency: "This week", agentId: "tour-agent" }] },
+    "caution":  { score: "caution",  context: "No tour yet — 8 days old", summary: "No tour scheduled yet. Inquiry risks going cold without follow-up.", signals: ["Requirement captured 8 days ago", "No tour date confirmed", "Tenant rep has not responded to last outreach", "Competing buildings may be scheduling faster"], recs: [{ action: "Re-engage tenant rep", urgency: "Today", agentId: "deal-momentum" }, { action: "Schedule tour", urgency: "Today", agentId: "tour-agent" }] },
+    "at-risk":  { score: "at-risk",  context: "No response, competitor touring", summary: "Inquiry has not progressed. Tenant may be disengaging. Competitor activity detected.", signals: ["12 days since inquiry with no forward progress", "No response to outreach attempts", "Competitor tour detected at 2 buildings", "Encumbrances on target space require rights holder notification before proceeding"], recs: [{ action: "Send urgent re-engagement", urgency: "Today", agentId: "deal-momentum" }, { action: "Notify rights holders on encumbered space", urgency: "Before proceeding", agentId: "doc-drafting" }] },
   },
   "Touring": {
-    active: { tier: 1, label: "On track", summary: "Tours underway. Capturing tenant feedback and matching spaces.", signals: ["Tour scheduled for Sep 10 · 10:00 AM", "Suite 2100 ranked best fit", "No competing tour detected"], recs: [{ action: "Prepare proposal for top-ranked suite", urgency: "This week", agentId: "proposal-builder" }] },
-    stalled: { tier: 2, label: "Stalled", summary: "Tour completed but no follow-up from tenant rep.", signals: ["Tour completed 9 days ago", "No feedback received", "Proposal not yet requested"], recs: [{ action: "Follow up on tour feedback", urgency: "Today", agentId: "deal-momentum" }, { action: "Prepare proactive proposal", urgency: "This week", agentId: "proposal-builder" }] },
-    "at-risk": { tier: 3, label: "At risk", summary: "Tenant toured a competitor property. Engagement declining.", signals: ["Competitor tour detected at 2 other buildings", "Last communication 14 days ago", "No proposal request received"], recs: [{ action: "Model concession scenarios", urgency: "Today", agentId: "scenario-modeling" }, { action: "Send differentiation brief", urgency: "Today", agentId: "deal-momentum" }] },
+    "strong":   { score: "strong",   context: "Space 2100 top-ranked, ready", summary: "Tour cycle complete with strong tenant feedback. Top space identified and proposal ready to deliver.", signals: ["3 tours completed across 2 buildings", "Space 2100 ranked top by tenant team", "Feedback captured: prefers higher floors, natural light", "No competitor tours detected"], recs: [{ action: "Deliver proposal for Space 2100", urgency: "This week", agentId: "proposal-builder" }] },
+    "on-track": { score: "on-track", context: "Tour Sep 18 · 2 spaces shortlisted", summary: "Tours underway. Capturing tenant feedback and matching spaces to requirements.", signals: ["Tour scheduled for Sep 18 · 10:00 AM", "Space 2100 ranked best fit so far", "No competing tour detected"], recs: [{ action: "Prepare proposal for top-ranked space", urgency: "This week", agentId: "proposal-builder" }] },
+    "caution":  { score: "caution",  context: "No follow-up in 9 days", summary: "Tour completed but no follow-up from tenant rep. Proposal not yet requested.", signals: ["Tour completed 9 days ago", "No feedback received from tenant team", "Proposal not yet requested"], recs: [{ action: "Follow up on tour feedback", urgency: "Today", agentId: "deal-momentum" }, { action: "Prepare proactive proposal", urgency: "This week", agentId: "proposal-builder" }] },
+    "at-risk":  { score: "at-risk",  context: "Competitor tours, silent 14 days", summary: "Tenant toured competitor properties. Engagement declining. Intervention recommended.", signals: ["Competitor tour detected at 2 other buildings", "Last communication 14 days ago", "No proposal request received", "Tenant rep unreachable"], recs: [{ action: "Model concession scenarios", urgency: "Today", agentId: "scenario-modeling" }, { action: "Send differentiation brief", urgency: "Today", agentId: "deal-momentum" }] },
   },
   "Proposal": {
-    active: { tier: 1, label: "On track", summary: "Proposal delivered. Monitoring for counter and feedback.", signals: ["Proposal sent to tenant team", "No counter overdue", "Deal Monitor watching engagement signals"], recs: [{ action: "Prepare counter-proposal scenarios", urgency: "This week", agentId: "scenario-modeling" }] },
-    stalled: { tier: 2, label: "Stalled", summary: "Proposal sent with no counter received. Follow-up needed.", signals: ["Proposal delivered 11 days ago", "No counter received", "Board review may be causing delay"], recs: [{ action: "Send follow-up on proposal", urgency: "Today", agentId: "deal-momentum" }, { action: "Model alternative proposal terms", urgency: "This week", agentId: "scenario-modeling" }] },
-    "at-risk": { tier: 3, label: "At risk", summary: "Multiple risk signals on proposal stage. Intervention recommended.", signals: ["Tenant seen touring competitor", "Budget gap of 12% vs market", "Last communication 14 days ago"], recs: [{ action: "Model concession scenarios", urgency: "Today", agentId: "scenario-modeling" }, { action: "Analyze deal intelligence", urgency: "Today", agentId: "deal-intelligence" }] },
+    "strong":   { score: "strong",   context: "Counter received, 4% gap", summary: "Proposal delivered and counter received. Terms are close. Deal is progressing to LOI.", signals: ["Proposal delivered Sep 5", "Counter received Sep 12", "Budget gap: 4% — within negotiable range", "Key terms aligned: TI, free rent, term length"], recs: [{ action: "Prepare LOI draft", urgency: "This week", agentId: "proposal-builder" }] },
+    "on-track": { score: "on-track", context: "Delivered Sep 5, awaiting counter", summary: "Proposal delivered. Monitoring for counter and tracking engagement signals.", signals: ["Proposal sent to tenant team Sep 5", "No counter overdue", "Deal Monitor watching engagement signals"], recs: [{ action: "Prepare counter-proposal scenarios", urgency: "This week", agentId: "scenario-modeling" }] },
+    "caution":  { score: "caution",  context: "No counter — 11 days old", summary: "Proposal sent with no counter received. Follow-up needed to keep momentum.", signals: ["Proposal delivered 11 days ago", "No counter received", "Board review may be causing delay", "Tenant rep last active 5 days ago"], recs: [{ action: "Send follow-up on proposal", urgency: "Today", agentId: "deal-momentum" }, { action: "Model alternative proposal terms", urgency: "This week", agentId: "scenario-modeling" }] },
+    "at-risk":  { score: "at-risk",  context: "12% gap, silent 14 days", summary: "Multiple risk signals detected. Intervention required to salvage this deal.", signals: ["Tenant seen touring competitor buildings", "Budget gap of 12% vs market rate", "Last communication 14 days ago", "No counter received"], recs: [{ action: "Model concession scenarios", urgency: "Today", agentId: "scenario-modeling" }, { action: "Analyze deal intelligence", urgency: "Today", agentId: "deal-intelligence" }] },
   },
   "LOI": {
-    active: { tier: 1, label: "On track", summary: "LOI executed. Preparing legal package for counsel.", signals: ["LOI signed by all parties", "Key terms extracted: 18 fields", "2 flags raised: TI escalation and subleasing rights"], recs: [{ action: "Prepare counsel handoff package", urgency: "This week", agentId: "counsel-handoff" }] },
-    stalled: { tier: 2, label: "Stalled", summary: "LOI signed but legal package not yet initiated.", signals: ["LOI executed 7 days ago", "No counsel engaged yet", "Clock running on exclusivity window"], recs: [{ action: "Initiate counsel handoff", urgency: "Today", agentId: "counsel-handoff" }, { action: "Flag exclusivity timeline risk", urgency: "Today", agentId: "deal-momentum" }] },
-    "at-risk": { tier: 3, label: "At risk", summary: "LOI terms at risk. Open items need immediate resolution.", signals: ["Subleasing rights dispute unresolved", "TI escalation clause flagged", "Exclusivity window closing in 5 days"], recs: [{ action: "Escalate flagged terms to counsel", urgency: "Today", agentId: "counsel-handoff" }, { action: "Prepare negotiation guidance", urgency: "Today", agentId: "negotiation-guidance" }] },
+    "strong":   { score: "strong",   context: "LOI signed, counsel engaged", summary: "LOI executed with clean terms. Legal package initiated and counsel engaged promptly.", signals: ["LOI signed by all parties Sep 8", "Key terms extracted: 18 fields, 0 flags", "Counsel engaged — package delivered Sep 9", "Exclusivity window: 30 days remaining"], recs: [{ action: "Monitor counsel progress", urgency: "This week", agentId: "counsel-handoff" }] },
+    "on-track": { score: "on-track", context: "LOI executed, preparing package", summary: "LOI executed. Preparing legal package for counsel handoff.", signals: ["LOI signed by all parties", "Key terms extracted: 18 fields", "2 flags raised: TI escalation and subleasing rights"], recs: [{ action: "Prepare counsel handoff package", urgency: "This week", agentId: "counsel-handoff" }] },
+    "caution":  { score: "caution",  context: "No counsel — 7 days since LOI", summary: "LOI signed but legal package not yet initiated. Exclusivity window is running.", signals: ["LOI executed 7 days ago", "No counsel engaged yet", "Clock running on exclusivity window"], recs: [{ action: "Initiate counsel handoff", urgency: "Today", agentId: "counsel-handoff" }, { action: "Flag exclusivity timeline risk", urgency: "Today", agentId: "deal-momentum" }] },
+    "at-risk":  { score: "at-risk",  context: "Exclusivity closes in 5 days", summary: "LOI terms at risk. Open items need immediate resolution before exclusivity expires.", signals: ["Subleasing rights dispute unresolved", "TI escalation clause flagged by tenant", "Exclusivity window closing in 5 days"], recs: [{ action: "Escalate flagged terms to counsel", urgency: "Today", agentId: "counsel-handoff" }, { action: "Prepare negotiation guidance", urgency: "Today", agentId: "negotiation-guidance" }] },
   },
   "Legal": {
-    active: { tier: 1, label: "On track", summary: "Legal review underway. Tracking open redlines.", signals: ["12 open redlines tracked", "Both counsel parties engaged", "No scope drift detected"], recs: [{ action: "Monitor redline resolution progress", urgency: "This week", agentId: "negotiation-guidance" }] },
-    stalled: { tier: 2, label: "Stalled", summary: "Legal review stalled. Redlines not progressing.", signals: ["No redline movement in 8 days", "Scope drift detected on subleasing rights", "Tenant counsel unresponsive"], recs: [{ action: "Escalate stalled redlines", urgency: "Today", agentId: "negotiation-guidance" }, { action: "Prepare concession on open items", urgency: "Today", agentId: "scenario-modeling" }] },
-    "at-risk": { tier: 3, label: "At risk", summary: "Critical legal issues detected. Immediate attention required.", signals: ["Subleasing rights moved without agreement", "3 rounds of redlines unresolved", "Tenant threatening to walk"], recs: [{ action: "Convene negotiation call", urgency: "Today", agentId: "negotiation-guidance" }, { action: "Escalate to senior leadership", urgency: "Today", agentId: "deal-health" }] },
+    "strong":   { score: "strong",   context: "8 of 12 redlines closed this week", summary: "Legal review progressing well. Both counsel engaged and redlines closing on schedule.", signals: ["8 of 12 redlines resolved this week", "Both counsel parties engaged and responsive", "No scope drift detected", "On track for execution by Oct 15"], recs: [{ action: "Monitor remaining redlines", urgency: "This week", agentId: "negotiation-guidance" }] },
+    "on-track": { score: "on-track", context: "12 open redlines, both counsel on", summary: "Legal review underway. Tracking open redlines with both counsel engaged.", signals: ["12 open redlines tracked", "Both counsel parties engaged", "No scope drift detected"], recs: [{ action: "Monitor redline resolution progress", urgency: "This week", agentId: "negotiation-guidance" }] },
+    "caution":  { score: "caution",  context: "No redline movement in 8 days", summary: "Legal review stalled. Redlines not progressing and scope drift detected.", signals: ["No redline movement in 8 days", "Scope drift detected on subleasing rights", "Tenant counsel unresponsive to last 2 emails"], recs: [{ action: "Escalate stalled redlines", urgency: "Today", agentId: "negotiation-guidance" }, { action: "Prepare concession on open items", urgency: "Today", agentId: "scenario-modeling" }] },
+    "at-risk":  { score: "at-risk",  context: "3 rounds unresolved, walk risk", summary: "Critical legal issues detected. Immediate escalation required.", signals: ["Subleasing rights moved without agreement", "3 rounds of redlines unresolved", "Tenant threatening to terminate negotiations"], recs: [{ action: "Convene negotiation call", urgency: "Today", agentId: "negotiation-guidance" }, { action: "Escalate to senior leadership", urgency: "Today", agentId: "deal-health" }] },
   },
   "Lease Out": {
-    active: { tier: 1, label: "On track", summary: "Lease out for signature. Tracking outstanding signatures.", signals: ["2 outstanding signatures: Tenant CFO and Landlord VP", "Execution package assembled", "Effective date confirmed"], recs: [{ action: "Track signature completion", urgency: "This week", agentId: "execution-management" }] },
-    stalled: { tier: 2, label: "Stalled", summary: "Lease out but no signatures received yet.", signals: ["Lease sent 6 days ago", "No signatures returned", "Signatory availability unconfirmed"], recs: [{ action: "Follow up with signatories", urgency: "Today", agentId: "execution-management" }, { action: "Re-engage tenant rep", urgency: "Today", agentId: "deal-momentum" }] },
-    "at-risk": { tier: 3, label: "At risk", summary: "Signature process at risk. Deal may not close.", signals: ["Tenant CFO travel delay", "Landlord VP approval pending board", "Competing lease opportunity detected"], recs: [{ action: "Escalate signature urgency", urgency: "Today", agentId: "execution-management" }, { action: "Prepare contingency scenarios", urgency: "Today", agentId: "scenario-modeling" }] },
+    "strong":   { score: "strong",   context: "Both signatures received", summary: "Both signatures collected. Lease ready for filing and effective date confirmed.", signals: ["Tenant CFO signed Sep 10", "Landlord VP signed Sep 11", "Effective date Jan 1, 2027 confirmed", "Filing package assembled"], recs: [{ action: "File executed lease", urgency: "Today", agentId: "execution-management" }] },
+    "on-track": { score: "on-track", context: "2 signatures outstanding", summary: "Lease out for signature. Tracking outstanding signatures from both parties.", signals: ["2 outstanding signatures: Tenant CFO and Landlord VP", "Execution package assembled", "Effective date confirmed"], recs: [{ action: "Track signature completion", urgency: "This week", agentId: "execution-management" }] },
+    "caution":  { score: "caution",  context: "No signatures — sent 6 days ago", summary: "Lease out but no signatures received yet. Follow-up needed.", signals: ["Lease sent 6 days ago", "No signatures returned", "Signatory availability unconfirmed"], recs: [{ action: "Follow up with signatories", urgency: "Today", agentId: "execution-management" }, { action: "Re-engage tenant rep", urgency: "Today", agentId: "deal-momentum" }] },
+    "at-risk":  { score: "at-risk",  context: "Delays, competing opportunity", summary: "Signature process at risk. Delays and competing opportunity may jeopardize close.", signals: ["Tenant CFO travel delay — unavailable until Sep 22", "Landlord VP approval pending board sign-off", "Competing lease opportunity detected"], recs: [{ action: "Escalate signature urgency", urgency: "Today", agentId: "execution-management" }, { action: "Prepare contingency scenarios", urgency: "Today", agentId: "scenario-modeling" }] },
   },
   "Executed": {
-    active: { tier: 1, label: "On track", summary: "Lease executed. Operational handoff in progress.", signals: ["Lease signed by all parties", "Effective date Jan 1, 2027", "16 operational tasks created"], recs: [{ action: "Complete operational handoff", urgency: "This week", agentId: "operational-handoff" }, { action: "Sync final terms to all systems", urgency: "This week", agentId: "data-writeback" }] },
-    stalled: { tier: 2, label: "Stalled", summary: "Execution complete but handoff tasks not started.", signals: ["Lease executed 3 days ago", "Property management not notified", "Buildout tasks not created"], recs: [{ action: "Initiate operational handoff", urgency: "Today", agentId: "operational-handoff" }, { action: "Sync final terms", urgency: "Today", agentId: "data-writeback" }] },
-    "at-risk": { tier: 3, label: "At risk", summary: "Post-execution tasks falling behind. Tenant move-in at risk.", signals: ["Buildout permit delayed", "Property management handoff incomplete", "Move-in date conflicts detected"], recs: [{ action: "Escalate buildout timeline", urgency: "Today", agentId: "operational-handoff" }, { action: "Resolve move-in conflicts", urgency: "Today", agentId: "data-writeback" }] },
+    "strong":   { score: "strong",   context: "Handoff complete, buildout on track", summary: "Execution complete and full operational handoff finished. Tenant onboarded and buildout proceeding on schedule.", signals: ["All 16 handoff tasks completed", "Property management notified and briefed", "Buildout permit approved", "Move-in confirmed Jan 1, 2027"], recs: [{ action: "Archive deal documentation", urgency: "This week", agentId: "data-writeback" }] },
+    "on-track": { score: "on-track", context: "16 handoff tasks in progress", summary: "Lease executed. Operational handoff underway with 16 tasks created.", signals: ["Lease signed by all parties", "Effective date Jan 1, 2027", "16 operational tasks created and assigned"], recs: [{ action: "Complete operational handoff", urgency: "This week", agentId: "operational-handoff" }, { action: "Sync final terms to all systems", urgency: "This week", agentId: "data-writeback" }] },
+    "caution":  { score: "caution",  context: "Handoff not started, 3 days out", summary: "Execution complete but handoff tasks not yet initiated. Key notifications overdue.", signals: ["Lease executed 3 days ago", "Property management not notified", "Buildout tasks not created"], recs: [{ action: "Initiate operational handoff", urgency: "Today", agentId: "operational-handoff" }, { action: "Sync final terms", urgency: "Today", agentId: "data-writeback" }] },
+    "at-risk":  { score: "at-risk",  context: "Permit delayed, move-in at risk", summary: "Post-execution tasks falling behind. Tenant move-in date at risk.", signals: ["Buildout permit delayed — city review backlog", "Property management handoff incomplete", "Move-in date conflicts detected"], recs: [{ action: "Escalate buildout timeline", urgency: "Today", agentId: "operational-handoff" }, { action: "Resolve move-in conflicts", urgency: "Today", agentId: "data-writeback" }] },
   },
 }
 
+const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
+  "d00": {
+    score: "at-risk",
+    context: "2 encumbrances on target space",
+    summary: "Two encumbrances detected on Space 0800. Rights holders must be notified before the space can be offered to Amazon.",
+    signals: [
+      "ROFO held by Sullivan & Cromwell — 1st priority, expires Apr 30, 2029",
+      "Expansion option held by Meridian Health Partners — 2nd priority, expires Mar 31, 2028",
+      "Both rights encumber Space 0800 · 18,000 sf — Amazon's target space",
+    ],
+    recs: [
+      { action: "Draft ROFO notice to Sullivan & Cromwell for Space 0800", urgency: "Before proceeding", agentId: "doc-drafting" },
+      { action: "Draft expansion option notice to Meridian Health Partners for Space 0800", urgency: "This week", agentId: "doc-drafting" },
+    ],
+  },
+}
 
-
-function DealHealthCard({ status, stage, dealId }: { status: DealStatus; stage: StageValue; dealId?: string }) {
-  const stageHealth = HEALTH_BY_STAGE[stage]
-  const baseCfg = stageHealth?.[status] ?? stageHealth?.active ?? HEALTH_BY_STAGE["Inquiry"].active!
-  const override = dealId ? HEALTH_REC_OVERRIDES[dealId] : undefined
-  const cfg = override ? { ...baseCfg, ...override } : baseCfg
-  return (
-    <div className={cn(cardBase, "border-transparent flex flex-col gap-4 bg-sidebar-accent")}>
-      <div className="flex items-start justify-between gap-2">
-        <div>
-          <p className="text-[10px] font-medium uppercase tracking-widest mb-1 text-sidebar-foreground/70">VTS agents</p>
-          <h2 className="text-xl font-semibold text-sidebar-foreground">Deal Health</h2>
-        </div>
-      </div>
-
-      <div className="rounded-lg px-3 py-2 flex items-center gap-3 bg-sidebar-foreground/10">
-        <HeartPulse className="h-3.5 w-3.5 shrink-0 text-sidebar-primary" />
-        <p className="text-xs leading-snug text-sidebar-foreground/70 flex-1">{cfg.summary}</p>
-        <Popover>
-          <PopoverTrigger render={<Button variant="outline" size="sm" className="shrink-0 gap-1.5 text-sidebar-foreground/85 border-current bg-transparent hover:bg-sidebar-foreground/10" />}>
-            Signals
-            <ChevronDown className="h-3 w-3" />
-          </PopoverTrigger>
-          <PopoverContent className="w-64 p-3" align="end">
-            <p className="text-xs font-semibold text-foreground mb-2">Signals</p>
-            <div className="flex flex-col gap-2">
-              {cfg.signals.map((s, i) => (
-                <div key={i} className="flex items-start gap-2 text-xs text-foreground/80 leading-snug">
-                  <CheckCircle2 className="h-3.5 w-3.5 text-success shrink-0 mt-0.5" />
-                  {s}
-                </div>
-              ))}
-            </div>
-          </PopoverContent>
-        </Popover>
-      </div>
-
-    </div>
-  )
+function getDealHealth(dealId: string | undefined, stage: StageValue, defaultScore: HealthScore = "on-track"): HealthEntry & { label: string; cls: string; textCls: string; bgCls: string } {
+  const override = dealId ? HEALTH_OVERRIDES[dealId] : undefined
+  const entry = override ?? HEALTH_BY_STAGE[stage][defaultScore]
+  const scoreCfg = HEALTH_SCORE_CONFIG[entry.score]
+  return { ...entry, label: scoreCfg.label, cls: scoreCfg.cls, textCls: scoreCfg.textCls, bgCls: scoreCfg.bgCls }
 }
 
 // ─── Main component ───────────────────────────────────────────────────────────
@@ -1504,24 +1512,60 @@ export function DealProfile({ deal, onBack: _onBack, status: statusProp, onStatu
   const _setStatus = onStatusChange ?? setInternalStatus; void _setStatus
   const [tab, setTab]               = React.useState(initialTab ?? "info")
   const [rightTab, setRightTab]     = React.useState("updates")
+  const [healthOpen, setHealthOpen] = React.useState(false)
+  const [rightCollapsed, setRightCollapsed] = React.useState(false)
   const stageIdx = ALL_STAGES.indexOf(stage)
+
+  const healthCfg = getDealHealth(deal.id, stage)
 
   return (
     <div className="flex flex-col gap-4 mt-4 pb-8">
 
-      {/* Financial KPI bar */}
-      <FinancialBar deal={deal} stageIdx={stageIdx} />
+      {/* Deal health modal */}
+      <DialogPrimitive.Root open={healthOpen} onOpenChange={setHealthOpen}>
+        <DialogPrimitive.Portal>
+          <DialogPrimitive.Backdrop className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm transition-opacity duration-150 data-ending-style:opacity-0 data-starting-style:opacity-0" />
+          <DialogPrimitive.Popup className="fixed left-1/2 top-1/2 z-50 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-2xl border-transparent bg-sidebar-accent p-6 shadow-xl transition-all duration-150 data-ending-style:opacity-0 data-ending-style:scale-95 data-starting-style:opacity-0 data-starting-style:scale-95">
+            <div className="flex items-start justify-between mb-5">
+              <div>
+                <p className="text-[10px] font-medium uppercase tracking-widest text-sidebar-foreground/70 mb-1">VTS agents</p>
+                <div className="flex items-baseline gap-3">
+                  <DialogPrimitive.Title className="text-xl font-semibold text-sidebar-foreground">Deal health</DialogPrimitive.Title>
+                  <span className={cn("text-xl font-semibold", healthCfg.textCls)}>{healthCfg.label}</span>
+                </div>
+              </div>
+              <DialogPrimitive.Close render={<Button variant="ghost" size="icon" className="h-7 w-7 shrink-0 -mt-1 -mr-2 text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-foreground/10"><X className="h-4 w-4" /></Button>} />
+            </div>
+            <div className="rounded-lg px-3 py-2.5 bg-sidebar-foreground/10 flex items-start gap-2.5 mb-5">
+              <HeartPulse className="h-4 w-4 shrink-0 text-sidebar-primary mt-0.5" />
+              <p className="text-sm leading-snug text-sidebar-foreground/80">{healthCfg.summary}</p>
+            </div>
+            <p className="text-[10px] font-medium uppercase tracking-widest text-sidebar-foreground/50 mb-3">Signals</p>
+            <div className="flex flex-col gap-3">
+              {healthCfg.signals.map((s, i) => (
+                <div key={i} className="flex items-start gap-2 text-sm text-sidebar-foreground/80 leading-snug">
+                  <Dot className="h-4 w-4 text-sidebar-foreground/40 shrink-0 mt-0.5" />
+                  {s}
+                </div>
+              ))}
+            </div>
+          </DialogPrimitive.Popup>
+        </DialogPrimitive.Portal>
+      </DialogPrimitive.Root>
 
+      {/* Financial KPI bar */}
       {/* Stage journey */}
       <StageJourneyBar currentStage={stage} onChange={s => { setStage(s); setRightTab("updates") }} />
+
+      <FinancialBar deal={deal} stageIdx={stageIdx} onHealthClick={() => setHealthOpen(true)} />
 
       {/* Agent strip */}
 
       {/* Main content grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-8 gap-4 items-start">
+      <div className="flex gap-4 items-stretch">
 
         {/* Left col: Info / Proposals / Encumbrances */}
-        <div className="lg:col-span-5 flex flex-col gap-4">
+        <div className="flex-[5] min-w-0 flex flex-col gap-4">
           <div className={cn(cardBase, "flex-1")}>
             <Tabs value={tab} onValueChange={v => setTab(v)} className="w-full">
               <TabsList variant="line" className="w-full mb-5 border-b border-border rounded-none bg-transparent p-0 h-auto gap-0 justify-start">
@@ -1543,28 +1587,52 @@ export function DealProfile({ deal, onBack: _onBack, status: statusProp, onStatu
           </div>
         </div>
 
-        {/* Right col: Deal Health + Updates / Tasks / Tours / Docs */}
-        <div className="lg:col-span-3 flex flex-col gap-4">
-          <DealHealthCard status={status} stage={stage} dealId={deal.id} />
-          <div className={cn(cardBase)}>
+        {/* Right col: Updates / Tasks / Docs / Reminders */}
+        <div className={cn("flex flex-col gap-4 transition-all duration-300", rightCollapsed ? "w-14 shrink-0" : "flex-[2.5]")}>
+          <div className={cn(cardBase, "overflow-hidden h-full", rightCollapsed && "!px-3 !py-3")}>
             <Tabs value={rightTab} onValueChange={v => setRightTab(v)} className="w-full">
-              <TabsList variant="line" className="w-full mb-4 border-b border-border rounded-none bg-transparent p-0 h-auto gap-0 justify-start">
-                {[
-                  { value: "updates",   label: "Updates" },
-                  { value: "tasks",     label: "Tasks", badge: STAGE_TASKS[stage]?.filter(t => !t.done).length || undefined, badgeCls: "bg-primary/15 text-primary" },
-                  { value: "documents", label: "Docs" },
-                  { value: "reminders", label: "Reminders" },
-                ].map(({ value, label, badge, badgeCls }) => (
-                  <TabsTrigger key={value} value={value} className="rounded-none !bg-transparent border-b-2 border-transparent data-active:border-primary data-active:!text-primary data-active:font-medium hover:!bg-transparent hover:text-foreground !shadow-none px-3 pb-2.5 pt-0 text-sm flex-none -mb-px">
-                    {label}
-                    {badge ? <span className={cn("ml-1 inline-flex items-center justify-center min-w-4 h-4 px-1 rounded-full text-[10px] font-bold", badgeCls ?? "bg-destructive text-primary-foreground")}>{badge}</span> : null}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-              <TabsContent value="updates"><ActivityFeed deal={deal} stage={stage} /></TabsContent>
-              <TabsContent value="tasks"><TasksTab stage={stage} status={status} dealId={deal.id} /></TabsContent>
-<TabsContent value="documents"><DocumentsTab stage={stage} /></TabsContent>
-              <TabsContent value="reminders"><p className="text-sm text-muted-foreground py-8 text-center">No reminders set.</p></TabsContent>
+              {/* Header: toggle left of tabs, always visible */}
+              <div className="flex items-center border-b border-border mb-4">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger render={<div className="shrink-0 pb-1 mr-1" />}>
+                      <Button
+                        variant="ghost" size="icon"
+                        onClick={() => setRightCollapsed(c => !c)}
+                        className="h-6 w-6 rounded-full bg-card border border-border text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                      >
+                        <ChevronRight className={cn("h-3 w-3 transition-transform duration-300", rightCollapsed && "rotate-180")} />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" className="text-xs font-medium">
+                      {rightCollapsed ? "Expand" : "Collapse"}
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                {!rightCollapsed && (
+                  <TabsList variant="line" className="flex-1 rounded-none bg-transparent p-0 h-auto gap-0 justify-start">
+                    {[
+                      { value: "updates",   label: "Updates" },
+                      { value: "tasks",     label: "Tasks", badge: STAGE_TASKS[stage]?.filter(t => !t.done).length || undefined, badgeCls: "bg-primary/15 text-primary" },
+                      { value: "documents", label: "Docs" },
+                      { value: "reminders", label: "Reminders" },
+                    ].map(({ value, label, badge, badgeCls }) => (
+                      <TabsTrigger key={value} value={value} className="rounded-none !bg-transparent border-b-2 border-transparent data-active:border-primary data-active:!text-primary data-active:font-medium hover:!bg-transparent hover:text-foreground !shadow-none px-3 pb-2.5 pt-0 text-sm flex-none -mb-px">
+                        {label}
+                        {badge ? <span className={cn("ml-1 inline-flex items-center justify-center min-w-4 h-4 px-1 rounded-full text-[10px] font-bold", badgeCls ?? "bg-destructive text-primary-foreground")}>{badge}</span> : null}
+                      </TabsTrigger>
+                    ))}
+                  </TabsList>
+                )}
+              </div>
+              {!rightCollapsed && (
+                <>
+                  <TabsContent value="updates"><ActivityFeed deal={deal} stage={stage} /></TabsContent>
+                  <TabsContent value="tasks"><TasksTab stage={stage} status={status} dealId={deal.id} /></TabsContent>
+                  <TabsContent value="documents"><DocumentsTab stage={stage} /></TabsContent>
+                  <TabsContent value="reminders"><p className="text-sm text-muted-foreground py-8 text-center">No reminders set.</p></TabsContent>
+                </>
+              )}
             </Tabs>
           </div>
         </div>

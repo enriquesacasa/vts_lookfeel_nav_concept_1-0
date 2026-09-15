@@ -14,7 +14,7 @@ import { LeasingAgents } from "@/components/leasing-agents"
 import { AgentsPage } from "@/components/agents-page"
 import { DealsPage, DEALS } from "@/components/deals-page"
 import type { Deal as DealsPageDeal } from "@/components/deals-page"
-import { DealProfile, TenantLogoImage, StatusBadge, type DealStatus } from "@/components/deal-profile"
+import { DealProfile, TenantLogoImage, type DealStatus } from "@/components/deal-profile"
 import { ThemeShowcase } from "@/components/theme-showcase"
 import { AgentPrinciples } from "@/components/agent-principles"
 import { StackingPlan, type StackingPlanSpaceRef, type StackingPlanHandle, type StackingPlanCommand } from "@/components/stacking-plan"
@@ -361,6 +361,42 @@ export default function App() {
   const selectedPortfolio = PORTFOLIOS.find(p => p.id === selectedAssetId)
   const selectedAsset = ASSETS.find(a => a.id === selectedAssetId)
 
+  // Maps App asset IDs → names used in budget/appraisal data
+  const PLANNING_ASSET_NAMES: Record<string, string> = {
+    "vts-tower":     "VTS Tower HQ",
+    "salesforce":    "Salesforce Tower",
+    "one-financial": "One Financial Plaza",
+    "empire-state":  "Empire State Bldg",
+  }
+  // Maps App asset IDs → city substrings used to filter comps by citySubmarket
+  const PLANNING_CITY_PREFIXES: Record<string, string[]> = {
+    "vts-tower":     ["New York"],
+    "salesforce":    ["San Francisco"],
+    "one-financial": ["Boston", "Providence"],
+    "empire-state":  ["New York"],
+    "willis":        ["Chicago"],
+    "one-wtc":       ["New York"],
+    "200-berkeley":  ["Boston"],
+    "hudson-yards":  ["New York"],
+    "transamerica":  ["San Francisco"],
+    "union-square":  ["Seattle"],
+    "peachtree":     ["Atlanta"],
+  }
+
+  const assetFilter: string[] = React.useMemo(() => {
+    if (selectedAssetId === "all") return []
+    if (selectedPortfolio) return selectedPortfolio.assetIds.map(id => PLANNING_ASSET_NAMES[id]).filter((v): v is string => !!v)
+    if (selectedAsset) { const n = PLANNING_ASSET_NAMES[selectedAsset.id]; return n ? [n] : [] }
+    return []
+  }, [selectedAssetId, selectedPortfolio, selectedAsset])
+
+  const cityFilter: string[] = React.useMemo(() => {
+    if (selectedAssetId === "all") return []
+    if (selectedPortfolio) return [...new Set(selectedPortfolio.assetIds.flatMap(id => PLANNING_CITY_PREFIXES[id] ?? []))]
+    if (selectedAsset) return PLANNING_CITY_PREFIXES[selectedAsset.id] ?? []
+    return []
+  }, [selectedAssetId, selectedPortfolio, selectedAsset])
+
   const renderPage = (page: string) => {
     if (page === "theme") {
       return <ThemeShowcase isDark={isDark} onToggleDark={toggleDark} />
@@ -465,7 +501,6 @@ export default function App() {
         image: <div className="relative shrink-0 w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-full overflow-hidden border border-border/30 shadow-sm"><TenantLogoImage name={selectedDeal.tenant} /></div>,
         actions: (
           <div className="flex items-center gap-2">
-            <StatusBadge status={selectedDealStatus} onChange={setSelectedDealStatus} />
             <AgentBtn className="!size-9" entity="Deal" label={`${selectedDeal.tenant} — ${selectedDeal.stage} — ${selectedDealStatus}`} />
           </div>
         ),
@@ -709,6 +744,8 @@ export default function App() {
             onViewBudgets={() => setCurrentPage("budgets")}
             onViewAppraisals={() => setCurrentPage("appraisals")}
             onViewComps={() => setCurrentPage("comps")}
+            assetFilter={assetFilter}
+            cityFilter={cityFilter}
           />
         </div>
       )
@@ -717,7 +754,7 @@ export default function App() {
       return (
         <div className="space-y-4">
           <BuildingHeader {...pagedHeaderProps} />
-          <BudgetsPage />
+          <BudgetsPage assetFilter={assetFilter} />
         </div>
       )
     }
@@ -725,7 +762,7 @@ export default function App() {
       return (
         <div className="space-y-4">
           <BuildingHeader {...pagedHeaderProps} />
-          <AppraisalsPage />
+          <AppraisalsPage assetFilter={assetFilter} />
         </div>
       )
     }
@@ -733,7 +770,7 @@ export default function App() {
       return (
         <div className="space-y-4">
           <BuildingHeader {...pagedHeaderProps} />
-          <CompsPage />
+          <CompsPage cityFilter={cityFilter} />
         </div>
       )
     }
