@@ -246,8 +246,8 @@ const CRITICAL_DATES: CriticalDate[] = [
 
 const VACANT_SPACES: VacantSpace[] = [
   { space: "Suite 2100",  sf: 34200, daysVacant: 210 },
-  { space: "Floor 7",     sf: 52000, daysVacant: 145 },
-  { space: "Suite 400B",  sf: 12800, daysVacant: 62  },
+  { space: "Suite 1800",  sf: 33000, daysVacant: 145 },
+  { space: "Suite 500",   sf: 43000, daysVacant: 62  },
   { space: "Floors 9–10", sf: 88000, daysVacant: 30  },
 ]
 
@@ -794,17 +794,17 @@ export default function App() {
         <BuildingHeader {...pagedHeaderProps} />
         <KpiBar kpis={KPIS} />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <AvailabilityOverview occupiedSf={957638} vacantSf={410416} vacantSpaces={VACANT_SPACES} onViewStackingPlan={() => setCurrentPage("stacking")} onSpaceClick={v => { setSelectedSpace({ suite: v.space, floor: "–", sf: v.sf, status: "Available", assetName: selectedAsset?.name }); setSelectedSpaceStatus("Available"); setCurrentPage("spaces") }} />
-          <CriticalDates dates={CRITICAL_DATES} className="md:col-span-2" onViewAll={() => setCurrentPage("critical-dates")} onRowClick={tenant => { const l = findLease(tenant); if (l) { setSelectedLease(l); setSelectedLeaseStatus(l.status as LeaseStatus); setCurrentPage("leases") } }} />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <AvailabilityOverview occupiedSf={957638} vacantSf={410416} vacantSpaces={VACANT_SPACES} deals={DEALS} onViewStackingPlan={() => setCurrentPage("stacking")} onSpaceClick={v => { setSelectedSpace({ suite: v.space, floor: "–", sf: v.sf, status: "Available", assetName: selectedAsset?.name }); setSelectedSpaceStatus("Available"); setCurrentPage("spaces") }} />
           <FinancialPerformance className="md:col-span-2" criticalDates={CRITICAL_DATES} deals={DEALS} onViewReport={() => setCurrentPage("leases")} onNavigate={setCurrentPage} />
-          <ActionLevers onNavigate={setCurrentPage} />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <LeasingActivity deals={DEALS} className="md:col-span-2" onViewAll={() => setCurrentPage("deals")}
             onDealClick={d => { setSelectedDeal(d); setSelectedDealStatus(d.status as DealStatus); setCurrentPage("deals") }} />
           <LeasingAgents deals={DEALS} />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <CriticalDates dates={CRITICAL_DATES} className="md:col-span-2" onViewAll={() => setCurrentPage("critical-dates")} onRowClick={tenant => { const l = findLease(tenant); if (l) { setSelectedLease(l); setSelectedLeaseStatus(l.status as LeaseStatus); setCurrentPage("leases") } }} />
+          <ActionLevers onNavigate={setCurrentPage} />
         </div>
       </div>
     )

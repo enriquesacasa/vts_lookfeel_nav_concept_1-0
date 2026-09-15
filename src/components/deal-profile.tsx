@@ -216,20 +216,6 @@ function FinancialBar({ deal, stageIdx, onHealthClick }: { deal: Deal; stageIdx:
   const health = getDealHealth(deal.id, stage)
 
   const kpis = [
-    ...(deal.budgetNer > 0 ? [{
-      label: "NER",
-      value: deal.ner ? `$${deal.ner.toFixed(2)}` : "—",
-      subtitle: deal.ner ? `${nerDelta.pct} vs budget` : `Budget $${deal.budgetNer.toFixed(2)}`,
-      trend: deal.ner && nerDelta.dir !== "flat" ? nerDelta.dir : undefined,
-    }] : []),
-    ...(deal.budgetNoi > 0 ? [{
-      label: "Annual NOI",
-      value: deal.noi ? `$${(deal.noi / 1_000_000).toFixed(2)}M` : "—",
-      subtitle: deal.noi ? `${noiDelta.pct} vs budget` : `Budget $${(deal.budgetNoi / 1_000_000).toFixed(2)}M`,
-      trend: deal.noi && noiDelta.dir !== "flat" ? noiDelta.dir : undefined,
-    }] : []),
-    ...(tlv ? [{ label: "Total lease value", value: `$${tlv.toFixed(1)}M`, subtitle: `${deal.term} months` }] : []),
-    ...(tiCost ? [{ label: "TI investment", value: `$${(tiCost / 1_000_000).toFixed(2)}M`, subtitle: "$80/sf est." }] : []),
     {
       label: "Deal health",
       value: health.label,
@@ -244,6 +230,20 @@ function FinancialBar({ deal, stageIdx, onHealthClick }: { deal: Deal; stageIdx:
       subtitle: health.context,
       onClick: onHealthClick,
     },
+    ...(deal.budgetNer > 0 ? [{
+      label: "NER",
+      value: deal.ner ? `$${deal.ner.toFixed(2)}` : "—",
+      subtitle: deal.ner ? `${nerDelta.pct} vs budget` : `Budget $${deal.budgetNer.toFixed(2)}`,
+      trend: deal.ner && nerDelta.dir !== "flat" ? nerDelta.dir : undefined,
+    }] : []),
+    ...(deal.budgetNoi > 0 ? [{
+      label: "Annual NOI",
+      value: deal.noi ? `$${(deal.noi / 1_000_000).toFixed(2)}M` : "—",
+      subtitle: deal.noi ? `${noiDelta.pct} vs budget` : `Budget $${(deal.budgetNoi / 1_000_000).toFixed(2)}M`,
+      trend: deal.noi && noiDelta.dir !== "flat" ? noiDelta.dir : undefined,
+    }] : []),
+    ...(tlv ? [{ label: "Total lease value", value: `$${tlv.toFixed(1)}M`, subtitle: `${deal.term} months` }] : []),
+    ...(tiCost ? [{ label: "TI investment", value: `$${(tiCost / 1_000_000).toFixed(2)}M`, subtitle: "$80/sf est." }] : []),
   ]
 
   return <KpiBar kpis={kpis} />
@@ -878,7 +878,7 @@ function TasksTab({ stage, dealId }: { stage: StageValue; status?: DealStatus; d
         <div className="flex flex-col gap-3 pt-3">
           {/* Deal Health suggestions — styled as agent card, matching UpdateCard agent style */}
           {healthRecs.length > 0 && (
-            <div className="mx-0 rounded-xl border border-border bg-card p-4 flex flex-col gap-2.5">
+            <div className="mx-0 rounded-xl border border-primary/20 bg-primary/5 p-4 flex flex-col gap-2.5">
               <div className="flex items-center gap-2.5">
                 <div className="h-8 w-8 rounded-full bg-primary/15 text-primary flex items-center justify-center shrink-0">
                   <HeartPulse className="h-4 w-4" />
@@ -1284,7 +1284,7 @@ function UpdateCard({ entry }: { entry: FeedEntry }) {
   if (entry.kind === "agent") {
     const AgentIcon = AGENT_ICON_MAP[entry.name] ?? Bot
     return (
-      <div className="rounded-xl border border-border bg-card p-4 flex flex-col gap-2.5">
+      <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 flex flex-col gap-2.5">
         <div className="flex items-center gap-2.5">
           <div className="h-8 w-8 rounded-full bg-primary/15 text-primary flex items-center justify-center shrink-0">
             <AgentIcon className="h-4 w-4" />
@@ -1488,7 +1488,7 @@ const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
   },
 }
 
-function getDealHealth(dealId: string | undefined, stage: StageValue, defaultScore: HealthScore = "on-track"): HealthEntry & { label: string; cls: string; textCls: string; bgCls: string } {
+export function getDealHealth(dealId: string | undefined, stage: StageValue, defaultScore: HealthScore = "on-track"): HealthEntry & { label: string; cls: string; textCls: string; bgCls: string } {
   const override = dealId ? HEALTH_OVERRIDES[dealId] : undefined
   const entry = override ?? HEALTH_BY_STAGE[stage][defaultScore]
   const scoreCfg = HEALTH_SCORE_CONFIG[entry.score]
@@ -1554,10 +1554,10 @@ export function DealProfile({ deal, onBack: _onBack, status: statusProp, onStatu
       </DialogPrimitive.Root>
 
       {/* Financial KPI bar */}
+      <FinancialBar deal={deal} stageIdx={stageIdx} onHealthClick={() => setHealthOpen(true)} />
+
       {/* Stage journey */}
       <StageJourneyBar currentStage={stage} onChange={s => { setStage(s); setRightTab("updates") }} />
-
-      <FinancialBar deal={deal} stageIdx={stageIdx} onHealthClick={() => setHealthOpen(true)} />
 
       {/* Agent strip */}
 
@@ -1588,7 +1588,7 @@ export function DealProfile({ deal, onBack: _onBack, status: statusProp, onStatu
         </div>
 
         {/* Right col: Updates / Tasks / Docs / Reminders */}
-        <div className={cn("flex flex-col gap-4 transition-all duration-300", rightCollapsed ? "w-14 shrink-0" : "flex-[2.5]")}>
+        <div className={cn("flex flex-col gap-4 transition-all duration-300", rightCollapsed ? "w-14 shrink-0" : "flex-[3]")}>
           <div className={cn(cardBase, "overflow-hidden h-full", rightCollapsed && "!px-3 !py-3")}>
             <Tabs value={rightTab} onValueChange={v => setRightTab(v)} className="w-full">
               {/* Header: toggle left of tabs, always visible */}
@@ -1613,7 +1613,7 @@ export function DealProfile({ deal, onBack: _onBack, status: statusProp, onStatu
                   <TabsList variant="line" className="flex-1 rounded-none bg-transparent p-0 h-auto gap-0 justify-start">
                     {[
                       { value: "updates",   label: "Updates" },
-                      { value: "tasks",     label: "Tasks", badge: STAGE_TASKS[stage]?.filter(t => !t.done).length || undefined, badgeCls: "bg-primary/15 text-primary" },
+                      { value: "tasks",     label: "Tasks", badge: STAGE_TASKS[stage]?.filter(t => !t.done).length || undefined, badgeCls: "bg-primary text-primary-foreground" },
                       { value: "documents", label: "Docs" },
                       { value: "reminders", label: "Reminders" },
                     ].map(({ value, label, badge, badgeCls }) => (

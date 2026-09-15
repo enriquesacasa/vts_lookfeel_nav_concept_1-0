@@ -8,6 +8,7 @@ import {
   SortableHead, useSortState,
 } from "@/components/sortable-table"
 import type { Deal } from "@/components/deals-page"
+import { getDealHealth } from "@/components/deal-profile"
 
 export type { Deal }
 
@@ -31,19 +32,6 @@ const STAGE_ORDER = ["Inquiry", "Touring", "Proposal", "LOI", "Legal", "Lease Ou
 type Stage = typeof STAGE_ORDER[number]
 const STATUS_ORDER: Array<Deal["status"]> = ["at-risk", "stalled", "active"]
 
-const STATUS_PILL: Record<string, string> = {
-  active:    "bg-success/10 text-success",
-  stalled:   "bg-warning/10 text-warning",
-  "at-risk": "bg-destructive/10 text-destructive",
-  executed:  "bg-muted text-muted-foreground",
-}
-
-const STATUS_LABEL: Record<string, string> = {
-  active:   "Active",
-  stalled:  "Stalled",
-  "at-risk":"At risk",
-  executed: "Executed",
-}
 
 function fmtSf(n: number) { return `${(n / 1000).toFixed(0)}K sf` }
 
@@ -116,13 +104,15 @@ const LeasingActivity = React.forwardRef<HTMLDivElement, LeasingActivityProps>(
               <SortableHead col="tenant" sortKey={sortKey} sortDir={sortDir} onSort={handleSort}>Tenant</SortableHead>
               <SortableHead col="space" sortKey={sortKey} sortDir={sortDir} onSort={handleSort} className="pl-3">Space</SortableHead>
               <SortableHead col="stage" sortKey={sortKey} sortDir={sortDir} onSort={handleSort} className="pl-3">Stage</SortableHead>
-              <SortableHead col="status" sortKey={sortKey} sortDir={sortDir} onSort={handleSort} className="pl-3">Status</SortableHead>
+              <SortableHead col="status" sortKey={sortKey} sortDir={sortDir} onSort={handleSort} className="pl-3">Health</SortableHead>
               <SortableHead col="ner" sortKey={sortKey} sortDir={sortDir} onSort={handleSort} right>NER / budget</SortableHead>
               <TableHead className="pb-2 pt-0 pl-2 w-8" />
             </TableRow>
           </TableHeader>
           <TableBody>
-            {sorted.map((d, i) => (
+            {sorted.map((d, i) => {
+              const healthCfg = getDealHealth(d.id, d.stage as any)
+              return (
               <TableRow key={d.id} className={cn("cursor-pointer hover:bg-muted/40 transition-colors", i > 0 ? "border-t border-border/40" : "border-0")} onClick={() => onDealClick?.(d)}>
                 <TableCell className="py-2.5 whitespace-nowrap">
                   <div className="flex items-center gap-2">
@@ -148,8 +138,8 @@ const LeasingActivity = React.forwardRef<HTMLDivElement, LeasingActivityProps>(
                   <div className="text-[10px] text-muted-foreground mt-0.5">{d.stage}</div>
                 </TableCell>
                 <TableCell className="py-2.5 pl-3">
-                  <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium", STATUS_PILL[d.status] ?? "bg-muted text-muted-foreground")}>
-                    {STATUS_LABEL[d.status] ?? d.status}
+                  <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium border", healthCfg.cls)}>
+                    {healthCfg.label}
                   </span>
                 </TableCell>
                 <TableCell className="py-2.5 pl-3">
@@ -159,7 +149,8 @@ const LeasingActivity = React.forwardRef<HTMLDivElement, LeasingActivityProps>(
                   <AgentBtn entity="Deal" label={`${d.tenant} — ${d.stage} · ${d.sf.toLocaleString()} sf, ${d.space} · $${d.ner}/sf NER vs $${d.budgetNer}/sf budget · status: ${d.status}${d.stalledDays ? ` · stalled ${d.stalledDays} days` : ""}${d.note ? ` · ${d.note}` : ""}`} onClick={e => e.stopPropagation()} />
                 </TableCell>
               </TableRow>
-            ))}
+              )
+            })}
           </TableBody>
         </Table>
       </div>

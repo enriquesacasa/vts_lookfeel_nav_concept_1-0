@@ -12,7 +12,7 @@ import {
   CheckCircle2,
 } from "lucide-react"
 import { AgentBtn } from "@/components/agent-btn"
-import { getLatestHumanUpdate, getEncumbranceCount } from "@/components/deal-profile"
+import { getLatestHumanUpdate, getEncumbranceCount, getDealHealth } from "@/components/deal-profile"
 import { KpiBar } from "@/components/kpi-bar"
 import {
   Table, TableHeader, TableBody, TableRow, TableCell,
@@ -167,7 +167,7 @@ const ALL_COLUMNS: ColDef[] = [
   { id: "sf",           label: "Size",           sortable: true,  right: true, defaultVisible: true  },
   { id: "dealType",     label: "Deal type",      sortable: true,  defaultVisible: false },
   { id: "stage",        label: "Stage",          sortable: true,  defaultVisible: true  },
-  { id: "status",       label: "Status",         sortable: true,  defaultVisible: true  },
+  { id: "status",       label: "Health",         sortable: true,  defaultVisible: true  },
   { id: "update",       label: "Latest update",  sortable: false, defaultVisible: true  },
   { id: "encumbrances", label: "Encumbrances",   sortable: true,  defaultVisible: true  },
   { id: "ner",          label: "NER / Budget",   sortable: true,  right: true, defaultVisible: true  },
@@ -554,7 +554,7 @@ export function DealsPage({ onDealClick }: { onDealClick?: (deal: Deal) => void 
             {paginated.map((deal, i) => {
               const days = daysSince(deal.lastUpdated)
               const stale = days >= 14
-              const statusCfg = STATUS_CONFIG[deal.status]
+              const healthCfg = getDealHealth(deal.id, deal.stage as any)
               const nerDiff = deal.ner - deal.budgetNer
               const nerPct = deal.budgetNer > 0 ? Math.round((nerDiff / deal.budgetNer) * 100) : 0
               const noiDiff = deal.noi - deal.budgetNoi
@@ -604,8 +604,8 @@ export function DealsPage({ onDealClick }: { onDealClick?: (deal: Deal) => void 
                       case "status":
                         return (
                           <TableCell key="status" className="py-3 pl-4">
-                            <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium", statusCfg.cls)}>
-                              {statusCfg.label}
+                            <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium border", healthCfg.cls)}>
+                              {healthCfg.label}
                             </span>
                           </TableCell>
                         )

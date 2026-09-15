@@ -81,8 +81,8 @@ function BudgetBarChart({ data }: { data: NerByAsset[] }) {
     <ResponsiveContainer width="100%" height={140}>
       <BarChart data={data} barCategoryGap="35%" margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
         <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="var(--color-border)" strokeOpacity={0.5} />
-        <XAxis dataKey="shortAsset" tick={{ fontSize: 9, fill: "var(--color-muted-foreground)" }} axisLine={false} tickLine={false} />
-        <YAxis tick={{ fontSize: 9, fill: "var(--color-muted-foreground)" }} axisLine={false} tickLine={false} tickFormatter={v => v != null ? `$${Number(v).toFixed(0)}` : ""} width={28} domain={[50, "auto"]} />
+        <XAxis dataKey="shortAsset" tick={{ fontSize: 11, fill: "var(--color-muted-foreground)" }} axisLine={false} tickLine={false} />
+        <YAxis tick={{ fontSize: 11, fill: "var(--color-muted-foreground)" }} axisLine={false} tickLine={false} tickFormatter={v => v != null ? `$${Number(v).toFixed(0)}` : ""} width={32} domain={[50, "auto"]} />
         <Tooltip formatter={(v) => [fmtRentFull(Number(v)), "Avg NER"]} contentStyle={{ fontSize: 11, borderRadius: 6 }} />
         <Bar dataKey="ner" fill="var(--color-primary)" radius={[3,3,0,0]} isAnimationActive={false} />
       </BarChart>
@@ -96,8 +96,8 @@ function CompsSubmarketChart({ data }: { data: SubmarketRent[] }) {
     <ResponsiveContainer width="100%" height={140}>
       <BarChart data={data} barCategoryGap="35%" margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
         <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="var(--color-border)" strokeOpacity={0.5} />
-        <XAxis dataKey="submarket" tick={{ fontSize: 8, fill: "var(--color-muted-foreground)" }} axisLine={false} tickLine={false} />
-        <YAxis tick={{ fontSize: 9, fill: "var(--color-muted-foreground)" }} axisLine={false} tickLine={false} tickFormatter={v => v != null ? `$${Number(v).toFixed(0)}` : ""} width={28} domain={[60, "auto"]} />
+        <XAxis dataKey="submarket" tick={{ fontSize: 10, fill: "var(--color-muted-foreground)" }} axisLine={false} tickLine={false} />
+        <YAxis tick={{ fontSize: 11, fill: "var(--color-muted-foreground)" }} axisLine={false} tickLine={false} tickFormatter={v => v != null ? `$${Number(v).toFixed(0)}` : ""} width={32} domain={[60, "auto"]} />
         <Tooltip formatter={(v, _n, p) => [fmtRentFull(Number(v)), `${p.payload?.count ?? ""} deals`]} contentStyle={{ fontSize: 11, borderRadius: 6 }} />
         <Bar dataKey="rent" fill="var(--color-primary)" radius={[3,3,0,0]} isAnimationActive={false} />
       </BarChart>
@@ -145,7 +145,7 @@ function BudgetSummaryCard({ nerByAsset, portfolioAvgNer, onViewAll }: BudgetSum
               </div>
             )
           })}
-          <p className="text-[10px] text-muted-foreground pt-1">Arrow vs portfolio avg ({fmtRent(portfolioAvgNer)})</p>
+          <p className="text-xs text-muted-foreground pt-1">vs portfolio avg NER ({fmtRentFull(portfolioAvgNer)})</p>
         </div>
       )}
       {nerByAsset.length === 0 && (
@@ -248,7 +248,7 @@ function CompsSummaryCard({ chartData, recentComps, onViewAll }: CompsSummaryCar
                   <p className="text-xs text-muted-foreground truncate">{c.citySubmarket} &middot; {c.lcd}</p>
                 </div>
                 <span className="text-xs text-muted-foreground shrink-0">{c.sf.toLocaleString()} sf</span>
-                <span className="text-sm tabular-nums font-medium text-foreground shrink-0">{fmtRent(c.rent)}</span>
+                <span className="text-sm tabular-nums font-medium text-foreground shrink-0">{fmtRentFull(c.rent)}</span>
                 <AgentBtn entity="comp" label={`Analyze comp: ${c.tenant}`} className="" />
               </div>
             ))}
@@ -290,7 +290,7 @@ function buildActivityItems(
   if (recentComp) {
     items.push({
       icon: <BarChart2 className="h-3.5 w-3.5 text-warning" />,
-      title: `${recentComp.label}: ${fmtRent(recentComp.rent)}, ${recentComp.sf.toLocaleString()} sf`,
+      title: `${recentComp.label}: ${fmtRentFull(recentComp.rent)}, ${recentComp.sf.toLocaleString()} sf`,
       asset: recentComp.citySubmarket,
       time: "2d ago",
       category: "Comp",
@@ -327,7 +327,7 @@ function buildActivityItems(
   if (secondComp) {
     items.push({
       icon: <BarChart2 className="h-3.5 w-3.5 text-warning" />,
-      title: `${secondComp.label}: ${fmtRent(secondComp.rent)}, ${secondComp.sf.toLocaleString()} sf`,
+      title: `${secondComp.label}: ${fmtRentFull(secondComp.rent)}, ${secondComp.sf.toLocaleString()} sf`,
       asset: secondComp.citySubmarket,
       time: "5d ago",
       category: "Comp",
@@ -351,7 +351,7 @@ function buildActivityItems(
   if (lowAppraisal) {
     items.push({
       icon: <Clock className="h-3.5 w-3.5 text-primary" />,
-      title: `${lowAppraisal.asset} ${lowAppraisal.label} — ${fmtRentFull(lowAppraisal.nerSizeYr)} (concession scenario)`,
+      title: `${lowAppraisal.asset} ${lowAppraisal.label} — ${fmtRentFull(lowAppraisal.nerSizeYr)} (low-side scenario)`,
       asset: lowAppraisal.asset,
       time: "1w ago",
       category: "Appraisal",
@@ -363,7 +363,7 @@ function buildActivityItems(
   if (thirdComp) {
     items.push({
       icon: <BarChart2 className="h-3.5 w-3.5 text-warning" />,
-      title: `${thirdComp.label}: ${fmtRent(thirdComp.rent)}, ${thirdComp.sf.toLocaleString()} sf`,
+      title: `${thirdComp.label}: ${fmtRentFull(thirdComp.rent)}, ${thirdComp.sf.toLocaleString()} sf`,
       asset: thirdComp.citySubmarket,
       time: "1w ago",
       category: "Comp",
@@ -402,9 +402,9 @@ function RecentActivityFeed({ items, className }: { items: ActivityItem[]; class
                 <p className="text-sm text-foreground leading-snug">{item.title}</p>
                 <p className="text-xs text-muted-foreground mt-0.5">{item.asset}</p>
               </div>
-              <div className="flex items-center gap-2 shrink-0">
-                <span className="text-xs text-muted-foreground w-10 text-right">{item.time}</span>
-                <span className={cn("text-[10px] font-medium px-1.5 py-0.5 rounded-full", CATEGORY_CLS[item.category])}>
+              <div className="flex items-center gap-2 shrink-0 w-40 justify-end">
+                <span className="text-xs text-muted-foreground w-10 text-right shrink-0">{item.time}</span>
+                <span className={cn("text-xs font-medium px-2 py-0.5 rounded-full whitespace-nowrap shrink-0", CATEGORY_CLS[item.category])}>
                   {item.category}
                 </span>
                 <AgentBtn entity={item.category} label={item.title} />
@@ -586,7 +586,7 @@ export function PlanningPage({ onViewBudgets, onViewAppraisals, onViewComps, ass
       const nerArr = rows.map(b => b.nerSizeYr)
       const spread = Math.max(...nerArr) - Math.min(...nerArr)
       if (spread > 5) {
-        alerts.push({ asset, desc: `NER spread ${fmtRent(Math.min(...nerArr))}–${fmtRent(Math.max(...nerArr))} across ${rows.length} scenarios` })
+        alerts.push({ asset, desc: `NER spread ${fmtRentFull(Math.min(...nerArr))} – ${fmtRentFull(Math.max(...nerArr))} across ${rows.length} scenarios` })
         break
       }
     }
@@ -606,13 +606,13 @@ export function PlanningPage({ onViewBudgets, onViewAppraisals, onViewComps, ass
     if (topSubmarket) {
       insights.push({
         asset: topSubmarket.submarket.replace("NY/", "New York / ").replace("BOS/", "Boston / "),
-        desc: `Avg comp rent ${fmtRent(topSubmarket.rent)}${topSmVsPf !== 0 ? ` — ${topSmVsPf > 0 ? "+" : ""}${topSmVsPf.toFixed(1)}% vs portfolio NER avg (${fmtRent(wtdAvgBudgetNer)})` : ""}`,
+        desc: `Avg comp rent ${fmtRentFull(topSubmarket.rent)}${topSmVsPf !== 0 ? ` — ${topSmVsPf > 0 ? "+" : ""}${topSmVsPf.toFixed(1)}% vs portfolio NER avg (${fmtRentFull(wtdAvgBudgetNer)})` : ""}`,
       })
     }
     if (topDealType) {
       insights.push({
         asset: "Market trend",
-        desc: `${topDealType[0]} most common (${topDealType[1]} of ${activeComps.length} comps); NER spread ${fmtRent(minNer)}–${fmtRent(maxNer)}`,
+        desc: `${topDealType[0]} most common (${topDealType[1]} of ${activeComps.length} comps); NER spread ${fmtRentFull(minNer)} – ${fmtRentFull(maxNer)}`,
       })
     }
     return insights
@@ -626,10 +626,10 @@ export function PlanningPage({ onViewBudgets, onViewAppraisals, onViewComps, ass
   const nerRange = nerValues.length ? { min: minNer, max: maxNer } : null
 
   const kpis = [
-    { label: "Active budgets",     value: String(activeBudgets.length) },
-    { label: "Active appraisals",  value: String(activeAppraisals.length) },
-    { label: "Avg comp rent",      value: activeComps.length ? fmtRent(wtdAvgCompRent) : "$–" },
-    { label: "Portfolio NER range", value: nerRange ? `${fmtRent(nerRange.min)} – ${fmtRent(nerRange.max)}` : "$–" },
+    { label: "Active budgets",      value: String(activeBudgets.length),                                           subtitle: activeBudgets.length ? `${budgetNerByAsset.length} asset${budgetNerByAsset.length !== 1 ? "s" : ""}` : undefined },
+    { label: "Active appraisals",   value: String(activeAppraisals.length),                                        subtitle: activeAppraisals.length ? `${appraisalNerByAsset.length} asset${appraisalNerByAsset.length !== 1 ? "s" : ""}` : undefined },
+    { label: "Avg comp rent",       value: activeComps.length ? fmtRentFull(wtdAvgCompRent) : "$–",                subtitle: activeComps.length ? `${activeComps.length} comp${activeComps.length !== 1 ? "s" : ""} · wtd avg` : undefined },
+    { label: "Budget NER range",    value: nerRange ? `${fmtRent(nerRange.min)} – ${fmtRent(nerRange.max)}` : "$–", subtitle: nerRange ? `across ${activeBudgets.length} budget${activeBudgets.length !== 1 ? "s" : ""}` : undefined },
   ]
 
   return (

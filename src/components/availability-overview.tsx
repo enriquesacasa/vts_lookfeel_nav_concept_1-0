@@ -3,6 +3,7 @@ import { PieChart, Pie, Cell } from "recharts"
 import { cn, cardBase } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { AgentBtn } from "@/components/agent-btn"
+import type { Deal } from "@/components/deals-page"
 
 export interface VacantSpace {
   space: string
@@ -14,6 +15,7 @@ interface AvailabilityOverviewProps {
   occupiedSf: number
   vacantSf: number
   vacantSpaces?: VacantSpace[]
+  deals?: Deal[]
   onViewStackingPlan?: () => void
   onSpaceClick?: (space: VacantSpace) => void
   className?: string
@@ -25,7 +27,7 @@ function fmtM(n: number) { return (n / 1_000_000).toFixed(1) + "M" }
 function fmtK(n: number) { return n >= 1000 ? `${(n / 1000).toFixed(0)}K` : n.toLocaleString() }
 
 const AvailabilityOverview = React.forwardRef<HTMLDivElement, AvailabilityOverviewProps>(
-  ({ occupiedSf, vacantSf, vacantSpaces, onViewStackingPlan, onSpaceClick, className }, ref) => {
+  ({ occupiedSf, vacantSf, vacantSpaces, deals, onViewStackingPlan, onSpaceClick, className }, ref) => {
     const totalSf = occupiedSf + vacantSf
     const occupiedPct = Math.round((occupiedSf / totalSf) * 100)
     const vacantPct = 100 - occupiedPct
@@ -100,13 +102,20 @@ const AvailabilityOverview = React.forwardRef<HTMLDivElement, AvailabilityOvervi
             <div className="mt-4">
               <p className="text-sm font-semibold text-foreground mb-3">Vacant Spaces</p>
               <div className="flex flex-col gap-2">
-                {vacantSpaces.map((v, i) => (
+                {vacantSpaces.map((v, i) => {
+                  const dealCount = (deals ?? []).filter(d => d.space === v.space).length
+                  return (
                   <div key={i} className="flex items-center justify-between gap-2 rounded-md px-2 py-1 -mx-2 cursor-pointer hover:bg-muted/40 dark:hover:bg-white/4 transition-colors group/space" onClick={() => onSpaceClick?.(v)}>
                     <div className="flex items-center gap-2 min-w-0">
                       <span className="text-sm font-medium text-foreground truncate">{v.space}</span>
                       <span className="text-sm text-muted-foreground shrink-0">{fmtK(v.sf)} sf</span>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
+                      {dealCount > 0 && (
+                        <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-success/10 text-success">
+                          {dealCount} {dealCount === 1 ? "deal" : "deals"}
+                        </span>
+                      )}
                       <span className={cn(
                         "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium tabular-nums",
                         v.daysVacant > 180
@@ -118,7 +127,8 @@ const AvailabilityOverview = React.forwardRef<HTMLDivElement, AvailabilityOvervi
                       <AgentBtn entity="Space" label={`${v.space} — ${v.sf.toLocaleString()} sf vacant · ${v.daysVacant} days on market`} onClick={e => e.stopPropagation()} />
                     </div>
                   </div>
-                ))}
+                  )
+                })}
               </div>
             </div>
           </>
