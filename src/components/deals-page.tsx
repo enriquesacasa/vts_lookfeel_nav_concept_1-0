@@ -983,10 +983,8 @@ export function DealsPage({ onDealClick, assetContext, allowedAssets }: { onDeal
             <Button size="sm" variant="outline" className="h-8 text-xs">Comment</Button>
             <Button size="sm" variant="outline" className="h-8 text-xs">Add requirement</Button>
             <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button size="sm" variant="outline" className="h-8 w-8 p-0">
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
+              <DropdownMenuTrigger className="inline-flex items-center justify-center h-8 w-8 rounded-md border border-input bg-background text-sm hover:bg-accent hover:text-accent-foreground transition-colors focus:outline-none">
+                <MoreHorizontal className="h-4 w-4" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-40">
                 <DropdownMenuItem>Move to dead</DropdownMenuItem>
@@ -1094,11 +1092,9 @@ export function DealsPage({ onDealClick, assetContext, allowedAssets }: { onDeal
                         return (
                           <TableCell key="stage" className={cn("py-3 pl-4", w)} onClick={e => e.stopPropagation()}>
                             <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <button className="inline-flex items-center gap-1.5 rounded-md border border-border/60 bg-background px-2.5 py-1 text-sm text-foreground hover:bg-muted/50 transition-colors focus:outline-none w-full justify-between">
-                                  <span className="truncate">{currentStage}</span>
-                                  <ChevronDown className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                                </button>
+                              <DropdownMenuTrigger className="inline-flex items-center gap-1.5 rounded-md border border-border/60 bg-background px-2.5 py-1 text-sm text-foreground hover:bg-muted/50 transition-colors focus:outline-none w-full justify-between">
+                                <span className="truncate">{currentStage}</span>
+                                <ChevronDown className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="start" className="w-36">
                                 {STAGES.map(s => (
@@ -1226,10 +1222,8 @@ export function DealsPage({ onDealClick, assetContext, allowedAssets }: { onDeal
                   })}
                   <td className="py-3 pl-1 pr-2 w-8" onClick={e => e.stopPropagation()}>
                     <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <button className="inline-flex items-center justify-center h-7 w-7 rounded-md hover:bg-muted/60 text-muted-foreground hover:text-foreground transition-colors focus:outline-none">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </button>
+                      <DropdownMenuTrigger className="inline-flex items-center justify-center h-7 w-7 rounded-md hover:bg-muted/60 text-muted-foreground hover:text-foreground transition-colors focus:outline-none">
+                        <MoreHorizontal className="h-4 w-4" />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-40">
                         <DropdownMenuItem>Set reminder</DropdownMenuItem>

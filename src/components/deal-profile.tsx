@@ -1866,8 +1866,8 @@ const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
       "Competing building has been touring same prospect",
     ],
     recs: [
-      "Re-engage tenant rep with new availability update",
-      "Offer incentive to accelerate LOI execution",
+      { action: "Re-engage tenant rep with new availability update", urgency: "This week", agentId: "deal-momentum" },
+      { action: "Offer incentive to accelerate LOI execution", urgency: "This week", agentId: "deal-momentum" },
     ],
   },
   // d40 — Boston Consulting Group · At risk (competitor shortlisted)
@@ -1881,9 +1881,9 @@ const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
       "Broker confirmed competitor is shortlisted",
     ],
     recs: [
-      "Schedule executive-level meeting to differentiate value",
-      "Revisit TI package to close gap with competitor",
-      "Offer naming rights on floor as differentiator",
+      { action: "Schedule executive-level meeting to differentiate value", urgency: "This week", agentId: "deal-momentum" },
+      { action: "Revisit TI package to close gap with competitor", urgency: "This week", agentId: "deal-momentum" },
+      { action: "Offer naming rights on floor as differentiator", urgency: "This week", agentId: "deal-momentum" },
     ],
   },
 
@@ -1899,8 +1899,8 @@ const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
       "Competing buildings are actively soliciting tenant",
     ],
     recs: [
-      "Escalate to ownership for direct C-suite outreach",
-      "Provide timeline pressure data on space alternatives",
+      { action: "Escalate to ownership for direct C-suite outreach", urgency: "This week", agentId: "deal-momentum" },
+      { action: "Provide timeline pressure data on space alternatives", urgency: "This week", agentId: "deal-momentum" },
     ],
   },
   // d44 — PVH Corp · Caution (no proposal yet)
@@ -1914,8 +1914,8 @@ const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
       "Broker responsiveness has slowed",
     ],
     recs: [
-      "Proactively send proposal to maintain momentum",
-      "Follow up with space planning study to deepen engagement",
+      { action: "Proactively send proposal to maintain momentum", urgency: "This week", agentId: "deal-momentum" },
+      { action: "Follow up with space planning study to deepen engagement", urgency: "This week", agentId: "deal-momentum" },
     ],
   },
 
@@ -1931,8 +1931,8 @@ const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
       "No follow-up tour or proposal requested",
     ],
     recs: [
-      "Send curated spec suite option to re-engage",
-      "Propose shorter initial term to reduce commitment risk",
+      { action: "Send curated spec suite option to re-engage", urgency: "This week", agentId: "deal-momentum" },
+      { action: "Propose shorter initial term to reduce commitment risk", urgency: "This week", agentId: "deal-momentum" },
     ],
   },
 
@@ -1948,8 +1948,8 @@ const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
       "Space committee recommending hybrid-first policy reducing needs",
     ],
     recs: [
-      "Model reduced-footprint scenario to retain tenant at lower sf",
-      "Prepare tiered proposal options by square footage",
+      { action: "Model reduced-footprint scenario to retain tenant at lower sf", urgency: "This week", agentId: "deal-momentum" },
+      { action: "Prepare tiered proposal options by square footage", urgency: "This week", agentId: "deal-momentum" },
     ],
   },
   // d56 — Liberty Mutual · Caution (stalled 16d)
@@ -1963,8 +1963,8 @@ const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
       "No scheduled call or meeting on calendar",
     ],
     recs: [
-      "Request status call with tenant's legal and real estate team",
-      "Set hard expiration on LOI terms to create urgency",
+      { action: "Request status call with tenant's legal and real estate team", urgency: "This week", agentId: "deal-momentum" },
+      { action: "Set hard expiration on LOI terms to create urgency", urgency: "This week", agentId: "deal-momentum" },
     ],
   },
   // d57 — John Hancock · At risk (stalled 21d)
@@ -1978,8 +1978,8 @@ const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
       "One Financial Plaza not on prospect's shortlist per market intel",
     ],
     recs: [
-      "Escalate to senior broker relationship contact",
-      "Submit unsolicited spec suite proposal with creative terms",
+      { action: "Escalate to senior broker relationship contact", urgency: "This week", agentId: "deal-momentum" },
+      { action: "Submit unsolicited spec suite proposal with creative terms", urgency: "This week", agentId: "deal-momentum" },
     ],
   },
 
@@ -1995,8 +1995,8 @@ const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
       "Space consolidation to other Chicago locations is under review",
     ],
     recs: [
-      "Propose phased renewal with flexible break clause",
-      "Model blend-and-extend option to reduce near-term cash impact",
+      { action: "Propose phased renewal with flexible break clause", urgency: "This week", agentId: "deal-momentum" },
+      { action: "Model blend-and-extend option to reduce near-term cash impact", urgency: "This week", agentId: "deal-momentum" },
     ],
   },
   // d63 — Exelon · At risk (competitor building)
@@ -2010,8 +2010,8 @@ const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
       "Willis Tower TI offer is $15/sf below competitor",
     ],
     recs: [
-      "Close TI gap with targeted improvement to offer",
-      "Leverage Willis Tower amenity advantage in executive presentation",
+      { action: "Close TI gap with targeted improvement to offer", urgency: "This week", agentId: "deal-momentum" },
+      { action: "Leverage Willis Tower amenity advantage in executive presentation", urgency: "This week", agentId: "deal-momentum" },
     ],
   },
   // d64 — Hyatt Hotels · Caution (stalled 13d)
@@ -2025,8 +2025,8 @@ const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
       "Competing submarkets also under evaluation",
     ],
     recs: [
-      "Send targeted proposal with expansion options and phasing",
-      "Offer test-fit at no charge to advance decision",
+      { action: "Send targeted proposal with expansion options and phasing", urgency: "This week", agentId: "deal-momentum" },
+      { action: "Offer test-fit at no charge to advance decision", urgency: "This week", agentId: "deal-momentum" },
     ],
   },
   // d65 — Aon · Caution (stalled 17d)
@@ -2040,8 +2040,8 @@ const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
       "Broker flagged competing buildings circling the tenant",
     ],
     recs: [
-      "Request status update call within the week",
-      "Prepare updated market comp analysis to support pricing",
+      { action: "Request status update call within the week", urgency: "This week", agentId: "deal-momentum" },
+      { action: "Prepare updated market comp analysis to support pricing", urgency: "This week", agentId: "deal-momentum" },
     ],
   },
 
@@ -2057,8 +2057,8 @@ const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
       "Apollo rep has not responded to latest proposal follow-up",
     ],
     recs: [
-      "Pursue direct outreach to Apollo CFO",
-      "Prepare competitive counter with enhanced concessions",
+      { action: "Pursue direct outreach to Apollo CFO", urgency: "This week", agentId: "deal-momentum" },
+      { action: "Prepare competitive counter with enhanced concessions", urgency: "This week", agentId: "deal-momentum" },
     ],
   },
   // d70 — KKR · At risk (stalled 19d)
@@ -2072,8 +2072,8 @@ const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
       "Market timing pressure — competing tenants eyeing same floors",
     ],
     recs: [
-      "Set firm deadline on LOI counter to maintain leverage",
-      "Escalate to KKR real estate decision-maker directly",
+      { action: "Set firm deadline on LOI counter to maintain leverage", urgency: "This week", agentId: "deal-momentum" },
+      { action: "Escalate to KKR real estate decision-maker directly", urgency: "This week", agentId: "deal-momentum" },
     ],
   },
   // d71 — Blackstone · Caution (stalled 15d)
@@ -2087,8 +2087,8 @@ const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
       "Deal not on Blackstone's internal priority list per intel",
     ],
     recs: [
-      "Arrange exclusive floor access with building amenity tour",
-      "Submit proactive proposal to re-engage",
+      { action: "Arrange exclusive floor access with building amenity tour", urgency: "This week", agentId: "deal-momentum" },
+      { action: "Submit proactive proposal to re-engage", urgency: "This week", agentId: "deal-momentum" },
     ],
   },
 
@@ -2104,8 +2104,8 @@ const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
       "Renewal proposal above tenant's revised budget target",
     ],
     recs: [
-      "Model downsized renewal scenario to retain tenant at reduced sf",
-      "Explore subleasing of excess space to offset deal economics",
+      { action: "Model downsized renewal scenario to retain tenant at reduced sf", urgency: "This week", agentId: "deal-momentum" },
+      { action: "Explore subleasing of excess space to offset deal economics", urgency: "This week", agentId: "deal-momentum" },
     ],
   },
   // d76 — Spotify WTC · Caution (stalled 11d)
@@ -2119,8 +2119,8 @@ const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
       "Two competing buildings also under consideration",
     ],
     recs: [
-      "Follow up with personalized view-of-downtown pitch",
-      "Propose informal roundtable with building management",
+      { action: "Follow up with personalized view-of-downtown pitch", urgency: "This week", agentId: "deal-momentum" },
+      { action: "Propose informal roundtable with building management", urgency: "This week", agentId: "deal-momentum" },
     ],
   },
 
@@ -2136,8 +2136,8 @@ const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
       "Renewal NER negotiation far below budgeted rate",
     ],
     recs: [
-      "Model reduced-footprint renewal to retain tenant",
-      "Explore backfill options for vacated floors proactively",
+      { action: "Model reduced-footprint renewal to retain tenant", urgency: "This week", agentId: "deal-momentum" },
+      { action: "Explore backfill options for vacated floors proactively", urgency: "This week", agentId: "deal-momentum" },
     ],
   },
   // d83 — Levi Strauss · Caution (stalled 14d)
@@ -2151,8 +2151,8 @@ const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
       "Broker confident on deal but cannot force timeline",
     ],
     recs: [
-      "Set LOI expiration to drive execution",
-      "Schedule weekly check-in call with tenant and broker",
+      { action: "Set LOI expiration to drive execution", urgency: "This week", agentId: "deal-momentum" },
+      { action: "Schedule weekly check-in call with tenant and broker", urgency: "This week", agentId: "deal-momentum" },
     ],
   },
   // d84 — Twitter/X Pyramid · At risk (cost cuts)
@@ -2166,8 +2166,8 @@ const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
       "No renewal discussion initiated despite lease expiring in 9 months",
     ],
     recs: [
-      "Proactively offer below-market renewal to preempt departure",
-      "Prepare backfill strategy for high-probability vacancy",
+      { action: "Proactively offer below-market renewal to preempt departure", urgency: "This week", agentId: "deal-momentum" },
+      { action: "Prepare backfill strategy for high-probability vacancy", urgency: "This week", agentId: "deal-momentum" },
     ],
   },
 
@@ -2183,8 +2183,8 @@ const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
       "NER expectation significantly below ask",
     ],
     recs: [
-      "Prepare tiered proposal at multiple size options",
-      "Offer phased expansion rights to lock in smaller initial deal",
+      { action: "Prepare tiered proposal at multiple size options", urgency: "This week", agentId: "deal-momentum" },
+      { action: "Offer phased expansion rights to lock in smaller initial deal", urgency: "This week", agentId: "deal-momentum" },
     ],
   },
   // d90 — Rapid7 · Caution (stalled 16d)
@@ -2198,8 +2198,8 @@ const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
       "Competing landlord rumored to be pursuing tenant",
     ],
     recs: [
-      "Request status call with Rapid7 legal and real estate",
-      "Set LOI expiration date to create urgency",
+      { action: "Request status call with Rapid7 legal and real estate", urgency: "This week", agentId: "deal-momentum" },
+      { action: "Set LOI expiration date to create urgency", urgency: "This week", agentId: "deal-momentum" },
     ],
   },
   // d91 — Brightcove · At risk (stalled 22d)
@@ -2213,8 +2213,8 @@ const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
       "Competing Seaport District buildings actively targeting tenant",
     ],
     recs: [
-      "Send speculative proposal to re-engage",
-      "Escalate to landlord rep for direct broker relationship call",
+      { action: "Send speculative proposal to re-engage", urgency: "This week", agentId: "deal-momentum" },
+      { action: "Escalate to landlord rep for direct broker relationship call", urgency: "This week", agentId: "deal-momentum" },
     ],
   },
   // d92 — DraftKings · Caution (stalled 13d)
@@ -2228,8 +2228,8 @@ const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
       "Competing landlord submitted unsolicited proposal",
     ],
     recs: [
-      "Follow up with updated test-fit and design concepts",
-      "Offer to host tenant's team for amenity preview",
+      { action: "Follow up with updated test-fit and design concepts", urgency: "This week", agentId: "deal-momentum" },
+      { action: "Offer to host tenant's team for amenity preview", urgency: "This week", agentId: "deal-momentum" },
     ],
   },
 
@@ -2245,8 +2245,8 @@ const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
       "Alternative buildings offering more aggressive TI for smaller footprint",
     ],
     recs: [
-      "Model 55,000 sf renewal scenario with enhanced TI",
-      "Prepare backfill strategy for 23,000 sf vacated space",
+      { action: "Model 55,000 sf renewal scenario with enhanced TI", urgency: "This week", agentId: "deal-momentum" },
+      { action: "Prepare backfill strategy for 23,000 sf vacated space", urgency: "This week", agentId: "deal-momentum" },
     ],
   },
   // d97 — Equifax · At risk (stalled 20d)
@@ -2260,8 +2260,8 @@ const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
       "Broker expressed concern about deal losing momentum",
     ],
     recs: [
-      "Request direct meeting with Equifax procurement team",
-      "Offer LOI signing incentive tied to execution date",
+      { action: "Request direct meeting with Equifax procurement team", urgency: "This week", agentId: "deal-momentum" },
+      { action: "Offer LOI signing incentive tied to execution date", urgency: "This week", agentId: "deal-momentum" },
     ],
   },
   // d98 — Delta Air Lines · Caution (stalled 14d)
@@ -2275,8 +2275,8 @@ const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
       "Alternative Buckhead space also under evaluation",
     ],
     recs: [
-      "Proactively submit proposal to advance timeline",
-      "Offer to schedule space planning study at no cost",
+      { action: "Proactively submit proposal to advance timeline", urgency: "This week", agentId: "deal-momentum" },
+      { action: "Offer to schedule space planning study at no cost", urgency: "This week", agentId: "deal-momentum" },
     ],
   },
   // d99 — Invesco · Caution (stalled 11d)
@@ -2290,8 +2290,8 @@ const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
       "Broker confirmed Invesco is not urgently motivated",
     ],
     recs: [
-      "Schedule committee presentation to accelerate review",
-      "Provide market urgency data on comparable spaces",
+      { action: "Schedule committee presentation to accelerate review", urgency: "This week", agentId: "deal-momentum" },
+      { action: "Provide market urgency data on comparable spaces", urgency: "This week", agentId: "deal-momentum" },
     ],
   },
 
@@ -2307,8 +2307,8 @@ const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
       "Alternative sublease options in building under tenant evaluation",
     ],
     recs: [
-      "Model 43,000 sf renewal with enhanced incentive package",
-      "Explore partnership with smaller tenant to backfill surplus",
+      { action: "Model 43,000 sf renewal with enhanced incentive package", urgency: "This week", agentId: "deal-momentum" },
+      { action: "Explore partnership with smaller tenant to backfill surplus", urgency: "This week", agentId: "deal-momentum" },
     ],
   },
   // d104 — F5 Networks · Caution (stalled 15d)
@@ -2322,8 +2322,8 @@ const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
       "F5 legal team has limited bandwidth due to other transactions",
     ],
     recs: [
-      "Propose modified termination clause with fee structure",
-      "Arrange call between both legal teams to close outstanding items",
+      { action: "Propose modified termination clause with fee structure", urgency: "This week", agentId: "deal-momentum" },
+      { action: "Arrange call between both legal teams to close outstanding items", urgency: "This week", agentId: "deal-momentum" },
     ],
   },
   // d105 — Weyerhaeuser · At risk (stalled 23d)
@@ -2337,8 +2337,8 @@ const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
       "Market intel suggests suburban Bellevue buildings also in consideration",
     ],
     recs: [
-      "Reach out via alternate Weyerhaeuser contact to gauge interest",
-      "Submit spec proposal highlighting transit access vs. suburban alternative",
+      { action: "Reach out via alternate Weyerhaeuser contact to gauge interest", urgency: "This week", agentId: "deal-momentum" },
+      { action: "Submit spec proposal highlighting transit access vs. suburban alternative", urgency: "This week", agentId: "deal-momentum" },
     ],
   },
 }

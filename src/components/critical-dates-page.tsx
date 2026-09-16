@@ -529,8 +529,6 @@ export function CriticalDatesPage({ assets, onRowClick }: { assets?: AssetRef[];
   function onClear(key: string) { setActiveFilters(prev => clearFilterKey(prev, key)); setPage(1) }
   function onClearAll() { setActiveFilters({}); setPage(1) }
 
-  function getStatus(r: CriticalDateRow): ActionStatus { return rowStatus[r.id] ?? r.status }
-
   function markNoticeSent(r: CriticalDateRow) {
     setRowStatus(prev => ({ ...prev, [r.id]: "Notice sent" }))
     const entry: ActivityEntry = {
@@ -734,10 +732,8 @@ export function CriticalDatesPage({ assets, onRowClick }: { assets?: AssetRef[];
                   })}
                   <TableCell className="py-2.5 pl-2" onClick={e => e.stopPropagation()}>
                     <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <button className="h-7 w-7 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </button>
+                      <DropdownMenuTrigger className="h-7 w-7 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors focus:outline-none">
+                        <MoreHorizontal className="h-4 w-4" />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-52">
                         <DropdownMenuItem onClick={() => markNoticeSent(r)} disabled={status === "Notice sent" || status === "Resolved"}>
