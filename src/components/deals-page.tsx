@@ -221,7 +221,7 @@ const STAGES: Stage[] = ["Inquiry", "Touring", "Proposal", "LOI", "Legal", "Leas
 
 const STATUS_CONFIG: Record<Status, { label: string; icon: React.ElementType; cls: string }> = {
   active:   { label: "Active",    icon: CheckCircle2, cls: "text-success bg-success/10" },
-  stalled:  { label: "Caution",   icon: Clock,        cls: "text-warning bg-warning/10" },
+  stalled:  { label: "Critical",   icon: Clock,        cls: "text-warning bg-warning/10" },
   "at-risk":{ label: "At Risk",   icon: AlertTriangle,cls: "text-destructive bg-destructive/10" },
   executed: { label: "Executed",  icon: CheckCircle2, cls: "text-success bg-success/10" },
 }
@@ -279,7 +279,7 @@ const FILTER_DEFS = [
   { key: "health",   label: "Health",    options: [
     { label: "Strong",   value: "strong"   },
     { label: "On track", value: "on-track" },
-    { label: "Caution",  value: "caution"  },
+    { label: "Critical",  value: "caution"  },
     { label: "At risk",  value: "at-risk"  },
   ]},
   { key: "stage",    label: "Stage",     options: STAGES.map(v => ({ label: v, value: v })) },
@@ -461,7 +461,7 @@ function PipelineViz({ deals }: { deals: Deal[] }) {
         </div>
         <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1">
           <span className="flex items-center gap-1.5"><span className="inline-block w-2 h-2 rounded-full bg-destructive/70" />At risk</span>
-          <span className="flex items-center gap-1.5"><span className="inline-block w-2 h-2 rounded-full bg-warning/70" />Caution</span>
+          <span className="flex items-center gap-1.5"><span className="inline-block w-2 h-2 rounded-full bg-warning/70" />Critical</span>
           <span className="flex items-center gap-1.5"><span className="inline-block w-2 h-2 rounded-full bg-success/80" />Active</span>
           <span className="flex items-center gap-1.5"><span className="inline-block w-2 h-2 rounded-full bg-primary/80" />Executed</span>
         </div>
@@ -498,7 +498,7 @@ function PipelineViz({ deals }: { deals: Deal[] }) {
 
 const ACTION_URGENCY: { score: string; label: string; cls: string; next: string }[] = [
   { score: "at-risk",  label: "At risk",  cls: "text-destructive bg-destructive/10 border-destructive/20", next: "Escalate today" },
-  { score: "caution",  label: "Caution",  cls: "text-warning bg-warning/10 border-warning/20",             next: "Review this week" },
+  { score: "caution",  label: "Critical",  cls: "text-warning bg-warning/10 border-warning/20",             next: "Review this week" },
   { score: "on-track", label: "Stale",    cls: "text-muted-foreground bg-muted/60 border-border",          next: "Check in" },
 ]
 
@@ -763,7 +763,7 @@ function KpiSummary({ deals }: { deals: Deal[] }) {
         subtitleNode: (
           <div className="flex items-center gap-1.5 flex-wrap">
             <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium border border-destructive/20", STATUS_CONFIG["at-risk"].cls)}>{atRisk} At Risk</span>
-            <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium border border-warning/20", STATUS_CONFIG["stalled"].cls)}>{caution} Caution</span>
+            <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium border border-warning/20", STATUS_CONFIG["stalled"].cls)}>{caution} Critical</span>
           </div>
         ),
       },

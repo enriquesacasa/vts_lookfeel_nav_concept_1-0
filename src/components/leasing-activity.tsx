@@ -41,6 +41,7 @@ const LeasingActivity = React.forwardRef<HTMLDivElement, LeasingActivityProps>(
       return score === "at-risk" || score === "caution"
     })
 
+
     const sorted = [...priority].sort((a, b) => {
       let av: string | number
       let bv: string | number
@@ -80,7 +81,6 @@ const LeasingActivity = React.forwardRef<HTMLDivElement, LeasingActivityProps>(
           <TableHeader>
             <TableRow className="border-b border-border/60 hover:bg-transparent">
               <SortableHead col="tenant" sortKey={sortKey} sortDir={sortDir} onSort={handleSort}>Tenant</SortableHead>
-              <SortableHead col="asset" sortKey={sortKey} sortDir={sortDir} onSort={handleSort} className="pl-4">Asset</SortableHead>
               <SortableHead col="stage" sortKey={sortKey} sortDir={sortDir} onSort={handleSort} className="pl-4">Stage</SortableHead>
               <SortableHead col="status" sortKey={sortKey} sortDir={sortDir} onSort={handleSort} className="pl-4">Health</SortableHead>
               <SortableHead col="update" sortKey={sortKey} sortDir={sortDir} onSort={handleSort} className="pl-4">Latest update</SortableHead>
@@ -117,10 +117,6 @@ const LeasingActivity = React.forwardRef<HTMLDivElement, LeasingActivityProps>(
                     </div>
                   </TableCell>
 
-                  {/* Asset */}
-                  <TableCell className="py-3 pl-4 text-sm text-foreground/80 w-[110px]">
-                    <span className="truncate block">{d.asset}</span>
-                  </TableCell>
 
                   {/* Stage — static pill */}
                   <TableCell className="py-3 pl-4 w-[120px]">

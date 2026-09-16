@@ -9,6 +9,7 @@ import { CriticalDates } from "@/components/critical-dates"
 import type { CriticalDate } from "@/components/critical-dates"
 import { FinancialPerformance } from "@/components/financial-performance"
 import { ActionLevers } from "@/components/action-levers"
+import { DealActions } from "@/components/deal-actions"
 import { KpiBar } from "@/components/kpi-bar"
 import { AgentsPage } from "@/components/agents-page"
 import { DealsPage, DEALS, DealHealthModal } from "@/components/deals-page"
@@ -529,7 +530,7 @@ export default function App() {
       const dealHeaderProps = selectedDeal ? {
         city: selectedDeal.asset,
         name: (<span><span className="font-semibold">{selectedDeal.tenant}</span>{" "}<span className="text-muted-foreground font-light">| {selectedDeal.dealType}</span></span>),
-        address: `${selectedDeal.space} · ${selectedDeal.sf.toLocaleString()} sf`,
+        address: [selectedDeal.space, `${selectedDeal.sf.toLocaleString()} sf`].filter(Boolean).join(" · "),
         image: <div className="relative shrink-0 w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-full overflow-hidden border border-border/30 shadow-sm"><TenantLogoImage name={selectedDeal.tenant} /></div>,
         actions: (
           <div className="flex items-center gap-2">
@@ -590,7 +591,7 @@ export default function App() {
                         <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium border border-destructive/20 text-destructive bg-destructive/10">{portfolioAtRisk.length} At risk</span>
                       )}
                       {portfolioCaution.length > 0 && (
-                        <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium border border-warning/20 text-warning bg-warning/10">{portfolioCaution.length} Caution</span>
+                        <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium border border-warning/20 text-warning bg-warning/10">{portfolioCaution.length} Critical</span>
                       )}
                       {portfolioNeedAttention === 0 && <span className="text-xs text-muted-foreground">None</span>}
                     </div>
@@ -661,7 +662,7 @@ export default function App() {
                             <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium border border-destructive/20 text-destructive bg-destructive/10">{atRiskDeals.length} At risk</span>
                           )}
                           {cautionDeals.length > 0 && (
-                            <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium border border-warning/20 text-warning bg-warning/10">{cautionDeals.length} Caution</span>
+                            <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium border border-warning/20 text-warning bg-warning/10">{cautionDeals.length} Critical</span>
                           )}
                           {needAttention === 0 && <span className="text-[10px] text-muted-foreground">None</span>}
                         </div>
@@ -873,10 +874,11 @@ export default function App() {
                 <AvailabilityOverview occupiedSf={957638} vacantSf={410416} vacantSpaces={VACANT_SPACES} deals={overviewDeals} onViewStackingPlan={() => setCurrentPage("stacking")} onSpaceClick={v => { setSelectedSpace({ suite: v.space, floor: "–", sf: v.sf, status: "Available", assetName: selectedAsset?.name }); setSelectedSpaceStatus("Available"); setCurrentPage("spaces") }} />
                 <FinancialPerformance className="md:col-span-2" criticalDates={overviewDates} deals={overviewDeals} onViewReport={() => setCurrentPage("leases")} onNavigate={setCurrentPage} />
               </div>
-              <div className="grid grid-cols-1 gap-4">
-                <LeasingActivity deals={overviewDeals} onViewAll={() => setCurrentPage("deals")}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <LeasingActivity className="md:col-span-2" deals={overviewDeals} onViewAll={() => setCurrentPage("deals")}
                   onDealClick={d => { setSelectedDeal(d); setSelectedDealStatus(d.status as DealStatus); setCurrentPage("deals") }}
                   onHealthClick={id => setOverviewHealthOpenId(id)} />
+                <DealActions deals={overviewDeals} />
               </div>
               {overviewHealthOpenId && <DealHealthModal dealId={overviewHealthOpenId} onClose={() => setOverviewHealthOpenId(null)} />}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

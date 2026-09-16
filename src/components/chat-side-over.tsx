@@ -2,7 +2,7 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { Sparkle, ArrowUp, X, Maximize2 } from "lucide-react"
+import { Sparkle, ArrowUp, X, Maximize2, Plus, Mic, AudioLines } from "lucide-react"
 import { useChatPattern, type TransferMessage, type ChatCommand } from "@/contexts/chat-pattern"
 import { SUGGESTED } from "@/components/ask-vts"
 
@@ -234,19 +234,34 @@ export function ChatSideOver() {
 
         {/* Input */}
         <div className="shrink-0 border-t border-border px-4 py-3">
-          <div className="flex items-end gap-2">
-            <Textarea
-              ref={inputRef}
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send() } }}
-              placeholder={messages.length === 0 ? "Ask anything about your portfolio…" : "Ask a follow-up…"}
-              className="resize-none text-sm border-none shadow-none bg-transparent focus-visible:ring-0 p-0 min-h-0 flex-1"
-              rows={1}
-            />
-            <Button size="icon" className="h-7 w-7 shrink-0" disabled={!input.trim()} onClick={send}>
-              <ArrowUp className="h-3.5 w-3.5" />
+          <Textarea
+            ref={inputRef}
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send() } }}
+            placeholder={messages.length === 0 ? "Ask anything about your portfolio…" : "Ask a follow-up…"}
+            className="resize-none text-sm border-none shadow-none bg-transparent focus-visible:ring-0 p-0 min-h-0 w-full"
+            rows={1}
+          />
+          <div className="flex items-center justify-between mt-2">
+            <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground h-7 px-2 text-xs">
+              <Plus className="h-3.5 w-3.5" />
+              Add
             </Button>
+            <div className="flex items-center gap-1">
+              <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground">
+                <Mic className="h-3.5 w-3.5" />
+              </Button>
+              {input.trim() ? (
+                <Button size="icon" className="h-7 w-7" onClick={send}>
+                  <ArrowUp className="h-3.5 w-3.5" />
+                </Button>
+              ) : (
+                <Button size="icon" className="h-7 w-7" onClick={() => {}}>
+                  <AudioLines className="h-3.5 w-3.5" />
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </div>

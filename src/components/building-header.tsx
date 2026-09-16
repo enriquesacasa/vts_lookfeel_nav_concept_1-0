@@ -55,11 +55,10 @@ function BuildingHeader({ image, name, address, city, badges, actions, className
               {city}
             </p>
           )}
-          <div className="flex items-center gap-6 flex-wrap">
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-medium text-foreground leading-tight">
+          <div className="flex items-center min-w-0">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-medium text-foreground leading-tight min-w-0">
               {name}
             </h1>
-            {actions}
           </div>
           <div>
             <p className="text-sm text-foreground">{address}</p>
@@ -67,6 +66,7 @@ function BuildingHeader({ image, name, address, city, badges, actions, className
           </div>
         </div>
         <div className="flex items-center gap-2 shrink-0">
+          {actions}
           {pattern === "popover" ? (
             <Popover open={popoverOpen} onOpenChange={setPopoverOpen} modal={false}>
               <PopoverTrigger render={<span />}>

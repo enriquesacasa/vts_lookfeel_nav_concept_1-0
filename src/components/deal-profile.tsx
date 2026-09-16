@@ -63,7 +63,7 @@ const ALL_STAGES: StageValue[] = ["Inquiry", "Touring", "Proposal", "LOI", "Lega
 
 const STATUS_CONFIG: Record<DealStatus, { label: string; Icon: React.ElementType; cls: string; dot: string }> = {
   active:    { label: "Active",   Icon: CheckCircle2,  cls: "text-success bg-success/10 border-success/20",         dot: "bg-success" },
-  stalled:   { label: "Caution",  Icon: Clock,         cls: "text-warning bg-warning/10 border-warning/20",          dot: "bg-warning" },
+  stalled:   { label: "Critical",  Icon: Clock,         cls: "text-warning bg-warning/10 border-warning/20",          dot: "bg-warning" },
   "at-risk": { label: "At risk",  Icon: AlertTriangle, cls: "text-destructive bg-destructive/10 border-destructive/20", dot: "bg-destructive" },
   executed:  { label: "Executed", Icon: CheckCircle2,  cls: "text-success bg-success/10 border-success/20",         dot: "bg-success" },
 }
@@ -193,8 +193,8 @@ function FinancialBar({ deal, stageIdx, onHealthClick }: { deal: Deal; stageIdx:
       subtitle: deal.ner ? `${nerDelta.pct} vs budget` : `Budget $${deal.budgetNer.toFixed(2)}`,
       trend: deal.ner && nerDelta.dir !== "flat" ? nerDelta.dir : undefined,
     }] : []),
-    ...(tlv ? [{ label: "Total lease value", value: `$${tlv.toFixed(1)}M`, subtitle: `${deal.term} months` }] : []),
-    ...(tiCost ? [{ label: "TI investment", value: `$${(tiCost / 1_000_000).toFixed(2)}M`, subtitle: "$80/sf est." }] : []),
+    ...(tlv ? [{ label: "Total lease value", value: `$${tlv.toFixed(1)}M`, subtitle: `${deal.term} months`, cellClassName: "hidden sm:block" }] : []),
+    ...(tiCost ? [{ label: "TI investment", value: `$${(tiCost / 1_000_000).toFixed(2)}M`, subtitle: "$80/sf est.", cellClassName: "hidden lg:block" }] : []),
   ]
 
   return <KpiBar kpis={kpis} />
@@ -424,7 +424,7 @@ function ProposalCard({ round, sf, base, measure }: { round: ProposalRound; sf: 
   const termLabel = Number.isInteger(termYrs) ? `${termYrs} yr` : `${round.term} mo`
 
   return (
-    <div className="rounded-xl border border-border bg-card overflow-hidden shrink-0 w-[240px] flex flex-col">
+    <div className="rounded-xl border border-border bg-card overflow-hidden flex-1 min-w-[220px] flex flex-col">
       {/* Header */}
       <div className={cn("px-4 pt-4 pb-3 space-y-2.5", cfg.divider)}>
         <div className="flex items-center justify-between gap-2">
@@ -682,7 +682,7 @@ function ProposalsTab({ deal, stageIdx, onAddProposal }: { deal: Deal; stageIdx:
       </div>
 
       {view === "cards" && (
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-col sm:flex-row flex-wrap gap-3">
           {cards.map((r, i) => (
             <ProposalCard key={i} round={r} sf={deal.sf} base={i === 0 ? null : cards[0]} measure={measure} />
           ))}
@@ -1374,7 +1374,7 @@ type HealthScore = "strong" | "on-track" | "caution" | "at-risk"
 const HEALTH_SCORE_CONFIG: Record<HealthScore, { label: string; cls: string; textCls: string; bgCls: string }> = {
   "strong":   { label: "Strong",   cls: "text-success bg-success/10 border-success/20",             textCls: "text-success",     bgCls: "bg-success/8"      },
   "on-track": { label: "On track", cls: "text-primary bg-primary/10 border-primary/20",             textCls: "text-primary",     bgCls: ""                  },
-  "caution":  { label: "Caution",  cls: "text-warning bg-warning/10 border-warning/20",             textCls: "text-warning",     bgCls: "bg-warning/8"      },
+  "caution":  { label: "Critical",  cls: "text-warning bg-warning/10 border-warning/20",             textCls: "text-warning",     bgCls: "bg-warning/8"      },
   "at-risk":  { label: "At risk",  cls: "text-destructive bg-destructive/10 border-destructive/20", textCls: "text-destructive", bgCls: "bg-destructive/8"  },
 }
 
@@ -2418,7 +2418,7 @@ export function DealProfile({ deal, onBack: _onBack, status: statusProp, onStatu
       {/* Agent strip */}
 
       {/* Main content grid */}
-      <div className="flex gap-4 items-stretch">
+      <div className="flex flex-col lg:flex-row gap-4 items-stretch">
 
         {/* Left col: Info / Proposals / Encumbrances */}
         <div className="flex-[5] min-w-0 flex flex-col gap-4">
@@ -2444,18 +2444,18 @@ export function DealProfile({ deal, onBack: _onBack, status: statusProp, onStatu
         </div>
 
         {/* Right col: Updates / Tasks / Docs / Reminders */}
-        <div className={cn("flex flex-col gap-4 transition-all duration-300", rightCollapsed ? "w-14 shrink-0" : "flex-[3]")}>
-          <div className={cn(cardBase, "overflow-hidden h-full", rightCollapsed && "!px-3 !py-3")}>
+        <div className={cn("flex flex-col gap-4 transition-all duration-300", rightCollapsed ? "lg:w-14 lg:shrink-0" : "lg:flex-[3]")}>
+          <div className={cn(cardBase, "overflow-hidden h-full", rightCollapsed && "lg:!px-3 lg:!py-3")}>
             <Tabs value={rightTab} onValueChange={v => setRightTab(v)} className="w-full">
               {/* Header: toggle left of tabs, always visible */}
               <div className="flex items-center border-b border-border mb-4">
                 <TooltipProvider>
                   <Tooltip>
-                    <TooltipTrigger render={<div className="shrink-0 pb-1 mr-1" />}>
+                    <TooltipTrigger render={<div className="hidden lg:block shrink-0 pb-1 mr-1" />}>
                       <Button
                         variant="ghost" size="icon"
                         onClick={() => setRightCollapsed(c => !c)}
-                        className="h-6 w-6 rounded-full bg-card border border-border text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                        className="hidden lg:flex h-6 w-6 rounded-full bg-card border border-border text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                       >
                         <ChevronRight className={cn("h-3 w-3 transition-transform duration-300", rightCollapsed && "rotate-180")} />
                       </Button>
@@ -2465,8 +2465,7 @@ export function DealProfile({ deal, onBack: _onBack, status: statusProp, onStatu
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
-                {!rightCollapsed && (
-                  <TabsList variant="line" className="flex-1 rounded-none bg-transparent p-0 h-auto gap-0 justify-start">
+                <TabsList variant="line" className={cn("flex-1 rounded-none bg-transparent p-0 h-auto gap-0 justify-start", rightCollapsed && "lg:hidden")}>
                     {[
                       { value: "updates",   label: "Updates" },
                       { value: "tasks",     label: "Tasks", badge: STAGE_TASKS[stage]?.filter(t => !t.done).length || undefined, badgeCls: "bg-primary text-primary-foreground" },
@@ -2479,16 +2478,13 @@ export function DealProfile({ deal, onBack: _onBack, status: statusProp, onStatu
                       </TabsTrigger>
                     ))}
                   </TabsList>
-                )}
               </div>
-              {!rightCollapsed && (
-                <>
-                  <TabsContent value="updates"><ActivityFeed deal={deal} stage={stage} /></TabsContent>
-                  <TabsContent value="tasks"><TasksTab stage={stage} status={status} dealId={deal.id} /></TabsContent>
-                  <TabsContent value="documents"><DocumentsTab stage={stage} /></TabsContent>
-                  <TabsContent value="reminders"><p className="text-sm text-muted-foreground py-8 text-center">No reminders set.</p></TabsContent>
-                </>
-              )}
+              <div className={cn(rightCollapsed && "lg:hidden")}>
+                <TabsContent value="updates"><ActivityFeed deal={deal} stage={stage} /></TabsContent>
+                <TabsContent value="tasks"><TasksTab stage={stage} status={status} dealId={deal.id} /></TabsContent>
+                <TabsContent value="documents"><DocumentsTab stage={stage} /></TabsContent>
+                <TabsContent value="reminders"><p className="text-sm text-muted-foreground py-8 text-center">No reminders set.</p></TabsContent>
+              </div>
             </Tabs>
           </div>
         </div>
