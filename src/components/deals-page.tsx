@@ -14,6 +14,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox"
 import { AgentBtn } from "@/components/agent-btn"
 import { getLatestHumanUpdate, getEncumbranceCount, getDealHealth } from "@/components/deal-profile"
+import { useChatPattern } from "@/contexts/chat-pattern"
 import { KpiBar } from "@/components/kpi-bar"
 import {
   Table, TableHeader, TableBody, TableRow, TableCell,
@@ -777,6 +778,7 @@ export function DealHealthModal({ dealId, onClose }: { dealId: string; onClose: 
   const hDeal = DEALS.find(d => d.id === dealId)
   if (!hDeal) return null
   const hCfg = getDealHealth(hDeal.id, hDeal.stage as any)
+  const { openChat } = useChatPattern()
   return (
     <DialogPrimitive.Root open onOpenChange={open => { if (!open) onClose() }}>
       <DialogPrimitive.Portal>
@@ -797,7 +799,7 @@ export function DealHealthModal({ dealId, onClose }: { dealId: string; onClose: 
             <p className="text-sm leading-snug text-sidebar-foreground/80">{hCfg.summary}</p>
           </div>
           <p className="text-[10px] font-medium uppercase tracking-widest text-sidebar-foreground/50 mb-3">Signals</p>
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3 mb-5">
             {hCfg.signals.map((s, i) => (
               <div key={i} className="flex items-start gap-2 text-sm text-sidebar-foreground/80 leading-snug">
                 <Dot className="h-4 w-4 text-sidebar-foreground/40 shrink-0 mt-0.5" />
@@ -805,6 +807,18 @@ export function DealHealthModal({ dealId, onClose }: { dealId: string; onClose: 
               </div>
             ))}
           </div>
+          {hCfg.recs.length > 0 && (
+            <button
+              onClick={() => {
+                onClose()
+                openChat({ message: `${hCfg.recs[0].action} — ${hDeal.tenant}` })
+              }}
+              className="w-full rounded-lg bg-sidebar-primary px-4 py-2.5 text-sm font-medium text-sidebar-primary-foreground transition-opacity hover:opacity-90 flex items-center justify-between gap-3"
+            >
+              {hCfg.recs[0].action}
+              <ChevronRight className="h-4 w-4 shrink-0 opacity-70" />
+            </button>
+          )}
         </DialogPrimitive.Popup>
       </DialogPrimitive.Portal>
     </DialogPrimitive.Root>

@@ -23,6 +23,7 @@ import { type Deal } from "@/components/deals-page"
 import { TENANT_LOGO } from "@/components/tenant-avatar"
 import { TENANT_DOMAIN } from "@/lib/tenant-data"
 import { KpiBar } from "@/components/kpi-bar"
+import { useChatPattern } from "@/contexts/chat-pattern"
 
 export function TenantLogoImage({ name }: { name: string }) {
   const domain = TENANT_DOMAIN[name]
@@ -2371,6 +2372,7 @@ export function DealProfile({ deal, onBack: _onBack, status: statusProp, onStatu
   const [healthOpen, setHealthOpen] = React.useState(false)
   const [rightCollapsed, setRightCollapsed] = React.useState(false)
   const stageIdx = ALL_STAGES.indexOf(stage)
+  const { openChat } = useChatPattern()
 
   const healthCfg = getDealHealth(deal.id, stage)
 
@@ -2397,7 +2399,7 @@ export function DealProfile({ deal, onBack: _onBack, status: statusProp, onStatu
               <p className="text-sm leading-snug text-sidebar-foreground/80">{healthCfg.summary}</p>
             </div>
             <p className="text-[10px] font-medium uppercase tracking-widest text-sidebar-foreground/50 mb-3">Signals</p>
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-3 mb-5">
               {healthCfg.signals.map((s, i) => (
                 <div key={i} className="flex items-start gap-2 text-sm text-sidebar-foreground/80 leading-snug">
                   <Dot className="h-4 w-4 text-sidebar-foreground/40 shrink-0 mt-0.5" />
@@ -2405,6 +2407,18 @@ export function DealProfile({ deal, onBack: _onBack, status: statusProp, onStatu
                 </div>
               ))}
             </div>
+            {healthCfg.recs.length > 0 && (
+              <button
+                onClick={() => {
+                  setHealthOpen(false)
+                  openChat({ message: `${healthCfg.recs[0].action} — ${deal.tenant}` })
+                }}
+                className="w-full rounded-lg bg-sidebar-primary px-4 py-2.5 text-sm font-medium text-sidebar-primary-foreground transition-opacity hover:opacity-90 flex items-center justify-between gap-3"
+              >
+                {healthCfg.recs[0].action}
+                <ChevronRight className="h-4 w-4 shrink-0 opacity-70" />
+              </button>
+            )}
           </DialogPrimitive.Popup>
         </DialogPrimitive.Portal>
       </DialogPrimitive.Root>
