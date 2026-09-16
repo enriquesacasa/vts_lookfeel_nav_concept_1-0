@@ -2,6 +2,9 @@ import * as React from "react"
 import { cn, cardBase } from "@/lib/utils"
 import { AlertTriangle, Zap, ShieldAlert, Sparkle, TrendingUp } from "lucide-react"
 import { AgentBtn } from "@/components/agent-btn"
+import type { CriticalDate } from "@/components/critical-dates"
+import type { Deal } from "@/components/deals-page"
+import { getDealHealth } from "@/components/deal-profile"
 
 interface ActionItem {
   type: "risk" | "upside" | "ops"
@@ -11,34 +14,14 @@ interface ActionItem {
   detail?: string
 }
 
-const ACTIONS: ActionItem[] = [
-  {
-    type: "risk",
-    text: "Leases expiring in < 12 mo",
-    value: "$234K/mo",
-    impact: "−$14.4M revenue at risk",
-    detail: "Pfizer · Morgan Stanley · Deloitte LLP",
-  },
-  {
-    type: "upside",
-    text: "LOI+ deals — revenue upside if executed",
-    value: "+$89K/mo",
-    impact: "+$3.7M projected revenue",
-    detail: "NovaTech · Vertex Studios · Bluewave LLC",
-  },
-  {
-    type: "ops",
-    text: "Outstanding AR > 30 days",
-    value: "$41K",
-    impact: "2 tenants past due",
-    detail: "Meridian Health · Atlas Group",
-  },
-]
-
 const CONFIG = {
   risk:   { icon: ShieldAlert   },
   upside: { icon: Zap           },
   ops:    { icon: AlertTriangle },
+}
+
+function fmt$(k: number) {
+  return k >= 1000 ? `$${(k / 1000).toFixed(1)}M` : `$${Math.round(k)}K`
 }
 
 function ActionRow({ item, onRun, onNavigate }: { item: ActionItem; onRun: () => void; onNavigate?: () => void }) {
@@ -68,18 +51,70 @@ function ActionRow({ item, onRun, onNavigate }: { item: ActionItem; onRun: () =>
   )
 }
 
+const AVG_RENT_PSF = 52
+
 interface ActionLeversProps {
+  deals?: Deal[]
+  criticalDates?: CriticalDate[]
   onNavigate?: (page: string) => void
   className?: string
 }
 
 const ActionLevers = React.forwardRef<HTMLDivElement, ActionLeversProps>(
-  ({ onNavigate, className }, ref) => {
+  ({ deals, criticalDates, onNavigate, className }, ref) => {
     const PAGE_MAP: Record<ActionItem["type"], string> = {
       risk: "leases",
       upside: "deals",
       ops: "leases",
     }
+
+    const actions = React.useMemo((): ActionItem[] => {
+      // Row 1 — expiring leases < 12 mo
+      const expiring = (criticalDates ?? []).filter(d => d.category === "expiring" && d.monthsOut <= 12)
+      const expiringRentMonthlyK = expiring.reduce((s, d) => s + (d.sf * AVG_RENT_PSF) / 1000 / 12, 0)
+      const expiringNerK = expiring.reduce((s, d) => s + (d.sf * AVG_RENT_PSF) / 1000, 0)
+      const expiringNames = expiring.map(d => d.tenant).join(" · ")
+
+      // Row 2 — late-stage deals (Lease Out+)
+      const CREDIBLE = new Set(["Lease Out", "Executed"])
+      const lateDeals = (deals ?? []).filter(d => CREDIBLE.has(d.stage))
+      const lateMonthlyK = lateDeals.reduce((s, d) => s + (d.sf * d.ner) / 1000 / 12, 0)
+      const lateNerK = lateDeals.reduce((s, d) => s + (d.sf * d.ner) / 1000, 0)
+      const lateNames = lateDeals.map(d => d.tenant).slice(0, 3).join(" · ")
+
+      // Row 3 — at-risk deals (stalled / at-risk health)
+      const atRisk = (deals ?? []).filter(d => getDealHealth(d.id, d.stage as any).score === "at-risk")
+      const atRiskNerK = atRisk.reduce((s, d) => s + (d.sf * d.budgetNer) / 1000, 0)
+      const atRiskNames = atRisk.map(d => d.tenant).slice(0, 3).join(" · ")
+
+      return [
+        {
+          type: "risk",
+          text: "Leases expiring in < 12 mo",
+          value: expiringRentMonthlyK > 0 ? `${fmt$(expiringRentMonthlyK)}/mo` : "—",
+          impact: expiringNerK > 0 ? `−${fmt$(expiringNerK)} NER exposure` : "No expirations",
+          detail: expiringNames || undefined,
+        },
+        {
+          type: "upside",
+          text: "Late-stage deals — projected NER if executed",
+          value: lateMonthlyK > 0 ? `+${fmt$(lateMonthlyK)}/mo` : "—",
+          impact: lateNerK > 0 ? `+${fmt$(lateNerK)} projected NER` : "No late-stage deals",
+          detail: lateNames || undefined,
+        },
+        {
+          type: "ops",
+          text: "At-risk deals requiring attention",
+          value: atRisk.length > 0 ? `${atRisk.length} deal${atRisk.length > 1 ? "s" : ""}` : "—",
+          impact: atRiskNerK > 0 ? `${fmt$(atRiskNerK)} NER at risk` : "No at-risk deals",
+          detail: atRiskNames || undefined,
+        },
+      ]
+    }, [deals, criticalDates])
+
+    const upside = actions.find(a => a.type === "upside")
+    const upsideVal = upside?.value ?? "—"
+
     return (
       <div
         ref={ref}
@@ -97,13 +132,13 @@ const ActionLevers = React.forwardRef<HTMLDivElement, ActionLeversProps>(
         <div className="rounded-lg px-3 py-2 flex items-center gap-2 bg-sidebar-foreground/10">
           <Sparkle className="h-4 w-4 shrink-0 text-sidebar-primary" />
           <p className="text-sm leading-snug text-sidebar-foreground/70">
-            3 financial improvements identified: <span className="text-sidebar-primary font-medium">$3.7M upside</span>
+            {actions.length} financial improvements identified: <span className="text-sidebar-primary font-medium">{upsideVal} upside</span>
           </p>
         </div>
 
         {/* Action items */}
         <div className="flex flex-col gap-2">
-          {ACTIONS.map((item, i) => (
+          {actions.map((item, i) => (
             <ActionRow key={i} item={item} onRun={() => {}} onNavigate={onNavigate ? () => onNavigate(PAGE_MAP[item.type]) : undefined} />
           ))}
         </div>

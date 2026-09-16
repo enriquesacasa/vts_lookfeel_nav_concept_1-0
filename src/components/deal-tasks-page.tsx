@@ -14,7 +14,7 @@ import {
   Table, TableHeader, TableBody, TableRow, TableCell, TableHead,
   SortableHead, useSortState,
 } from "@/components/sortable-table"
-import { DEALS } from "@/components/deals-page"
+import { DEALS, TenantAvatar } from "@/components/deals-page"
 
 // ── Task definitions (mirroring deal-profile STAGE_TASKS) ────────────────────
 
@@ -291,7 +291,7 @@ const FILTER_DEFS = [
 
 // ── Main page ─────────────────────────────────────────────────────────────────
 
-export function DealTasksPage({ onTaskClick }: { onTaskClick?: (dealId: string) => void }) {
+export function DealTasksPage({ onTaskClick, assetContext }: { onTaskClick?: (dealId: string) => void; assetContext?: string }) {
   const [doneSet, setDoneSet] = React.useState<Set<string>>(
     () => new Set(ALL_ROWS.filter(r => r.status === "Complete").map(r => r.id))
   )
@@ -317,7 +317,7 @@ export function DealTasksPage({ onTaskClick }: { onTaskClick?: (dealId: string) 
   function onClearAll() { setActiveFilters({}); setPage(1) }
 
   const filtered = React.useMemo(() => {
-    let r = [...ALL_ROWS]
+    let r = assetContext ? ALL_ROWS.filter(row => row.asset === assetContext) : [...ALL_ROWS]
     if (search) {
       const q = search.toLowerCase()
       r = r.filter(s => s.tenant.toLowerCase().includes(q) || s.taskLabel.toLowerCase().includes(q) || s.asset.toLowerCase().includes(q))
@@ -425,7 +425,14 @@ export function DealTasksPage({ onTaskClick }: { onTaskClick?: (dealId: string) 
                 {orderedCols.map(col => {
                   switch (col.id) {
                     case "tenant":
-                      return <TableCell key="tenant" className="py-2.5 text-sm font-medium text-foreground whitespace-nowrap">{r.tenant}</TableCell>
+                      return (
+                        <TableCell key="tenant" className="py-2.5 whitespace-nowrap">
+                          <div className="flex items-center gap-2">
+                            <TenantAvatar name={r.tenant} />
+                            <span className="text-sm font-medium text-foreground">{r.tenant}</span>
+                          </div>
+                        </TableCell>
+                      )
                     case "asset":
                       return <TableCell key="asset" className="py-2.5 text-sm text-muted-foreground whitespace-nowrap">{r.asset}</TableCell>
                     case "space":

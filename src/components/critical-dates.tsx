@@ -15,6 +15,7 @@ type SortKey = "tenant" | "type" | "space" | "date" | "monthsOut"
 
 export interface CriticalDate {
   tenant: string
+  asset?: string
   type: string
   space: string
   sf: number

@@ -47,7 +47,7 @@ const CONVERSATIONS: Conversation[] = [
     time: "Just now",
     messages: [
       { id: "m1", role: "user",      timestamp: "9:12 AM", content: "What's the cost of delay on the KPMG renewal?" },
-      { id: "m2", role: "assistant", timestamp: "9:12 AM", content: "The KPMG renewal at Empire State Bldg (Suite 3400, 117,000 sf) has been stalled for 26 days.\n\nCost of delay: $3,705/day based on the budget NOI of $6.435M annually. Total delay cost so far: $96,330.\n\nThe blocker is board approval — Paul Simmons indicated the board review was pushed to mid-August. Two follow-up actions are ready:\n\n1. A targeted follow-up to Paul Simmons\n2. A CFO escalation draft\n\nWould you like me to surface those drafts for your review?" },
+      { id: "m2", role: "assistant", timestamp: "9:12 AM", content: "The KPMG renewal at Empire State Bldg (Suite 3400, 117,000 sf) has been stalled for 26 days.\n\nCost of delay: $3,705/day based on the budget NER of $55/sf. Total delay cost so far: $96,330.\n\nThe blocker is board approval — Paul Simmons indicated the board review was pushed to mid-August. Two follow-up actions are ready:\n\n1. A targeted follow-up to Paul Simmons\n2. A CFO escalation draft\n\nWould you like me to surface those drafts for your review?" },
       { id: "m3", role: "user",      timestamp: "9:13 AM", content: "Yes, show me the CFO escalation draft." },
       { id: "m4", role: "assistant", timestamp: "9:13 AM", content: "Here's the CFO escalation draft from Deal Momentum:\n\nTo: CFO, KPMG\nSubject: 399 Park renewal — timing update requested\n\nWe wanted to follow up on the renewal discussion for KPMG's Suite 3400 at Empire State Building. The current proposal has been with your team for 26 days and we want to ensure we can hold the space through your board process.\n\nWould you be available for a brief call this week to confirm timing?\n\nShall I route this for your approval before it sends?" },
     ],
@@ -59,7 +59,7 @@ const CONVERSATIONS: Conversation[] = [
     time: "Yesterday",
     messages: [
       { id: "m1", role: "user",      timestamp: "2:05 PM", content: "Summarize the Amazon inquiry at VTS Tower." },
-      { id: "m2", role: "assistant", timestamp: "2:05 PM", content: "Amazon.com — VTS Tower, Suite 0800 (Floor 8)\n\nType: New deal · 18,000 sf\nStage: Inquiry\nRep: Sarah Okonkwo · CBRE\nBudget NER: $98.00 PSF/yr\nBudget NOI: $1.76M/yr\n\nDeal Capture parsed the inbound email and created the record today at 8:50 AM. Tour request submitted for Sep 3. No proposal issued yet.\n\nDeal Intelligence is queued to pull credit, comps, and market context once requirements are confirmed." },
+      { id: "m2", role: "assistant", timestamp: "2:05 PM", content: "Amazon.com — VTS Tower, Suite 0800 (Floor 8)\n\nType: New deal · 18,000 sf\nStage: Inquiry\nRep: Sarah Okonkwo · CBRE\nBudget NER: $98.00 PSF/yr\n\nDeal Capture parsed the inbound email and created the record today at 8:50 AM. Tour request submitted for Sep 3. No proposal issued yet.\n\nDeal Intelligence is queued to pull credit, comps, and market context once requirements are confirmed." },
     ],
   },
   {
@@ -74,12 +74,12 @@ const CONVERSATIONS: Conversation[] = [
   },
   {
     id: "c4",
-    title: "Pipeline NOI vs budget",
-    preview: "Deals above and below budget NOI",
+    title: "Pipeline NER vs budget",
+    preview: "Deals above and below budget NER",
     time: "Jul 14",
     messages: [
-      { id: "m1", role: "user",      timestamp: "4:30 PM", content: "Which active deals are above budget NOI?" },
-      { id: "m2", role: "assistant", timestamp: "4:30 PM", content: "Deals tracking above budget NOI:\n\nStarbucks — $1.48M vs $1.43M budget (+4.0%)\nDeloitte — $3.10M vs $3.01M budget (+2.9%)\nMorgan Stanley — touring, no NOI yet\n\nDeals below budget:\n\nApex Capital — $2.16M vs $2.34M (−7.7%)\nKPMG — $5.73M vs $6.44M (−11.0%)\nAtlas Group — $2.68M vs $3.05M (−12.1%)\n\nKPMG and Atlas Group are the largest gaps. Both are currently stalled." },
+      { id: "m1", role: "user",      timestamp: "4:30 PM", content: "Which active deals are above budget NER?" },
+      { id: "m2", role: "assistant", timestamp: "4:30 PM", content: "Deals tracking above budget NER:\n\nStarbucks — $52/sf vs $50/sf budget (+4.0%)\nDeloitte — $72/sf vs $70/sf budget (+2.9%)\nMorgan Stanley — touring, no NER set yet\n\nDeals below budget:\n\nApex Capital — $48/sf vs $52/sf (−7.7%)\nKPMG — $49/sf vs $55/sf (−10.9%)\nAtlas Group — $44/sf vs $50/sf (−12.0%)\n\nKPMG and Atlas Group are the largest gaps. Both are currently stalled." },
     ],
   },
 ]
@@ -109,7 +109,7 @@ function _generateResponseRaw(text: string): string {
     const stage = text.match(/· ([^·]+) · /)?.[1]
     return `**${tenant}** has been stalled in ${stage ?? "the current stage"} for ${days ?? "several"} days with no activity recorded.
 
-Cost of delay is accumulating at the budget NOI rate — approximately $${Math.round(Math.random() * 800 + 200).toLocaleString()}/day based on this deal's economics. At ${days ?? "this"} days stalled, that's $${(parseInt(days ?? "14") * 950).toLocaleString()} in delayed value.
+Cost of delay is accumulating at the budget NER rate — approximately $${Math.round(Math.random() * 800 + 200).toLocaleString()}/day based on this deal's economics. At ${days ?? "this"} days stalled, that's $${(parseInt(days ?? "14") * 950).toLocaleString()} in delayed value.
 
 The most common unblock at this stage is a direct re-engagement from ownership or the leasing lead — not the broker. I can draft that outreach now.
 
@@ -124,7 +124,7 @@ The most common unblock at this stage is a direct re-engagement from ownership o
 
 The rent delta in your proposal may be creating an opening. Deals at this stage with a competing building in play close at roughly 60% of the normal rate unless ownership engages directly.
 
-I can model what concessions would improve close probability without breaching budget NOI, and draft a countersign narrative tailored to ${tenant}'s stated concerns.
+I can model what concessions would improve close probability without breaching budget NER, and draft a countersign narrative tailored to ${tenant}'s stated concerns.
 
 **Suggested agents:**
 — **Scenario Modeling** can run the economics on TI, free rent, and NER trade-offs to find the strongest counter that still hits budget.
@@ -184,13 +184,13 @@ I recommend leading with occupancy certainty and a TI refresh rather than NER re
     const date = text.match(/· ([A-Z][a-z]+ \d+, \d{4})/)?.[1]
     return `**${tenant}'s ${type}** notice deadline is ${date ? `${date}` : "approaching"}. Missing this date forfeits the option — it cannot be reinstated.
 
-${type === "Contraction Option" ? "If exercised, this reduces your occupied sf and creates a vacancy you'll need to backfill. Model the NOI impact before the deadline to understand the trade-off." : type === "ROFO" ? "If ${tenant} exercises the ROFO, you'll need to assess impact on adjacent availability and pending deals for that space." : "Expansion options, if exercised, typically compress your adjacent vacancy — confirm you have the space to honor it."}
+${type === "Contraction Option" ? "If exercised, this reduces your occupied sf and creates a vacancy you'll need to backfill. Model the NER and NPV impact before the deadline to understand the trade-off." : type === "ROFO" ? "If ${tenant} exercises the ROFO, you'll need to assess impact on adjacent availability and pending deals for that space." : "Expansion options, if exercised, typically compress your adjacent vacancy — confirm you have the space to honor it."}
 
 I'd recommend putting a decision brief in front of ownership now so there are no surprises at the deadline.
 
 **Suggested agents:**
 — **Approval Readiness** can prep an option-exercise scenario brief for internal review ahead of the deadline.
-— **Scenario Modeling** can model the NOI impact of exercise vs. non-exercise to inform your response strategy.`
+— **Scenario Modeling** can model the NER and NPV impact of exercise vs. non-exercise to inform your response strategy.`
   }
 
   // Vacant space
@@ -242,7 +242,7 @@ I can draft a next-step recommendation, pull activity history, or model the econ
 export const SUGGESTED = [
   { label: "Review pipeline health",   prompt: "Which deals need attention today?" },
   { label: "Surface stalled deals",    prompt: "Show me all stalled deals and their cost of delay." },
-  { label: "Check NOI vs budget",      prompt: "Which active deals are above budget NOI?" },
+  { label: "Check NER vs budget",       prompt: "Which active deals are above budget NER?" },
   { label: "Summarize deal stages",    prompt: "How many deals are in each stage right now?" },
   { label: "Flag expiring leases",     prompt: "What leases expire in the next 90 days?" },
   { label: "Show agent activity",      prompt: "What have VTS Agents done in the last 24 hours?" },

@@ -14,7 +14,8 @@ import {
   Table, TableHeader, TableBody, TableRow, TableCell, TableHead,
   SortableHead, useSortState,
 } from "@/components/sortable-table"
-import { floors } from "@/components/stacking-plan"
+import { floors, FLOORS_BY_ASSET, type Floor } from "@/components/stacking-plan"
+import { LEASES } from "@/components/leases-page"
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -43,18 +44,18 @@ interface AssetRef { id: string; name: string }
 
 // ── Derive rows from stacking-plan floors ─────────────────────────────────────
 
-function buildRows(): OptionRight[] {
+function buildRows(fl: Floor[], assetName: string): OptionRight[] {
   const rows: OptionRight[] = []
   let seq = 0
 
   // Encumbrances (ROFR/ROFO/Expansion on available/vacant spaces)
-  for (const f of floors) {
+  for (const f of fl) {
     for (const s of f.spaces) {
       if (s.encumbrances) {
         for (const enc of s.encumbrances) {
           rows.push({
             id: `enc-${seq++}`,
-            asset: "VTS Tower Headquarters",
+            asset: assetName,
             tenant: enc.tenant,
             suite: s.suite,
             floor: `Floor ${f.number}`,
@@ -74,7 +75,7 @@ function buildRows(): OptionRight[] {
         for (const opt of s.leaseOptions) {
           rows.push({
             id: `opt-${seq++}`,
-            asset: "VTS Tower Headquarters",
+            asset: assetName,
             tenant: s.tenant,
             suite: s.suite,
             floor: `Floor ${f.number}`,
@@ -104,8 +105,6 @@ const NOTICE_DEADLINES: Record<string, string> = {
   "ROFO":                 "10 business days",
   "ROFR":                 "5 business days",
 }
-
-const ROWS = buildRows()
 
 const PAGE_SIZE = 15
 
@@ -240,18 +239,26 @@ function ColumnManager({
 
 const OPTION_TYPES: OptionType[] = ["Renewal Option", "Expansion Option", "Termination Option", "ROFO", "ROFR", "Contraction Option"]
 const STATUSES: OptionStatus[]   = ["Active", "Expiring soon", "Exercised", "Expired"]
-const ALL_TENANTS = [...new Set(ROWS.map(r => r.tenant))].sort()
-
-const BASE_FILTER_DEFS = [
+const BASE_FILTER_DEFS_NO_TENANT = [
   { key: "optionType", label: "Option type", options: OPTION_TYPES.map(v => ({ label: v, value: v })) },
   { key: "status",     label: "Status",      options: STATUSES.map(v => ({ label: v, value: v })) },
-  { key: "tenant",     label: "Tenant",      options: ALL_TENANTS.map(v => ({ label: v, value: v })) },
 ]
 
 // ── Main page ─────────────────────────────────────────────────────────────────
 
-export function OptionsRightsPage({ assets, onRowClick }: { assets?: AssetRef[]; onRowClick?: (tenant: string) => void }) {
+export function OptionsRightsPage({ assets, assetId, onRowClick }: { assets?: AssetRef[]; assetId?: string; onRowClick?: (tenant: string) => void }) {
   const isMultiAsset = (assets?.length ?? 0) > 1
+  const ROWS = React.useMemo(() => {
+    let rows: OptionRight[]
+    if (!assetId && isMultiAsset && assets?.length) {
+      rows = assets.flatMap(a => buildRows(FLOORS_BY_ASSET[a.id] ?? (a.id === "vts-tower" ? floors : []), a.name))
+    } else {
+      const assetFloors = assetId ? (FLOORS_BY_ASSET[assetId] ?? floors) : floors
+      const assetName = assets?.find(a => a.id === assetId)?.name ?? assets?.[0]?.name ?? "VTS Tower Headquarters"
+      rows = buildRows(assetFloors, assetName)
+    }
+    return rows.filter(r => LEASES.some(l => l.tenant === r.tenant && l.asset === r.asset))
+  }, [assetId, isMultiAsset, assets])
   const { sortKey, sortDir, handleSort: _handleSort } = useSortState<SortKey>("tenant")
   const [page, setPage]   = React.useState(1)
   const [search, setSearch] = React.useState("")
@@ -267,9 +274,11 @@ export function OptionsRightsPage({ assets, onRowClick }: { assets?: AssetRef[];
   )
 
   const FILTER_DEFS = React.useMemo(() => {
-    if (!isMultiAsset || !assets?.length) return BASE_FILTER_DEFS
-    return [{ key: "asset", label: "Asset", options: assets.map(a => ({ label: a.name, value: a.name })) }, ...BASE_FILTER_DEFS]
-  }, [isMultiAsset, assets])
+    const tenantFilter = { key: "tenant", label: "Tenant", options: [...new Set(ROWS.map(r => r.tenant))].sort().map(v => ({ label: v, value: v })) }
+    const base = [...BASE_FILTER_DEFS_NO_TENANT, tenantFilter]
+    if (!isMultiAsset || !assets?.length) return base
+    return [{ key: "asset", label: "Asset", options: assets.map(a => ({ label: a.name, value: a.name })) }, ...base]
+  }, [isMultiAsset, assets, ROWS])
 
   const [visible, setVisible] = React.useState<Set<string>>(
     () => new Set(ALL_COLUMNS.filter(c => c.defaultVisible).map(c => c.id))

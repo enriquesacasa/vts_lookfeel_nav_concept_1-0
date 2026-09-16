@@ -98,9 +98,44 @@ export const BUDGETS: Budget[] = [
   { id: "b12", label: "Full floor",         asset: "Empire State Bldg",    budgetYear: 2026, floor: "Floor 31", space: "3100", size: 21000, startDate: "07/01/26", term: 120, baseRent: 82.00, baseRentStep: { month: 61, rent: 96.00 }, esca: "3.5% fixed", ti: 80.00, freeRent: 10, nerSizeYr: 78.90, dateEntered: "03/01/26", archived: false },
   { id: "b13", label: "Partial floor",      asset: "Empire State Bldg",    budgetYear: 2026, floor: "Floor 31", space: "3101", size: 10500, startDate: "07/01/26", term: 84,  baseRent: 84.00, esca: "3% fixed", ti: 80.00, freeRent: 6,  nerSizeYr: 80.50, dateEntered: "03/15/26", archived: false },
 
+  // Willis Tower (Chicago)
+  { id: "b16", label: "Base case",          asset: "Willis Tower",         budgetYear: 2026, floor: "Floor 42", space: "4200", size: 16800, startDate: "04/01/26", term: 84,  baseRent: 65.00, baseRentStep: { month: 37, rent: 75.00 }, esca: "3% fixed",    ti: 55.00, freeRent: 6,  nerSizeYr: 61.40, dateEntered: "01/10/26", archived: false },
+  { id: "b17", label: "High-rent scenario", asset: "Willis Tower",         budgetYear: 2026, floor: "Floor 42", space: "4200", size: 16800, startDate: "04/01/26", term: 84,  baseRent: 73.00, baseRentStep: { month: 37, rent: 84.00 }, esca: "3.5% fixed",  ti: 60.00, freeRent: 5,  nerSizeYr: 69.50, dateEntered: "01/24/26", archived: false },
+  { id: "b18", label: "Sublease option",    asset: "Willis Tower",         budgetYear: 2026, floor: "Floor 38", space: "3800", size: 8400,  startDate: "07/01/26", term: 60,  baseRent: 58.00, esca: "Market",      ti: 40.00, freeRent: 3,  nerSizeYr: 55.30, dateEntered: "02/05/26", archived: false },
+
+  // 30 Hudson Yards (NYC Hudson Yards)
+  { id: "b19", label: "Base case",          asset: "30 Hudson Yards",      budgetYear: 2026, floor: "Floor 55", space: "5500", size: 22000, startDate: "06/01/26", term: 96,  baseRent: 112.00, baseRentStep: { month: 49, rent: 128.00 }, esca: "3% fixed",   ti: 95.00, freeRent: 9,  nerSizeYr: 107.20, dateEntered: "02/18/26", archived: false },
+  { id: "b20", label: "High-rent scenario", asset: "30 Hudson Yards",      budgetYear: 2026, floor: "Floor 57", space: "5700", size: 22000, startDate: "06/01/26", term: 120, baseRent: 128.00, baseRentStep: { month: 61, rent: 146.00 }, esca: "3.5% fixed", ti: 110.00, freeRent: 12, nerSizeYr: 122.40, dateEntered: "03/01/26", archived: false },
+  { id: "b21", label: "Partial floor",      asset: "30 Hudson Yards",      budgetYear: 2026, floor: "Floor 55", space: "5501", size: 11000, startDate: "09/01/26", term: 84,  baseRent: 118.00, esca: "3% fixed",     ti: 100.00, freeRent: 8,  nerSizeYr: 113.50, dateEntered: "03/15/26", archived: false },
+
+  // One World Trade Ctr (NYC Downtown)
+  { id: "b22", label: "Base case",          asset: "One World Trade Ctr",  budgetYear: 2026, floor: "Floor 68", space: "6800", size: 19500, startDate: "05/01/26", term: 96,  baseRent: 82.00, baseRentStep: { month: 49, rent: 94.00 }, esca: "3% fixed",    ti: 85.00, freeRent: 8,  nerSizeYr: 78.30, dateEntered: "01/28/26", archived: false },
+  { id: "b23", label: "High-rent scenario", asset: "One World Trade Ctr",  budgetYear: 2026, floor: "Floor 70", space: "7000", size: 19500, startDate: "05/01/26", term: 120, baseRent: 93.00, baseRentStep: { month: 61, rent: 108.00 }, esca: "3.5% fixed", ti: 95.00, freeRent: 10, nerSizeYr: 89.10, dateEntered: "02/12/26", archived: false },
+  { id: "b24", label: "Sublease option",    asset: "One World Trade Ctr",  budgetYear: 2026, floor: "Floor 65", space: "6500", size: 9750,  startDate: "08/01/26", term: 60,  baseRent: 75.00, esca: "Market",      ti: 65.00, freeRent: 4,  nerSizeYr: 72.20, dateEntered: "03/10/26", archived: false },
+
+  // Transamerica Pyramid (San Francisco)
+  { id: "b25", label: "Base case",          asset: "Transamerica Pyramid",  budgetYear: 2026, floor: "Floor 28", space: "2800", size: 14200, startDate: "07/01/26", term: 84,  baseRent: 96.00, baseRentStep: { month: 37, rent: 110.00 }, esca: "3% fixed",    ti: 90.00, freeRent: 7,  nerSizeYr: 91.80, dateEntered: "03/05/26", archived: false },
+  { id: "b26", label: "High-rent scenario", asset: "Transamerica Pyramid",  budgetYear: 2026, floor: "Floor 30", space: "3000", size: 14200, startDate: "07/01/26", term: 96,  baseRent: 108.00, baseRentStep: { month: 49, rent: 124.00 }, esca: "3.5% fixed", ti: 100.00, freeRent: 9,  nerSizeYr: 103.50, dateEntered: "03/20/26", archived: false },
+  { id: "b27", label: "Short-term option",  asset: "Transamerica Pyramid",  budgetYear: 2026, floor: "Floor 26", space: "2600", size: 7100,  startDate: "10/01/26", term: 48,  baseRent: 88.00, esca: "CPI capped 3%", ti: 70.00, freeRent: 4,  nerSizeYr: 85.20, dateEntered: "04/02/26", archived: false },
+
+  // 200 Berkeley St (Boston)
+  { id: "b28", label: "Base case",          asset: "200 Berkeley St",      budgetYear: 2026, floor: "Floor 12", space: "1200", size: 10500, startDate: "04/01/26", term: 72,  baseRent: 86.00, baseRentStep: { month: 37, rent: 98.00 }, esca: "3% fixed",    ti: 78.00, freeRent: 6,  nerSizeYr: 82.40, dateEntered: "01/15/26", archived: false },
+  { id: "b29", label: "High-rent scenario", asset: "200 Berkeley St",      budgetYear: 2026, floor: "Floor 14", space: "1400", size: 10500, startDate: "04/01/26", term: 84,  baseRent: 96.00, baseRentStep: { month: 37, rent: 110.00 }, esca: "3.5% fixed", ti: 88.00, freeRent: 7,  nerSizeYr: 91.90, dateEntered: "02/01/26", archived: false },
+
+  // One Peachtree Ctr (Atlanta)
+  { id: "b30", label: "Base case",          asset: "One Peachtree Ctr",    budgetYear: 2026, floor: "Floor 22", space: "2200", size: 12000, startDate: "03/01/26", term: 72,  baseRent: 50.00, baseRentStep: { month: 37, rent: 57.00 }, esca: "3% fixed",    ti: 48.00, freeRent: 5,  nerSizeYr: 47.20, dateEntered: "11/20/25", archived: false },
+  { id: "b31", label: "High-rent scenario", asset: "One Peachtree Ctr",    budgetYear: 2026, floor: "Floor 24", space: "2400", size: 12000, startDate: "03/01/26", term: 84,  baseRent: 56.00, baseRentStep: { month: 37, rent: 64.00 }, esca: "3.5% fixed", ti: 55.00, freeRent: 6,  nerSizeYr: 52.80, dateEntered: "12/05/25", archived: false },
+  { id: "b32", label: "Sublease option",    asset: "One Peachtree Ctr",    budgetYear: 2026, floor: "Floor 18", space: "1800", size: 6000,  startDate: "06/01/26", term: 48,  baseRent: 44.00, esca: "Market",      ti: 35.00, freeRent: 3,  nerSizeYr: 42.10, dateEntered: "12/20/25", archived: false },
+
+  // Two Union Square (Seattle)
+  { id: "b33", label: "Base case",          asset: "Two Union Square",     budgetYear: 2026, floor: "Floor 36", space: "3600", size: 14500, startDate: "05/01/26", term: 84,  baseRent: 62.00, baseRentStep: { month: 37, rent: 71.00 }, esca: "3% fixed",    ti: 58.00, freeRent: 6,  nerSizeYr: 58.80, dateEntered: "01/05/26", archived: false },
+  { id: "b34", label: "High-rent scenario", asset: "Two Union Square",     budgetYear: 2026, floor: "Floor 38", space: "3800", size: 14500, startDate: "05/01/26", term: 96,  baseRent: 70.00, baseRentStep: { month: 49, rent: 80.00 }, esca: "3.5% fixed", ti: 65.00, freeRent: 7,  nerSizeYr: 66.80, dateEntered: "01/22/26", archived: false },
+  { id: "b35", label: "Partial floor",      asset: "Two Union Square",     budgetYear: 2026, floor: "Floor 34", space: "3400", size: 7250,  startDate: "08/01/26", term: 60,  baseRent: 55.00, esca: "CPI capped 3%", ti: 48.00, freeRent: 4,  nerSizeYr: 52.50, dateEntered: "02/10/26", archived: false },
+
   // Archived
   { id: "b14", label: "2024 initial draft", asset: "VTS Tower HQ",         budgetYear: 2024, floor: "Floor 14", space: "1400", size: 12500, startDate: "01/01/24", term: 84,  baseRent: 82.00, esca: "3% fixed", ti: 75.00, freeRent: 6,  nerSizeYr: 79.10, dateEntered: "08/10/23", archived: true  },
   { id: "b15", label: "2023 base case",     asset: "One Financial Plaza",  budgetYear: 2023, floor: "Floor 8",  space: "800",  size: 7400,  startDate: "01/01/23", term: 60,  baseRent: 70.00, esca: "3% fixed", ti: 65.00, freeRent: 4,  nerSizeYr: 67.30, dateEntered: "06/05/22", archived: true  },
+  { id: "b36", label: "2024 base case",     asset: "Willis Tower",         budgetYear: 2024, floor: "Floor 40", space: "4000", size: 16800, startDate: "01/01/24", term: 72,  baseRent: 58.00, esca: "3% fixed", ti: 50.00, freeRent: 5,  nerSizeYr: 54.90, dateEntered: "07/15/23", archived: true  },
 ]
 
 // ── Helpers ───────────────────────────────────────────────────────────────────

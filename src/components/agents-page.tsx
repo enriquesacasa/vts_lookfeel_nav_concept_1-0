@@ -828,8 +828,8 @@ const ALL_RUNS: AgentRun[] = [
     agentId: "scenario-modeling",
     category: "Scenario Modeling",
     time: "30 min ago",
-    summary: "Base, aggressive, and blended structures compared. Blended structure meets NOI target with 2-month free rent.",
-    output: "Scenario A (base): $82 PSF, 7-year term, 6 months free rent. Scenario B (aggressive): $86 PSF, 5-year term, 3 months free rent. Scenario C (blended): $84 PSF, 7-year term, 2 months free rent — meets NOI target. Recommend Scenario C.",
+    summary: "Base, aggressive, and blended structures compared. Blended structure meets NER target with 2-month free rent.",
+    output: "Scenario A (base): $82 PSF, 7-year term, 6 months free rent. Scenario B (aggressive): $86 PSF, 5-year term, 3 months free rent. Scenario C (blended): $84 PSF, 7-year term, 2 months free rent — meets NER target. Recommend Scenario C.",
     actionLabel: "Save to deal",
     actionKind: "confirm",
   },
@@ -1422,7 +1422,7 @@ const AGENT_STATS: Record<string, { label: string; value: string }[]> = {
   "deal-health": [
     { label: "Deals scored", value: "29" },
     { label: "At risk",      value: "2"  },
-    { label: "Stalled",      value: "3"  },
+    { label: "Caution",      value: "3"  },
   ],
   "doc-drafting": [
     { label: "Docs drafted",  value: "14" },

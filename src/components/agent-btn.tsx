@@ -33,7 +33,7 @@ function getSuggestions(label: string): string[] {
     return [
       `What concessions could win back ${tenant}?`,
       `Compare our proposal to likely competing buildings`,
-      `What's the NOI impact if we lose ${tenant}?`,
+      `What's the NER impact if we lose ${tenant}?`,
     ]
   }
   // LOI / Legal / Lease Out
@@ -41,7 +41,7 @@ function getSuggestions(label: string): string[] {
     return [
       `Summarize open items and blockers for the ${tenant} deal`,
       `Draft a follow-up to accelerate ${tenant} to execution`,
-      `What's the budget NOI delta if ${tenant} closes at current rent?`,
+      `What's the budget NER delta if ${tenant} closes at current rent?`,
     ]
   }
   // Proposal
@@ -86,7 +86,7 @@ function getSuggestions(label: string): string[] {
   // Lease expiration
   if (l.includes("lease expiration")) {
     return [
-      `What's the NOI at risk if ${tenant} doesn't renew?`,
+      `What's the NER at risk if ${tenant} doesn't renew?`,
       `When should we start the renewal conversation with ${tenant}?`,
       `Pull comps for comparable renewals in this submarket`,
     ]

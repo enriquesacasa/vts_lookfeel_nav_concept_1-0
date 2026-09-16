@@ -35,7 +35,7 @@ const CASH_FLOW_ROWS: Array<{
   total: number | null
   isCurrency?: boolean
   isDate?: boolean
-  isNOI?: boolean
+  isNerRow?: boolean
   isNeg?: boolean
   isNetCashFlow?: boolean
   isGrossTotal?: boolean
@@ -43,7 +43,7 @@ const CASH_FLOW_ROWS: Array<{
   { label: "Start date",           mo1: "11/2026", mo2: "12/2026", mo3: "1/2027",  mo4: "2/2027",  total: null,     isDate: true },
   { label: "Base rent",            mo1: 37200,     mo2: 37200,     mo3: 37200,     mo4: 37200,     total: 3124800,  isCurrency: true },
   { label: "Gross revenue",        mo1: 37200,     mo2: 37200,     mo3: 37200,     mo4: 37200,     total: 3124800,  isGrossTotal: true },
-  { label: "Net operating income", mo1: 37200,     mo2: 37200,     mo3: 37200,     mo4: 37200,     total: 3124800,  isCurrency: true, isNOI: true },
+  { label: "Net revenue",          mo1: 37200,     mo2: 37200,     mo3: 37200,     mo4: 37200,     total: 3124800,  isCurrency: true, isNerRow: true },
   { label: "Commissions",          mo1: -495000,   mo2: 0,         mo3: 0,         mo4: 0,         total: -495000,  isNeg: true },
   { label: "Capital",              mo1: -930000,   mo2: 0,         mo3: 0,         mo4: 0,         total: -930000,  isNeg: true },
   { label: "Net cash flow",        mo1: -1387800,  mo2: 37200,     mo3: 37200,     mo4: 37200,     total: 1699800,  isCurrency: true, isNetCashFlow: true },
@@ -507,6 +507,11 @@ export function ProposalBuilderPage({ className, isDark = false, onToggleDark }:
 
             {/* Metrics + cash flow card */}
             <div className="rounded-xl border border-border/60 bg-card overflow-hidden">
+              {/* Card header */}
+              <div className="flex items-center justify-between px-5 py-2.5 border-b border-border/40 bg-muted/30">
+                <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Proposal model</p>
+                <p className="text-xs text-muted-foreground">Updates as you edit the form</p>
+              </div>
               {/* Key metrics */}
               <div className="p-5 pb-4">
                 <div className="flex items-center justify-between mb-4">
@@ -574,10 +579,10 @@ function CashFlowTable() {
               className={cn(
                 "border-b border-border/30 last:border-0",
                 row.isNetCashFlow && "border-t border-border",
-                row.isNOI && "border-t border-border/60"
+                row.isNerRow && "border-t border-border/60"
               )}
             >
-              <td className={cn("px-5 py-2 text-muted-foreground", (row.isNOI || row.isNetCashFlow || row.isGrossTotal) && "font-semibold text-foreground")}>
+              <td className={cn("px-5 py-2 text-muted-foreground", (row.isNerRow || row.isNetCashFlow || row.isGrossTotal) && "font-semibold text-foreground")}>
                 {row.label}
               </td>
               {row.isDate ? (

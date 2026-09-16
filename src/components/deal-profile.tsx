@@ -19,65 +19,23 @@ import {
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Checkbox } from "@/components/ui/checkbox"
 import { AGENT_ICON_MAP, AGENTS } from "@/components/agents-page"
-import { TENANT_LOGO, type Deal } from "@/components/deals-page"
+import { type Deal } from "@/components/deals-page"
+import { TENANT_LOGO } from "@/components/tenant-avatar"
+import { TENANT_DOMAIN } from "@/lib/tenant-data"
 import { KpiBar } from "@/components/kpi-bar"
-
-// ─── Tenant logo ──────────────────────────────────────────────────────────────
-
-const TENANT_DOMAIN: Record<string, string> = {
-  "Starbucks Corporation": "starbucks.com",
-  "Pfizer Inc.":           "pfizer.com",
-  "Morgan Stanley":        "morganstanley.com",
-  "Deloitte LLP":          "deloitte.com",
-  "KPMG":                  "kpmg.com",
-  "Ernst & Young":         "ey.com",
-  "HSBC Holdings":         "hsbc.com",
-  "Latham & Watkins":      "lw.com",
-  "JPMorgan Chase":        "jpmorgan.com",
-  "Amazon.com":            "amazon.com",
-  "Amazon.com Inc.":       "amazon.com",
-  "Blackstone Inc.":       "blackstone.com",
-  "Vantage Point Capital LP": "vantagepoint.com",
-  "Sullivan & Cromwell LLP":  "sullcrom.com",
-  "Pacific Wealth Management LLC": "pacificwealth.com",
-  "Arthur & Brennan LLP":  "arthurbrennan.com",
-  "Meridian Health Partners Inc.": "meridianhealth.com",
-  "The Carlyle Group Inc.": "carlyle.com",
-  "CVS Health Corporation": "cvshealth.com",
-  "Pfizer":                "pfizer.com",
-  "Skadden Arps":          "skadden.com",
-  "Citigroup":             "citi.com",
-  "Blackrock":             "blackrock.com",
-  "WeWork":                "wework.com",
-  "Google LLC":            "google.com",
-  "Tesla Inc.":            "tesla.com",
-  "Cisco Systems":         "cisco.com",
-  "Salesforce Inc.":       "salesforce.com",
-  "BlackRock":             "blackrock.com",
-  "Goldman Sachs":         "goldmansachs.com",
-  "McKinsey & Co.":        "mckinsey.com",
-  "Spotify":               "spotify.com",
-  "Airbnb":                "airbnb.com",
-  "Stripe":                "stripe.com",
-  "Twitter/X":             "x.com",
-  "Uber Technologies":     "uber.com",
-  "Microsoft":             "microsoft.com",
-  "Meta Platforms":        "meta.com",
-}
 
 export function TenantLogoImage({ name }: { name: string }) {
   const domain = TENANT_DOMAIN[name]
-  const clearbitSrc = domain ? `https://logo.clearbit.com/${domain}?size=256` : null
   const brandfetchSrc = domain ? `https://cdn.brandfetch.io/${domain}/w/256/h/256` : null
   const localSrc = TENANT_LOGO[name] || null
-  const sources = [clearbitSrc, brandfetchSrc, localSrc].filter(Boolean) as string[]
+  const sources = [brandfetchSrc, localSrc].filter(Boolean) as string[]
   const [srcIdx, setSrcIdx] = React.useState(0)
   const src = sources[srcIdx] ?? null
   const initials = name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()
 
   const handleError = () => {
     if (srcIdx < sources.length - 1) setSrcIdx(i => i + 1)
-    else setSrcIdx(sources.length) // exhausted — show initials
+    else setSrcIdx(sources.length)
   }
 
   if (src) {
@@ -105,7 +63,7 @@ const ALL_STAGES: StageValue[] = ["Inquiry", "Touring", "Proposal", "LOI", "Lega
 
 const STATUS_CONFIG: Record<DealStatus, { label: string; Icon: React.ElementType; cls: string; dot: string }> = {
   active:    { label: "Active",   Icon: CheckCircle2,  cls: "text-success bg-success/10 border-success/20",         dot: "bg-success" },
-  stalled:   { label: "Stalled",  Icon: Clock,         cls: "text-warning bg-warning/10 border-warning/20",          dot: "bg-warning" },
+  stalled:   { label: "Caution",  Icon: Clock,         cls: "text-warning bg-warning/10 border-warning/20",          dot: "bg-warning" },
   "at-risk": { label: "At risk",  Icon: AlertTriangle, cls: "text-destructive bg-destructive/10 border-destructive/20", dot: "bg-destructive" },
   executed:  { label: "Executed", Icon: CheckCircle2,  cls: "text-success bg-success/10 border-success/20",         dot: "bg-success" },
 }
@@ -209,7 +167,6 @@ function delta(actual: number, budget: number): { dir: "up" | "down" | "flat"; p
 
 function FinancialBar({ deal, stageIdx, onHealthClick }: { deal: Deal; stageIdx: number; onHealthClick: () => void }) {
   const nerDelta = delta(deal.ner, deal.budgetNer)
-  const noiDelta = delta(deal.noi, deal.budgetNoi)
   const tlv = deal.ner && deal.term ? (deal.ner * deal.sf * (deal.term / 12) / 1_000_000) : null
   const tiCost = stageIdx >= 2 ? deal.sf * 80 : null
   const stage = ALL_STAGES[stageIdx] ?? "Inquiry"
@@ -235,12 +192,6 @@ function FinancialBar({ deal, stageIdx, onHealthClick }: { deal: Deal; stageIdx:
       value: deal.ner ? `$${deal.ner.toFixed(2)}` : "—",
       subtitle: deal.ner ? `${nerDelta.pct} vs budget` : `Budget $${deal.budgetNer.toFixed(2)}`,
       trend: deal.ner && nerDelta.dir !== "flat" ? nerDelta.dir : undefined,
-    }] : []),
-    ...(deal.budgetNoi > 0 ? [{
-      label: "Annual NOI",
-      value: deal.noi ? `$${(deal.noi / 1_000_000).toFixed(2)}M` : "—",
-      subtitle: deal.noi ? `${noiDelta.pct} vs budget` : `Budget $${(deal.budgetNoi / 1_000_000).toFixed(2)}M`,
-      trend: deal.noi && noiDelta.dir !== "flat" ? noiDelta.dir : undefined,
     }] : []),
     ...(tlv ? [{ label: "Total lease value", value: `$${tlv.toFixed(1)}M`, subtitle: `${deal.term} months` }] : []),
     ...(tiCost ? [{ label: "TI investment", value: `$${(tiCost / 1_000_000).toFixed(2)}M`, subtitle: "$80/sf est." }] : []),
@@ -401,11 +352,11 @@ function buildLines(r: ProposalRound, sf: number, measure: ProposalMeasure): Fin
   const retax = sf * 6.0 * yrs
   const grossRev = baseRentTotal + abated + opex + retax
   const totalExp = -(opex + retax)
-  const noi = grossRev + totalExp
+  const netRev = grossRev + totalExp
   const ti = -(r.ti * sf)
   const commission = -(r.rent * sf * yrs * 0.03)
   const capital = ti + commission
-  const ncf = noi + capital
+  const ncf = netRev + capital
 
   // Scale factor to selected measure
   const scale = measure === "psf-yr" ? 1 / (sf * yrs)
@@ -434,7 +385,7 @@ function buildLines(r: ProposalRound, sf: number, measure: ProposalMeasure): Fin
     { label: "Opex",                 value: fmt(-opex) },
     { label: "Real estate taxes",    value: fmt(-retax) },
     { label: "Total expenses",       value: fmt(totalExp),  bold: true, dividerAbove: "single" },
-    { label: "Net operating income", value: fmt(noi),       bold: true, dividerAbove: "double", prefix: "$" },
+    { label: "Net revenue",          value: fmt(netRev),    bold: true, dividerAbove: "double", prefix: "$" },
     { label: "Tenant improvements",  value: fmt(ti) },
     { label: "Commissions",          value: fmt(commission) },
     { label: "Capital",              value: fmt(capital),   bold: true, dividerAbove: "single" },
@@ -596,19 +547,31 @@ const REFERENCE_POOL: ReferenceCardDef[] = [
 
 const REF_GROUPS = Array.from(new Set(REFERENCE_POOL.map(r => r.group)))
 
-function ProposalsTab({ deal, stageIdx }: { deal: Deal; stageIdx: number }) {
+function ProposalsTab({ deal, stageIdx, onAddProposal }: { deal: Deal; stageIdx: number; onAddProposal?: () => void }) {
   const [measure, setMeasure] = React.useState<ProposalMeasure>("psf-yr")
   const [sortOrder, setSortOrder] = React.useState<ProposalSort>("desc")
   const [view, setView] = React.useState<ProposalView>("cards")
   const [selectedRefs, setSelectedRefs] = React.useState<Set<string>>(new Set())
   const [refOpen, setRefOpen] = React.useState(false)
 
+  const AddProposalBtn = (
+    <Button size="sm" className="gap-1.5" onClick={onAddProposal}>
+      <Plus className="h-3 w-3" />
+      Add proposal
+    </Button>
+  )
+
   if (stageIdx < 2) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 gap-2 text-center">
-        <FileText className="h-8 w-8 text-muted-foreground/30" />
-        <p className="text-sm text-muted-foreground">No proposals yet. This deal is at the {deal.stage} stage.</p>
-        <p className="text-xs text-muted-foreground/60">Proposals will appear here once the deal reaches the Proposal stage.</p>
+      <div className="flex flex-col gap-5">
+        <div className="flex justify-end">
+          {AddProposalBtn}
+        </div>
+        <div className="flex flex-col items-center justify-center py-10 gap-2 text-center">
+          <FileText className="h-8 w-8 text-muted-foreground/30" />
+          <p className="text-sm text-muted-foreground">No proposals yet. This deal is at the {deal.stage} stage.</p>
+          <p className="text-xs text-muted-foreground/60">Proposals will appear here once the deal reaches the Proposal stage.</p>
+        </div>
       </div>
     )
   }
@@ -704,10 +667,7 @@ function ProposalsTab({ deal, stageIdx }: { deal: Deal; stageIdx: number }) {
           </PopoverContent>
         </Popover>
 
-        <Button size="sm" className="gap-1.5">
-          <Plus className="h-3 w-3" />
-          Proposal
-        </Button>
+        {AddProposalBtn}
 
         <div className="ml-auto flex items-center gap-1">
           <Button variant="outline" size="icon" onClick={() => setView("cards")}
@@ -1472,6 +1432,7 @@ const HEALTH_BY_STAGE: Record<StageValue, Record<HealthScore, HealthEntry>> = {
 }
 
 const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
+  // d00 — Amazon.com · Inquiry · 2 encumbrances on Space 0800
   "d00": {
     score: "at-risk",
     context: "2 encumbrances on target space",
@@ -1484,6 +1445,900 @@ const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
     recs: [
       { action: "Draft ROFO notice to Sullivan & Cromwell for Space 0800", urgency: "Before proceeding", agentId: "doc-drafting" },
       { action: "Draft expansion option notice to Meridian Health Partners for Space 0800", urgency: "This week", agentId: "doc-drafting" },
+    ],
+  },
+  // d01 — Starbucks · Legal · 2 encumbrances on adjacent spaces; NER above budget
+  "d01": {
+    score: "at-risk",
+    context: "2 encumbrances — ROFO + expansion option",
+    summary: "Two encumbrances held by Starbucks on adjacent spaces require resolution before legal package can close.",
+    signals: [
+      "ROFO on Space 750 held by Starbucks Corporation — expires Dec 31, 2027",
+      "Expansion option on Space 900 held by Starbucks Corporation — expires Jun 30, 2028",
+      "Encumbered spaces are adjacent to Suite 800 — legal review required before proceeding",
+    ],
+    recs: [
+      { action: "Resolve ROFO and expansion option with Starbucks before lease execution", urgency: "Before proceeding", agentId: "doc-drafting" },
+    ],
+  },
+  // d02 — Apex Capital · Proposal · 2 encumbrances; counter awaiting response; NER 8% below budget
+  "d02": {
+    score: "at-risk",
+    context: "2 encumbrances + counter pending + 8% below budget",
+    summary: "Two encumbrances on target floors, counter proposal unanswered, and NER 8% below budget — multiple compounding risks.",
+    signals: [
+      "ROFO held by Apex Capital on Floor 11 — expires Mar 15, 2027",
+      "Contraction option on Floor 12 North Wing — must be resolved before lease can execute",
+      "Counter proposal delivered — no response received",
+      "NER at $48/sf vs $52/sf budget — 8% shortfall",
+    ],
+    recs: [
+      { action: "Follow up on counter proposal immediately", urgency: "Today", agentId: "deal-momentum" },
+      { action: "Draft encumbrance notices for both rights holders", urgency: "This week", agentId: "doc-drafting" },
+    ],
+  },
+  // d03 — Meridian Health · Lease Out · stalled 18 days
+  "d03": {
+    score: "caution",
+    context: "Stalled 18 days at lease-out",
+    summary: "Lease out package has been with the tenant team for 18 days without response. Risk of further delay.",
+    signals: [
+      "Lease out sent 18 days ago — no tenant response",
+      "NER on budget at $55/sf — terms are aligned",
+      "No competing offers identified, but momentum is slowing",
+    ],
+    recs: [
+      { action: "Follow up with Priya Nair to confirm receipt and timeline", urgency: "Today", agentId: "deal-momentum" },
+    ],
+  },
+  // d04 — Atlas Group · Proposal · at-risk status · 3 encumbrances · competitor
+  "d04": {
+    score: "at-risk",
+    context: "Competitor touring, 3 encumbrances, 12% below budget",
+    summary: "Tenant is considering a competitor. Three encumbrances on target floors and a 12% NER gap make this deal a priority intervention.",
+    signals: [
+      "Tenant reported considering a competitor building",
+      "NER at $44/sf vs $50/sf budget — 12% shortfall",
+      "ROFO on Floors 4–5 held by Atlas Group — expires Jan 1, 2028",
+      "Expansion option on Floor 6 plus conflicting ROFR from Horizon Ventures",
+    ],
+    recs: [
+      { action: "Model concession scenarios to close NER gap", urgency: "Today", agentId: "scenario-modeling" },
+      { action: "Resolve conflicting ROFR before proceeding", urgency: "Before proceeding", agentId: "doc-drafting" },
+    ],
+  },
+  // d05 — Vertex Studios · LOI · 1 encumbrance; NER slightly above budget
+  "d05": {
+    score: "at-risk",
+    context: "1 encumbrance on adjacent space — must resolve before LOI executes",
+    summary: "Expansion option on the adjacent space must be resolved before LOI can execute. Disclosure required and timeline uncertain.",
+    signals: [
+      "Expansion option held by Vertex Studios on Space 650 — expires Sep 30, 2027",
+      "Encumbrance blocks adjacent space — rights holder must be notified before execution",
+      "LOI terms otherwise aligned — NER $2/sf above budget",
+      "Delay risk if rights holder exercises option",
+    ],
+    recs: [
+      { action: "Draft expansion option notice to rights holder for Space 650", urgency: "Before LOI execution", agentId: "doc-drafting" },
+    ],
+  },
+  // d06 — Bluewave LLC · Lease Out · active · on budget
+  "d06": {
+    score: "on-track",
+    context: "Lease out delivered, on budget",
+    summary: "Lease out package delivered and terms are on budget. Awaiting tenant signature.",
+    signals: [
+      "Lease out sent to Tom Reyes — awaiting countersignature",
+      "NER at $51/sf — exactly on budget",
+      "No encumbrances on Suite 300",
+    ],
+    recs: [],
+  },
+  // d07 — Pfizer · LOI · NER 3% above budget · strong momentum
+  "d07": {
+    score: "strong",
+    context: "LOI signed, NER above budget",
+    summary: "LOI executed with terms above budget. Counsel engaged and legal package in preparation.",
+    signals: [
+      "LOI signed by all parties",
+      "NER at $62/sf vs $60/sf budget — 3% above budget",
+      "No encumbrances on target floors",
+      "Counsel engaged — Pfizer legal team responsive",
+    ],
+    recs: [],
+  },
+  // d08 — Morgan Stanley · Touring · no proposal submitted yet · competitor activity
+  "d08": {
+    score: "caution",
+    context: "No proposal yet — competitor tours reported",
+    summary: "Tour completed but no proposal delivered. Competitor activity reported on the same floor — urgency to move forward.",
+    signals: [
+      "Tour completed — no proposal submitted yet",
+      "Competitor building reported touring the same requirement",
+      "Suite 2200 top-ranked but no formal commitment from tenant team",
+      "180,000 sf requirement makes this a high-priority deal to protect",
+    ],
+    recs: [{ action: "Submit proposal for Suite 2200 before competitor advances", urgency: "Today", agentId: "proposal-builder" }],
+  },
+  // d09 — Deloitte · Legal · NER 3% above budget · expansion · active
+  "d09": {
+    score: "strong",
+    context: "Legal progressing, NER 3% above budget",
+    summary: "Legal package advancing with terms above budget. Expansion deal with strong tenant engagement.",
+    signals: [
+      "NER at $72/sf vs $70/sf budget — 3% above target",
+      "Legal package with counsel — no open flags",
+      "Expansion into Suite 500 aligns with tenant's existing footprint",
+      "No encumbrances on target space",
+    ],
+    recs: [],
+  },
+  // d10 — KPMG · Proposal · stalled 26 days · NER 11% below budget
+  "d10": {
+    score: "at-risk",
+    context: "Stalled 26 days, board delay, 11% below budget",
+    summary: "Proposal stalled for 26 days pending KPMG board approval. NER shortfall and prolonged silence increase execution risk.",
+    signals: [
+      "Proposal stalled 26 days — board review ongoing",
+      "NER at $49/sf vs $55/sf budget — 11% below target",
+      "No counter received — last contact 26 days ago",
+      "Board approval timeline unknown",
+    ],
+    recs: [
+      { action: "Request board meeting timeline from Paul Simmons", urgency: "Today", agentId: "deal-momentum" },
+      { action: "Model revised proposal at $52/sf to bridge NER gap", urgency: "This week", agentId: "scenario-modeling" },
+    ],
+  },
+  // d11 — Ernst & Young · Proposal · no response in 11 days
+  "d11": {
+    score: "caution",
+    context: "Proposal unanswered for 11 days",
+    summary: "Proposal delivered 11 days ago with no counter received. Silence from Claire Marsh's team warrants a follow-up.",
+    signals: [
+      "Proposal sent 11 days ago — no counter received from Claire Marsh",
+      "NER at $58/sf vs $57/sf budget — terms are competitive",
+      "No encumbrances on Suite 2200",
+      "Risk of deal going cold without outreach",
+    ],
+    recs: [{ action: "Follow up with Claire Marsh on proposal status", urgency: "Today", agentId: "deal-momentum" }],
+  },
+  // d12 — HSBC · Inquiry · active · renewal
+  "d12": {
+    score: "on-track",
+    context: "Inquiry received, coordinating tour",
+    summary: "Renewal inquiry received and logged. Coordinating tour schedule with HSBC facilities team.",
+    signals: [
+      "Renewal inquiry received from Frank Lee",
+      "Suite 900 available — matches HSBC's existing footprint",
+      "No encumbrances on target space",
+    ],
+    recs: [{ action: "Schedule renewal tour with Frank Lee", urgency: "This week", agentId: "tour-agent" }],
+  },
+  // d13 — Latham & Watkins · LOI · at-risk · competitor offering lower TI
+  "d13": {
+    score: "at-risk",
+    context: "Competitor undercutting TI, LOI stalled",
+    summary: "Competitor offering lower tenant improvement allowance. LOI terms at risk of being undercut — intervention needed.",
+    signals: [
+      "Competitor building offering lower TI package — reported by Grace Yu",
+      "NER at $65/sf vs $66/sf budget — 2% shortfall",
+      "LOI not yet executed — tenant team reviewing alternatives",
+      "Last communication 12 days ago",
+    ],
+    recs: [
+      { action: "Model revised TI package to match competitor offer", urgency: "Today", agentId: "scenario-modeling" },
+      { action: "Reach out to Grace Yu with updated terms", urgency: "Today", agentId: "deal-momentum" },
+    ],
+  },
+  // d14 — JPMorgan · Legal · NER 4% above budget · expansion
+  "d14": {
+    score: "strong",
+    context: "Legal advancing, NER 4% above budget",
+    summary: "Legal package progressing well with NER above budget. Expansion deal with aligned terms and no encumbrances.",
+    signals: [
+      "NER at $75/sf vs $72/sf budget — 4% above target",
+      "Legal package underway — no open items flagged",
+      "Expansion on Floor 6 aligned with JPMorgan's existing footprint",
+      "No encumbrances on target floor",
+    ],
+    recs: [],
+  },
+  // d15 — Amazon.com · Touring · active · large deal · no encumbrances
+  "d15": {
+    score: "on-track",
+    context: "Tours underway, large block requirement",
+    summary: "Tour cycle underway for a 150,000 sf block requirement. Spaces on Floors 4–6 shortlisted.",
+    signals: [
+      "Tour scheduled with Mia Zhao — facilities and brokerage team confirmed",
+      "3 floors shortlisted for review — Floors 4, 5, 6",
+      "No encumbrances on target floors",
+      "No competitor tours detected",
+    ],
+    recs: [{ action: "Prepare block space proposal after tour", urgency: "This week", agentId: "proposal-builder" }],
+  },
+  // d16 — WeWork · Lease Out · stalled 28 days · NER 5% below budget
+  "d16": {
+    score: "at-risk",
+    context: "Stalled 28 days, budget constraints",
+    summary: "Lease out stalled for 28 days. WeWork citing budget constraints — NER gap and extended silence signal execution risk.",
+    signals: [
+      "Lease out stalled 28 days — WeWork team unresponsive",
+      "NER at $38/sf vs $40/sf budget — 5% below target",
+      "Tenant cited budget constraints as primary concern",
+      "No encumbrances on target floors",
+    ],
+    recs: [
+      { action: "Re-engage Ethan Ross with revised terms", urgency: "Today", agentId: "deal-momentum" },
+      { action: "Model reduced TI or free rent to bridge budget gap", urgency: "This week", agentId: "scenario-modeling" },
+    ],
+  },
+  // d17 — Google · LOI · NER 3% above budget · large deal
+  "d17": {
+    score: "strong",
+    context: "LOI signed, NER above budget",
+    summary: "LOI executed on strong terms. Google's 200,000 sf deal is advancing with terms above budget and counsel engaged.",
+    signals: [
+      "LOI signed — all parties aligned on key terms",
+      "NER at $82/sf vs $80/sf budget — 3% above target",
+      "No encumbrances on Floors 5–8",
+      "Counsel handoff package initiated",
+    ],
+    recs: [],
+  },
+  // d18 — Tesla · Proposal · NER 6% above budget · active
+  "d18": {
+    score: "on-track",
+    context: "Proposal delivered, NER above budget",
+    summary: "Proposal delivered with NER above budget. Awaiting counter from Omar Khalid.",
+    signals: [
+      "Proposal sent to Omar Khalid — response expected",
+      "NER at $35/sf vs $33/sf budget — 6% above target",
+      "No encumbrances on Suite 1100",
+    ],
+    recs: [],
+  },
+  // d19 — Cisco · LOI · NER 5% above budget · active renewal
+  "d19": {
+    score: "strong",
+    context: "LOI advancing, NER 5% above budget",
+    summary: "LOI in progress with terms well above budget. Renewal deal with aligned terms and strong engagement.",
+    signals: [
+      "LOI terms agreed — NER at $58/sf vs $55/sf budget",
+      "Renewal covers Floors 20–22 — aligned with existing footprint",
+      "No encumbrances on target floors",
+      "Jenny Park responsive — execution on track",
+    ],
+    recs: [],
+  },
+  // d20 — Salesforce · Legal · NER 2% above budget · expansion
+  "d20": {
+    score: "strong",
+    context: "Legal progressing, NER above budget",
+    summary: "Legal package advancing with NER above budget. Expansion at home tower with fully aligned terms.",
+    signals: [
+      "NER at $90/sf vs $88/sf budget — 2% above target",
+      "Legal package with counsel — no open items",
+      "Salesforce expansion at Salesforce Tower — home tower advantage",
+      "No encumbrances on Floor 30",
+    ],
+    recs: [],
+  },
+  // d21 — BlackRock · Proposal · at-risk · slow responses · NER below budget
+  "d21": {
+    score: "at-risk",
+    context: "Slow responses, 16-day gap, NER below budget",
+    summary: "BlackRock engagement declining. No counter received and NER below budget. Intervention needed to keep deal alive.",
+    signals: [
+      "Last communication 16 days ago — tenant team unresponsive",
+      "NER at $78/sf vs $80/sf budget — 2% below target",
+      "No counter received since proposal delivery",
+      "Risk of deal going cold without outreach",
+    ],
+    recs: [
+      { action: "Re-engage Kate Morrison with updated proposal", urgency: "Today", agentId: "deal-momentum" },
+    ],
+  },
+  // d22 — Goldman Sachs · Executed
+  "d22": {
+    score: "strong",
+    context: "Executed — NER 4% above budget",
+    summary: "Lease executed with all parties signed. NER 4% above budget. Effective date Jan 1, 2027.",
+    signals: [
+      "Lease executed — all parties signed Jul 1, 2026",
+      "NER at $88/sf vs $85/sf budget — 4% above target",
+      "185,000 sf renewal at 30 Hudson Yards — flagship execution",
+    ],
+    recs: [],
+  },
+  // d23 — McKinsey · LOI · NER 1% above budget · active
+  "d23": {
+    score: "on-track",
+    context: "LOI advancing, terms aligned",
+    summary: "LOI in progress with terms on budget. McKinsey team engaged and moving toward legal.",
+    signals: [
+      "LOI terms largely aligned — NER 1% above budget",
+      "Tara Singh responsive — legal team on standby",
+      "No encumbrances on Suite 4200",
+    ],
+    recs: [],
+  },
+  // d24 — Spotify · Touring · active
+  "d24": {
+    score: "on-track",
+    context: "Tours scheduled, tenant engaged",
+    summary: "Tour cycle initiated with Spotify's broker. Tenant engaged and spaces under review.",
+    signals: [
+      "Tour scheduled with Ben Walsh — broker confirmed",
+      "Suite 700 shortlisted as primary option",
+      "No encumbrances on target space",
+      "No competitor tours detected",
+    ],
+    recs: [],
+  },
+  // d25 — Airbnb · Inquiry · active
+  "d25": {
+    score: "on-track",
+    context: "Inquiry captured, spaces being matched",
+    summary: "Inquiry captured and being processed. Spaces at Salesforce Tower being matched to requirements.",
+    signals: [
+      "Inquiry received from Lily Chen — requirement logged",
+      "Floor 25 being prepared for proposal",
+      "No encumbrances on target floor",
+    ],
+    recs: [{ action: "Schedule initial tour with Lily Chen", urgency: "This week", agentId: "tour-agent" }],
+  },
+  // d26 — Stripe · Proposal · NER above budget but TI ask higher than expected
+  "d26": {
+    score: "caution",
+    context: "TI ask above standard — NER impact unclear",
+    summary: "Proposal delivered above NER budget, but Stripe's TI request is above standard. Net economics need remodeling before counter.",
+    signals: [
+      "Proposal sent to Raj Mehta — counter expected",
+      "NER at $62/sf vs $60/sf budget — 3% above target on face rent",
+      "TI ask flagged as above-standard — net impact on effective NER TBD",
+      "No encumbrances on Floor 15",
+    ],
+    recs: [{ action: "Model effective NER with Stripe's TI ask before counter", urgency: "This week", agentId: "scenario-modeling" }],
+  },
+  // d27 — Twitter/X · LOI · stalled 31 days · NER 13% below budget · seeking concessions
+  "d27": {
+    score: "at-risk",
+    context: "Stalled 31 days, seeking major concessions",
+    summary: "LOI stalled for 31 days. Twitter/X seeking major rent concessions with NER 13% below budget. Deal at serious risk.",
+    signals: [
+      "LOI stalled 31 days — tenant requesting major concessions",
+      "NER at $45/sf vs $52/sf budget — 13% below target",
+      "Dana Fox unresponsive for 2 weeks",
+      "Cost of delay: $2,400/day based on current lease gap",
+    ],
+    recs: [
+      { action: "Escalate concession decision to ownership", urgency: "Today", agentId: "deal-momentum" },
+      { action: "Model minimum acceptable terms for Twitter/X", urgency: "Today", agentId: "scenario-modeling" },
+    ],
+  },
+  // d28 — Uber · Proposal · NER 6% above budget · active
+  "d28": {
+    score: "on-track",
+    context: "Proposal delivered, NER above budget",
+    summary: "Proposal delivered with NER above budget. Uber team reviewing terms.",
+    signals: [
+      "Proposal sent to Kai Brown — under review",
+      "NER at $38/sf vs $36/sf budget — 6% above target",
+      "No encumbrances on Suite 800",
+    ],
+    recs: [],
+  },
+  // d29 — Microsoft · Legal · NER 2% above budget · large deal
+  "d29": {
+    score: "strong",
+    context: "Legal advancing, NER above budget",
+    summary: "Legal package progressing well on a landmark 250,000 sf deal. NER above budget with no open flags.",
+    signals: [
+      "NER at $92/sf vs $90/sf budget — 2% above target",
+      "Legal package with counsel — Skadden engaged on tenant side",
+      "No encumbrances on Floors 60–65",
+      "Largest active deal in the portfolio",
+    ],
+    recs: [],
+  },
+  // d30 — Meta · Executed
+  "d30": {
+    score: "strong",
+    context: "Executed — NER 3% above budget",
+    summary: "Lease executed with all parties signed. NER above budget on a 130,000 sf expansion.",
+    signals: [
+      "Lease executed — all parties signed",
+      "NER at $75/sf vs $73/sf budget — 3% above target",
+      "130,000 sf expansion at 30 Hudson Yards",
+    ],
+    recs: [],
+  },
+
+  // --- VTS Tower HQ additions ---
+  // d39 — Hogan Lovells · Caution (stalled 14d)
+  "d39": {
+    score: "caution",
+    context: "Stalled 14 days — no response since counter",
+    summary: "Counter proposal sent 14 days ago with no response. Risk of losing momentum before LOI.",
+    signals: [
+      "Counter sent 7/1 — no follow-up in 14 days",
+      "Decision-maker travel cited as reason for delay",
+      "Competing building has been touring same prospect",
+    ],
+    recs: [
+      "Re-engage tenant rep with new availability update",
+      "Offer incentive to accelerate LOI execution",
+    ],
+  },
+  // d40 — Boston Consulting Group · At risk (competitor shortlisted)
+  "d40": {
+    score: "at-risk",
+    context: "Competitor shortlisted — touring paused",
+    summary: "Prospect is actively evaluating a competing building with superior views and lower TI ask. Tour cadence has stopped.",
+    signals: [
+      "Prospect toured competitor twice in past 3 weeks",
+      "No second tour scheduled at VTS Tower",
+      "Broker confirmed competitor is shortlisted",
+    ],
+    recs: [
+      "Schedule executive-level meeting to differentiate value",
+      "Revisit TI package to close gap with competitor",
+      "Offer naming rights on floor as differentiator",
+    ],
+  },
+
+  // --- Empire State Building additions ---
+  // d43 — Verizon · At risk (stalled 22d, board approval)
+  "d43": {
+    score: "at-risk",
+    context: "Stalled 22 days — board approval pending",
+    summary: "Renewal is stalled while Verizon awaits internal board sign-off. Budget window closes in Q3 and risk of rollover is high.",
+    signals: [
+      "No activity for 22 days since initial proposal",
+      "Tenant rep confirmed board vote not scheduled",
+      "Competing buildings are actively soliciting tenant",
+    ],
+    recs: [
+      "Escalate to ownership for direct C-suite outreach",
+      "Provide timeline pressure data on space alternatives",
+    ],
+  },
+  // d44 — PVH Corp · Caution (no proposal yet)
+  "d44": {
+    score: "caution",
+    context: "Touring complete — proposal not yet requested",
+    summary: "Tours wrapped up 10 days ago but tenant has not requested a proposal. Engagement is passive and needs a push.",
+    signals: [
+      "Two tours completed; third not scheduled",
+      "No RFP or proposal requested in 10 days post-tour",
+      "Broker responsiveness has slowed",
+    ],
+    recs: [
+      "Proactively send proposal to maintain momentum",
+      "Follow up with space planning study to deepen engagement",
+    ],
+  },
+
+  // --- Salesforce Tower additions ---
+  // d50 — Lyft · Caution (stalled 12d)
+  "d50": {
+    score: "caution",
+    context: "Stalled 12 days — decision on hold",
+    summary: "Lyft paused touring activity citing internal reorganization. No next steps agreed upon after initial walkthrough.",
+    signals: [
+      "Last contact 12 days ago following first tour",
+      "Tenant cited internal headcount uncertainty",
+      "No follow-up tour or proposal requested",
+    ],
+    recs: [
+      "Send curated spec suite option to re-engage",
+      "Propose shorter initial term to reduce commitment risk",
+    ],
+  },
+
+  // --- One Financial Plaza additions ---
+  // d55 — State Street · At risk (budget cuts, possible footprint reduction)
+  "d55": {
+    score: "at-risk",
+    context: "Budget cuts — possible 20% footprint reduction",
+    summary: "State Street is in renewal discussions but internal cost initiatives may reduce their required space by 20%, jeopardizing deal economics.",
+    signals: [
+      "Tenant confirmed budget review underway",
+      "Initial renewal proposal significantly above budget expectation",
+      "Space committee recommending hybrid-first policy reducing needs",
+    ],
+    recs: [
+      "Model reduced-footprint scenario to retain tenant at lower sf",
+      "Prepare tiered proposal options by square footage",
+    ],
+  },
+  // d56 — Liberty Mutual · Caution (stalled 16d)
+  "d56": {
+    score: "caution",
+    context: "Stalled 16 days at LOI",
+    summary: "LOI submitted but Liberty Mutual legal team has not responded. Internal approval process appears slower than anticipated.",
+    signals: [
+      "LOI sent 16 days ago with no redlines returned",
+      "Tenant rep citing internal review backlog",
+      "No scheduled call or meeting on calendar",
+    ],
+    recs: [
+      "Request status call with tenant's legal and real estate team",
+      "Set hard expiration on LOI terms to create urgency",
+    ],
+  },
+  // d57 — John Hancock · At risk (stalled 21d)
+  "d57": {
+    score: "at-risk",
+    context: "Stalled 21 days — no contact after tour",
+    summary: "Prospect went cold after an initial tour 21 days ago. No proposal has been requested and broker has become difficult to reach.",
+    signals: [
+      "No outreach or follow-up in 21 days",
+      "Broker not returning calls",
+      "One Financial Plaza not on prospect's shortlist per market intel",
+    ],
+    recs: [
+      "Escalate to senior broker relationship contact",
+      "Submit unsolicited spec suite proposal with creative terms",
+    ],
+  },
+
+  // --- Willis Tower additions ---
+  // d62 — United Airlines · At risk (cost program, stalled 24d)
+  "d62": {
+    score: "at-risk",
+    context: "Cost-reduction program — stalled 24 days",
+    summary: "United Airlines is undergoing a corporate cost-reduction program that has frozen real estate decisions. Renewal is at risk of lapsing.",
+    signals: [
+      "No activity in 24 days following proposal submission",
+      "Tenant confirmed cost freeze affecting all capital commitments",
+      "Space consolidation to other Chicago locations is under review",
+    ],
+    recs: [
+      "Propose phased renewal with flexible break clause",
+      "Model blend-and-extend option to reduce near-term cash impact",
+    ],
+  },
+  // d63 — Exelon · At risk (competitor building)
+  "d63": {
+    score: "at-risk",
+    context: "Competitor building actively competing",
+    summary: "Exelon is deep in LOI discussions but has revealed it is simultaneously pursuing a competing building with a more aggressive TI package.",
+    signals: [
+      "Prospect toured competitor building twice in last 3 weeks",
+      "Broker confirmed competing LOI submitted",
+      "Willis Tower TI offer is $15/sf below competitor",
+    ],
+    recs: [
+      "Close TI gap with targeted improvement to offer",
+      "Leverage Willis Tower amenity advantage in executive presentation",
+    ],
+  },
+  // d64 — Hyatt Hotels · Caution (stalled 13d)
+  "d64": {
+    score: "caution",
+    context: "Stalled 13 days after expansion tour",
+    summary: "Post-tour follow-up has been unresponsive. Hyatt's real estate team appears to be evaluating multiple options without committing.",
+    signals: [
+      "Last contact 13 days ago following expansion tour",
+      "No proposal requested despite expressed interest",
+      "Competing submarkets also under evaluation",
+    ],
+    recs: [
+      "Send targeted proposal with expansion options and phasing",
+      "Offer test-fit at no charge to advance decision",
+    ],
+  },
+  // d65 — Aon · Caution (stalled 17d)
+  "d65": {
+    score: "caution",
+    context: "Stalled 17 days — renewal proposal pending internal review",
+    summary: "Renewal proposal is with Aon's internal real estate committee but no feedback has been received in 17 days.",
+    signals: [
+      "Proposal submitted 17 days ago; no response",
+      "Committee meeting reportedly scheduled but not confirmed",
+      "Broker flagged competing buildings circling the tenant",
+    ],
+    recs: [
+      "Request status update call within the week",
+      "Prepare updated market comp analysis to support pricing",
+    ],
+  },
+
+  // --- 30 Hudson Yards additions ---
+  // d69 — Apollo Global · At risk (competitor)
+  "d69": {
+    score: "at-risk",
+    context: "Competitor building under active evaluation",
+    summary: "Apollo is evaluating an adjacent Hudson Yards tower with lower base rent and more aggressive TI. Deal is at risk of being lost.",
+    signals: [
+      "Broker confirmed Apollo has toured two other Hudson Yards buildings",
+      "Competing LOI rumored in market",
+      "Apollo rep has not responded to latest proposal follow-up",
+    ],
+    recs: [
+      "Pursue direct outreach to Apollo CFO",
+      "Prepare competitive counter with enhanced concessions",
+    ],
+  },
+  // d70 — KKR · At risk (stalled 19d)
+  "d70": {
+    score: "at-risk",
+    context: "Stalled 19 days — LOI terms under internal debate",
+    summary: "KKR submitted redlines on the LOI 19 days ago but internal alignment issues have stalled execution. Risk of deal timing out.",
+    signals: [
+      "LOI redlines received; counter not yet sent",
+      "KKR legal team and real estate team reportedly misaligned",
+      "Market timing pressure — competing tenants eyeing same floors",
+    ],
+    recs: [
+      "Set firm deadline on LOI counter to maintain leverage",
+      "Escalate to KKR real estate decision-maker directly",
+    ],
+  },
+  // d71 — Blackstone · Caution (stalled 15d)
+  "d71": {
+    score: "caution",
+    context: "Stalled 15 days post-tour",
+    summary: "Blackstone showed strong interest during touring but has gone quiet. No proposal has been requested in 15 days.",
+    signals: [
+      "Tour completed with positive feedback; no follow-up in 15 days",
+      "Broker not actively pushing deal",
+      "Deal not on Blackstone's internal priority list per intel",
+    ],
+    recs: [
+      "Arrange exclusive floor access with building amenity tour",
+      "Submit proactive proposal to re-engage",
+    ],
+  },
+
+  // --- One World Trade Center additions ---
+  // d75 — Conde Nast WTC · At risk (budget cuts)
+  "d75": {
+    score: "at-risk",
+    context: "Content budget cuts threatening renewal size",
+    summary: "Conde Nast is facing significant media industry headwinds and may reduce its footprint by up to 25% at renewal.",
+    signals: [
+      "Tenant confirmed editorial headcount reductions underway",
+      "Broker flagged possible downsizing by 40,000–50,000 sf",
+      "Renewal proposal above tenant's revised budget target",
+    ],
+    recs: [
+      "Model downsized renewal scenario to retain tenant at reduced sf",
+      "Explore subleasing of excess space to offset deal economics",
+    ],
+  },
+  // d76 — Spotify WTC · Caution (stalled 11d)
+  "d76": {
+    score: "caution",
+    context: "Stalled 11 days after first tour",
+    summary: "Spotify toured One WTC but has not followed up. Decision timeline is unclear and engagement has slowed.",
+    signals: [
+      "Tour completed; no second tour or proposal request in 11 days",
+      "Broker cited Spotify's internal real estate team restructuring",
+      "Two competing buildings also under consideration",
+    ],
+    recs: [
+      "Follow up with personalized view-of-downtown pitch",
+      "Propose informal roundtable with building management",
+    ],
+  },
+
+  // --- Transamerica Pyramid additions ---
+  // d82 — DocuSign · At risk (remote work reducing footprint)
+  "d82": {
+    score: "at-risk",
+    context: "Remote-first policy cutting required footprint",
+    summary: "DocuSign's shift to a remote-first policy means renewal is likely to happen at a significantly reduced square footage.",
+    signals: [
+      "Tenant announced remote-first policy for most roles",
+      "Current 41,000 sf likely targeted for reduction to 20–25,000 sf",
+      "Renewal NER negotiation far below budgeted rate",
+    ],
+    recs: [
+      "Model reduced-footprint renewal to retain tenant",
+      "Explore backfill options for vacated floors proactively",
+    ],
+  },
+  // d83 — Levi Strauss · Caution (stalled 14d)
+  "d83": {
+    score: "caution",
+    context: "Stalled 14 days at LOI",
+    summary: "LOI terms are agreed in principle but execution has stalled while Levi's internal approvals are pending.",
+    signals: [
+      "LOI agreed verbally; not yet signed after 14 days",
+      "Internal approval committee meeting delayed twice",
+      "Broker confident on deal but cannot force timeline",
+    ],
+    recs: [
+      "Set LOI expiration to drive execution",
+      "Schedule weekly check-in call with tenant and broker",
+    ],
+  },
+  // d84 — Twitter/X Pyramid · At risk (cost cuts)
+  "d84": {
+    score: "at-risk",
+    context: "Cost-cutting may force relocation to cheaper space",
+    summary: "Twitter/X is evaluating cheaper alternatives as part of ongoing cost reduction. Existing space may be abandoned or significantly downsized.",
+    signals: [
+      "Tenant on record with CFO directive to cut real estate costs 40%",
+      "Space is above-market; tenant seeking sub-market alternatives",
+      "No renewal discussion initiated despite lease expiring in 9 months",
+    ],
+    recs: [
+      "Proactively offer below-market renewal to preempt departure",
+      "Prepare backfill strategy for high-probability vacancy",
+    ],
+  },
+
+  // --- 200 Berkeley Street additions ---
+  // d89 — Vertex Pharmaceuticals · At risk (budget, reduced sf)
+  "d89": {
+    score: "at-risk",
+    context: "Budget cut — reconsidering square footage",
+    summary: "Vertex is revisiting its space requirement after a budget revision, potentially reducing the deal size by 30%.",
+    signals: [
+      "CFO directive to reduce real estate spend by 30%",
+      "Broker flagged Vertex may need only 35,000–40,000 sf",
+      "NER expectation significantly below ask",
+    ],
+    recs: [
+      "Prepare tiered proposal at multiple size options",
+      "Offer phased expansion rights to lock in smaller initial deal",
+    ],
+  },
+  // d90 — Rapid7 · Caution (stalled 16d)
+  "d90": {
+    score: "caution",
+    context: "Stalled 16 days at LOI",
+    summary: "Rapid7's legal team is reviewing LOI terms but has not returned redlines. Momentum risk is building.",
+    signals: [
+      "LOI under internal review for 16 days",
+      "No redlines or counter received",
+      "Competing landlord rumored to be pursuing tenant",
+    ],
+    recs: [
+      "Request status call with Rapid7 legal and real estate",
+      "Set LOI expiration date to create urgency",
+    ],
+  },
+  // d91 — Brightcove · At risk (stalled 22d)
+  "d91": {
+    score: "at-risk",
+    context: "Stalled 22 days — no contact after tour",
+    summary: "Brightcove has been unresponsive for 22 days following their tour. No proposal requested and broker has not followed up.",
+    signals: [
+      "No outreach in 22 days post-tour",
+      "Broker difficult to reach",
+      "Competing Seaport District buildings actively targeting tenant",
+    ],
+    recs: [
+      "Send speculative proposal to re-engage",
+      "Escalate to landlord rep for direct broker relationship call",
+    ],
+  },
+  // d92 — DraftKings · Caution (stalled 13d)
+  "d92": {
+    score: "caution",
+    context: "Stalled 13 days — proposal not yet countered",
+    summary: "DraftKings received a proposal 13 days ago but has not responded. Legal is reportedly reviewing but no feedback has come through.",
+    signals: [
+      "Proposal sent 7/3; no counter in 13 days",
+      "Tenant rep says team is reviewing but timeline unclear",
+      "Competing landlord submitted unsolicited proposal",
+    ],
+    recs: [
+      "Follow up with updated test-fit and design concepts",
+      "Offer to host tenant's team for amenity preview",
+    ],
+  },
+
+  // --- One Peachtree Center additions ---
+  // d96 — Cox Enterprises · At risk (footprint reduction)
+  "d96": {
+    score: "at-risk",
+    context: "Consolidating — targeting 30% footprint reduction",
+    summary: "Cox is consolidating Atlanta offices and targeting a 30% reduction in square footage at renewal, which significantly impacts NER and NPV.",
+    signals: [
+      "Cox confirmed consolidation to one primary Atlanta location",
+      "Renewal proposal premised on 78,000 sf; tenant wants 55,000 sf",
+      "Alternative buildings offering more aggressive TI for smaller footprint",
+    ],
+    recs: [
+      "Model 55,000 sf renewal scenario with enhanced TI",
+      "Prepare backfill strategy for 23,000 sf vacated space",
+    ],
+  },
+  // d97 — Equifax · At risk (stalled 20d)
+  "d97": {
+    score: "at-risk",
+    context: "Stalled 20 days — LOI execution delayed",
+    summary: "Equifax LOI has been verbally agreed but execution is stalled due to internal procurement delays.",
+    signals: [
+      "LOI agreed 20 days ago; not yet signed",
+      "Procurement review process adding unexpected delays",
+      "Broker expressed concern about deal losing momentum",
+    ],
+    recs: [
+      "Request direct meeting with Equifax procurement team",
+      "Offer LOI signing incentive tied to execution date",
+    ],
+  },
+  // d98 — Delta Air Lines · Caution (stalled 14d)
+  "d98": {
+    score: "caution",
+    context: "Stalled 14 days post-tour",
+    summary: "Delta toured the expansion space but has not followed up with a proposal request. Decision timeline has drifted.",
+    signals: [
+      "Tour completed; no proposal request in 14 days",
+      "Delta real estate team cited Q3 budget cycle as factor",
+      "Alternative Buckhead space also under evaluation",
+    ],
+    recs: [
+      "Proactively submit proposal to advance timeline",
+      "Offer to schedule space planning study at no cost",
+    ],
+  },
+  // d99 — Invesco · Caution (stalled 11d)
+  "d99": {
+    score: "caution",
+    context: "Stalled 11 days — proposal under internal review",
+    summary: "Invesco's real estate committee is reviewing the proposal but no feedback has been provided in 11 days.",
+    signals: [
+      "Proposal submitted 7/4; no response as of today",
+      "Internal committee review cycle typically 2 weeks",
+      "Broker confirmed Invesco is not urgently motivated",
+    ],
+    recs: [
+      "Schedule committee presentation to accelerate review",
+      "Provide market urgency data on comparable spaces",
+    ],
+  },
+
+  // --- Two Union Square additions ---
+  // d103 — Alaska Airlines · At risk (downsizing post-merger)
+  "d103": {
+    score: "at-risk",
+    context: "Post-merger downsizing — cutting 20% of footprint",
+    summary: "Alaska Airlines is rationalizing real estate post-merger and plans to reduce Seattle footprint by 20%, putting renewal economics at significant risk.",
+    signals: [
+      "Merger integration team has mandated real estate consolidation",
+      "Renewal proposal at full 54,000 sf is not viable for tenant",
+      "Alternative sublease options in building under tenant evaluation",
+    ],
+    recs: [
+      "Model 43,000 sf renewal with enhanced incentive package",
+      "Explore partnership with smaller tenant to backfill surplus",
+    ],
+  },
+  // d104 — F5 Networks · Caution (stalled 15d)
+  "d104": {
+    score: "caution",
+    context: "Stalled 15 days — LOI terms not yet agreed",
+    summary: "F5 and landlord are close on LOI terms but a sticking point on termination rights has stalled agreement for 15 days.",
+    signals: [
+      "LOI terms 90% agreed; termination rights clause is blocker",
+      "Broker flagged potential timeline risk if not resolved this week",
+      "F5 legal team has limited bandwidth due to other transactions",
+    ],
+    recs: [
+      "Propose modified termination clause with fee structure",
+      "Arrange call between both legal teams to close outstanding items",
+    ],
+  },
+  // d105 — Weyerhaeuser · At risk (stalled 23d)
+  "d105": {
+    score: "at-risk",
+    context: "Stalled 23 days — no contact after tour",
+    summary: "Weyerhaeuser went dark after an initial tour 23 days ago. No broker follow-up and market intel suggests they may be looking at suburban options.",
+    signals: [
+      "No contact in 23 days post-tour",
+      "Broker has not returned calls",
+      "Market intel suggests suburban Bellevue buildings also in consideration",
+    ],
+    recs: [
+      "Reach out via alternate Weyerhaeuser contact to gauge interest",
+      "Submit spec proposal highlighting transit access vs. suburban alternative",
     ],
   },
 }
@@ -1503,9 +2358,10 @@ interface DealProfileProps {
   status?: DealStatus
   onStatusChange?: (s: DealStatus) => void
   initialTab?: string
+  onAddProposal?: () => void
 }
 
-export function DealProfile({ deal, onBack: _onBack, status: statusProp, onStatusChange, initialTab }: DealProfileProps) {
+export function DealProfile({ deal, onBack: _onBack, status: statusProp, onStatusChange, initialTab, onAddProposal }: DealProfileProps) {
   const [stage, setStage]           = React.useState<StageValue>(deal.stage as StageValue)
   const [internalStatus, setInternalStatus] = React.useState<DealStatus>(deal.status as DealStatus)
   const status    = statusProp ?? internalStatus
@@ -1581,7 +2437,7 @@ export function DealProfile({ deal, onBack: _onBack, status: statusProp, onStatu
                 ))}
               </TabsList>
               <TabsContent value="info"><OverviewTab deal={deal} stageIdx={stageIdx} /></TabsContent>
-              <TabsContent value="proposals"><ProposalsTab deal={deal} stageIdx={stageIdx} /></TabsContent>
+              <TabsContent value="proposals"><ProposalsTab deal={deal} stageIdx={stageIdx} onAddProposal={onAddProposal} /></TabsContent>
               <TabsContent value="encumbrances"><EncumbrancesTab deal={deal} /></TabsContent>
             </Tabs>
           </div>

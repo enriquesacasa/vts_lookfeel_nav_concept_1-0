@@ -12,9 +12,9 @@ import { ActionLevers } from "@/components/action-levers"
 import { KpiBar } from "@/components/kpi-bar"
 import { LeasingAgents } from "@/components/leasing-agents"
 import { AgentsPage } from "@/components/agents-page"
-import { DealsPage, DEALS } from "@/components/deals-page"
+import { DealsPage, DEALS, DealHealthModal } from "@/components/deals-page"
 import type { Deal as DealsPageDeal } from "@/components/deals-page"
-import { DealProfile, TenantLogoImage, type DealStatus } from "@/components/deal-profile"
+import { DealProfile, TenantLogoImage, getDealHealth, type DealStatus } from "@/components/deal-profile"
 import { ThemeShowcase } from "@/components/theme-showcase"
 import { AgentPrinciples } from "@/components/agent-principles"
 import { StackingPlan, type StackingPlanSpaceRef, type StackingPlanHandle, type StackingPlanCommand } from "@/components/stacking-plan"
@@ -59,8 +59,9 @@ const TENANT_ALIAS: Record<string, string> = {
   "Carlyle & Associates":     "The Carlyle Group Inc.",
   "CVS Health":               "CVS Health Corporation",
 }
-function findLease(tenant: string) {
+function findLease(tenant: string, assetName?: string) {
   const key = TENANT_ALIAS[tenant] ?? tenant
+  if (assetName) return LEASES.find(x => x.tenant === key && x.asset === assetName) ?? LEASES.find(x => x.tenant === key)
   return LEASES.find(x => x.tenant === key)
 }
 
@@ -207,41 +208,56 @@ export const ASSET_DETAILS: Record<string, { city: string; image: string }> = {
 }
 
 export const ASSET_KPIS: Record<string, {
-  occupancy: number; noi: string; noiBudgetDelta: string; noiBudgetUp: boolean;
+  occupancy: number; avgNer: string; nerBudgetDelta: string; nerBudgetUp: boolean;
   expiring12mo: number; activeDeals: number; alert?: string
 }> = {
-  "vts-tower":     { occupancy: 70, noi: "$29.1M", noiBudgetDelta: "+9.4%", noiBudgetUp: true,  expiring12mo: 3, activeDeals: 6 },
-  "one-financial": { occupancy: 88, noi: "$18.4M", noiBudgetDelta: "+2.1%", noiBudgetUp: true,  expiring12mo: 1, activeDeals: 2 },
-  "empire-state":  { occupancy: 94, noi: "$41.2M", noiBudgetDelta: "-1.3%", noiBudgetUp: false, expiring12mo: 5, activeDeals: 4, alert: "2 options expiring" },
-  "salesforce":    { occupancy: 82, noi: "$55.8M", noiBudgetDelta: "+5.7%", noiBudgetUp: true,  expiring12mo: 2, activeDeals: 3 },
-  "willis":        { occupancy: 76, noi: "$33.0M", noiBudgetDelta: "-3.1%", noiBudgetUp: false, expiring12mo: 4, activeDeals: 1, alert: "Below occupancy target" },
-  "hudson-yards":  { occupancy: 97, noi: "$62.4M", noiBudgetDelta: "+11.2%", noiBudgetUp: true, expiring12mo: 0, activeDeals: 5 },
-  "one-wtc":       { occupancy: 91, noi: "$48.7M", noiBudgetDelta: "+3.8%", noiBudgetUp: true,  expiring12mo: 2, activeDeals: 2 },
-  "transamerica":  { occupancy: 68, noi: "$14.2M", noiBudgetDelta: "-6.5%", noiBudgetUp: false, expiring12mo: 6, activeDeals: 3, alert: "High vacancy risk" },
-  "peachtree":     { occupancy: 85, noi: "$22.1M", noiBudgetDelta: "+1.9%", noiBudgetUp: true,  expiring12mo: 1, activeDeals: 0 },
-  "union-square":  { occupancy: 93, noi: "$31.5M", noiBudgetDelta: "+4.4%", noiBudgetUp: true,  expiring12mo: 3, activeDeals: 4 },
-  "200-berkeley":  { occupancy: 79, noi: "$19.8M", noiBudgetDelta: "-0.8%", noiBudgetUp: false, expiring12mo: 2, activeDeals: 1 },
+  "vts-tower":     { occupancy: 70, avgNer: "$74/sf", nerBudgetDelta: "+9.4%", nerBudgetUp: true,  expiring12mo: 3, activeDeals: 6 },
+  "one-financial": { occupancy: 88, avgNer: "$43/sf", nerBudgetDelta: "+2.1%", nerBudgetUp: true,  expiring12mo: 1, activeDeals: 2 },
+  "empire-state":  { occupancy: 94, avgNer: "$57/sf", nerBudgetDelta: "-1.3%", nerBudgetUp: false, expiring12mo: 5, activeDeals: 4, alert: "2 options expiring" },
+  "salesforce":    { occupancy: 82, avgNer: "$88/sf", nerBudgetDelta: "+5.7%", nerBudgetUp: true,  expiring12mo: 2, activeDeals: 3 },
+  "willis":        { occupancy: 76, avgNer: "$46/sf", nerBudgetDelta: "-3.1%", nerBudgetUp: false, expiring12mo: 4, activeDeals: 1, alert: "Below occupancy target" },
+  "hudson-yards":  { occupancy: 97, avgNer: "$83/sf", nerBudgetDelta: "+11.2%", nerBudgetUp: true, expiring12mo: 0, activeDeals: 5 },
+  "one-wtc":       { occupancy: 91, avgNer: "$76/sf", nerBudgetDelta: "+3.8%", nerBudgetUp: true,  expiring12mo: 2, activeDeals: 2 },
+  "transamerica":  { occupancy: 68, avgNer: "$38/sf", nerBudgetDelta: "-6.5%", nerBudgetUp: false, expiring12mo: 6, activeDeals: 3, alert: "High vacancy risk" },
+  "peachtree":     { occupancy: 85, avgNer: "$33/sf", nerBudgetDelta: "+1.9%", nerBudgetUp: true,  expiring12mo: 1, activeDeals: 0 },
+  "union-square":  { occupancy: 93, avgNer: "$56/sf", nerBudgetDelta: "+4.4%", nerBudgetUp: true,  expiring12mo: 3, activeDeals: 4 },
+  "200-berkeley":  { occupancy: 79, avgNer: "$71/sf", nerBudgetDelta: "-0.8%", nerBudgetUp: false, expiring12mo: 2, activeDeals: 1 },
 }
 
+const _expiring12mo = LEASES.filter(l => l.remaining > 0 && l.remaining <= 12)
+const _expiringSf   = _expiring12mo.reduce((a, l) => a + l.sf, 0)
+const _lateStage    = DEALS.filter(d => ["LOI", "Legal", "Lease Out"].includes(d.stage) && d.status !== "executed")
+const _lateStageNer = _lateStage.filter(d => d.ner > 0).reduce((a, d) => a + (d.ner * d.sf) / 12, 0)
+
 const KPIS = [
-  { label: "In-place NOI",           value: "$29.1M",    subtitle: "+9.4% vs budget",  trend: "up"   as const },
-  { label: "Revenue at risk (12mo)", value: "$234K/mo",  subtitle: "-$18K vs budget",  trend: "down" as const },
-  { label: "Pipeline upside",        value: "+$89K/mo",  subtitle: "+$12K vs budget",  trend: "up"   as const },
-  { label: "WALT",                   value: "4.2 yrs",   subtitle: "Weighted avg lease" },
+  { label: "Avg NER",                value: "$74/sf",   subtitle: "+9.4% vs budget", trend: "up" as const },
+  {
+    label: "Expiring leases (12mo)",
+    value: String(_expiring12mo.length),
+    subtitle: `${(_expiringSf / 1000).toFixed(0)}K sf at risk`,
+    trend: _expiring12mo.length > 3 ? "down" as const : undefined,
+  },
+  {
+    label: "Late-stage deals",
+    value: String(_lateStage.length),
+    subtitle: `$${(_lateStageNer / 1000).toFixed(0)}K/mo projected NER`,
+    trend: "up" as const,
+  },
+  { label: "WALT", value: "4.2 yrs", subtitle: "Weighted avg lease" },
 ]
 
 
 
 
 const CRITICAL_DATES: CriticalDate[] = [
-  { tenant: "Pfizer",              type: "Lease Expiration",              space: "Suite 1200",   sf: 117000, date: "Sep 15, 2026", monthsOut: 2,  category: "expiring" },
-  { tenant: "Morgan Stanley",      type: "Lease Expiration",              space: "Floors 8–11",  sf: 116000, date: "Nov 1, 2026",  monthsOut: 4,  category: "expiring" },
-  { tenant: "Deloitte LLP",        type: "Rent Commencement Date",        space: "Suite 500",    sf: 43000,  date: "Dec 1, 2026",  monthsOut: 5,  category: "expiring" },
-  { tenant: "KPMG",                type: "Renewal Window Opens",          space: "Suite 3400",   sf: 117000, date: "Jan 31, 2027", monthsOut: 6,  category: "renewal"  },
-  { tenant: "Ernst & Young",       type: "Contraction Option Deadline",   space: "Suite 2200",   sf: 80100,  date: "Mar 1, 2027",  monthsOut: 8,  category: "options"  },
-  { tenant: "HSBC Holdings",       type: "ROFO Latest Notice Date",       space: "Suite 900",    sf: 69300,  date: "Apr 15, 2027", monthsOut: 9,  category: "options"  },
-  { tenant: "Latham & Watkins",    type: "Renewal Window Opens",          space: "Floors 14–15", sf: 119000, date: "May 1, 2027",  monthsOut: 10, category: "renewal"  },
-  { tenant: "JPMorgan Chase",      type: "Expansion Option Deadline",     space: "Floor 6",      sf: 55800,  date: "Jun 30, 2027", monthsOut: 11, category: "options"  },
+  { tenant: "Pfizer",              asset: "VTS Tower Headquarters", type: "Lease Expiration",              space: "Suite 1200",   sf: 117000, date: "Sep 15, 2026", monthsOut: 2,  category: "expiring" },
+  { tenant: "Morgan Stanley",      asset: "VTS Tower Headquarters", type: "Lease Expiration",              space: "Floors 8–11",  sf: 116000, date: "Nov 1, 2026",  monthsOut: 4,  category: "expiring" },
+  { tenant: "Deloitte LLP",        asset: "VTS Tower Headquarters", type: "Rent Commencement Date",        space: "Suite 500",    sf: 43000,  date: "Dec 1, 2026",  monthsOut: 5,  category: "expiring" },
+  { tenant: "KPMG",                asset: "VTS Tower Headquarters", type: "Renewal Window Opens",          space: "Suite 3400",   sf: 117000, date: "Jan 31, 2027", monthsOut: 6,  category: "renewal"  },
+  { tenant: "Ernst & Young",       asset: "One Financial Plaza",    type: "Contraction Option Deadline",   space: "Suite 2200",   sf: 80100,  date: "Mar 1, 2027",  monthsOut: 8,  category: "options"  },
+  { tenant: "HSBC Holdings",       asset: "One Financial Plaza",    type: "ROFO Latest Notice Date",       space: "Suite 900",    sf: 69300,  date: "Apr 15, 2027", monthsOut: 9,  category: "options"  },
+  { tenant: "Latham & Watkins",    asset: "Willis Tower",           type: "Renewal Window Opens",          space: "Floors 14–15", sf: 119000, date: "May 1, 2027",  monthsOut: 10, category: "renewal"  },
+  { tenant: "JPMorgan Chase",      asset: "Willis Tower",           type: "Expansion Option Deadline",     space: "Floor 6",      sf: 55800,  date: "Jun 30, 2027", monthsOut: 11, category: "options"  },
 ]
 
 const VACANT_SPACES: VacantSpace[] = [
@@ -283,6 +299,7 @@ export default function App() {
   const [selectedLease, setSelectedLease] = React.useState<Lease | null>(null)
   const [selectedLeaseStatus, setSelectedLeaseStatus] = React.useState<LeaseStatus>("Active")
   const [askVtsKey, setAskVtsKey] = React.useState(0)
+  const [overviewHealthOpenId, setOverviewHealthOpenId] = React.useState<string | null>(null)
   const stackingPlanRef = React.useRef<StackingPlanHandle>(null)
   useChatPattern()
   const [isDark, setIsDark] = React.useState(() => document.documentElement.classList.contains("dark"))
@@ -360,6 +377,15 @@ export default function App() {
 
   const selectedPortfolio = PORTFOLIOS.find(p => p.id === selectedAssetId)
   const selectedAsset = ASSETS.find(a => a.id === selectedAssetId)
+  const isMultiAsset = selectedAssetId === "all" || !!selectedPortfolio
+
+  // Asset names currently in scope — used to scope asset filter options on list pages
+  const allowedAssets: string[] = React.useMemo(() => {
+    if (selectedAssetId === "all") return ASSETS.map(a => a.name)
+    if (selectedPortfolio) return ASSETS.filter(a => selectedPortfolio.assetIds.includes(a.id)).map(a => a.name)
+    if (selectedAsset) return [selectedAsset.name]
+    return ASSETS.map(a => a.name)
+  }, [selectedAssetId, selectedPortfolio, selectedAsset])
 
   // Maps App asset IDs → names used in budget/appraisal data
   const PLANNING_ASSET_NAMES: Record<string, string> = {
@@ -367,6 +393,13 @@ export default function App() {
     "salesforce":    "Salesforce Tower",
     "one-financial": "One Financial Plaza",
     "empire-state":  "Empire State Bldg",
+    "willis":        "Willis Tower",
+    "hudson-yards":  "30 Hudson Yards",
+    "one-wtc":       "One World Trade Ctr",
+    "transamerica":  "Transamerica Pyramid",
+    "200-berkeley":  "200 Berkeley St",
+    "peachtree":     "One Peachtree Ctr",
+    "union-square":  "Two Union Square",
   }
   // Maps App asset IDs → city substrings used to filter comps by citySubmarket
   const PLANNING_CITY_PREFIXES: Record<string, string[]> = {
@@ -520,8 +553,8 @@ export default function App() {
             ]} />
           )}
           {selectedDeal
-            ? <DealProfile deal={selectedDeal} onBack={() => { setSelectedDeal(null); setSelectedDealInitialTab(undefined) }} status={selectedDealStatus} onStatusChange={setSelectedDealStatus} initialTab={selectedDealInitialTab} />
-            : <DealsPage onDealClick={deal => setSelectedDeal(deal)} />
+            ? <DealProfile deal={selectedDeal} onBack={() => { setSelectedDeal(null); setSelectedDealInitialTab(undefined) }} status={selectedDealStatus} onStatusChange={setSelectedDealStatus} initialTab={selectedDealInitialTab} onAddProposal={() => setCurrentPage("proposal-builder")} />
+            : <DealsPage key={selectedAssetId} onDealClick={(deal, initialTab) => { setSelectedDeal(deal); setSelectedDealInitialTab(initialTab) }} assetContext={isMultiAsset ? undefined : selectedAsset?.name} allowedAssets={isMultiAsset ? allowedAssets : undefined} />
           }
         </div>
       )
@@ -534,17 +567,48 @@ export default function App() {
       return (
         <div className="space-y-4">
           <BuildingHeader {...pagedHeaderProps} />
-          <KpiBar kpis={[
-            { label: "Total portfolio NOI", value: "$312M",   subtitle: "+4.2% vs budget",  trend: "up"   as const },
-            { label: "Occupancy",           value: "91.4%",  subtitle: "+0.8% vs budget",  trend: "up"   as const },
-            { label: "Total SF",            value: "4.2M sf", subtitle: "across all assets" },
-            { label: "Markets",             value: selectedPortfolio ? "1" : "5" },
-          ]} />
+          {(() => {
+            const visibleAssetNames = new Set(visibleAssets.map(a => a.name))
+            const portfolioExpiring = CRITICAL_DATES.filter(d => d.category === "expiring" && d.monthsOut <= 12 && (!d.asset || visibleAssetNames.has(d.asset)))
+            const expiringCount = portfolioExpiring.length
+            const expiringSf = portfolioExpiring.reduce((s, d) => s + d.sf, 0)
+            const expiringSfStr = expiringSf >= 1000000 ? `${(expiringSf / 1000000).toFixed(1)}M sf` : `${Math.round(expiringSf / 1000)}K sf`
+            const portfolioDeals = DEALS.filter(d => visibleAssetNames.has(d.asset))
+            const portfolioAtRisk = portfolioDeals.filter(d => getDealHealth(d.id, d.stage as any).score === "at-risk")
+            const portfolioCaution = portfolioDeals.filter(d => getDealHealth(d.id, d.stage as any).score === "caution")
+            const portfolioNeedAttention = portfolioAtRisk.length + portfolioCaution.length
+            return (
+              <KpiBar kpis={[
+                { label: "Avg portfolio NER",  value: "$62/sf",  subtitle: "+4.2% vs budget",  trend: "up" as const },
+                { label: "Occupancy",          value: "91.4%",  subtitle: "+0.8% vs budget",  trend: "up" as const },
+                { label: "Expiring < 12 mo",   value: `${expiringCount} lease${expiringCount !== 1 ? "s" : ""}`, subtitle: expiringSf > 0 ? expiringSfStr : "None expiring", trend: expiringCount > 2 ? "down" as const : undefined },
+                {
+                  label: "Need attention",
+                  value: `${portfolioNeedAttention} deal${portfolioNeedAttention !== 1 ? "s" : ""}`,
+                  subtitleNode: (
+                    <div className="flex items-center gap-1.5 flex-wrap mt-0.5">
+                      {portfolioAtRisk.length > 0 && (
+                        <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium border border-destructive/20 text-destructive bg-destructive/10">{portfolioAtRisk.length} At risk</span>
+                      )}
+                      {portfolioCaution.length > 0 && (
+                        <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium border border-warning/20 text-warning bg-warning/10">{portfolioCaution.length} Caution</span>
+                      )}
+                      {portfolioNeedAttention === 0 && <span className="text-xs text-muted-foreground">None</span>}
+                    </div>
+                  ),
+                },
+              ]} />
+            )
+          })()}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {visibleAssets.map(asset => {
               const kpi = ASSET_KPIS[asset.id]
               const detail = ASSET_DETAILS[asset.id]
               if (!kpi) return null
+              const assetDeals = DEALS.filter(d => d.asset === asset.name)
+              const atRiskDeals = assetDeals.filter(d => getDealHealth(d.id, d.stage as any).score === "at-risk")
+              const cautionDeals = assetDeals.filter(d => getDealHealth(d.id, d.stage as any).score === "caution")
+              const needAttention = atRiskDeals.length + cautionDeals.length
               return (
                 <div
                   key={asset.id}
@@ -579,9 +643,9 @@ export default function App() {
                     </div>
                     <div className="grid grid-cols-3 divide-x divide-border/60">
                       <div className="pr-3">
-                        <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-0.5">NOI</p>
-                        <p className="text-sm font-semibold text-foreground">{kpi.noi}</p>
-                        <p className={cn("text-xs font-medium", kpi.noiBudgetUp ? "text-success" : "text-destructive")}>{kpi.noiBudgetDelta} vs budget</p>
+                        <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-0.5">Avg NER</p>
+                        <p className="text-sm font-semibold text-foreground">{kpi.avgNer}</p>
+                        <p className={cn("text-xs font-medium", kpi.nerBudgetUp ? "text-success" : "text-destructive")}>{kpi.nerBudgetDelta} vs budget</p>
                       </div>
                       <div className="px-3">
                         <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-0.5">Expiring</p>
@@ -591,9 +655,17 @@ export default function App() {
                         </p>
                       </div>
                       <div className="pl-3">
-                        <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-0.5">Deals</p>
-                        <p className="text-sm font-semibold text-foreground">{kpi.activeDeals}</p>
-                        <p className="text-xs text-muted-foreground">active</p>
+                        <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-0.5">Need attention</p>
+                        <p className="text-sm font-semibold text-foreground">{needAttention} deal{needAttention !== 1 ? "s" : ""}</p>
+                        <div className="flex items-center gap-1 mt-0.5 flex-wrap">
+                          {atRiskDeals.length > 0 && (
+                            <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium border border-destructive/20 text-destructive bg-destructive/10">{atRiskDeals.length} At risk</span>
+                          )}
+                          {cautionDeals.length > 0 && (
+                            <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium border border-warning/20 text-warning bg-warning/10">{cautionDeals.length} Caution</span>
+                          )}
+                          {needAttention === 0 && <span className="text-[10px] text-muted-foreground">None</span>}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -644,7 +716,7 @@ export default function App() {
       return (
         <div className="space-y-4">
           <BuildingHeader {...pagedHeaderProps} />
-          <SpacesPage assets={spacesAssets} onSpaceClick={handleSpacesPageClick} />
+          <SpacesPage key={selectedAssetId} assets={spacesAssets} onSpaceClick={handleSpacesPageClick} />
         </div>
       )
     }
@@ -652,14 +724,14 @@ export default function App() {
       return (
         <div className="space-y-4">
           <BuildingHeader {...pagedHeaderProps} />
-          <DealTasksPage onTaskClick={dealId => {
+          <DealTasksPage key={selectedAssetId} onTaskClick={dealId => {
             const deal = DEALS.find(d => d.id === dealId) ?? null
             if (deal) {
               setSelectedDeal(deal)
               setSelectedDealInitialTab("tasks")
               setCurrentPage("deals")
             }
-          }} />
+          }} assetContext={isMultiAsset ? undefined : selectedAsset?.name} />
         </div>
       )
     }
@@ -692,7 +764,7 @@ export default function App() {
       return (
         <div className="space-y-4">
           <BuildingHeader {...pagedHeaderProps} />
-          <LeasesPage onLeaseClick={l => { setSelectedLease(l); setSelectedLeaseStatus(l.status as LeaseStatus) }} />
+          <LeasesPage key={selectedAssetId} onLeaseClick={l => { setSelectedLease(l); setSelectedLeaseStatus(l.status as LeaseStatus) }} assetContext={isMultiAsset ? undefined : selectedAsset?.name} allowedAssets={isMultiAsset ? allowedAssets : undefined} />
         </div>
       )
     }
@@ -705,7 +777,7 @@ export default function App() {
       return (
         <div className="space-y-4">
           <BuildingHeader {...pagedHeaderProps} />
-          <CriticalDatesPage assets={cdAssets} onRowClick={tenant => { const l = findLease(tenant); if (l) { setSelectedLease(l); setSelectedLeaseStatus(l.status as LeaseStatus); setCurrentPage("leases") } }} />
+          <CriticalDatesPage key={selectedAssetId} assets={cdAssets} onRowClick={tenant => { const l = findLease(tenant, selectedAsset?.name); if (l) { setSelectedLease(l); setSelectedLeaseStatus(l.status as LeaseStatus); setCurrentPage("leases") } }} />
         </div>
       )
     }
@@ -718,7 +790,7 @@ export default function App() {
       return (
         <div className="space-y-4">
           <BuildingHeader {...pagedHeaderProps} />
-          <OptionsRightsPage assets={optionsAssets} onRowClick={tenant => { const l = findLease(tenant); if (l) { setSelectedLease(l); setSelectedLeaseStatus(l.status as LeaseStatus); setCurrentPage("leases") } }} />
+          <OptionsRightsPage key={selectedAssetId} assets={optionsAssets} assetId={selectedAsset?.id} onRowClick={tenant => { const l = findLease(tenant, selectedAsset?.name); if (l) { setSelectedLease(l); setSelectedLeaseStatus(l.status as LeaseStatus); setCurrentPage("leases") } }} />
         </div>
       )
     }
@@ -793,19 +865,28 @@ export default function App() {
       <div className="space-y-4">
         <BuildingHeader {...pagedHeaderProps} />
         <KpiBar kpis={KPIS} />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <AvailabilityOverview occupiedSf={957638} vacantSf={410416} vacantSpaces={VACANT_SPACES} deals={DEALS} onViewStackingPlan={() => setCurrentPage("stacking")} onSpaceClick={v => { setSelectedSpace({ suite: v.space, floor: "–", sf: v.sf, status: "Available", assetName: selectedAsset?.name }); setSelectedSpaceStatus("Available"); setCurrentPage("spaces") }} />
-          <FinancialPerformance className="md:col-span-2" criticalDates={CRITICAL_DATES} deals={DEALS} onViewReport={() => setCurrentPage("leases")} onNavigate={setCurrentPage} />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <LeasingActivity deals={DEALS} className="md:col-span-2" onViewAll={() => setCurrentPage("deals")}
-            onDealClick={d => { setSelectedDeal(d); setSelectedDealStatus(d.status as DealStatus); setCurrentPage("deals") }} />
-          <LeasingAgents deals={DEALS} />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <CriticalDates dates={CRITICAL_DATES} className="md:col-span-2" onViewAll={() => setCurrentPage("critical-dates")} onRowClick={tenant => { const l = findLease(tenant); if (l) { setSelectedLease(l); setSelectedLeaseStatus(l.status as LeaseStatus); setCurrentPage("leases") } }} />
-          <ActionLevers onNavigate={setCurrentPage} />
-        </div>
+        {(() => {
+          const overviewDeals = selectedAsset ? DEALS.filter(d => d.asset === selectedAsset.name) : DEALS
+          const overviewDates = selectedAsset ? CRITICAL_DATES.filter(d => d.asset === selectedAsset.name) : CRITICAL_DATES
+          return (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <AvailabilityOverview occupiedSf={957638} vacantSf={410416} vacantSpaces={VACANT_SPACES} deals={overviewDeals} onViewStackingPlan={() => setCurrentPage("stacking")} onSpaceClick={v => { setSelectedSpace({ suite: v.space, floor: "–", sf: v.sf, status: "Available", assetName: selectedAsset?.name }); setSelectedSpaceStatus("Available"); setCurrentPage("spaces") }} />
+                <FinancialPerformance className="md:col-span-2" criticalDates={overviewDates} deals={overviewDeals} onViewReport={() => setCurrentPage("leases")} onNavigate={setCurrentPage} />
+              </div>
+              <div className="grid grid-cols-1 gap-4">
+                <LeasingActivity deals={overviewDeals} onViewAll={() => setCurrentPage("deals")}
+                  onDealClick={d => { setSelectedDeal(d); setSelectedDealStatus(d.status as DealStatus); setCurrentPage("deals") }}
+                  onHealthClick={id => setOverviewHealthOpenId(id)} />
+              </div>
+              {overviewHealthOpenId && <DealHealthModal dealId={overviewHealthOpenId} onClose={() => setOverviewHealthOpenId(null)} />}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <CriticalDates dates={overviewDates} className="md:col-span-2" onViewAll={() => setCurrentPage("critical-dates")} onRowClick={tenant => { const l = findLease(tenant); if (l) { setSelectedLease(l); setSelectedLeaseStatus(l.status as LeaseStatus); setCurrentPage("leases") } }} />
+                <ActionLevers deals={overviewDeals} criticalDates={overviewDates} onNavigate={setCurrentPage} />
+              </div>
+            </>
+          )
+        })()}
       </div>
     )
   }

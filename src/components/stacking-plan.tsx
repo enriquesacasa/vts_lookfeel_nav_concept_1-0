@@ -1,4 +1,5 @@
-import { useState, forwardRef, useImperativeHandle } from "react"
+import React, { useState, forwardRef, useImperativeHandle } from "react"
+import { FLOORS_BY_ASSET as _FLOORS_BY_ASSET_EXT } from "@/lib/floors-by-asset"
 import { Settings2Icon, DownloadIcon, ChevronDownIcon, ConstructionIcon, HandshakeIcon, FileCheckIcon } from "lucide-react"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -396,17 +397,7 @@ function getSpaceAtDate(space: Space, date: Date): Space {
   }
 }
 
-const ALL_LXD_DATES = floors.flatMap((f) =>
-  f.spaces.flatMap((s) => [s.lxd, s.committedLxd].filter(Boolean) as string[])
-).map(parseMDY)
-const SLIDER_MIN_DATE = (() => { const d = new Date(); d.setDate(1); d.setHours(0,0,0,0); return d })()
-const SLIDER_MAX_DATE = (() => {
-  const last = ALL_LXD_DATES.reduce((a, b) => (b > a ? b : a), SLIDER_MIN_DATE)
-  const d = new Date(last); d.setMonth(d.getMonth() + 1); return d
-})()
-const SLIDER_TOTAL_MONTHS =
-  (SLIDER_MAX_DATE.getFullYear() - SLIDER_MIN_DATE.getFullYear()) * 12 +
-  (SLIDER_MAX_DATE.getMonth() - SLIDER_MIN_DATE.getMonth())
+// Slider date constants are now computed per-asset inside the StackingPlan component
 
 function addMonths(base: Date, months: number): Date {
   const d = new Date(base); d.setMonth(d.getMonth() + months); return d
@@ -528,8 +519,12 @@ export type StackingPlanCommand =
 export type StackingPlanHandle = { applyCommand: (cmd: StackingPlanCommand) => void }
 export interface StackingPlanSpaceRef { suite: string; floor: string; sf: number; status: string; tenant?: string; rent?: number; expiry?: string }
 
+// Per-asset floor data — VTS Tower uses the module-level `floors` as default; others loaded from floors-by-asset
+export const FLOORS_BY_ASSET: Record<string, Floor[]> = { ..._FLOORS_BY_ASSET_EXT }
+
 // --- Main Component ---
-export const StackingPlan = forwardRef<StackingPlanHandle, { onSpaceClick?: (s: StackingPlanSpaceRef) => void }>(function StackingPlan({ onSpaceClick }, ref) {
+export const StackingPlan = forwardRef<StackingPlanHandle, { assetId?: string; onSpaceClick?: (s: StackingPlanSpaceRef) => void }>(function StackingPlan({ assetId, onSpaceClick }, ref) {
+  const activeFloors = assetId ? (FLOORS_BY_ASSET[assetId] ?? floors) : floors
   const [activeFilters, setActiveFilters] = useState<Record<string, string[]>>({})
   const [viewType, setViewType] = useState<ViewType>("Standard")
   const [enabledOptions, setEnabledOptions] = useState<Set<string>>(new Set(DEFAULT_VIEW_OPTIONS))
@@ -577,9 +572,20 @@ export const StackingPlan = forwardRef<StackingPlanHandle, { onSpaceClick?: (s: 
   const toggleOption = (opt: string) =>
     setEnabledOptions((prev) => { const n = new Set(prev); n.has(opt) ? n.delete(opt) : n.add(opt); return n })
 
-  const sliderDate = addMonths(SLIDER_MIN_DATE, sliderMonths)
+  const sliderMinDate = React.useMemo(() => { const d = new Date(); d.setDate(1); d.setHours(0,0,0,0); return d }, [])
+  const sliderMaxDate = React.useMemo(() => {
+    const allLxd = activeFloors.flatMap(f => f.spaces.flatMap(s => [s.lxd, s.committedLxd].filter(Boolean) as string[])).map(parseMDY)
+    const last = allLxd.reduce((a, b) => (b > a ? b : a), sliderMinDate)
+    const d = new Date(last); d.setMonth(d.getMonth() + 1); return d
+  }, [activeFloors, sliderMinDate])
+  const sliderTotalMonths = React.useMemo(() =>
+    (sliderMaxDate.getFullYear() - sliderMinDate.getFullYear()) * 12 +
+    (sliderMaxDate.getMonth() - sliderMinDate.getMonth()),
+  [sliderMaxDate, sliderMinDate])
 
-  const resolvedFloors = floors.map((floor) => {
+  const sliderDate = addMonths(sliderMinDate, sliderMonths)
+
+  const resolvedFloors = activeFloors.map((floor) => {
     const spaces = floor.spaces.map((space) => {
       if ((expirationMode === "in-place-committed" || expirationMode === "lease-abstract-committed") && space.committedLease && space.committedTenant) {
         return { ...space, expBucket: space.committedExpBucket ?? "2030", tenant: space.committedTenant, lcd: space.committedLcd, lxd: space.committedLxd } as Space
@@ -696,11 +702,11 @@ export const StackingPlan = forwardRef<StackingPlanHandle, { onSpaceClick?: (s: 
 
         {showSlider && (
           <div className="flex items-center gap-3 px-4 py-3 border-t border-border bg-muted/20">
-            <span className="text-xs text-muted-foreground shrink-0">{formatSliderDate(SLIDER_MIN_DATE)}</span>
-            <input type="range" min={0} max={SLIDER_TOTAL_MONTHS} step={1} value={sliderMonths}
+            <span className="text-xs text-muted-foreground shrink-0">{formatSliderDate(sliderMinDate)}</span>
+            <input type="range" min={0} max={sliderTotalMonths} step={1} value={sliderMonths}
               onChange={(e) => setSliderMonths(Number(e.target.value))}
               className="flex-1 accent-primary cursor-pointer" />
-            <span className="text-xs text-muted-foreground shrink-0">{formatSliderDate(SLIDER_MAX_DATE)}</span>
+            <span className="text-xs text-muted-foreground shrink-0">{formatSliderDate(sliderMaxDate)}</span>
             <span className="text-xs font-semibold shrink-0 min-w-[80px] text-center rounded-md px-2 py-1 border border-border bg-background text-primary">
               {formatSliderDate(sliderDate)}
             </span>

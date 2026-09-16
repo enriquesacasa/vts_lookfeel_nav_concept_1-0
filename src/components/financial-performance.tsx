@@ -19,6 +19,7 @@ interface MonthDatum {
   revActual?: number       // collected rent, actual months only
   revInPlace?: number      // in-place lease revenue, projected months only
   revDeals?: number        // Lease Out+ deal revenue, projected months only
+  revExpiring?: number     // expiring lease revenue in that projected month
   revBudget: number
 }
 
@@ -29,13 +30,14 @@ const CHART_DATA: MonthDatum[] = [
   { month: "Apr", revActual: 4750, revBudget: 4650 },
   { month: "May", revActual: 5010, revBudget: 4700 },
   { month: "Jun", revActual: 4830, revBudget: 4700 },
-  // Sep onward: in-place drops ~$160K/mo to reflect Globex expiration (38K sf @ $52/sf ÷ 12)
-  { month: "Jul", revInPlace: 4720, revDeals:  200, revBudget: 4750 },
-  { month: "Aug", revInPlace: 4720, revDeals:  380, revBudget: 4800 },
-  { month: "Sep", revInPlace: 4555, revDeals:  495, revBudget: 4800 },
-  { month: "Oct", revInPlace: 4555, revDeals:  425, revBudget: 4850 },
-  { month: "Nov", revInPlace: 4555, revDeals:  645, revBudget: 4900 },
-  { month: "Dec", revInPlace: 4555, revDeals:  795, revBudget: 4950 },
+  // Sep onward: in-place drops ~$165K/mo to reflect Globex expiration (38K sf @ $52/sf ÷ 12)
+  // revExpiring shows the lost monthly revenue segment starting from the expiry month
+  { month: "Jul", revInPlace: 4720, revDeals:  200,                  revBudget: 4750 },
+  { month: "Aug", revInPlace: 4720, revDeals:  380,                  revBudget: 4800 },
+  { month: "Sep", revInPlace: 4555, revDeals:  495, revExpiring: 165, revBudget: 4800 },
+  { month: "Oct", revInPlace: 4555, revDeals:  425, revExpiring: 165, revBudget: 4850 },
+  { month: "Nov", revInPlace: 4555, revDeals:  645, revExpiring: 165, revBudget: 4900 },
+  { month: "Dec", revInPlace: 4555, revDeals:  795, revExpiring: 165, revBudget: 4950 },
 ]
 
 // Lease Out+ threshold — per reviewer guidance (LOI is too early to count)
@@ -68,6 +70,9 @@ function ChartPatternDefs() {
       </pattern>
       <pattern id="stripe-deals" patternUnits="userSpaceOnUse" width="5" height="5" patternTransform="rotate(45)">
         <rect width="2.5" height="5" fill="var(--color-success)" fillOpacity={0.85} />
+      </pattern>
+      <pattern id="stripe-expiring" patternUnits="userSpaceOnUse" width="5" height="5" patternTransform="rotate(45)">
+        <rect width="2.5" height="5" fill="var(--color-destructive)" fillOpacity={0.7} />
       </pattern>
     </defs>
   )
@@ -133,6 +138,17 @@ function ChartTooltip({ active, payload, label, expiryByMonth }: any) {
                 <span className="text-muted-foreground">Late-stage deals</span>
               </div>
               <span className="font-medium tabular-nums">{fmtM(d.revDeals ?? 0)}</span>
+            </div>
+          )}
+          {(d.revExpiring ?? 0) > 0 && (
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-1.5">
+                <svg width="10" height="10" className="shrink-0 rounded-sm overflow-hidden">
+                  <rect width="10" height="10" fill="url(#stripe-expiring)" />
+                </svg>
+                <span className="text-destructive">Expiring leases</span>
+              </div>
+              <span className="font-medium tabular-nums text-destructive">-{fmtM(d.revExpiring ?? 0)}/mo</span>
             </div>
           )}
           <div className="flex items-center justify-between gap-4 border-t border-border/40 pt-1">
@@ -327,6 +343,13 @@ const FinancialPerformance = React.forwardRef<HTMLDivElement, FinancialPerforman
               ))}
             </Bar>
 
+            {/* Projected months: expiring lease revenue segment (destructive striped) */}
+            <Bar dataKey="revExpiring" name="Expiring leases" barSize={20} radius={[2,2,0,0]} isAnimationActive={false} stackId="rev">
+              {CHART_DATA.map((m, i) => (
+                <Cell key={i} fill={m.revExpiring != null ? "url(#stripe-expiring)" : "transparent"} />
+              ))}
+            </Bar>
+
             {/* Budget reference bar */}
             <Bar dataKey="revBudget" name="Budget" barSize={20} radius={[2,2,0,0]} isAnimationActive={false}
               fill="var(--color-primary)" fillOpacity={0.18} />
@@ -368,12 +391,17 @@ const FinancialPerformance = React.forwardRef<HTMLDivElement, FinancialPerforman
             <span className="h-2.5 w-2.5 rounded-sm shrink-0 bg-primary/20" />
             <span className="text-sm text-muted-foreground">Budget</span>
           </div>
-          {Object.keys(expiryByMonth).length > 0 && (
-            <div className="flex items-center gap-1.5">
-              <span className="h-2 w-2 rounded-full shrink-0 bg-destructive" />
-              <span className="text-sm text-muted-foreground">Expiring leases</span>
-            </div>
-          )}
+          <div className="flex items-center gap-1.5">
+            <svg width="10" height="10" className="shrink-0 rounded-sm overflow-hidden">
+              <defs>
+                <pattern id="leg-expiring" patternUnits="userSpaceOnUse" width="5" height="5" patternTransform="rotate(45)">
+                  <rect width="2.5" height="5" fill="var(--color-destructive)" fillOpacity={0.7} />
+                </pattern>
+              </defs>
+              <rect width="10" height="10" fill="url(#leg-expiring)" />
+            </svg>
+            <span className="text-sm text-muted-foreground">Expiring leases</span>
+          </div>
         </div>
 
         {/* Bridge table */}
@@ -395,7 +423,7 @@ const FinancialPerformance = React.forwardRef<HTMLDivElement, FinancialPerforman
                 <tr><td colSpan={4}><div className="h-px bg-border/50 my-1" /></td></tr>
 
                 {/* H2 in-place projection vs H2 budget */}
-                <BridgeRow item={{ label: "In-place projection (H2)", budget: h2Budget, actual: h2InPlace, swatch: (
+                <BridgeRow item={{ label: "In-place projection", budget: h2Budget, actual: h2InPlace, swatch: (
                     <svg width="10" height="10" className="shrink-0 rounded-sm overflow-hidden">
                       <rect width="10" height="10" fill="url(#leg-in-place)" />
                     </svg>
@@ -404,17 +432,21 @@ const FinancialPerformance = React.forwardRef<HTMLDivElement, FinancialPerforman
                 {/* Expirations — show sf AND dollar value */}
                 {totalExpiringRentK > 0 && (
                   <ForwardRow item={{
-                    label: "Expiring leases (next 12 mo)",
+                    label: "Expiring leases",
                     value: -(totalExpiringRentK / 12),
                     sentiment: "bad",
-                    swatch: <span className="h-2 w-2 rounded-full shrink-0 bg-destructive" />,
+                    swatch: (
+                      <svg width="10" height="10" className="shrink-0 rounded-sm overflow-hidden">
+                        <rect width="10" height="10" fill="url(#leg-expiring)" />
+                      </svg>
+                    ),
                   }} />
                 )}
 
                 {/* Late-stage deal revenue */}
                 {lateStageDealsK > 0 && (
                   <ForwardRow item={{
-                    label: "Late-stage deal revenue (Lease Out+)",
+                    label: "Late-stage deals (Lease Out+)",
                     value: lateStageDealsK / 12,
                     sentiment: "good",
                     swatch: (

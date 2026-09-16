@@ -182,7 +182,7 @@ export function AmPipelineEmailPage() {
           {[
             { value: "$28.4M", label: "Pipeline ARR" },
             { value: "8",      label: "Active deals" },
-            { value: "2",      label: "Stalled", highlight: true },
+            { value: "2",      label: "Caution", highlight: true },
             { value: "1",      label: "Lease out this week" },
           ].map(({ value, label, highlight }) => (
             <div key={label} className="rounded-xl border border-border p-3 text-center">
@@ -204,8 +204,8 @@ export function AmPipelineEmailPage() {
             <tbody>
               {[
                 { id: "d01", tenant: "Starbucks",     stage: "Legal",    days: "12d", ner: "$52 vs $50", status: "On track", color: "green" as const },
-                { id: "d02", tenant: "Apex Capital",  stage: "Proposal", days: "18d", ner: "$48 vs $52", status: "Stalled",  color: "red"   as const },
-                { id: "d10", tenant: "KPMG",          stage: "Proposal", days: "26d", ner: "$49 vs $55", status: "Stalled",  color: "red"   as const },
+                { id: "d02", tenant: "Apex Capital",  stage: "Proposal", days: "18d", ner: "$48 vs $52", status: "Caution",  color: "red"   as const },
+                { id: "d10", tenant: "KPMG",          stage: "Proposal", days: "26d", ner: "$49 vs $55", status: "Caution",  color: "red"   as const },
                 { id: "d14", tenant: "JPMorgan Chase",stage: "Legal",    days: "9d",  ner: "$75 vs $72", status: "On track", color: "green" as const },
                 { id: "d09", tenant: "Deloitte",      stage: "Legal",    days: "5d",  ner: "$72 vs $70", status: "On track", color: "green" as const },
                 { id: "d17", tenant: "Google",        stage: "LOI",      days: "8d",  ner: "$82 vs $80", status: "On track", color: "green" as const },
@@ -445,8 +445,8 @@ export function OwnerUpdateEmailPage() {
                 { id: "d09", tenant: "Deloitte",      stage: "Legal",    sf: "43,000", ner: "$72", status: "On track", color: "green" as const },
                 { id: "d01", tenant: "Starbucks",     stage: "Legal",    sf: "28,000", ner: "$52", status: "On track", color: "green" as const },
                 { id: "d18", tenant: "Tesla",         stage: "Proposal", sf: "55,000", ner: "$35", status: "At risk",  color: "amber" as const },
-                { id: "d02", tenant: "Apex Capital",  stage: "Proposal", sf: "45,000", ner: "$48", status: "Stalled",  color: "red"   as const },
-                { id: "d10", tenant: "KPMG",          stage: "Proposal", sf: "51,000", ner: "$49", status: "Stalled",  color: "red"   as const },
+                { id: "d02", tenant: "Apex Capital",  stage: "Proposal", sf: "45,000", ner: "$48", status: "Caution",  color: "red"   as const },
+                { id: "d10", tenant: "KPMG",          stage: "Proposal", sf: "51,000", ner: "$49", status: "Caution",  color: "red"   as const },
               ].map((row, i) => (
                 <tr key={row.id} className={`${i < 7 ? "border-b border-gray-100" : ""} ${row.color === "red" ? "bg-red-50" : ""}`}>
                   <td className="px-3 py-2.5"><DealLink id={row.id}>{row.tenant}</DealLink></td>

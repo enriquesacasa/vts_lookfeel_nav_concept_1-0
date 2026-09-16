@@ -173,7 +173,7 @@ function MiniPanel({ mode }: { mode: "light" | "dark" }) {
           </div>
           {/* Stats row */}
           <div className="grid grid-cols-3 gap-px border-b border-border bg-border">
-            {[["In-Place NOI","$29.1M","+9.4%","text-primary"],["Revenue at Risk","$234K/mo","−$18K","text-destructive"],["Pipeline","$89K/mo","+$12K","text-primary"]].map(([label,val,delta,color]) => (
+            {[["Avg NER","$74/sf","+9.4%","text-primary"],["Revenue at Risk","$234K/mo","−$18K","text-destructive"],["Pipeline","$89K/mo","+$12K","text-primary"]].map(([label,val,delta,color]) => (
               <div key={String(label)} className="px-3 py-2 bg-background">
                 <p className="text-[8px] uppercase text-muted-foreground mb-0.5">{label}</p>
                 <p className="font-bold text-[12px] text-foreground">{val}</p>
@@ -655,7 +655,7 @@ export function ThemeShowcase({ isDark, onToggleDark }: ThemeShowcaseProps) {
               </div>
               <div className="rounded-lg bg-primary/15 border border-primary/25 px-3 py-2.5 flex items-center gap-2.5">
                 <Sparkle className="h-4 w-4 shrink-0 text-sidebar-primary" />
-                <p className="text-sm text-sidebar-foreground">3 deal risks identified: <span className="text-sidebar-primary font-medium">$1.8M NOI at risk</span></p>
+                <p className="text-sm text-sidebar-foreground">3 deal risks identified: <span className="text-sidebar-primary font-medium">$1.8M NER at risk</span></p>
               </div>
               {[
                 { label: "4 deals stalling 20+ days", value: "276K sf" },
@@ -680,7 +680,7 @@ export function ThemeShowcase({ isDark, onToggleDark }: ThemeShowcaseProps) {
               <Loader2 className="h-5 w-5 text-primary animate-spin shrink-0" />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-sidebar-foreground">1 agent running</p>
-                <p className="text-xs text-sidebar-foreground/60 truncate">Northeast Corridor Portfolio · Q3 NOI improvement</p>
+                <p className="text-xs text-sidebar-foreground/60 truncate">Northeast Corridor Portfolio · Q3 NER improvement</p>
               </div>
               <Button variant="outline" size="sm" className="shrink-0 text-sidebar-foreground border-current bg-transparent hover:bg-sidebar-accent/60 text-xs">View</Button>
             </div>

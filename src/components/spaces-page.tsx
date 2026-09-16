@@ -334,7 +334,7 @@ export function SpacesPage({ assets, onSpaceClick }: { assets?: AssetRef[], onSp
       return sortDir === "asc" ? cmp : -cmp
     })
     return r
-  }, [search, activeFilters, sortKey, sortDir])
+  }, [search, activeFilters, sortKey, sortDir, isMultiAsset, assets])
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
   const paginated  = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)

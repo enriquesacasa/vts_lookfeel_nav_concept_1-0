@@ -780,7 +780,7 @@ function AgentSettingsPanel({
             </label>
             <label className="flex items-center gap-2 cursor-pointer">
               <Checkbox checked={incEconomic} onCheckedChange={v => setIncEconomic(!!v)} />
-              <span className="text-sm text-foreground">Economic summary (NOI, TI)</span>
+              <span className="text-sm text-foreground">Economic summary (NER, TI)</span>
             </label>
             <label className="flex items-center gap-2 cursor-pointer">
               <Checkbox checked={incComp} onCheckedChange={v => setIncComp(!!v)} />
