@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { LogoMenuContent } from "@/components/logo-menu-content"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { FILTER_TAB_GROUP_CLS, FILTER_TAB_ITEM_CLS } from "@/components/filter-chip"
@@ -12,7 +13,7 @@ import {
   ArrowUp, Sparkle, FileText, Plus, ChevronDown,
   BarChart3, Table2, Settings2, Upload, X, Mic,
   ThumbsUp, Copy, RefreshCw, Search, AudioLines,
-  Download, Share2, Mail, MoreHorizontal,
+  Download, MoreHorizontal,
 } from "lucide-react"
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
@@ -50,10 +51,10 @@ const CASH_FLOW_ROWS: Array<{
 ]
 
 const SUGGESTED_PROMPTS = [
-  "Is this competitive for this market?",
-  "What has Amazon asked for?",
-  "How does this compare to round 1?",
-  "Suggest a counter-proposal strategy",
+  "Suggest opening terms based on Amazon's requirements",
+  "What are Amazon's space and term requirements?",
+  "What's the market rate for this submarket?",
+  "What's the minimum rent to hit our budget?",
 ]
 
 // ─── Context data ─────────────────────────────────────────────────────────────
@@ -104,13 +105,17 @@ const MARKET_BENCHMARKS = [
 type TabId = "info" | "term1" | "options"
 type ViewMode = "table" | "chart"
 
+const HasTermsCtx = React.createContext(false)
+
 // ─── Reusable form primitives ─────────────────────────────────────────────────
 
 function FormRow({
-  label, value, placeholder, required, hint,
+  label, value, placeholder, required, hint, delay = 0,
 }: {
-  label: string; value?: string; placeholder?: string; required?: boolean; hint?: string
+  label: string; value?: string; placeholder?: string; required?: boolean; hint?: string; delay?: number
 }) {
+  const hasTerms = React.useContext(HasTermsCtx)
+  const displayValue = hasTerms ? value : undefined
   return (
     <div className="flex items-start gap-3 min-h-[32px]">
       <span className="text-sm text-muted-foreground w-36 shrink-0 pt-1.5">
@@ -118,13 +123,25 @@ function FormRow({
       </span>
       <div className="flex-1 space-y-0.5">
         <div className={cn(
-          "h-8 rounded-md border border-input px-2.5 text-sm flex items-center bg-card",
-          value ? "text-foreground" : "text-muted-foreground/50"
+          "h-8 rounded-md border border-input px-2.5 text-sm flex items-center bg-card transition-colors duration-300",
+          displayValue ? "text-foreground border-primary/40 bg-primary/5" : "text-muted-foreground/50"
         )}>
-          {value ?? placeholder}
+          {displayValue ? (
+            <span
+              className="animate-in fade-in slide-in-from-bottom-1 duration-300"
+              style={{ animationDelay: `${delay}ms`, animationFillMode: "both" }}
+            >
+              {displayValue}
+            </span>
+          ) : (placeholder ?? "")}
         </div>
-        {hint && (
-          <p className="text-xs text-muted-foreground/60 px-0.5">{hint}</p>
+        {hasTerms && hint && (
+          <p
+            className="text-xs text-muted-foreground/60 px-0.5 animate-in fade-in duration-300"
+            style={{ animationDelay: `${delay + 100}ms`, animationFillMode: "both" }}
+          >
+            {hint}
+          </p>
         )}
       </div>
     </div>
@@ -170,8 +187,9 @@ function CollapsibleSection({ label, children, defaultOpen = true, onAdd, badge 
 // ─── Financial sub-components ─────────────────────────────────────────────────
 
 function MetricCard({ label, value, budget, chevron }: { label: string; value: string; budget: string | null; chevron?: boolean }) {
+  const hasTerms = React.useContext(HasTermsCtx)
   const comparison = React.useMemo(() => {
-    if (!budget) return null
+    if (!hasTerms || !budget) return null
     const numVal = parseFloat(value.replace(/[$,]/g, ""))
     const numBudget = parseFloat(budget.replace(/[$,]/g, ""))
     if (isNaN(numVal) || isNaN(numBudget)) return null
@@ -182,17 +200,23 @@ function MetricCard({ label, value, budget, chevron }: { label: string; value: s
       ? `$${(delta / 1000).toFixed(0)}k`
       : `$${delta.toFixed(2)}`
     return { above, formatted }
-  }, [value, budget])
+  }, [hasTerms, value, budget])
 
   return (
     <div className="space-y-1.5">
       <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground leading-none">{label}</p>
       <div className="flex items-baseline gap-1">
-        <p className="text-base font-semibold text-foreground tracking-tight">{value}</p>
-        {chevron && <ChevronDown className="h-3 w-3 text-muted-foreground" />}
+        {hasTerms ? (
+          <p className="text-base font-semibold tracking-tight text-foreground animate-in fade-in slide-in-from-bottom-1 duration-500" style={{ animationFillMode: "both" }}>
+            {value}
+          </p>
+        ) : (
+          <p className="text-base font-semibold tracking-tight text-muted-foreground/40">--</p>
+        )}
+        {chevron && hasTerms && <ChevronDown className="h-3 w-3 text-muted-foreground animate-in fade-in duration-500" style={{ animationFillMode: "both" }} />}
       </div>
       {comparison && (
-        <p className={cn("text-xs", comparison.above ? "text-success" : "text-destructive")}>
+        <p className={cn("text-xs animate-in fade-in duration-500", comparison.above ? "text-success" : "text-destructive")} style={{ animationFillMode: "both" }}>
           {comparison.above ? "↑" : "↓"} {comparison.formatted} vs budget {budget}
         </p>
       )}
@@ -201,8 +225,19 @@ function MetricCard({ label, value, budget, chevron }: { label: string; value: s
 }
 
 function CashFlowChart() {
+  const hasTerms = React.useContext(HasTermsCtx)
+  const [filled, setFilled] = React.useState(false)
   const months = Array.from({ length: 36 }, (_, i) => i + 1)
   const CHART_H = 120
+
+  React.useEffect(() => {
+    if (hasTerms) {
+      const t = setTimeout(() => setFilled(true), 100)
+      return () => clearTimeout(t)
+    } else {
+      setFilled(false)
+    }
+  }, [hasTerms])
 
   return (
     <div className="px-5 py-4">
@@ -211,29 +246,34 @@ function CashFlowChart() {
           const isFirst = mo === 1
           const val = isFirst ? -1387800 : 37200
           const maxAbs = 1387800
-          const barH = Math.max(Math.abs(val) / maxAbs * CHART_H * 0.85, 4)
+          const targetH = Math.max(Math.abs(val) / maxAbs * CHART_H * 0.85, 4)
+          const placeholderH = Math.max(8 + (mo % 5) * 6, 8)
+          const barH = filled ? targetH : placeholderH
+
           return (
             <div key={mo} className="flex-1 flex flex-col justify-end" style={{ height: "100%" }}>
-              {isFirst ? (
-                <div className="w-full rounded-sm bg-muted-foreground/25" style={{ height: barH }} />
-              ) : (
-                <div
-                  className="w-full rounded-sm"
-                  style={{
-                    height: barH,
-                    backgroundColor: mo <= 20
-                      ? "hsl(var(--muted-foreground) / 0.3)"
-                      : "hsl(var(--primary) / 0.8)",
-                  }}
-                />
-              )}
+              <div
+                className="w-full rounded-sm transition-all ease-out"
+                style={{
+                  height: barH,
+                  transitionDuration: filled ? "600ms" : "300ms",
+                  transitionDelay: filled ? `${mo * 14}ms` : "0ms",
+                  backgroundColor: filled
+                    ? isFirst
+                      ? "hsl(var(--muted-foreground) / 0.25)"
+                      : mo <= 20
+                        ? "hsl(var(--muted-foreground) / 0.3)"
+                        : "hsl(var(--primary) / 0.8)"
+                    : "hsl(var(--muted) / 0.7)",
+                }}
+              />
             </div>
           )
         })}
       </div>
       <div className="flex justify-between mt-1.5">
         {[1, 12, 24, 36].map(mo => (
-          <span key={mo} className="text-[9px] text-muted-foreground">MO {mo}</span>
+          <span key={mo} className={cn("text-[9px] transition-colors duration-300", hasTerms ? "text-muted-foreground" : "text-muted-foreground/40")}>MO {mo}</span>
         ))}
       </div>
     </div>
@@ -254,6 +294,7 @@ export function ProposalBuilderPage({ className, isDark = false, onToggleDark }:
   const [logoOpen, setLogoOpen] = React.useState(false)
   const [chatInput, setChatInput] = React.useState("")
   const [messages, setMessages] = React.useState<{ role: "user" | "assistant"; content: string }[]>([])
+  const [hasTerms, setHasTerms] = React.useState(false)
   const bottomRef = React.useRef<HTMLDivElement>(null)
 
   React.useEffect(() => {
@@ -264,16 +305,17 @@ export function ProposalBuilderPage({ className, isDark = false, onToggleDark }:
     const msg = text.trim()
     if (!msg) return
     setChatInput("")
-    setMessages(prev => [
-      ...prev,
-      { role: "user", content: msg },
-    ])
+    setMessages(prev => [...prev, { role: "user", content: msg }])
+    const isSuggest = msg.toLowerCase().includes("suggest") && msg.toLowerCase().includes("term")
     setTimeout(() => {
       setMessages(prev => [...prev, {
         role: "assistant",
-        content: generateResponse(msg),
+        content: isSuggest
+          ? "I've filled in opening terms based on Amazon's requirements and Class A submarket benchmarks.\n\n• Base rent $36.00/sf/yr — just under their $37.00 ceiling, $4 above your $32.00 budget floor, in line with the $33–38 market range\n• TIA $75/sf — closes most of their $80 ask; going to $78 would cost ~$25K more but may be worth it to lock the deal\n• Free rent 6 months — market typical; they asked 8, so there's room to move here as a concession\n• 84-month term — hits their 7–10 yr preference and maximizes NPV\n• Commencement 11/1/2026 — tight but achievable given their timeline\n\nNER at $34.18/sf/yr and NPV $3.24M both clear your targets. The biggest remaining gap is TIA."
+          : generateResponse(msg),
       }])
-    }, 800)
+      if (isSuggest) setHasTerms(true)
+    }, 1400)
   }
 
   const TABS: { id: TabId; label: string }[] = [
@@ -283,6 +325,7 @@ export function ProposalBuilderPage({ className, isDark = false, onToggleDark }:
   ]
 
   return (
+    <HasTermsCtx.Provider value={hasTerms}>
     <div className={cn("flex flex-col h-screen overflow-hidden gap-4 p-4", className)}>
       <div className="flex flex-1 min-h-0 rounded-2xl overflow-hidden bg-background border border-border/70 divide-x divide-border/40">
 
@@ -333,19 +376,7 @@ export function ProposalBuilderPage({ className, isDark = false, onToggleDark }:
 
           {/* Messages */}
           <div className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-3">
-            {messages.length === 0 ? (
-              <div className="flex flex-col justify-end h-full pb-1">
-                <div className="flex flex-wrap gap-2">
-                    {SUGGESTED_PROMPTS.map(p => (
-                      <Button key={p} variant="outline" size="sm"
-                        className="rounded-full shrink-0 whitespace-nowrap"
-                        onClick={() => sendMessage(p)}>
-                        {p}
-                      </Button>
-                    ))}
-                </div>
-              </div>
-            ) : (
+            {messages.length > 0 && (
               messages.map((m, i) => (
                 <div key={i} className={cn("flex gap-2", m.role === "user" && "flex-row-reverse")}>
                   <div className={cn("flex flex-col gap-1", m.role === "user" && "items-end")}>
@@ -368,6 +399,18 @@ export function ProposalBuilderPage({ className, isDark = false, onToggleDark }:
             )}
             <div ref={bottomRef} />
           </div>
+
+          {/* Suggested prompts */}
+          {messages.length === 0 && (
+            <div className="shrink-0 px-4 pb-2 flex flex-col gap-1.5">
+              {SUGGESTED_PROMPTS.map(p => (
+                <button key={p} onClick={() => sendMessage(p)}
+                  className="text-left text-xs px-3 py-2 rounded-md border border-primary text-primary bg-transparent hover:bg-primary/10 transition-colors leading-snug w-full">
+                  {p}
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* Input */}
           <div className="shrink-0 px-4 pb-4 pt-2">
@@ -409,42 +452,32 @@ export function ProposalBuilderPage({ className, isDark = false, onToggleDark }:
             <div className="flex flex-col flex-1 min-h-0 px-4 pt-4">
 
             {/* Tabs */}
-            <div className="flex items-center gap-0.5 pb-2 -mx-1 shrink-0">
-              {TABS.map(tab => (
-                <Button
-                  key={tab.id}
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setActiveTab(tab.id)}
-                  className={cn(
-                    "px-2.5 py-1.5 text-xs font-medium rounded-lg transition-colors whitespace-nowrap h-auto",
-                    activeTab === tab.id
-                      ? "bg-muted text-foreground"
-                      : "text-muted-foreground hover:text-foreground"
-                  )}
-                >
-                  {tab.label}
+            <Tabs value={activeTab} onValueChange={v => setActiveTab(v as TabId)} className="flex flex-col flex-1 min-h-0">
+              <div className="flex items-center border-b border-border shrink-0">
+                <TabsList variant="line" className="flex-1 rounded-none bg-transparent p-0 h-auto gap-0 justify-start">
+                  {TABS.map(tab => (
+                    <TabsTrigger key={tab.id} value={tab.id} className="rounded-none !bg-transparent border-b-2 border-transparent data-active:border-primary data-active:!text-primary data-active:font-medium hover:!bg-transparent hover:text-foreground !shadow-none px-3 pb-2.5 pt-0 text-sm flex-none -mb-px">
+                      {tab.label}
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+                <Button variant="ghost" size="sm" className="flex items-center gap-1 text-xs text-primary font-medium px-2 h-7 shrink-0">
+                  <Plus className="h-3 w-3" />Term
                 </Button>
-              ))}
-              <Button variant="ghost" size="sm" className="ml-auto flex items-center gap-1 text-[11px] text-primary font-medium px-2 py-1 rounded-lg h-auto">
-                <Plus className="h-3 w-3" />Term
-              </Button>
-            </div>
+              </div>
 
-            <Separator />
-
-            {/* Tab body */}
-            <div className="flex-1 overflow-y-auto py-3">
-              {activeTab === "info"    && <InfoTab />}
-              {activeTab === "term1"   && <Term1Tab />}
-              {activeTab === "options" && <OptionsTab />}
-            </div>
+              {/* Tab body */}
+              <div className="flex-1 overflow-y-auto py-3">
+                {activeTab === "info"    && <InfoTab />}
+                {activeTab === "term1"   && <Term1Tab />}
+                {activeTab === "options" && <OptionsTab />}
+              </div>
+            </Tabs>
             </div>
 
             {/* Footer actions */}
-            <div className="flex items-center gap-2 px-4 py-3 border-t border-border/60 shrink-0">
-              <Button variant="outline" size="sm" className="h-9 flex-1">Save</Button>
-              <Button size="sm" className="h-9 flex-1">Save and draft LOI</Button>
+            <div className="px-4 py-3 border-t border-border/60 shrink-0">
+              <Button size="default" className="w-full h-9">Save</Button>
             </div>
           </div>
         )}
@@ -472,17 +505,11 @@ export function ProposalBuilderPage({ className, isDark = false, onToggleDark }:
               )}
             </div>
             <div className="flex items-center gap-2 shrink-0">
-              <Button variant="outline" size="sm" className="gap-1.5 text-xs h-7">
+              <Button variant="outline" size="sm" className="gap-1.5 text-sm h-8">
                 <Download className="h-3.5 w-3.5" />Export
                 <ChevronDown className="h-3 w-3 text-muted-foreground" />
               </Button>
-              <Button variant="outline" size="sm" className="gap-1.5 text-xs h-7">
-                <Mail className="h-3.5 w-3.5" />Email
-              </Button>
-              <Button size="sm" className="gap-1.5 text-xs h-7">
-                <Share2 className="h-3.5 w-3.5" />Share
-              </Button>
-              <div className="w-px h-4 bg-border/60 mx-1" />
+<div className="w-px h-4 bg-border/60 mx-1" />
               <Button variant="ghost" size="icon-sm" className="h-7 w-7 text-muted-foreground"
                 onClick={() => { window.location.hash = "#/dashboard" }}>
                 <X className="h-4 w-4" />
@@ -494,7 +521,7 @@ export function ProposalBuilderPage({ className, isDark = false, onToggleDark }:
           <div className="flex-1 overflow-y-auto px-6 py-6 space-y-4">
 
             {/* Context card */}
-            <div className="rounded-xl border border-border/60 bg-card">
+            <div className="rounded-2xl border border-border/70 bg-card/70 backdrop-blur-md overflow-hidden">
               <div className="grid grid-cols-2 divide-x divide-border/40">
                 <div className="p-5">
                   <TenantRequirementsCard />
@@ -506,7 +533,7 @@ export function ProposalBuilderPage({ className, isDark = false, onToggleDark }:
             </div>
 
             {/* Metrics + cash flow card */}
-            <div className="rounded-xl border border-border/60 bg-card overflow-hidden">
+            <div className="rounded-2xl border border-border/70 bg-card/70 backdrop-blur-md overflow-hidden">
               {/* Card header */}
               <div className="flex items-center justify-between px-5 py-2.5 border-b border-border/40 bg-muted/30">
                 <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Proposal model</p>
@@ -539,8 +566,8 @@ export function ProposalBuilderPage({ className, isDark = false, onToggleDark }:
                       <Table2 className="h-3 w-3" />Table
                     </ToggleGroupItem>
                   </ToggleGroup>
-                  <Button variant="outline" size="sm" className="h-6 px-2 text-xs gap-1 font-normal">
-                    Monthly <ChevronDown className="h-3 w-3 text-muted-foreground" />
+                  <Button variant="outline" size="sm" className="h-8 px-3 text-sm gap-1.5 font-normal">
+                    Monthly <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
                   </Button>
                   <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground">
                     <Settings2 className="h-3.5 w-3.5" />
@@ -554,12 +581,14 @@ export function ProposalBuilderPage({ className, isDark = false, onToggleDark }:
 
       </div>
     </div>
+    </HasTermsCtx.Provider>
   )
 }
 
 // ─── Cash flow table ──────────────────────────────────────────────────────────
 
 function CashFlowTable() {
+  const hasTerms = React.useContext(HasTermsCtx)
   return (
     <div className="overflow-x-auto pb-4">
       <table className="w-full text-xs">
@@ -585,7 +614,15 @@ function CashFlowTable() {
               <td className={cn("px-5 py-2 text-muted-foreground", (row.isNerRow || row.isNetCashFlow || row.isGrossTotal) && "font-semibold text-foreground")}>
                 {row.label}
               </td>
-              {row.isDate ? (
+              {!hasTerms ? (
+                <>
+                  <td className="px-4 py-2 text-right text-muted-foreground/30">--</td>
+                  <td className="px-4 py-2 text-right text-muted-foreground/30">--</td>
+                  <td className="px-4 py-2 text-right text-muted-foreground/30">--</td>
+                  <td className="px-4 py-2 text-right text-muted-foreground/30">--</td>
+                  <td className="px-4 py-2 text-right text-muted-foreground/30">--</td>
+                </>
+              ) : row.isDate ? (
                 <>
                   <td />
                   {[row.mo1, row.mo2, row.mo3, row.mo4].map((v, j) => (
@@ -734,26 +771,27 @@ function Term1Tab() {
     <div className="space-y-3">
       <div>
         <CollapsibleSection label="Overview">
-          <FormRow label="Term type"          value="New" />
-          <FormRow label="Spaces"             value="Suite 800, Floor 8" />
-          <FormRow label="Rentable size"      value="12,400 sf" required hint="Tenant ask: 12,000–14,000 sf" />
+          <FormRow label="Term type"          value="New"           delay={0} />
+          <FormRow label="Spaces"             value="Suite 800, Floor 8" delay={60} />
+          <FormRow label="Rentable size"      value="12,400 sf" required hint="Tenant ask: 12,000–14,000 sf" delay={120} />
           <FormRow label="Downtime"           placeholder="mo" />
           <FormRow label="Tenant possession"  placeholder="MM/DD/YYYY" />
           <FormRow label="Tenant buildout"    placeholder="Days" />
-          <FormRow label="Commencement date"  value="11/01/2026" required />
-          <FormRow label="Term duration"      value="84 mo" required hint="Tenant preference: 7–10 yr" />
+          <FormRow label="Commencement date"  value="11/01/2026" required delay={180} />
+          <FormRow label="Term duration"      value="84 mo" required hint="Tenant preference: 7–10 yr" delay={240} />
           <FormRow label="Rent commencement"  placeholder="MM/DD/YYYY" />
           <FormRow label="Lock-in end"        placeholder="MM/DD/YYYY" />
         </CollapsibleSection>
 
         <CollapsibleSection label="Income">
           <p className="text-xs font-semibold text-foreground">Base rent</p>
-          <FormRow label="Starts (mo)" value="1" required />
+          <FormRow label="Starts (mo)" value="1" required delay={300} />
           <FormRow
             label="Amount"
             value="36.00 $/sf/yr"
             required
             hint="Market: $33–38 · Building avg: $35.50 · Budget: $32.00"
+            delay={360}
           />
           <Button variant="ghost" size="sm" className="text-xs text-primary font-medium flex items-center gap-1 h-auto px-0">
             <Plus className="h-3 w-3" />Base rent
@@ -764,7 +802,7 @@ function Term1Tab() {
             <Plus className="h-3 w-3" />
           </Button>
           <p className="text-xs font-semibold text-muted-foreground">Free rent</p>
-          <FormRow label="Months" value="6 mo" hint="Tenant ask: 8 mo · Market typical: 4–8 mo" />
+          <FormRow label="Months" value="6 mo" hint="Tenant ask: 8 mo · Market typical: 4–8 mo" delay={420} />
           <p className="text-xs font-semibold text-muted-foreground">Other income</p>
           <Button variant="outline" size="icon" className="h-6 w-6 rounded text-primary hover:bg-muted">
             <Plus className="h-3 w-3" />
@@ -773,7 +811,7 @@ function Term1Tab() {
 
         <CollapsibleSection label="Capital" defaultOpen={false}>
           <p className="text-xs font-semibold text-foreground">Tenant improvement allowance</p>
-          <FormRow label="Amount" value="$75.00 $/sf" hint="Tenant ask: $80/sf · Market: $65–80/sf" />
+          <FormRow label="Amount" value="$75.00 $/sf" hint="Tenant ask: $80/sf · Market: $65–80/sf" delay={480} />
         </CollapsibleSection>
 
         <CollapsibleSection label="Expenses and recoveries" defaultOpen={false} onAdd>
@@ -781,11 +819,11 @@ function Term1Tab() {
         </CollapsibleSection>
 
         <CollapsibleSection label="Commission" defaultOpen={false}>
-          <FormRow label="Type"         value="Landlord" />
-          <FormRow label="Broker"       value="CBRE" />
-          <FormRow label="Structure"    value="% of total rent" />
-          <FormRow label="Amount"       value="4.00 %" required />
-          <FormRow label="Payout month" value="1" required />
+          <FormRow label="Type"         value="Landlord"         delay={540} />
+          <FormRow label="Broker"       value="CBRE"             delay={580} />
+          <FormRow label="Structure"    value="% of total rent"  delay={620} />
+          <FormRow label="Amount"       value="4.00 %" required  delay={660} />
+          <FormRow label="Payout month" value="1" required       delay={700} />
         </CollapsibleSection>
 
         <CollapsibleSection label="Remaining lease obligations" defaultOpen={false} onAdd />

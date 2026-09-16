@@ -967,7 +967,17 @@ export function DealsPage({ onDealClick, assetContext, allowedAssets }: { onDeal
           agents:    <AiInsightCard key="agents" deals={scopedDeals} />,
           pipeline:  <PipelineViz  key="pipeline" deals={scopedDeals} />,
         }
-        return <div className="grid gap-4 items-stretch" style={{ gridTemplateColumns: `repeat(${active.length}, minmax(0, 1fr))` }}>{active.map(id => CARD_MAP[id])}</div>
+        const cols = active.length
+        return (
+          <div
+            className={cn(
+              "grid gap-4 items-stretch",
+              cols === 1 ? "grid-cols-1" : cols === 2 ? "grid-cols-1 md:grid-cols-2" : cols === 3 ? "grid-cols-1 md:grid-cols-2 xl:grid-cols-3" : "grid-cols-1 md:grid-cols-2 xl:grid-cols-4"
+            )}
+          >
+            {active.map(id => CARD_MAP[id])}
+          </div>
+        )
       })()}
 
       {/* Deals table */}
@@ -1012,7 +1022,7 @@ export function DealsPage({ onDealClick, assetContext, allowedAssets }: { onDeal
             onClearAll={onClearAll}
             visibleCount={4}
           />
-          <div className="ml-auto flex items-center gap-2">
+          <div className="ml-auto flex items-center gap-2 shrink-0">
             <CardManager visible={visibleCards} order={cardOrder} onToggle={toggleCard} onReorder={updateCardOrder} />
             <ColumnManager
               columns={ALL_COLUMNS}
@@ -1026,6 +1036,7 @@ export function DealsPage({ onDealClick, assetContext, allowedAssets }: { onDeal
         </div>
 
         {/* Table */}
+        <div className="overflow-x-auto -mx-5 px-5">
         <Table className="border-collapse">
           <TableHeader>
             <TableRow className="border-b-2 border-border/60 hover:bg-transparent">
@@ -1244,6 +1255,7 @@ export function DealsPage({ onDealClick, assetContext, allowedAssets }: { onDeal
             </TableRow>
           </TableBody>
         </Table>
+        </div>
 
         {/* Pagination */}
         <div className="flex items-center justify-between mt-4 pt-4 border-t border-border/40">
