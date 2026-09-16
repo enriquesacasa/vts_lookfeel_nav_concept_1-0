@@ -28,9 +28,10 @@ interface FilterChipProps {
   selected: string[]
   onToggle: (value: string) => void
   onClear: () => void
+  triggerClassName?: string
 }
 
-export function FilterChip({ filter, selected, onToggle, onClear }: FilterChipProps) {
+export function FilterChip({ filter, selected, onToggle, onClear, triggerClassName }: FilterChipProps) {
   const isActive = selected.length > 0
   return (
     <Popover>
@@ -39,7 +40,8 @@ export function FilterChip({ filter, selected, onToggle, onClear }: FilterChipPr
         size="sm"
         className={cn(
           "gap-1 font-normal whitespace-nowrap",
-          isActive && "border-primary bg-primary/10 text-primary font-medium"
+          isActive && "border-primary bg-primary/10 text-primary font-medium",
+          triggerClassName
         )}
       />}>
         {filter.label}
@@ -96,6 +98,7 @@ interface FilterBarProps {
   onClearAll: () => void
   visibleCount?: number
   className?: string
+  chipClassName?: string
 }
 
 export function FilterBar({
@@ -106,6 +109,7 @@ export function FilterBar({
   onClearAll,
   visibleCount = 4,
   className,
+  chipClassName,
 }: FilterBarProps) {
   const [showAll, setShowAll] = React.useState(false)
   const hasAny = Object.values(active).some((v) => v.length > 0)
@@ -121,6 +125,7 @@ export function FilterBar({
           selected={active[f.key] ?? []}
           onToggle={(v) => onToggle(f.key, v)}
           onClear={() => onClear(f.key)}
+          triggerClassName={chipClassName}
         />
       ))}
 
