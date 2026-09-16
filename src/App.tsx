@@ -195,7 +195,7 @@ export const PORTFOLIOS = [
 ]
 
 export const ASSET_DETAILS: Record<string, { city: string; image: string }> = {
-  "vts-tower":     { city: "Built 2017 · 52 floors · Office",   image: "https://images.unsplash.com/photo-1631085474949-d8a367d9d26d?w=800&h=500&fit=crop&crop=top&auto=format" },
+  "vts-tower":     { city: "Built 2017 · 52 floors · Office",   image: "https://images.unsplash.com/photo-1583009640887-eafd1a994d30?w=800&h=500&fit=crop&crop=center&auto=format" },
   "one-financial": { city: "Built 1992 · 36 floors · Office",   image: "https://images.unsplash.com/photo-1554435493-93422e8220c8?w=800&h=500&fit=crop&auto=format" },
   "empire-state":  { city: "Built 1931 · 102 floors · Office",  image: "https://images.unsplash.com/photo-1499092346589-b9b6be3e94b2?w=800&h=500&fit=crop&auto=format" },
   "salesforce":    { city: "Built 2018 · 61 floors · Office",   image: "https://images.unsplash.com/photo-1464938050520-ef2270bb8ce8?w=800&h=500&fit=crop&auto=format" },
