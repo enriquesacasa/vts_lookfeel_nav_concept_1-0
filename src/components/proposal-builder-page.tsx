@@ -109,6 +109,37 @@ const HasTermsCtx = React.createContext(false)
 
 // ─── Reusable form primitives ─────────────────────────────────────────────────
 
+function ChatBubbleContent({ text }: { text: string }) {
+  const paragraphs = text.split("\n\n")
+  return (
+    <div className="space-y-2 leading-relaxed">
+      {paragraphs.map((block, i) => {
+        const lines = block.split("\n")
+        const isBulletBlock = lines.every(l => l.startsWith("•"))
+        if (isBulletBlock) {
+          return (
+            <ul key={i} className="space-y-1.5">
+              {lines.map((line, j) => {
+                const [head, ...rest] = line.replace(/^•\s*/, "").split(" — ")
+                return (
+                  <li key={j} className="flex gap-1.5 items-start">
+                    <span className="mt-1.5 h-1 w-1 rounded-full bg-primary/60 shrink-0" />
+                    <span>
+                      <span className="font-medium">{head}</span>
+                      {rest.length > 0 && <span className="text-muted-foreground"> — {rest.join(" — ")}</span>}
+                    </span>
+                  </li>
+                )
+              })}
+            </ul>
+          )
+        }
+        return <p key={i}>{block}</p>
+      })}
+    </div>
+  )
+}
+
 function FormRow({
   label, value, placeholder, required, hint, delay = 0,
 }: {
@@ -381,10 +412,10 @@ export function ProposalBuilderPage({ className, isDark = false, onToggleDark }:
                 <div key={i} className={cn("flex gap-2", m.role === "user" && "flex-row-reverse")}>
                   <div className={cn("flex flex-col gap-1", m.role === "user" && "items-end")}>
                     <div className={cn(
-                      "rounded-xl px-3 py-2.5 text-sm text-foreground leading-relaxed max-w-[248px]",
+                      "rounded-xl px-3 py-2.5 text-sm text-foreground max-w-[248px]",
                       m.role === "user" ? "bg-primary/10" : "bg-muted/40"
                     )}>
-                      {m.content}
+                      <ChatBubbleContent text={m.content} />
                     </div>
                     {m.role === "assistant" && (
                       <div className="flex items-center gap-0.5 px-0.5">

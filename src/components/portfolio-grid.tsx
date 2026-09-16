@@ -236,14 +236,14 @@ export function PortfolioGrid({ assets, deals, onAssetClick }: PortfolioGridProp
                     <div className="pl-3">
                       <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-0.5">Need attention</p>
                       <p className="text-sm font-semibold text-foreground">{needAttention} deal{needAttention !== 1 ? "s" : ""}</p>
-                      <div className="flex items-center gap-1 mt-0.5 flex-wrap">
+                      <div className="flex items-center gap-2 mt-0.5 flex-wrap">
                         {atRisk.length > 0 && (
-                          <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium border border-destructive/20 text-destructive bg-destructive/10">{atRisk.length} At risk</span>
+                          <span className="text-xs text-destructive font-medium">{atRisk.length} at risk</span>
                         )}
                         {caution.length > 0 && (
-                          <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium border border-warning/20 text-warning bg-warning/10">{caution.length} Critical</span>
+                          <span className="text-xs text-warning font-medium">{caution.length} critical</span>
                         )}
-                        {needAttention === 0 && <span className="text-[10px] text-muted-foreground">None</span>}
+                        {needAttention === 0 && <span className="text-xs text-muted-foreground">None</span>}
                       </div>
                     </div>
                   </div>
