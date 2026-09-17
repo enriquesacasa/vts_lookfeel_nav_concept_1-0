@@ -1,5 +1,4 @@
 import * as React from "react"
-import { AgentBtn } from "@/components/agent-btn"
 import { AppNav } from "@/components/app-nav"
 import { BuildingHeader } from "@/components/building-header"
 import { AvailabilityOverview } from "@/components/availability-overview"
@@ -13,7 +12,7 @@ import { DealActions } from "@/components/deal-actions"
 import { PortfolioGrid } from "@/components/portfolio-grid"
 import { KpiBar } from "@/components/kpi-bar"
 import { AgentsPage } from "@/components/agents-page"
-import { DealsPage, DEALS, DealHealthModal } from "@/components/deals-page"
+import { DealsPage, DEALS } from "@/components/deals-page"
 import type { Deal as DealsPageDeal } from "@/components/deals-page"
 import { DealProfile, TenantLogoImage, getDealHealth, type DealStatus } from "@/components/deal-profile"
 import { ThemeShowcase } from "@/components/theme-showcase"
@@ -300,7 +299,6 @@ export default function App() {
   const [selectedLease, setSelectedLease] = React.useState<Lease | null>(null)
   const [selectedLeaseStatus, setSelectedLeaseStatus] = React.useState<LeaseStatus>("Active")
   const [askVtsKey, setAskVtsKey] = React.useState(0)
-  const [overviewHealthOpenId, setOverviewHealthOpenId] = React.useState<string | null>(null)
   const stackingPlanRef = React.useRef<StackingPlanHandle>(null)
   useChatPattern()
   const [isDark, setIsDark] = React.useState(() => document.documentElement.classList.contains("dark"))
@@ -533,11 +531,7 @@ export default function App() {
         name: (<span><span className="font-semibold">{selectedDeal.tenant}</span>{" "}<span className="text-muted-foreground font-light">| {selectedDeal.dealType}</span></span>),
         address: [selectedDeal.space, `${selectedDeal.sf.toLocaleString()} sf`].filter(Boolean).join(" · "),
         image: <div className="relative shrink-0 w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-full overflow-hidden border border-border/30 shadow-sm"><TenantLogoImage name={selectedDeal.tenant} /></div>,
-        actions: (
-          <div className="flex items-center gap-2">
-            <AgentBtn className="!size-9" entity="Deal" label={`${selectedDeal.tenant} — ${selectedDeal.stage} — ${selectedDealStatus}`} />
-          </div>
-        ),
+        actions: undefined,
       } : pagedHeaderProps
       return (
         <div className="space-y-4">
@@ -679,7 +673,6 @@ export default function App() {
           actions: (
             <div className="flex items-center gap-2">
               <LeaseStatusBadge status={selectedLeaseStatus} onChange={setSelectedLeaseStatus} />
-              <AgentBtn className="!size-9" entity="Lease" label={`${selectedLease.tenant} · ${selectedLease.asset} · Suite ${selectedLease.suite}`} />
             </div>
           ),
         }
@@ -809,11 +802,9 @@ export default function App() {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <LeasingActivity className="md:col-span-2" deals={overviewDeals} onViewAll={() => setCurrentPage("deals")}
-                  onDealClick={d => { setSelectedDeal(d); setSelectedDealStatus(d.status as DealStatus); setCurrentPage("deals") }}
-                  onHealthClick={id => setOverviewHealthOpenId(id)} />
+                  onDealClick={(d, tab) => { setSelectedDeal(d); setSelectedDealStatus(d.status as DealStatus); setSelectedDealInitialTab(tab); setCurrentPage("deals") }} />
                 <DealActions deals={overviewDeals} />
               </div>
-              {overviewHealthOpenId && <DealHealthModal dealId={overviewHealthOpenId} onClose={() => setOverviewHealthOpenId(null)} />}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <CriticalDates dates={overviewDates} className="md:col-span-2" onViewAll={() => setCurrentPage("critical-dates")} onRowClick={tenant => { const l = findLease(tenant); if (l) { setSelectedLease(l); setSelectedLeaseStatus(l.status as LeaseStatus); setCurrentPage("leases") } }} />
                 <ActionLevers deals={overviewDeals} criticalDates={overviewDates} onNavigate={setCurrentPage} />

@@ -6,7 +6,7 @@ import {
   SortableHead, useSortState,
 } from "@/components/sortable-table"
 import { TenantAvatar, type Deal } from "@/components/deals-page"
-import { getDealHealth, getLatestHumanUpdate } from "@/components/deal-profile"
+import { getDealHealth, getLatestHumanUpdate, DealHealthPopover } from "@/components/deal-profile"
 import { AgentBtn } from "@/components/agent-btn"
 
 export type { Deal }
@@ -21,8 +21,7 @@ interface LeasingActivityProps {
   deals: Deal[]
   decisions?: DecisionItem[]
   onViewAll?: () => void
-  onDealClick?: (deal: Deal) => void
-  onHealthClick?: (dealId: string) => void
+  onDealClick?: (deal: Deal, initialTab?: string) => void
   className?: string
 }
 
@@ -33,7 +32,7 @@ type Stage = typeof STAGE_ORDER[number]
 const HEALTH_RANK: Record<string, number> = { "at-risk": 0, "caution": 1, "on-track": 2, "strong": 3 }
 
 const LeasingActivity = React.forwardRef<HTMLDivElement, LeasingActivityProps>(
-  ({ deals, onViewAll, onDealClick, onHealthClick, className }, ref) => {
+  ({ deals, onViewAll, onDealClick, className }, ref) => {
     const { sortKey, sortDir, handleSort } = useSortState<SortKey>("status")
 
     const priority = deals.filter(d => {
@@ -126,10 +125,12 @@ const LeasingActivity = React.forwardRef<HTMLDivElement, LeasingActivityProps>(
                   </TableCell>
 
                   {/* Health badge */}
-                  <TableCell className="py-3 pl-4 w-[96px]" onClick={e => { e.stopPropagation(); onHealthClick?.(d.id) }}>
-                    <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium border cursor-pointer hover:opacity-80 transition-opacity", healthCfg.cls)}>
-                      {healthCfg.label}
-                    </span>
+                  <TableCell className="py-3 pl-4 w-[96px]" onClick={e => e.stopPropagation()}>
+                    <DealHealthPopover dealId={d.id} stage={d.stage as any} onShowTasks={() => onDealClick?.(d, "tasks")}>
+                      <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium border cursor-pointer hover:opacity-80 transition-opacity", healthCfg.cls)}>
+                        {healthCfg.label}
+                      </span>
+                    </DealHealthPopover>
                   </TableCell>
 
                   {/* Latest update */}

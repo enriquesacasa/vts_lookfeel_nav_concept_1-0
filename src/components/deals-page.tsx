@@ -13,8 +13,7 @@ import {
 } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { AgentBtn } from "@/components/agent-btn"
-import { getLatestHumanUpdate, getEncumbranceCount, getDealHealth } from "@/components/deal-profile"
-import { useChatPattern } from "@/contexts/chat-pattern"
+import { getLatestHumanUpdate, getEncumbranceCount, getDealHealth, DealHealthPopover } from "@/components/deal-profile"
 import { KpiBar } from "@/components/kpi-bar"
 import {
   Table, TableHeader, TableBody, TableRow, TableCell,
@@ -505,7 +504,7 @@ const ACTION_URGENCY: { score: string; label: string; cls: string; next: string 
 
 const CARD_PAGE_SIZE = 5
 
-function ActionQueue({ deals, onDealClick, onHealthClick }: { deals: Deal[]; onDealClick?: (deal: Deal) => void; onHealthClick?: (dealId: string) => void }) {
+function ActionQueue({ deals, onDealClick }: { deals: Deal[]; onDealClick?: (deal: Deal, initialTab?: string) => void }) {
   const card = React.useContext(CardCtx)
   const [page, setPage] = React.useState(0)
 
@@ -553,10 +552,11 @@ function ActionQueue({ deals, onDealClick, onHealthClick }: { deals: Deal[]; onD
                 <span className="text-xs text-muted-foreground">{deal.stage} · {days}d no update</span>
               </div>
               <div className="flex flex-col items-end gap-1 shrink-0">
-                <span
-                  className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium border cursor-pointer hover:opacity-80 transition-opacity", urgencyCfg.cls)}
-                  onClick={e => { e.stopPropagation(); onHealthClick?.(deal.id) }}
-                >{urgencyCfg.label}</span>
+                <DealHealthPopover dealId={deal.id} stage={deal.stage as any} onShowTasks={() => onDealClick?.(deal, "tasks")}>
+                  <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium border cursor-pointer hover:opacity-80 transition-opacity", urgencyCfg.cls)}>
+                    {urgencyCfg.label}
+                  </span>
+                </DealHealthPopover>
                 <span className="text-xs text-muted-foreground">{urgencyCfg.next}</span>
               </div>
             </div>
@@ -778,7 +778,6 @@ export function DealHealthModal({ dealId, onClose }: { dealId: string; onClose: 
   const hDeal = DEALS.find(d => d.id === dealId)
   if (!hDeal) return null
   const hCfg = getDealHealth(hDeal.id, hDeal.stage as any)
-  const { openChat } = useChatPattern()
   return (
     <DialogPrimitive.Root open onOpenChange={open => { if (!open) onClose() }}>
       <DialogPrimitive.Portal>
@@ -799,7 +798,7 @@ export function DealHealthModal({ dealId, onClose }: { dealId: string; onClose: 
             <p className="text-sm leading-snug text-sidebar-foreground/80">{hCfg.summary}</p>
           </div>
           <p className="text-[10px] font-medium uppercase tracking-widest text-sidebar-foreground/50 mb-3">Signals</p>
-          <div className="flex flex-col gap-3 mb-5">
+          <div className="flex flex-col gap-3">
             {hCfg.signals.map((s, i) => (
               <div key={i} className="flex items-start gap-2 text-sm text-sidebar-foreground/80 leading-snug">
                 <Dot className="h-4 w-4 text-sidebar-foreground/40 shrink-0 mt-0.5" />
@@ -807,18 +806,6 @@ export function DealHealthModal({ dealId, onClose }: { dealId: string; onClose: 
               </div>
             ))}
           </div>
-          {hCfg.recs.length > 0 && (
-            <button
-              onClick={() => {
-                onClose()
-                openChat({ message: `${hCfg.recs[0].action} — ${hDeal.tenant}` })
-              }}
-              className="w-full rounded-lg bg-sidebar-primary px-4 py-2.5 text-sm font-medium text-sidebar-primary-foreground transition-opacity hover:opacity-90 flex items-center justify-between gap-3"
-            >
-              {hCfg.recs[0].action}
-              <ChevronRight className="h-4 w-4 shrink-0 opacity-70" />
-            </button>
-          )}
         </DialogPrimitive.Popup>
       </DialogPrimitive.Portal>
     </DialogPrimitive.Root>
@@ -837,7 +824,6 @@ export function DealsPage({ onDealClick, assetContext, allowedAssets }: { onDeal
     return FILTER_DEFS
   }, [assetContext, allowedAssets])
   const [stageOverrides, setStageOverrides] = React.useState<Record<string, Stage>>({})
-  const [healthOpenId, setHealthOpenId] = React.useState<string | null>(null)
   const [composerOpenId, setComposerOpenId] = React.useState<string | null>(null)
   const [composerDraft, setComposerDraft] = React.useState("")
   const [localComments, setLocalComments] = React.useState<Record<string, { message: string; name: string; timestamp: string }>>({})
@@ -976,7 +962,7 @@ export function DealsPage({ onDealClick, assetContext, allowedAssets }: { onDeal
         const active = cardOrder.filter(id => visibleCards.has(id))
         if (!active.length) return null
         const CARD_MAP: Record<string, React.ReactNode> = {
-          attention: <ActionQueue key="attention" deals={scopedDeals} onDealClick={d => onDealClick?.(d, undefined)} onHealthClick={setHealthOpenId} />,
+          attention: <ActionQueue key="attention" deals={scopedDeals} onDealClick={(d, tab) => onDealClick?.(d, tab)} />,
           ner:       <NerBoard   key="ner"       deals={scopedDeals} onDealClick={d => onDealClick?.(d, undefined)} />,
           agents:    <AiInsightCard key="agents" deals={scopedDeals} />,
           pipeline:  <PipelineViz  key="pipeline" deals={scopedDeals} />,
@@ -1138,10 +1124,12 @@ export function DealsPage({ onDealClick, assetContext, allowedAssets }: { onDeal
                       }
                       case "status":
                         return (
-                          <TableCell key="status" className={cn("py-3 pl-4", w)} onClick={e => { e.stopPropagation(); setHealthOpenId(deal.id) }}>
-                            <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium border cursor-pointer hover:opacity-80 transition-opacity", healthCfg.cls)}>
-                              {healthCfg.label}
-                            </span>
+                          <TableCell key="status" className={cn("py-3 pl-4", w)} onClick={e => e.stopPropagation()}>
+                            <DealHealthPopover dealId={deal.id} stage={deal.stage as any} onShowTasks={() => onDealClick?.(deal, "tasks")}>
+                              <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium border cursor-pointer hover:opacity-80 transition-opacity", healthCfg.cls)}>
+                                {healthCfg.label}
+                              </span>
+                            </DealHealthPopover>
                           </TableCell>
                         )
                       case "update":
@@ -1292,9 +1280,6 @@ export function DealsPage({ onDealClick, assetContext, allowedAssets }: { onDeal
     </div>
     </CardCtx.Provider>
 
-    {/* Health modal */}
-
-    {healthOpenId && <DealHealthModal dealId={healthOpenId} onClose={() => setHealthOpenId(null)} />}
     </>
   )
 }

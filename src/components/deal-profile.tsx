@@ -6,14 +6,13 @@ import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
-import { Dialog as DialogPrimitive } from "@base-ui/react/dialog"
 import {
   ChevronDown, Check, FileText, Download, Send,
   Building2, User, MapPin, Ruler, Tag, Calendar,
   CheckCircle2, Clock, AlertTriangle, HeartPulse, Zap, Dot,
   Bot, LayoutGrid, Table2, ArrowUpDown,
   Briefcase, Globe, Mail, DollarSign, Layers, Target,
-  Star, Home, SquareStack, Scale, Trophy, Plus, Paperclip, X,
+  Star, Home, SquareStack, Scale, Trophy, Plus, Paperclip,
   ChevronRight,
 } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
@@ -23,7 +22,6 @@ import { type Deal } from "@/components/deals-page"
 import { TENANT_LOGO } from "@/components/tenant-avatar"
 import { TENANT_DOMAIN } from "@/lib/tenant-data"
 import { KpiBar } from "@/components/kpi-bar"
-import { useChatPattern } from "@/contexts/chat-pattern"
 
 export function TenantLogoImage({ name }: { name: string }) {
   const domain = TENANT_DOMAIN[name]
@@ -166,27 +164,68 @@ function delta(actual: number, budget: number): { dir: "up" | "down" | "flat"; p
   return { dir: p > 0 ? "up" : "down", pct: `${p > 0 ? "+" : ""}${p.toFixed(1)}%` }
 }
 
-function FinancialBar({ deal, stageIdx, onHealthClick }: { deal: Deal; stageIdx: number; onHealthClick: () => void }) {
+function FinancialBar({ deal, stageIdx, onShowTasks }: { deal: Deal; stageIdx: number; onShowTasks?: () => void }) {
   const nerDelta = delta(deal.ner, deal.budgetNer)
   const tlv = deal.ner && deal.term ? (deal.ner * deal.sf * (deal.term / 12) / 1_000_000) : null
   const tiCost = stageIdx >= 2 ? deal.sf * 80 : null
   const stage = ALL_STAGES[stageIdx] ?? "Inquiry"
   const health = getDealHealth(deal.id, stage)
+  const [healthPopoverOpen, setHealthPopoverOpen] = React.useState(false)
 
   const kpis = [
     {
       label: "Deal health",
       value: health.label,
       valueNode: (
-        <div className="flex items-center gap-1.5">
-          {(health.score === "caution" || health.score === "at-risk") && (
-            <AlertTriangle className={cn("h-4 w-4 shrink-0", health.textCls)} />
-          )}
-          <p className={cn("text-xl font-medium", health.textCls)}>{health.label}</p>
-        </div>
+        <Popover open={healthPopoverOpen} onOpenChange={setHealthPopoverOpen}>
+          <PopoverTrigger render={<button className="text-left" />}>
+            <div className="flex items-center gap-1.5 cursor-pointer">
+              {(health.score === "caution" || health.score === "at-risk") && (
+                <AlertTriangle className={cn("h-4 w-4 shrink-0", health.textCls)} />
+              )}
+              <p className={cn("text-xl font-medium", health.textCls)}>{health.label}</p>
+            </div>
+          </PopoverTrigger>
+          <PopoverContent side="bottom" align="start" className="w-96 p-0 overflow-hidden bg-sidebar-accent border-0 shadow-xl">
+            <div className="p-5">
+              <div className="mb-4">
+                <p className="text-[10px] font-medium uppercase tracking-widest text-sidebar-foreground/70 mb-1">VTS agents</p>
+                <div className="flex items-baseline gap-3">
+                  <p className="text-lg font-semibold text-sidebar-foreground">Deal health</p>
+                  <span className={cn("text-lg font-semibold", health.textCls)}>{health.label}</span>
+                </div>
+              </div>
+              <div className="rounded-lg px-3 py-2.5 bg-sidebar-foreground/10 flex items-start gap-2.5 mb-4">
+                <HeartPulse className="h-4 w-4 shrink-0 text-sidebar-primary mt-0.5" />
+                <p className="text-sm leading-snug text-sidebar-foreground/80">{health.summary}</p>
+              </div>
+              <p className="text-[10px] font-medium uppercase tracking-widest text-sidebar-foreground/50 mb-2">Signals</p>
+              <div className="flex flex-col gap-2.5 mb-4">
+                {health.signals.map((s, i) => (
+                  <div key={i} className="flex items-start gap-2 text-sm text-sidebar-foreground/80 leading-snug">
+                    <Dot className="h-4 w-4 text-sidebar-foreground/40 shrink-0 mt-0.5" />
+                    {s}
+                  </div>
+                ))}
+              </div>
+              {onShowTasks && (
+                <Button
+                  variant="outline"
+                  className="w-full justify-between border-sidebar-foreground/40 text-sidebar-foreground hover:bg-sidebar-foreground/10 hover:text-sidebar-foreground"
+                  onClick={() => {
+                    setHealthPopoverOpen(false)
+                    onShowTasks()
+                  }}
+                >
+                  View agent tasks
+                  <ChevronRight className="h-4 w-4 shrink-0 opacity-70" />
+                </Button>
+              )}
+            </div>
+          </PopoverContent>
+        </Popover>
       ),
       subtitle: health.context,
-      onClick: onHealthClick,
     },
     ...(deal.budgetNer > 0 ? [{
       label: "NER",
@@ -199,6 +238,64 @@ function FinancialBar({ deal, stageIdx, onHealthClick }: { deal: Deal; stageIdx:
   ]
 
   return <KpiBar kpis={kpis} />
+}
+
+// ─── Standalone deal health popover (reusable outside DealProfile) ────────────
+
+export function DealHealthPopover({
+  dealId,
+  stage,
+  children,
+  onShowTasks,
+}: {
+  dealId: string
+  stage: StageValue
+  children: React.ReactNode
+  onShowTasks?: () => void
+}) {
+  const [open, setOpen] = React.useState(false)
+  const health = getDealHealth(dealId, stage)
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger render={<span />} onClick={e => { (e as React.MouseEvent).stopPropagation(); setOpen(true) }}>
+        {children}
+      </PopoverTrigger>
+      <PopoverContent side="bottom" align="start" className="w-96 p-0 overflow-hidden bg-sidebar-accent border-0 shadow-xl">
+        <div className="p-5">
+          <div className="mb-4">
+            <p className="text-[10px] font-medium uppercase tracking-widest text-sidebar-foreground/70 mb-1">VTS agents</p>
+            <div className="flex items-baseline gap-3">
+              <p className="text-lg font-semibold text-sidebar-foreground">Deal health</p>
+              <span className={cn("text-lg font-semibold", health.textCls)}>{health.label}</span>
+            </div>
+          </div>
+          <div className="rounded-lg px-3 py-2.5 bg-sidebar-foreground/10 flex items-start gap-2.5 mb-4">
+            <HeartPulse className="h-4 w-4 shrink-0 text-sidebar-primary mt-0.5" />
+            <p className="text-sm leading-snug text-sidebar-foreground/80">{health.summary}</p>
+          </div>
+          <p className="text-[10px] font-medium uppercase tracking-widest text-sidebar-foreground/50 mb-2">Signals</p>
+          <div className="flex flex-col gap-2.5 mb-4">
+            {health.signals.map((s, i) => (
+              <div key={i} className="flex items-start gap-2 text-sm text-sidebar-foreground/80 leading-snug">
+                <Dot className="h-4 w-4 text-sidebar-foreground/40 shrink-0 mt-0.5" />
+                {s}
+              </div>
+            ))}
+          </div>
+          {onShowTasks && (
+            <Button
+              variant="outline"
+              className="w-full justify-between border-sidebar-foreground/40 text-sidebar-foreground hover:bg-sidebar-foreground/10 hover:text-sidebar-foreground"
+              onClick={() => { setOpen(false); onShowTasks() }}
+            >
+              View agent tasks
+              <ChevronRight className="h-4 w-4 shrink-0 opacity-70" />
+            </Button>
+          )}
+        </div>
+      </PopoverContent>
+    </Popover>
+  )
 }
 
 // ─── Agent strip ──────────────────────────────────────────────────────────────
@@ -790,7 +887,7 @@ const STAGE_TASKS: Record<StageValue, TaskItem[]> = {
   ],
 }
 
-const TASKS_SHOW_STAGES: StageValue[] = ["Proposal", "LOI", "Legal", "Lease Out"]
+const TASKS_SHOW_STAGES: StageValue[] = ["Inquiry", "Touring", "Proposal", "LOI", "Legal", "Lease Out", "Executed"]
 
 function TasksTab({ stage, dealId }: { stage: StageValue; status?: DealStatus; dealId?: string }) {
   const [doneMap, setDoneMap] = React.useState<Record<number, boolean>>(() => {
@@ -1533,7 +1630,7 @@ const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
       "NER at $51/sf — exactly on budget",
       "No encumbrances on Suite 300",
     ],
-    recs: [],
+    recs: [{ action: "Follow up with Tom Reyes on countersignature", urgency: "This week", agentId: "execution-management" }],
   },
   // d07 — Pfizer · LOI · NER 3% above budget · strong momentum
   "d07": {
@@ -1546,7 +1643,7 @@ const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
       "No encumbrances on target floors",
       "Counsel engaged — Pfizer legal team responsive",
     ],
-    recs: [],
+    recs: [{ action: "Prepare legal package for counsel handoff", urgency: "This week", agentId: "counsel-handoff" }],
   },
   // d08 — Morgan Stanley · Touring · no proposal submitted yet · competitor activity
   "d08": {
@@ -1572,7 +1669,7 @@ const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
       "Expansion into Suite 500 aligns with tenant's existing footprint",
       "No encumbrances on target space",
     ],
-    recs: [],
+    recs: [{ action: "Monitor redline resolution progress", urgency: "This week", agentId: "negotiation-guidance" }],
   },
   // d10 — KPMG · Proposal · stalled 26 days · NER 11% below budget
   "d10": {
@@ -1642,7 +1739,7 @@ const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
       "Expansion on Floor 6 aligned with JPMorgan's existing footprint",
       "No encumbrances on target floor",
     ],
-    recs: [],
+    recs: [{ action: "Monitor redline resolution progress", urgency: "This week", agentId: "negotiation-guidance" }],
   },
   // d15 — Amazon.com · Touring · active · large deal · no encumbrances
   "d15": {
@@ -1684,7 +1781,7 @@ const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
       "No encumbrances on Floors 5–8",
       "Counsel handoff package initiated",
     ],
-    recs: [],
+    recs: [{ action: "Monitor counsel handoff progress", urgency: "This week", agentId: "counsel-handoff" }],
   },
   // d18 — Tesla · Proposal · NER 6% above budget · active
   "d18": {
@@ -1696,7 +1793,7 @@ const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
       "NER at $35/sf vs $33/sf budget — 6% above target",
       "No encumbrances on Suite 1100",
     ],
-    recs: [],
+    recs: [{ action: "Prepare counter-proposal scenarios", urgency: "This week", agentId: "scenario-modeling" }],
   },
   // d19 — Cisco · LOI · NER 5% above budget · active renewal
   "d19": {
@@ -1709,7 +1806,7 @@ const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
       "No encumbrances on target floors",
       "Jenny Park responsive — execution on track",
     ],
-    recs: [],
+    recs: [{ action: "Prepare counsel handoff package", urgency: "This week", agentId: "counsel-handoff" }],
   },
   // d20 — Salesforce · Legal · NER 2% above budget · expansion
   "d20": {
@@ -1722,7 +1819,7 @@ const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
       "Salesforce expansion at Salesforce Tower — home tower advantage",
       "No encumbrances on Floor 30",
     ],
-    recs: [],
+    recs: [{ action: "Monitor remaining redlines", urgency: "This week", agentId: "negotiation-guidance" }],
   },
   // d21 — BlackRock · Proposal · at-risk · slow responses · NER below budget
   "d21": {
@@ -1749,7 +1846,7 @@ const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
       "NER at $88/sf vs $85/sf budget — 4% above target",
       "185,000 sf renewal at 30 Hudson Yards — flagship execution",
     ],
-    recs: [],
+    recs: [{ action: "Archive deal documentation", urgency: "This week", agentId: "data-writeback" }],
   },
   // d23 — McKinsey · LOI · NER 1% above budget · active
   "d23": {
@@ -1761,7 +1858,7 @@ const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
       "Tara Singh responsive — legal team on standby",
       "No encumbrances on Suite 4200",
     ],
-    recs: [],
+    recs: [{ action: "Prepare counsel handoff package", urgency: "This week", agentId: "counsel-handoff" }],
   },
   // d24 — Spotify · Touring · active
   "d24": {
@@ -1774,7 +1871,7 @@ const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
       "No encumbrances on target space",
       "No competitor tours detected",
     ],
-    recs: [],
+    recs: [{ action: "Prepare proposal for top-ranked space", urgency: "This week", agentId: "proposal-builder" }],
   },
   // d25 — Airbnb · Inquiry · active
   "d25": {
@@ -1827,7 +1924,7 @@ const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
       "NER at $38/sf vs $36/sf budget — 6% above target",
       "No encumbrances on Suite 800",
     ],
-    recs: [],
+    recs: [{ action: "Follow up on proposal with Kai Brown", urgency: "This week", agentId: "deal-momentum" }],
   },
   // d29 — Microsoft · Legal · NER 2% above budget · large deal
   "d29": {
@@ -1840,7 +1937,7 @@ const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
       "No encumbrances on Floors 60–65",
       "Largest active deal in the portfolio",
     ],
-    recs: [],
+    recs: [{ action: "Monitor remaining redlines", urgency: "This week", agentId: "negotiation-guidance" }],
   },
   // d30 — Meta · Executed
   "d30": {
@@ -1852,7 +1949,7 @@ const HEALTH_OVERRIDES: Record<string, HealthEntry> = {
       "NER at $75/sf vs $73/sf budget — 3% above target",
       "130,000 sf expansion at 30 Hudson Yards",
     ],
-    recs: [],
+    recs: [{ action: "Archive deal documentation", urgency: "This week", agentId: "data-writeback" }],
   },
 
   // --- VTS Tower HQ additions ---
@@ -2367,64 +2464,16 @@ export function DealProfile({ deal, onBack: _onBack, status: statusProp, onStatu
   const [internalStatus, setInternalStatus] = React.useState<DealStatus>(deal.status as DealStatus)
   const status    = statusProp ?? internalStatus
   const _setStatus = onStatusChange ?? setInternalStatus; void _setStatus
-  const [tab, setTab]               = React.useState(initialTab ?? "info")
-  const [rightTab, setRightTab]     = React.useState("updates")
-  const [healthOpen, setHealthOpen] = React.useState(false)
+  const [tab, setTab]               = React.useState("info")
+  const [rightTab, setRightTab]     = React.useState(initialTab === "tasks" ? "tasks" : "updates")
   const [rightCollapsed, setRightCollapsed] = React.useState(false)
   const stageIdx = ALL_STAGES.indexOf(stage)
-  const { openChat } = useChatPattern()
-
-  const healthCfg = getDealHealth(deal.id, stage)
 
   return (
     <div className="flex flex-col gap-4 mt-4 pb-8">
 
-      {/* Deal health modal */}
-      <DialogPrimitive.Root open={healthOpen} onOpenChange={setHealthOpen}>
-        <DialogPrimitive.Portal>
-          <DialogPrimitive.Backdrop className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm transition-opacity duration-150 data-ending-style:opacity-0 data-starting-style:opacity-0" />
-          <DialogPrimitive.Popup className="fixed left-1/2 top-1/2 z-50 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-2xl border-transparent bg-sidebar-accent p-6 shadow-xl transition-all duration-150 data-ending-style:opacity-0 data-ending-style:scale-95 data-starting-style:opacity-0 data-starting-style:scale-95">
-            <div className="flex items-start justify-between mb-5">
-              <div>
-                <p className="text-[10px] font-medium uppercase tracking-widest text-sidebar-foreground/70 mb-1">VTS agents</p>
-                <div className="flex items-baseline gap-3">
-                  <DialogPrimitive.Title className="text-xl font-semibold text-sidebar-foreground">Deal health</DialogPrimitive.Title>
-                  <span className={cn("text-xl font-semibold", healthCfg.textCls)}>{healthCfg.label}</span>
-                </div>
-              </div>
-              <DialogPrimitive.Close render={<Button variant="ghost" size="icon" className="h-7 w-7 shrink-0 -mt-1 -mr-2 text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-foreground/10"><X className="h-4 w-4" /></Button>} />
-            </div>
-            <div className="rounded-lg px-3 py-2.5 bg-sidebar-foreground/10 flex items-start gap-2.5 mb-5">
-              <HeartPulse className="h-4 w-4 shrink-0 text-sidebar-primary mt-0.5" />
-              <p className="text-sm leading-snug text-sidebar-foreground/80">{healthCfg.summary}</p>
-            </div>
-            <p className="text-[10px] font-medium uppercase tracking-widest text-sidebar-foreground/50 mb-3">Signals</p>
-            <div className="flex flex-col gap-3 mb-5">
-              {healthCfg.signals.map((s, i) => (
-                <div key={i} className="flex items-start gap-2 text-sm text-sidebar-foreground/80 leading-snug">
-                  <Dot className="h-4 w-4 text-sidebar-foreground/40 shrink-0 mt-0.5" />
-                  {s}
-                </div>
-              ))}
-            </div>
-            {healthCfg.recs.length > 0 && (
-              <button
-                onClick={() => {
-                  setHealthOpen(false)
-                  openChat({ message: `${healthCfg.recs[0].action} — ${deal.tenant}` })
-                }}
-                className="w-full rounded-lg bg-sidebar-primary px-4 py-2.5 text-sm font-medium text-sidebar-primary-foreground transition-opacity hover:opacity-90 flex items-center justify-between gap-3"
-              >
-                {healthCfg.recs[0].action}
-                <ChevronRight className="h-4 w-4 shrink-0 opacity-70" />
-              </button>
-            )}
-          </DialogPrimitive.Popup>
-        </DialogPrimitive.Portal>
-      </DialogPrimitive.Root>
-
       {/* Financial KPI bar */}
-      <FinancialBar deal={deal} stageIdx={stageIdx} onHealthClick={() => setHealthOpen(true)} />
+      <FinancialBar deal={deal} stageIdx={stageIdx} onShowTasks={() => setRightTab("tasks")} />
 
       {/* Stage journey */}
       <StageJourneyBar currentStage={stage} onChange={s => { setStage(s); setRightTab("updates") }} />
